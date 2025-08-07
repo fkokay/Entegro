@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Markalar";
+}
+
+<div class="flex-grow-1 container-p-y container-fluid">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi /</span> Markalar</h4>
+    <div class="card">
+        <h5 class="card-header">Markalar</h5>
+        <div class="card-datatable text-nowrap">
+            <table id="BrandTable" class="table">
+                <thead >
+                    <tr>
+                        <th>Marka adı</th>
+                        <th>Görüntüleme sırası</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#BrandTable').dataTable({
+                serverSide: true,
+                ajax: {
+                    url: '/Brand/BrandList',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: function (d) {
+                        return JSON.stringify(d);
+                    },
+                },
+                columns: [
+                    { data: 'Name' },
+                    { data: 'DisplayOrder' },
+                ],
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
+            });
+        });
+    </script>
+}
