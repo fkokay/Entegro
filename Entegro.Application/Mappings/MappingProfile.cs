@@ -17,6 +17,7 @@ namespace Entegro.Application.Mappings
         public MappingProfile()
         {
             CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<Product, CreateProductDto>().ReverseMap();
             CreateMap<PagedResult<Product>, PagedResult<ProductDto>>().ReverseMap();
 
             CreateMap<Brand, BrandDto>().ReverseMap();

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entegro.Web", "Entegro.Web\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entegro.Api", "Entegro.Api\Entegro.Api.csproj", "{FA56D700-7ABB-4CC7-8AFF-E658F54E295F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entegro.Service", "Entegro.Service\Entegro.Service.csproj", "{BB302A79-F520-46D4-9B83-FCE0F9EBB89D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{FA56D700-7ABB-4CC7-8AFF-E658F54E295F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA56D700-7ABB-4CC7-8AFF-E658F54E295F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA56D700-7ABB-4CC7-8AFF-E658F54E295F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB302A79-F520-46D4-9B83-FCE0F9EBB89D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB302A79-F520-46D4-9B83-FCE0F9EBB89D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB302A79-F520-46D4-9B83-FCE0F9EBB89D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB302A79-F520-46D4-9B83-FCE0F9EBB89D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

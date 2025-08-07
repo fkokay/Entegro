@@ -6,24 +6,18 @@ using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Repositories;
+using Entegro.Service;
+using Entegro.Service.Jobs;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
+using Quartz;
 
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllersWithViews().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-}); 
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddDbContext<EntegroContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile), typeof(SmartstoreMappingProfile));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
@@ -36,27 +30,25 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddHttpClient();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+builder.Services.AddQuartz(q =>
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+    q.UseMicrosoftDependencyInjectionJobFactory();
 
-app.UseHttpsRedirection();
-app.UseRouting();
+    var jobKey = new JobKey("SmartstoreDataSyncJob");
 
-app.UseAuthorization();
+    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKey));
 
-app.MapStaticAssets();
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("SmartstoreDataSyncJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(10)
+            .RepeatForever())
+    );
+});
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+// Quartz hosted service
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
-
-app.Run();
+var host = builder.Build();
+host.Run();
