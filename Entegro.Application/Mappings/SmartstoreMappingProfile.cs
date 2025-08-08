@@ -20,9 +20,12 @@ namespace Entegro.Application.Mappings
                 .ForMember(m => m.Price, opt => opt.MapFrom(src => src.Price))
                 .ForMember(m => m.Code, opt => opt.MapFrom(src => src.Sku));
 
+            CreateMap<SmartstoreOrderItemDto, CreateOrderItemDto>();
+
             CreateMap<SmartstoreOrderDto, CreateOrderDto>()
-                .ForMember(m => m.OrderNo, opt => opt.MapFrom(src => src.Id.ToString()))
-                .ForMember(m => m.OrderDate, opt => opt.MapFrom(src => src.CreatedOnUtc));
+            .ForMember(m => m.OrderNo, opt => opt.MapFrom(src => src.Id.ToString()))
+            .ForMember(m => m.OrderDate, opt => opt.MapFrom(src => src.CreatedOnUtc))
+            .ForMember(m => m.OrderItems, opt => opt.MapFrom(src => src.OrderItems));
         }
     }
 }

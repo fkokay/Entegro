@@ -67,5 +67,6 @@ namespace Entegro.Application.DTOs.Smartstore
         public int Id { get; set; }
 
         public SmartstoreCustomerDto Customer { get; set; }
+        public List<SmartstoreOrderItemDto> OrderItems { get; set; } = new();
     }
 }

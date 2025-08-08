@@ -14,5 +14,7 @@ namespace Entegro.Application.DTOs.Order
         public decimal TotalAmount { get; set; }
         public bool Deleted { get; set; }
         public bool IsTransient { get; set; }
+
+        public List<CreateOrderItemDto> OrderItems { get; set; } = new();
     }
 }
