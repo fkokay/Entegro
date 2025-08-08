@@ -10,7 +10,9 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface ICustomerRepository
     {
+        Task<bool> ExistsByEmailAsync(string email);
         Task<Customer?> GetByIdAsync(int id);
+        Task<Customer?> GetByEmailAsync(string email);
         Task<List<Customer>> GetAllAsync();
         Task<PagedResult<Customer>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(Customer customer);

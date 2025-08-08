@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.Customer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,5 +17,6 @@ namespace Entegro.Application.DTOs.Order
         public bool IsTransient { get; set; }
 
         public List<CreateOrderItemDto> OrderItems { get; set; } = new();
+        public CustomerDto Customer { get; set; }
     }
 }

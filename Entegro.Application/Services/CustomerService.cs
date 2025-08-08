@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
@@ -17,7 +16,7 @@ namespace Entegro.Application.Services
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
-        public CustomerService(ICustomerRepository customerRepository,IMapper mapper)
+        public CustomerService(ICustomerRepository customerRepository, IMapper mapper)
         {
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -41,6 +40,23 @@ namespace Entegro.Application.Services
             }
             await _customerRepository.DeleteAsync(customer);
             return true;
+        }
+
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            return await _customerRepository.ExistsByEmailAsync(email);
+        }
+
+        public async Task<CustomerDto> GetCustomerByEmailAsync(string email)
+        {
+            var customer = await _customerRepository.GetByEmailAsync(email);
+            if (customer == null)
+            {
+                throw new KeyNotFoundException($"Customer with Email {email} not found.");
+            }
+
+            var customerDto = _mapper.Map<CustomerDto>(customer);
+            return customerDto;
         }
 
         public async Task<CustomerDto> GetCustomerByIdAsync(int customerId)

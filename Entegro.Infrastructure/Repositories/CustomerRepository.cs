@@ -31,6 +31,11 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            return await _context.Customers.Where(m=> m.Email == email).AnyAsync();
+        }
+
         public async Task<List<Customer>> GetAllAsync()
         {
             return await _context.Customers.ToListAsync();
@@ -58,6 +63,11 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Customer?> GetByIdAsync(int id)
         {
             return await _context.Customers.FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<Customer?> GetByEmailAsync(string email)
+        {
+            return await _context.Customers.FirstOrDefaultAsync(o => o.Email == email);
         }
 
         public async Task UpdateAsync(Customer customer)
