@@ -91,6 +91,8 @@ namespace Entegro.Service.Jobs
                 {
                     await retryPolicy.ExecuteAsync(async () =>
                     {
+
+
                         await _orderService.CreateOrderAsync(order);
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
                     });
