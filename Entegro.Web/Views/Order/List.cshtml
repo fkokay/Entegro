@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Siparişler";
+}
+
+<div class="flex-grow-1 container-p-y container-fluid">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sipariş Yönetimi /</span> Siparişler</h4>
+    <div class="card">
+        <h5 class="card-header">Siparişler</h5>
+        <div class="card-datatable text-nowrap">
+            <table id="OrderTable" class="table">
+                <thead >
+                    <tr>
+                        <th>Sipariş no</th>
+                        <th>Sipariş tarihi</th>
+                        <th>Sipariş tutarı</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#ProductTable').dataTable({
+                serverSide: true,
+                ajax: {
+                    url: '/Order/OrderList',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: function (d) {
+                        return JSON.stringify(d);
+                    },
+                },
+                columns: [
+                    { data: 'OrderNo' },
+                    { data: 'OrderDate' },
+                    { data: 'TotalAmount' },
+                ],
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
+            });
+        });
+    </script>
+}

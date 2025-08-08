@@ -29,7 +29,7 @@ namespace Entegro.Web.Controllers
 
             return Json(new
             {
-                draw = 1,
+                draw = result.PageNumber,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

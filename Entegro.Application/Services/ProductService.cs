@@ -41,6 +41,16 @@ namespace Entegro.Application.Services
             return true;
         }
 
+        public async Task<bool> ExistsByCodeAsync(string productCode)
+        {
+            return await _productRepository.ExistsByCodeAsync(productCode);
+        }
+
+        public async Task<bool> ExistsByNameAsync(string productName)
+        {
+           return await _productRepository.ExistsByNameAsync(productName);
+        }
+
         public async Task<ProductDto> GetProductByIdAsync(int productId)
         {
             var product = await _productRepository.GetByIdAsync(productId);

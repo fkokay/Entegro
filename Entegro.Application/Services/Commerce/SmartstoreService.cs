@@ -30,23 +30,40 @@ namespace Entegro.Application.Services.Commerce
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
         }
 
-        public async Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync()
+        public async Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(int pageSize = 50)
         {
-            var response = await _httpClient.GetAsync("products?$count=true");
+            var allProducts = new List<SmartstoreProductDto>();
+            int skip = 0;
+            bool moreData = true;
 
-            if (!response.IsSuccessStatusCode)
+            while (moreData)
             {
-                throw new Exception($"API hatası: {response.StatusCode}");
+                var url = $"products?$top={pageSize}&$skip={skip}&$count=true";
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreProductDto>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (data?.Value == null || !data.Value.Any())
+                {
+                    break;
+                }
+
+                allProducts.AddRange(data.Value);
+
+                skip += pageSize;
+
+                if (allProducts.Count() >= data.Count)
+                {
+                    moreData = false;
+                }
             }
 
-            var jsonString = await response.Content.ReadAsStringAsync();
-
-            var odataResponse = JsonSerializer.Deserialize<ODataResponse<SmartstoreProductDto>>(jsonString, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            return odataResponse?.Value ?? new List<SmartstoreProductDto>();
+            return allProducts;
         }
         public async Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync()
         {
@@ -76,19 +93,40 @@ namespace Entegro.Application.Services.Commerce
 
             return manufacturers?.Value ?? Enumerable.Empty<SmartstoreManufacturerDto>();
         }
-        public async Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int top = 10, int skip = 0)
+        public async Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50)
         {
-            var url = $"orders?$top={top}&$skip={skip}&$count=true";
-            var response = await _httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+            var allOrders = new List<SmartstoreOrderDto>();
+            int skip = 0;
+            bool moreData = true;
 
-            var json = await response.Content.ReadAsStringAsync();
-            var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreOrderDto>>(json, new JsonSerializerOptions
+            while (moreData)
             {
-                PropertyNameCaseInsensitive = true
-            });
+                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true";
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
 
-            return data?.Value ?? Enumerable.Empty<SmartstoreOrderDto>();
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreOrderDto>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (data?.Value == null || !data.Value.Any())
+                {
+                    break;
+                }
+
+                allOrders.AddRange(data.Value);
+
+                skip += pageSize;
+
+                if (allOrders.Count() >= data.Count)
+                {
+                    moreData = false;
+                }
+            }
+
+            return allOrders;
         }
     }
 }

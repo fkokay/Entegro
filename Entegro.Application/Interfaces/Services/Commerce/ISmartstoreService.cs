@@ -11,9 +11,9 @@ namespace Entegro.Application.Interfaces.Services.Commerce
 {
     public interface ISmartstoreService
     {
-        Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync();
+        Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(int pageSize = 50);
         Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync();
         Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync();
-        Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int top = 10, int skip = 0);
+        Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50);
     }
 }

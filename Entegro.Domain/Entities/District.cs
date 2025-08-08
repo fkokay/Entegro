@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
-    public class Product : BaseEntity
+    public class District : BaseEntity
     {
-        public string Code { get; set; }
+        public int TownId { get; set; }
         public string Name { get; set; }
-        public string? Description { get; set; }
-        public decimal Price { get; set; }
+        public bool Published { get; set; }
     }
 }

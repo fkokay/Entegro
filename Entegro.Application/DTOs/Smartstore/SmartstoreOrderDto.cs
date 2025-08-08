@@ -65,5 +65,7 @@ namespace Entegro.Application.DTOs.Smartstore
         public int ShippingStatusId { get; set; }
         public int CustomerTaxDisplayTypeId { get; set; }
         public int Id { get; set; }
+
+        public SmartstoreCustomerDto Customer { get; set; }
     }
 }

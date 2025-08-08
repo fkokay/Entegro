@@ -1,18 +1,18 @@
 ﻿using Entegro.Application.Interfaces.Services;
-using Entegro.Infrastructure.Data;
+using Entegro.Application.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
-    public class ProductController : Controller
+    public class OrderController : Controller
     {
-        private readonly IProductService _productService;
-        public ProductController(IProductService productService)
+        private readonly IOrderService _orderService;
+        public OrderController(IOrderService orderService)
         {
-            _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
         }
+
         public IActionResult Index()
         {
             return List();
@@ -24,9 +24,9 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProductList([FromBody] DatatableData model)
+        public async Task<IActionResult> OrderList([FromBody] DatatableData model)
         {
-            var result = await _productService.GetProductsAsync(model.Draw, model.Length);
+            var result = await _orderService.GetOrdersAsync(model.Draw, model.Length);
 
             return Json(new
             {

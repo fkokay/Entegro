@@ -35,7 +35,7 @@ namespace Entegro.Application.DTOs.Smartstore
         public bool IsGiftCard { get; set; }
         public int GiftCardTypeId { get; set; }
         public bool RequireOtherProducts { get; set; }
-        public List<int> RequiredProductIds { get; set; }
+        public string RequiredProductIds { get; set; }
         public bool AutomaticallyAddRequiredProducts { get; set; }
         public bool IsDownload { get; set; }
         public bool UnlimitedDownloads { get; set; }
@@ -104,7 +104,7 @@ namespace Entegro.Application.DTOs.Smartstore
         public int? DeliveryTimeId { get; set; }
         public int? QuantityUnitId { get; set; }
         public string CustomsTariffNumber { get; set; }
-        public int CountryOfOriginId { get; set; }
+        public int? CountryOfOriginId { get; set; }
         public bool BasePriceEnabled { get; set; }
         public string BasePriceMeasureUnit { get; set; }
         public decimal? BasePriceAmount { get; set; }
@@ -113,7 +113,7 @@ namespace Entegro.Application.DTOs.Smartstore
         public bool BundlePerItemShipping { get; set; }
         public bool BundlePerItemPricing { get; set; }
         public bool BundlePerItemShoppingCart { get; set; }
-        public int MainPictureId { get; set; }
+        public int? MainPictureId { get; set; }
         public bool HasPreviewPicture { get; set; }
         public bool HasDiscountsApplied { get; set; }
         public int Id { get; set; }

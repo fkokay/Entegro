@@ -11,6 +11,8 @@ namespace Entegro.Application.Interfaces.Services
     public interface IProductService
     {
         Task<ProductDto> GetProductByIdAsync(int productId);
+        Task<bool> ExistsByNameAsync(string productName);
+        Task<bool> ExistsByCodeAsync(string productCode);
         Task<IEnumerable<ProductDto>> GetProductsAsync();
         Task<PagedResult<ProductDto>> GetProductsAsync(int pageNumber, int pageSize);
         Task<int> CreateProductAsync(CreateProductDto createProduct);

@@ -26,11 +26,11 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> BrandList([FromBody] DatatableData model)
         {
-            var result = await _brandService.GetBrandsAsync(model.Start, model.Length);
+            var result = await _brandService.GetBrandsAsync(model.Draw, model.Length);
 
             return Json(new
             {
-                draw = 1,
+                draw = result.PageNumber,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Domain.Entities;
 using System;
@@ -18,13 +19,23 @@ namespace Entegro.Application.Mappings
         {
             CreateMap<Product, ProductDto>().ReverseMap();
             CreateMap<Product, CreateProductDto>().ReverseMap();
+            CreateMap<Product, UpdateProductDto>().ReverseMap();
             CreateMap<PagedResult<Product>, PagedResult<ProductDto>>().ReverseMap();
 
             CreateMap<Brand, BrandDto>().ReverseMap();
+            CreateMap<Brand, CreateBrandDto>().ReverseMap();
+            CreateMap<Brand, UpdateBrandDto>().ReverseMap();
             CreateMap<PagedResult<Brand>, PagedResult<BrandDto>>().ReverseMap();
 
             CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<Category, CreateCategoryDto>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDto>().ReverseMap();
             CreateMap<PagedResult<Category>, PagedResult<CategoryDto>>().ReverseMap();
+
+            CreateMap<Order, OrderDto>().ReverseMap();
+            CreateMap<Order, CreateOrderDto>().ReverseMap();
+            CreateMap<Order, UpdateOrderDto>().ReverseMap();
+            CreateMap<PagedResult<Order>, PagedResult<OrderDto>>().ReverseMap();
         }
     }
 }

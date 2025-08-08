@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.Smartstore;
 using System;
@@ -18,6 +19,10 @@ namespace Entegro.Application.Mappings
                 .ForMember(m => m.Description, opt => opt.MapFrom(src => src.FullDescription))
                 .ForMember(m => m.Price, opt => opt.MapFrom(src => src.Price))
                 .ForMember(m => m.Code, opt => opt.MapFrom(src => src.Sku));
+
+            CreateMap<SmartstoreOrderDto, CreateOrderDto>()
+                .ForMember(m => m.OrderNo, opt => opt.MapFrom(src => src.Id.ToString()))
+                .ForMember(m => m.OrderDate, opt => opt.MapFrom(src => src.CreatedOnUtc));
         }
     }
 }
