@@ -1,0 +1,92 @@
+﻿@model BrandDto
+
+@Html.HiddenFor(m => m.Id)
+
+<div class="col-lg-9 col-12 mb-lg-0 mb-4">
+    <div class="card mb-3">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" role="tab" aria-selected="true">
+                        Genel
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-seo" role="tab" aria-selected="false" tabindex="-1">
+                        Seo
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-products" role="tab" aria-selected="false" tabindex="-1">
+                        Ürünler
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content">
+            <!-- Personal Info -->
+            <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Ad</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Açıklama</label>
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Account Details -->
+            <div class="tab-pane fade" id="form-tabs-seo" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Başlık</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.MetaTitle, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Anahtar Kelimeler</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.MetaKeywords, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Açıklama</label>
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.MetaDescription, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Social Links -->
+            <div class="tab-pane fade" id="form-tabs-products" role="tabpanel">
+
+            </div>
+        </div>
+    </div>
+</div>

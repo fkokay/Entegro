@@ -1,7 +1,10 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Product;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -21,6 +24,45 @@ namespace Entegro.Web.Controllers
         public IActionResult List()
         {
             return View();
+        }
+
+        public IActionResult Create()
+        {
+            BrandDto model = new BrandDto();
+            model.DisplayOrder = 0;
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateBrandDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _brandService.CreateBrandAsync(model);
+                return RedirectToAction(nameof(List));
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var brand = await _brandService.GetBrandByIdAsync(id);
+            if (brand == null)
+            {
+                return NotFound();
+            }
+            return View(brand);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(UpdateBrandDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _brandService.UpdateBrandAsync(model);
+                return RedirectToAction(nameof(List));
+            }
+            return View(model);
         }
 
         [HttpPost]

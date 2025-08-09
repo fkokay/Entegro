@@ -1,140 +1,143 @@
-table.dataTable thead tr > .dtfc-fixed-left,
-table.dataTable thead tr > .dtfc-fixed-right,
-table.dataTable tfoot tr > .dtfc-fixed-left,
-table.dataTable tfoot tr > .dtfc-fixed-right {
-  top: 0;
-  bottom: 0;
-  z-index: 3;
-  background-color: white;
+table.dataTable thead tr > .dtfc-fixed-start, table.dataTable thead tr > .dtfc-fixed-end, table.dataTable tfoot tr > .dtfc-fixed-start, table.dataTable tfoot tr > .dtfc-fixed-end {
+    top: 0;
+    bottom: 0;
+    z-index: 3;
+    background-color: white
 }
 
-table.dataTable tbody tr > .dtfc-fixed-left,
-table.dataTable tbody tr > .dtfc-fixed-right {
-  z-index: 1;
-  background-color: white;
+table.dataTable tbody tr > .dtfc-fixed-start, table.dataTable tbody tr > .dtfc-fixed-end {
+    z-index: 1;
+    background-color: white
 }
 
-div.dtfc-left-top-blocker,
-div.dtfc-right-top-blocker {
-  background-color: white;
+table.dataTable tr > .dtfc-fixed-left::after, table.dataTable tr > .dtfc-fixed-right::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    transition: box-shadow .3s;
+    content: "";
+    pointer-events: none
 }
 
-div.dtfc-right-top-blocker,
-div.dtfc-left-top-blocker {
-  margin-top: 6px;
-  border-bottom: 0px solid #ddd !important;
+table.dataTable tr > .dtfc-fixed-left::after {
+    right: 0;
+    transform: translateX(100%)
 }
 
-table.dataTable.table-bordered.dtfc-has-left {
-  border-left: none;
+table.dataTable tr > .dtfc-fixed-right::after {
+    left: 0;
+    transform: translateX(-80%)
 }
 
-div.dataTables_scroll.dtfc-has-left table.table-bordered {
-  border-left: none;
+table.dataTable.dtfc-scrolling-left tr > .dtfc-fixed-left::after {
+    box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.2)
 }
 
-div.dataTables_scrollBody {
-  border-left: 1px solid #ddd !important;
+table.dataTable.dtfc-scrolling-right tr > .dtfc-fixed-right::after {
+    box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.2)
 }
 
-div.dataTables_scrollFootInner table.table-bordered tr th:first-child,
-div.dataTables_scrollHeadInner table.table-bordered tr th:first-child {
-  border-left: 1px solid #ddd !important;
+table.dataTable.dtfc-scrolling-right tr > .dtfc-fixed-right + .dtfc-fixed-right::after {
+    box-shadow: none
 }
 
-div.dataTables_scrollBody thead tr,
-div.DTFC_LeftBodyLiner thead tr {
-  border-top-width: 0;
-  border-bottom-width: 0;
+div.dt-scroll, div.dtfh-floatingparent {
+    position: relative
 }
 
-div.dataTables_scrollBody {
-  border: 0 !important;
+    div.dt-scroll div.dtfc-top-blocker, div.dt-scroll div.dtfc-bottom-blocker, div.dtfh-floatingparent div.dtfc-top-blocker, div.dtfh-floatingparent div.dtfc-bottom-blocker {
+        position: absolute;
+        background-color: white
+    }
+
+html.dark table.dataTable thead tr > .dtfc-fixed-start, html.dark table.dataTable thead tr > .dtfc-fixed-end, html.dark table.dataTable tfoot tr > .dtfc-fixed-start, html.dark table.dataTable tfoot tr > .dtfc-fixed-end {
+    background-color: var(--dt-html-background)
 }
 
-html:not([dir=rtl]) div.dataTables_scrollFootInner table.table-bordered tr th:first-child,
-html:not([dir=rtl]) div.dataTables_scrollHeadInner table.table-bordered tr th:first-child {
-  border-left: 0 !important;
+html.dark table.dataTable tbody tr > .dtfc-fixed-start, html.dark table.dataTable tbody tr > .dtfc-fixed-end {
+    background-color: var(--dt-html-background)
 }
 
-html:not([dir=rtl]) .dt-fixedcolumns.table-bordered > :not(caption) > * {
-  border-width: 0 !important;
+html.dark table.dataTable.dtfc-scrolling-left tbody > tr > .dtfc-fixed-left::after {
+    box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.3)
 }
 
-[dir=rtl] table.dataTable thead th,
-[dir=rtl] table.dataTable thead td,
-[dir=rtl] table.dataTable tfoot th,
-[dir=rtl] table.dataTable tfoot td {
-  text-align: right !important;
+html.dark table.dataTable.dtfc-scrolling-right tbody > tr > .dtfc-fixed-right::after {
+    box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.3)
 }
 
-.light-style table.DTFC_Cloned tr {
-  border-color: var(--bs-border-color);
-}
-.light-style div.dataTables_scrollFootInner table.table-bordered tr th:first-child,
-.light-style div.dataTables_scrollHeadInner table.table-bordered tr th:first-child {
-  border-left: 1px solid var(--bs-border-color);
-}
-.light-style table.dataTable thead tr > .dtfc-fixed-left,
-.light-style table.dataTable thead tr > .dtfc-fixed-right,
-.light-style table.dataTable tbody tr > .dtfc-fixed-left,
-.light-style table.dataTable tbody tr > .dtfc-fixed-right,
-.light-style div.dtfc-right-top-blocker,
-.light-style div.dtfc-left-top-blocker {
-  background-color: #fff;
-}
-.light-style .dt-fixedcolumns thead {
-  border-top-color: var(--bs-border-color);
-}
-.light-style[dir=rtl] div.dataTables_scrollHead table,
-.light-style[dir=rtl] div.dataTables_scrollBody table {
-  border: 0;
-}
-.light-style[dir=rtl] div.DTFC_LeftBodyLiner {
-  padding-right: 0 !important;
-}
-.light-style[dir=rtl] div.DTFC_RightHeadWrapper table,
-.light-style[dir=rtl] div.DTFC_RightBodyWrapper table {
-  border: 0;
-}
-.light-style[dir=rtl] div.DTFC_RightBodyLiner {
-  padding-left: 0 !important;
+html.dark table.dataTable.dtfc-scrolling-right tbody > tr > .dtfc-fixed-right + .dtfc-fixed-right::after {
+    box-shadow: none
 }
 
-.dark-style table.DTFC_Cloned tr {
-  background-color: #2f3349;
-  border-color: var(--bs-border-color);
+html.dark div.dtfc-top-blocker, html.dark div.dtfc-bottom-blocker {
+    background-color: var(--dt-html-background)
 }
-.dark-style div.dataTables_scrollHead table,
-.dark-style div.DTFC_RightHeadWrapper table {
-  background-color: #2f3349;
+
+div.dtfc-top-blocker, div.dtfc-top-blocker {
+    border-bottom: 0px solid #ddd !important
 }
-.dark-style div.dataTables_scrollFootInner table.table-bordered tr th:first-child,
-.dark-style div.dataTables_scrollHeadInner table.table-bordered tr th:first-child {
-  border-left: 1px solid var(--bs-border-color);
+
+table.dataTable {
+    border-collapse: separate
 }
-.dark-style table.dataTable thead tr > .dtfc-fixed-left,
-.dark-style table.dataTable thead tr > .dtfc-fixed-right,
-.dark-style table.dataTable tbody tr > .dtfc-fixed-left,
-.dark-style table.dataTable tbody tr > .dtfc-fixed-right,
-.dark-style div.dtfc-right-top-blocker,
-.dark-style div.dtfc-left-top-blocker {
-  background-color: #2f3349;
+
+    table.dataTable.table-bordered {
+        border-left-width: 0;
+        border-right-width: 0
+    }
+
+        table.dataTable.table-bordered th, table.dataTable.table-bordered td {
+            border-right-width: 0;
+            border-top-width: 0
+        }
+
+            table.dataTable.table-bordered th:last-child, table.dataTable.table-bordered td:last-child {
+                border-right: 1px solid #dee2e6
+            }
+
+        table.dataTable.table-bordered tr:last-child th, table.dataTable.table-bordered tr:last-child td {
+            border-bottom-width: 0
+        }
+
+    table.dataTable thead tr > .dtfc-fixed-start, table.dataTable thead tr > .dtfc-fixed-end, table.dataTable tfoot tr > .dtfc-fixed-start, table.dataTable tfoot tr > .dtfc-fixed-end {
+        background-color: var(--bs-table-bg)
+    }
+
+    table.dataTable tbody tr > .dtfc-fixed-start, table.dataTable tbody tr > .dtfc-fixed-end {
+        background-color: var(--bs-table-bg)
+    }
+
+div.dtfc-top-blocker, div.dtfc-bottom-blocker {
+    background-color: var(--bs-body-bg)
 }
-.dark-style .dt-fixedcolumns thead {
-  border-top-color: var(--bs-border-color);
+
+div.dt-scroll-body {
+    border-left-color: var(--bs-table-color) !important
 }
-.dark-style[dir=rtl] div.dataTables_scrollHead table,
-.dark-style[dir=rtl] div.dataTables_scrollBody table {
-  border: 0;
+
+div.dt-scroll-headInner table.table-bordered tr th:first-child, div.dt-scroll-footInner table.table-bordered tr th:first-child {
+    border-left-color: var(--bs-border-color) !important
 }
-.dark-style[dir=rtl] div.DTFC_LeftBodyLiner {
-  padding-right: 0 !important;
+
+div.dt-container div.dt-scroll-body thead tr {
+    border-block-end-width: 0;
+    border-block-start-width: 0
 }
-.dark-style[dir=rtl] div.DTFC_RightHeadWrapper table,
-.dark-style[dir=rtl] div.DTFC_RightBodyWrapper table {
-  border: 0;
+
+div.dt-container table.dataTable thead tr > .dtfc-fixed-left, div.dt-container table.dataTable thead tr > .dtfc-fixed-right, div.dt-container table.dataTable tbody tr > .dtfc-fixed-left, div.dt-container table.dataTable tbody tr > .dtfc-fixed-right {
+    background-color: var(--bs-paper-bg)
 }
-.dark-style[dir=rtl] div.DTFC_RightBodyLiner {
-  padding-left: 0 !important;
+
+div.dt-container table.dataTable thead th {
+    text-align: center
+}
+
+div.dt-container table.dataTable.dtfc-scrolling-left tr > .dtfc-fixed-left::after, div.dt-container table.dataTable.dtfc-scrolling-right tr > .dtfc-fixed-right::after {
+    box-shadow: none
+}
+
+div.dt-container div.dt-scroll div.dtfc-top-blocker {
+    background-color: var(--bs-paper-bg)
 }

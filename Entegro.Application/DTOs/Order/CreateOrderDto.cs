@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Customer;
+using Entegro.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace Entegro.Application.DTOs.Order
 {
     public class CreateOrderDto
     {
+        public OrderSource OrderSource { get; set; }
         public string OrderNo { get; set; }
         public int CustomerId { get; set; }
         public DateTime OrderDate { get; set; }

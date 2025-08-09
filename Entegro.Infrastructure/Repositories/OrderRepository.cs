@@ -42,7 +42,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Orders.AsQueryable();
+            var query = _context.Orders.Include(m=>m.Customer).Include(m=>m.OrderItems).AsQueryable();
 
             var totalCount = await query.CountAsync();
             var orders = await query

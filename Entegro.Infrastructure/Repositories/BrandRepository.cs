@@ -21,6 +21,8 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(Brand brand)
         {
+            brand.CreatedOn = DateTime.Now;
+            brand.UpdatedOn = DateTime.Now;
             await _context.Brands.AddAsync(brand);
             await _context.SaveChangesAsync();
         }
@@ -42,7 +44,7 @@ namespace Entegro.Infrastructure.Repositories
 
             var totalCount = await query.CountAsync();
             var brands = await query
-                .Skip(pageNumber * pageSize)
+                .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
@@ -62,6 +64,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Brand brand)
         {
+            brand.UpdatedOn = DateTime.Now;
             _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
         }

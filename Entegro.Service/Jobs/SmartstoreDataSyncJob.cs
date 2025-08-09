@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.Smartstore;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Domain.Entities;
+using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
@@ -43,7 +44,7 @@ namespace Entegro.Service.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            await ProductSync();
+            //await ProductSync();
             await OrderSync();
         }
 
@@ -87,12 +88,12 @@ namespace Entegro.Service.Jobs
                     continue;
                 }
 
+                order.OrderSource = OrderSource.Smartstore;
+
                 try
                 {
                     await retryPolicy.ExecuteAsync(async () =>
                     {
-
-
                         await _orderService.CreateOrderAsync(order);
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
                     });

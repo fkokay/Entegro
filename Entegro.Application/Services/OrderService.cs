@@ -50,6 +50,7 @@ namespace Entegro.Application.Services
             }
 
             var order = _mapper.Map<Order>(createOrder);
+            order.Customer = null;
             order.CustomerId = customerId;
 
             await _orderRepository.AddAsync(order);
