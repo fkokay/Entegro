@@ -23,6 +23,7 @@ namespace Entegro.Service.Jobs
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
+        private readonly IBrandService _brandService;
         private readonly IMapper _mapper;
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
 
@@ -31,6 +32,7 @@ namespace Entegro.Service.Jobs
             IProductService productService,
             IOrderService orderService,
             ICustomerService customerService,
+            IBrandService brandService,
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
         {
@@ -38,14 +40,15 @@ namespace Entegro.Service.Jobs
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
+            _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            //await ProductSync();
-            await OrderSync();
+            await ProductSync();
+            //await OrderSync();
         }
 
         private async Task OrderSync()
