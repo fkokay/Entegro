@@ -40,6 +40,7 @@
                         <th>Ürün adı</th>
                         <th>Ürün kodu</th>
                         <th>Liste fiyatı</th>
+                        <th>Marka</th>
                         <th>Kayıt tarihi</th>
                         <th></th>
                     </tr>
@@ -72,6 +73,7 @@
                     {   data: 'Name' },
                     {   data: 'Code' },
                     {   data: 'Price' },
+                    {   data: 'Brand.Name' },
                     {   data: 'CreatedOn',
                         render: function(data, type, row) {
                             if(type === "sort" || type === "type"){
