@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Mappings\Logo\" />
+    <Folder Include="Mappings\Opak\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Entegro.ERP.Abstractions\Entegro.ERP.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
