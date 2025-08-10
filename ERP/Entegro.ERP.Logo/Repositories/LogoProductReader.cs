@@ -19,19 +19,30 @@ namespace Entegro.ERP.Logo.Repositories
             _connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetProductsAsync(int page, int pageSize)
+        public async Task<ErpResponse<ProductDto>> GetProductsAsync(int page, int pageSize)
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
+            var countSql = @"SELECT COUNT(*) FROM LG_200_ITEMS WHERE CARDTYPE = 1 AND ACTIVE = 0";
+            var totalCount = await connection.ExecuteScalarAsync<int>(countSql);
+
             var sql = @"
-            SELECT CODE as Code,NAME as Name FROM LG_200_ITEMS WHERE CARDTYPE = 1 AND ACTIVE = 1
+            SELECT CODE as Code,NAME as Name FROM LG_200_ITEMS WHERE CARDTYPE = 1 AND ACTIVE = 0
             ORDER BY LOGICALREF
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
             var products = await connection.QueryAsync<ProductDto>(sql, new { Offset = (page - 1) * pageSize, PageSize = pageSize });
 
-            return products;
+
+            return new ErpResponse<ProductDto>
+            {
+                Content = products.ToList(),
+                Page = page,
+                Size = pageSize,
+                TotalElements = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
         }
     }
 }

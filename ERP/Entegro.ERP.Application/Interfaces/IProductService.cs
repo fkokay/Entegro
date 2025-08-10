@@ -9,6 +9,6 @@ namespace Entegro.ERP.Application.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductDto>> GetProductsAsync(int page,int pageSize);
+        Task<ErpResponse<ProductDto>> GetProductsAsync(int page,int pageSize);
     }
 }

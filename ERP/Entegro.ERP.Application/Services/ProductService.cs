@@ -18,7 +18,7 @@ namespace Entegro.ERP.Application.Services
             _erpProductReader = erpProductReader;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetProductsAsync(int page, int pageSize)
+        public async Task<ErpResponse<ProductDto>> GetProductsAsync(int page, int pageSize)
         {
             return await _erpProductReader.GetProductsAsync(page, pageSize);
         }

@@ -9,6 +9,6 @@ namespace Entegro.ERP.Abstractions.Interfaces
 {
     public interface IErpProductReader
     {
-        Task<IEnumerable<ProductDto>> GetProductsAsync(int page,int pageSize);
+        Task<ErpResponse<ProductDto>> GetProductsAsync(int page,int pageSize);
     }
 }

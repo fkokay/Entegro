@@ -16,7 +16,7 @@ namespace Entegro.ERP.Opak.Repositories
         {
             _connectionString = connectionString;
         }
-        public Task<IEnumerable<ProductDto>> GetProductsAsync(int page, int pageSize)
+        public Task<ErpResponse<ProductDto>> GetProductsAsync(int page, int pageSize)
         {
             throw new NotImplementedException();
         }
