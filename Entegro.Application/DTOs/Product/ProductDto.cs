@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.Brand;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +25,7 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaTitle { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+
+        public BrandDto? Brand { get; set; }
     }
 }

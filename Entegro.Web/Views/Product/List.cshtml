@@ -73,7 +73,13 @@
                     {   data: 'Name' },
                     {   data: 'Code' },
                     {   data: 'Price' },
-                    {   data: 'Brand.Name' },
+                    {   data: 'Brand.Name',  render: function(data, type, row) {
+                         if(type === "sort" || type === "type"){
+                            return data;
+                         }
+
+                         return data ? data : '<span class="text-muted">-</span>';
+                    } },
                     {   data: 'CreatedOn',
                         render: function(data, type, row) {
                             if(type === "sort" || type === "type"){

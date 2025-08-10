@@ -53,6 +53,18 @@ namespace Entegro.Application.Services
             return brandDto;
         }
 
+        public async Task<BrandDto> GetBrandByNameAsync(string brandName)
+        {
+            var brand = await _brandRepository.GetByNameAsync(brandName);
+            if (brand == null)
+            {
+                throw new KeyNotFoundException($"Brand with Name {brandName} not found.");
+            }
+
+            var brandDto = _mapper.Map<BrandDto>(brand);
+            return brandDto;
+        }
+
         public async Task<IEnumerable<BrandDto>> GetBrandsAsync()
         {
             var brands = await _brandRepository.GetAllAsync();
@@ -71,6 +83,11 @@ namespace Entegro.Application.Services
         {
             await _brandRepository.UpdateAsync(_mapper.Map<Brand>(updateBrand));
             return true;
+        }
+
+        public async Task<bool> ExistsByNameAsync(string brandName)
+        {
+            return await _brandRepository.ExistsByNameAsync(brandName);
         }
     }
 }

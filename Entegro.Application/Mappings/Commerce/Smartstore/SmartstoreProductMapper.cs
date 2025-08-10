@@ -26,11 +26,32 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                     return null;
                 }
 
+                SmartstoreManufacturerMapper.ConfigureLogger(_logger);
+
                 ProductDto productDto = new ProductDto();
                 productDto.Name = smartstoreProduct.Name;
                 productDto.Code = smartstoreProduct.Sku;
                 productDto.Description = smartstoreProduct.FullDescription;
                 productDto.Price = smartstoreProduct.Price;
+                productDto.MetaKeywords = smartstoreProduct.MetaKeywords;
+                productDto.MetaDescription = smartstoreProduct.MetaDescription;
+                productDto.MetaTitle = smartstoreProduct.MetaTitle;
+                productDto.StockQuantity = smartstoreProduct.StockQuantity;
+                productDto.CreatedOn = DateTime.Now;
+                productDto.UpdatedOn = DateTime.Now;
+
+                if (smartstoreProduct.ProductManufacturers.Any())
+                {
+                    var productManufacturer = smartstoreProduct.ProductManufacturers.First(); 
+                    var brand = SmartstoreManufacturerMapper.ToDto(productManufacturer.Manufacturer);
+                    productDto.Brand = brand;
+                }
+                else
+                {
+                    productDto.Brand = null;
+                }
+
+
                 return productDto; ;
             }
             catch (Exception ex)

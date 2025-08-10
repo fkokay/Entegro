@@ -93,6 +93,20 @@ namespace Entegro.Application.Services.Commerce
 
             return manufacturers?.Value ?? Enumerable.Empty<SmartstoreManufacturerDto>();
         }
+        public async Task<SmartstoreManufacturerDto?> GetManufacturerAsync(int id)
+        {
+            var response = await _httpClient.GetAsync($"manufacturers({id})");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var manufacturer = JsonSerializer.Deserialize<SmartstoreManufacturerDto>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return manufacturer;
+        }
         public async Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50)
         {
             var allOrders = new List<SmartstoreOrderDto>();

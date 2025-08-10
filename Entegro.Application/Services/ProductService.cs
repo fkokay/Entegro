@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Repositories;
@@ -15,19 +16,40 @@ namespace Entegro.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IBrandService _brandService;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, IMapper mapper)
+        public ProductService(IProductRepository productRepository, IBrandService brandService, IMapper mapper)
         {
             _productRepository = productRepository;
+            _brandService = brandService;
             _mapper = mapper;
         }
         public async Task<int> CreateProductAsync(CreateProductDto createProduct)
         {
+            if (createProduct.BrandId == null && createProduct.Brand != null)
+            {
+                if (await _brandService.ExistsByNameAsync(createProduct.Brand.Name))
+                {
+                    var brand = await _brandService.GetBrandByNameAsync(createProduct.Brand.Name);
+                    createProduct.BrandId = brand.Id;
+                    createProduct.Brand = null;
+                }
+                else
+                {
+                    var createBrand = _mapper.Map<CreateBrandDto>(createProduct.Brand);
+
+                    var brandResult = await _brandService.CreateBrandAsync(createBrand);
+                    createProduct.BrandId = brandResult;
+                    createProduct.Brand = null;
+                }
+            }
+
             var product = _mapper.Map<Product>(createProduct);
             await _productRepository.AddAsync(product);
 
             return product.Id;
         }
+
 
         public async Task<bool> DeleteProductAsync(int productId)
         {
@@ -48,7 +70,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> ExistsByNameAsync(string productName)
         {
-           return await _productRepository.ExistsByNameAsync(productName);
+            return await _productRepository.ExistsByNameAsync(productName);
         }
 
         public async Task<ProductDto> GetProductByIdAsync(int productId)

@@ -135,6 +135,14 @@ namespace Entegro.Service.Jobs
                 return;
             }
 
+            foreach (var item in smartstoreProducts)
+            {
+                foreach (var productManufacturer in item.ProductManufacturers)
+                {
+                    productManufacturer.Manufacturer = await _smartstoreService.GetManufacturerAsync(productManufacturer.ManufacturerId);
+                }
+            }
+
             SmartstoreProductMapper.ConfigureLogger(_logger);
             var products = SmartstoreProductMapper.ToDtoList(smartstoreProducts);
 

@@ -22,6 +22,8 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(Product product)
         {
+            product.CreatedOn = DateTime.Now;
+            product.UpdatedOn = DateTime.Now;
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
         }
@@ -49,7 +51,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _context.Products.Include(m=>m.Brand).AsQueryable();
 
             var totalCount = await query.CountAsync();
             var products = await query
@@ -73,6 +75,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Product product)
         {
+            product.UpdatedOn = DateTime.Now;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }

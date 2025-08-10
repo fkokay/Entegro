@@ -14,6 +14,7 @@ namespace Entegro.Application.Interfaces.Services.Commerce
         Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(int pageSize = 50);
         Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync();
         Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync();
+        Task<SmartstoreManufacturerDto?> GetManufacturerAsync(int id);
         Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50);
     }
 }

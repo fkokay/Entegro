@@ -119,6 +119,6 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public int Id { get; set; }
         public string GroupedProductConfiguration { get; set; }
 
-        public List<SmartstoreManufacturerDto>? ProductManufacturers { get; set; }
+        public List<SmartstoreProductManufacturerDto> ProductManufacturers { get; set; } = new();
     }
 }

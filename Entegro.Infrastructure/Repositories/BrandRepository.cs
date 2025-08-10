@@ -33,6 +33,11 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _context.Brands.AnyAsync(o => o.Name == name);
+        }
+
         public async Task<List<Brand>> GetAllAsync()
         {
             return await _context.Brands.ToListAsync();
@@ -60,6 +65,11 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Brand?> GetByIdAsync(int id)
         {
             return await _context.Brands.FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<Brand?> GetByNameAsync(string name)
+        {
+            return await _context.Brands.FirstOrDefaultAsync(o => o.Name == name);
         }
 
         public async Task UpdateAsync(Brand brand)
