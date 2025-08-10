@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Commerce.Smartstore;
-using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.OrderItem;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

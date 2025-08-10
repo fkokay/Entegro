@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Application.DTOs.Order
+namespace Entegro.Application.DTOs.OrderItem
 {
-    public class UpdateOrderItemDto
+    public class CreateOrderItemDto
     {
-        public int Id { get; set; }
         public int OrderId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }

@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
 using Entegro.Domain.Entities;
 using System;

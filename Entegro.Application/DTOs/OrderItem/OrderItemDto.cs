@@ -1,13 +1,16 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.Product;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Application.DTOs.Order
+namespace Entegro.Application.DTOs.OrderItem
 {
-    public class CreateOrderItemDto
+    public class OrderItemDto
     {
+        public int Id { get; set; }
         public int OrderId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
@@ -15,5 +18,8 @@ namespace Entegro.Application.DTOs.Order
         public decimal Price { get; set; }
         public decimal TaxRate { get; set; }
         public decimal DiscountAmount { get; set; }
+
+        public OrderDto? Order { get; set; }
+        public ProductDto? Product { get; set; }
     }
 }
