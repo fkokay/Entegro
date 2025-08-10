@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.ProductImage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,5 +28,6 @@ namespace Entegro.Application.DTOs.Product
         public DateTime UpdatedOn { get; set; }
 
         public BrandDto? Brand { get; set; }
+        public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
     }
 }

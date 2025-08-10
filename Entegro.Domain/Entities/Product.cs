@@ -29,5 +29,6 @@ namespace Entegro.Domain.Entities
         public DateTime UpdatedOn { get; set; }
 
         public virtual Brand? Brand { get; set; }
+        public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
     }
 }

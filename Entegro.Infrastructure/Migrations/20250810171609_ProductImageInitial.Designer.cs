@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250810171609_ProductImageInitial")]
+    partial class ProductImageInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -413,8 +416,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("ProductImages");
                 });
 
@@ -545,17 +546,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductImage", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany("ProductImages")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Entegro.Domain.Entities.Town", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.City", null)
@@ -578,11 +568,6 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Product", b =>
-                {
-                    b.Navigation("ProductImages");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Town", b =>

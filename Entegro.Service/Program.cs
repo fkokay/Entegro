@@ -1,10 +1,12 @@
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
+using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings;
 using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
+using Entegro.Application.Services.Marketplace;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Repositories;
 using Entegro.Service;
@@ -34,19 +36,32 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
+builder.Services.AddScoped<ITrendyolService, TrendyolService>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-    var jobKey = new JobKey("SmartstoreDataSyncJob");
+    var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
-    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKey));
+    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
 
     q.AddTrigger(opts => opts
-        .ForJob(jobKey)
+        .ForJob(jobKeySmartstore)
         .WithIdentity("SmartstoreDataSyncJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(10)
+            .RepeatForever())
+        );
+
+    var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+
+    q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKeyTrendyol)
+        .WithIdentity("TrendyolDataSyncJob-trigger")
         .WithSimpleSchedule(x => x
             .WithIntervalInMinutes(10)
             .RepeatForever())

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.ProductImage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,5 +23,7 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaKeywords { get; set; }
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
+
+        public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
     }
 }
