@@ -13,6 +13,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Entegro.ERP.Abstractions\Entegro.ERP.Abstractions.csproj" />
+    <ProjectReference Include="..\Entegro.ERP.Logo\Entegro.ERP.Logo.csproj" />
+    <ProjectReference Include="..\Entegro.ERP.Netsis\Entegro.ERP.Netsis.csproj" />
+    <ProjectReference Include="..\Entegro.ERP.Opak\Entegro.ERP.Opak.csproj" />
   </ItemGroup>
 
 </Project>

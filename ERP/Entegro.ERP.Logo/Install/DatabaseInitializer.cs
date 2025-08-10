@@ -21,8 +21,7 @@ namespace Entegro.ERP.Logo.Install
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var checkViewCmd = new SqlCommand(
-                "SELECT OBJECT_ID('vw_LogoProducts', 'V')", connection);
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('vw_LogoProducts', 'V')", connection);
 
             var result = await checkViewCmd.ExecuteScalarAsync();
 

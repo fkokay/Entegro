@@ -1,18 +1,24 @@
+using Entegro.ERP.Abstractions.Interfaces;
+using Entegro.ERP.Application.Factories;
+using Entegro.ERP.Logo.Repositories;
+using Entegro.ERP.Netsis.Repositories;
+using Entegro.ERP.Opak.Repositories;
+using Microsoft.Extensions.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+builder.Services.AddScoped<IErpProductReaderFactory, ErpProductReaderFactory>();
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

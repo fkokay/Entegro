@@ -10,6 +10,12 @@ namespace Entegro.ERP.Netsis.Repositories
 {
     public class NetsisProductReader : IErpProductReader
     {
+        private readonly string _connectionString;
+
+        public NetsisProductReader(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
         public Task<IEnumerable<ProductDto>> GetProductsAsync(int page, int pageSize)
         {
             throw new NotImplementedException();
