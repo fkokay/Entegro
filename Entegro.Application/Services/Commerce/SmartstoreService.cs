@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
-using Entegro.Application.DTOs.Smartstore;
 using Entegro.Application.Interfaces.Services.Commerce;
 using System;
 using System.Collections.Generic;
@@ -101,7 +101,7 @@ namespace Entegro.Application.Services.Commerce
 
             while (moreData)
             {
-                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer";
+                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer,OrderItems";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 

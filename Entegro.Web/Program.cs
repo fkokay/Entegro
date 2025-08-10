@@ -2,6 +2,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings;
+using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Infrastructure.Data;
@@ -23,7 +24,7 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 builder.Services.AddDbContext<EntegroContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile), typeof(SmartstoreMappingProfile));
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 

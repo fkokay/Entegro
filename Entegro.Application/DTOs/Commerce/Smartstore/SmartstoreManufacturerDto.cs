@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Application.DTOs.Smartstore
+namespace Entegro.Application.DTOs.Commerce.Smartstore
 {
     public class SmartstoreManufacturerDto
     {

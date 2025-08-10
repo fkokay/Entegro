@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Application.DTOs.Smartstore
+namespace Entegro.Application.DTOs.Commerce.Smartstore
 {
     public class SmartstoreOrderDto
     {
         public string OrderNumber { get; set; }
         public Guid OrderGuid { get; set; }
         public int StoreId { get; set; }
-        public int CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public int BillingAddressId { get; set; }
         public int ShippingAddressId { get; set; }
         public string PaymentMethodSystemName { get; set; }
@@ -66,7 +66,7 @@ namespace Entegro.Application.DTOs.Smartstore
         public int CustomerTaxDisplayTypeId { get; set; }
         public int Id { get; set; }
 
-        public SmartstoreCustomerDto Customer { get; set; }
+        public SmartstoreCustomerDto? Customer { get; set; }
         public List<SmartstoreOrderItemDto> OrderItems { get; set; } = new();
     }
 }

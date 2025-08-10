@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.Order;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,13 @@ namespace Entegro.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly ICustomerService _customerService;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, ICustomerService customerService, IMapper mapper)
+        private readonly ILogger<OrderService> _logger;
+        public OrderService(IOrderRepository orderRepository, ICustomerService customerService, IMapper mapper, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<int> CreateOrderAsync(CreateOrderDto createOrder)

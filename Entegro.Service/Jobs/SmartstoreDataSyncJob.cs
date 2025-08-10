@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
-using Entegro.Application.DTOs.Smartstore;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
+using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -48,7 +49,7 @@ namespace Entegro.Service.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             await ProductSync();
-            //await OrderSync();
+            await OrderSync();
         }
 
         private async Task OrderSync()
@@ -71,7 +72,8 @@ namespace Entegro.Service.Jobs
                 return;
             }
 
-            var orders = _mapper.Map<IEnumerable<CreateOrderDto>>(smartstoreOrders);
+            SmartstoreOrderMapper.ConfigureLogger(_logger);
+            var orders = SmartstoreOrderMapper.ToDtoList(smartstoreOrders);
 
             var retryPolicy = Policy
                 .Handle<Exception>()
@@ -97,7 +99,8 @@ namespace Entegro.Service.Jobs
                 {
                     await retryPolicy.ExecuteAsync(async () =>
                     {
-                        await _orderService.CreateOrderAsync(order);
+                        var createOrder = _mapper.Map<CreateOrderDto>(order);
+                        await _orderService.CreateOrderAsync(createOrder);
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
                     });
                 }
@@ -132,7 +135,8 @@ namespace Entegro.Service.Jobs
                 return;
             }
 
-            var products = _mapper.Map<IEnumerable<CreateProductDto>>(smartstoreProducts);
+            SmartstoreProductMapper.ConfigureLogger(_logger);
+            var products = SmartstoreProductMapper.ToDtoList(smartstoreProducts);
 
             var retryPolicy = Policy
                 .Handle<Exception>()
@@ -161,7 +165,8 @@ namespace Entegro.Service.Jobs
                 {
                     await retryPolicy.ExecuteAsync(async () =>
                     {
-                        await _productService.CreateProductAsync(product);
+                        var createProduct = _mapper.Map<CreateProductDto>(product);
+                        await _productService.CreateProductAsync(createProduct);
                         _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
                     });
                 }

@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
-using Entegro.Application.DTOs.Smartstore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

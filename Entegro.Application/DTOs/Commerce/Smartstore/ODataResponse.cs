@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Entegro.Application.DTOs.Smartstore
+namespace Entegro.Application.DTOs.Commerce.Smartstore
 {
     public class ODataResponse<T>
     {
