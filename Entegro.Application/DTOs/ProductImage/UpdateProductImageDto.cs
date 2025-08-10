@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.ProductImage
 {
-    public class UpdateProductDto
+    public class UpdateProductImageDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }

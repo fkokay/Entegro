@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Mappings.Commerce.Smartstore;
@@ -36,9 +37,20 @@ namespace Entegro.Application.Mappings.Marketplace
             productDto.MetaDescription = "";
             productDto.MetaTitle = "";
             productDto.StockQuantity = trendyolProduct.quantity;
+            productDto.Barcode = trendyolProduct.barcode;
             productDto.CreatedOn = DateTime.Now;
             productDto.UpdatedOn = DateTime.Now;
-            productDto.Brand = null;
+            productDto.Brand = new BrandDto()
+            {
+                Name = trendyolProduct.brand,
+                Description = "",
+                MetaDescription = "",
+                MetaTitle = trendyolProduct.brand,
+                MetaKeywords = trendyolProduct.brand.ToLower(),
+                DisplayOrder = 0,
+                CreatedOn = DateTime.Now,
+                UpdatedOn = DateTime.Now,
+            };
             productDto.ProductImages = TrendyolProductImageMapper.ToDtoList(trendyolProduct.images).ToList();
 
             return productDto; ;

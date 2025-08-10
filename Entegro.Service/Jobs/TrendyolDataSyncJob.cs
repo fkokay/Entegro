@@ -110,7 +110,7 @@ namespace Entegro.Service.Jobs
                 }
             }
 
-            _logger.LogInformation("Smartstore ürün senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+            _logger.LogInformation("Trendyol ürün senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
         }
     }
 }

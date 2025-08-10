@@ -36,6 +36,7 @@
                 <thead>
                     <tr>
                         <th>Id</th>
+                        <th></th>
                         <th>Id</th>
                         <th>Ürün adı</th>
                         <th>Ürün kodu</th>
@@ -58,7 +59,7 @@
                     url: '//cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
                 },
                 serverSide: true,
-                order: [[2, 'asc']],
+                order: [[3, 'asc']],
                 ajax: {
                     url: '/Product/ProductList',
                     type: 'POST',
@@ -70,6 +71,7 @@
                 columns: [
                     {   data: 'Id' },
                     {   data: 'Id' },
+                    {   data: 'Image'},
                     {   data: 'Name' },
                     {   data: 'Code' },
                     {   data: 'Price' },
@@ -91,39 +93,51 @@
                     { data:''}
                 ],
                 columnDefs:[
-                  {
-                      targets: 0,
-                      searchable: false,
-                      orderable: false,
-                      render: function () {
-                          return '<input type="checkbox" class="dt-checkboxes form-check-input">'
-                      },
-                      checkboxes: {
-                          selectAllRender: '<input type="checkbox" class="form-check-input">'
-                      },
-                      responsivePriority: 4
-                  },
-                  {
-                      // Actions
-                      targets: -1,
-                      title: 'İşlemler',
-                      searchable: false,
-                      orderable: false,
-                      render: function (data, type, full, meta) {
-
+                    {
+                        targets: 0,
+                        searchable: false,
+                        orderable: false,
+                        render: function () {
+                            return '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                        },
+                        checkboxes: {
+                            selectAllRender: '<input type="checkbox" class="form-check-input">'
+                        },
+                        responsivePriority: 4
+                    },
+                    {
+                        // Actions
+                        targets: 2,
+                        title: '',
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, full, meta) {
                             return (
-                          '<div class="d-inline-block">' +
-                          '<a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-dark ti ti-dots-vertical"></i></a>' +
-                          '<div class="dropdown-menu dropdown-menu-end m-0">' +
-                          '<a href="javascript:;" class="dropdown-item">Details</a>' +
-                          '<a href="javascript:;" class="dropdown-item">Archive</a>' +
-                          '<div class="dropdown-divider"></div>' +
-                          '<a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a>' +
-                          '</div>' +
-                          '</div>' +
-                          '<a href="Edit?id='+full.Id+'" class="btn btn-sm btn-icon item-edit"><i class="text-dark ti ti-pencil"></i></a>'
-                        );
-                      }
+                              '<img src="'+full.Image+'" height="50"/>'
+                            );
+                        }
+                    },
+                    {
+                        // Actions
+                        targets: -1,
+                        title: 'İşlemler',
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, full, meta) {
+
+                              return (
+                                '<div class="d-inline-block">' +
+                                '<a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-dark ti ti-dots-vertical"></i></a>' +
+                                '<div class="dropdown-menu dropdown-menu-end m-0">' +
+                                '<a href="javascript:;" class="dropdown-item">Details</a>' +
+                                '<a href="javascript:;" class="dropdown-item">Archive</a>' +
+                                '<div class="dropdown-divider"></div>' +
+                                '<a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a>' +
+                                '</div>' +
+                                '</div>' +
+                                '<a href="Edit?id='+full.Id+'" class="btn btn-sm btn-icon item-edit"><i class="text-dark ti ti-pencil"></i></a>'
+                              );
+                        }
                     }
                 ],
                 dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'

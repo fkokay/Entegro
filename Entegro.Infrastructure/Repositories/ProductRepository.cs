@@ -51,7 +51,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.Include(m=>m.Brand).AsQueryable();
+            var query = _context.Products.Include(m=>m.Brand).Include(m=>m.ProductImages).AsQueryable();
 
             var totalCount = await query.CountAsync();
             var products = await query

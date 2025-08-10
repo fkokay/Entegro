@@ -14,6 +14,18 @@ namespace Entegro.Application.DTOs.Product
         public string Code { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string? Image
+        {
+            get
+            {
+                if (ProductImages.Any())
+                {
+                    return ProductImages.OrderBy(m => m.DisplayOrder).Select(m => m.Url).FirstOrDefault();
+                }
+
+                return "";
+            }
+        }
         public decimal Price { get; set; }
         public int? BrandId { get; set; }
         public int StockQuantity { get; set; }
@@ -24,6 +36,7 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaKeywords { get; set; }
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
+        public string? Barcode { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
