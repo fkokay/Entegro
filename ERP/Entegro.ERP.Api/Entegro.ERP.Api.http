@@ -1,0 +1,6 @@
+@Entegro.ERP.Api_HostAddress = http://localhost:5211
+
+GET {{Entegro.ERP.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
