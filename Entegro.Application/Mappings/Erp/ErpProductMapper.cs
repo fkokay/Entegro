@@ -29,6 +29,13 @@ namespace Entegro.Application.Mappings.Erp
             ProductDto product = new ProductDto();
             product.Name = erpProduct.Name;
             product.Code = erpProduct.Code;
+            product.Description = erpProduct.Description;
+            product.Price = erpProduct.Price;
+            product.Currency = erpProduct.Currency;
+            product.Unit = erpProduct.Unit;
+            product.VatRate = erpProduct.VatRate;
+            product.VatInc = erpProduct.VatInc;
+
 
             return product; ;
         }

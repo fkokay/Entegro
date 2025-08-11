@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250811121745_ProductVatEdit")]
+    partial class ProductVatEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,9 +329,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -357,17 +357,8 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
 
-                    b.Property<string>("Unit")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("VatInc")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("VatRate")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Weight")
                         .HasColumnType("decimal(18,2)");
