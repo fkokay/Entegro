@@ -45,7 +45,7 @@ namespace Entegro.Service.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            await ProductSync();
+            //await ProductSync();
             await OrderSync();
         }
 

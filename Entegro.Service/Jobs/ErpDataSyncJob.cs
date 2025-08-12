@@ -47,7 +47,7 @@ namespace Entegro.Service.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            string erpType = "opak";
+            string erpType = "logo";
             await ProductSync(erpType);
         }
 
