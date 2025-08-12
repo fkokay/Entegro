@@ -34,5 +34,9 @@ namespace Entegro.Infrastructure.Data
         public DbSet<City> Cities { get; set; }
         public DbSet<Town> Towns { get; set; }
         public DbSet<District> Districts { get; set; }
+
+        public DbSet<IntegrationSystem> IntegrationSystems { get; set; }
+        public DbSet<IntegrationSystemParameter> IntegrationSystemParameters { get; set; }
+        public DbSet<IntegrationSystemLog> IntegrationSystemLogs { get; set; }
     }
 }

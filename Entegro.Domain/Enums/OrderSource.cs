@@ -11,5 +11,7 @@ namespace Entegro.Domain.Enums
     {
         [Description("Smartstore")]
         Smartstore = 1,
+        [Description("Trednyol")]
+        Trednyol = 1,
     }
 }

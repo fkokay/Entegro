@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
@@ -45,6 +46,69 @@ namespace Entegro.Service.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             await ProductSync();
+            await OrderSync();
+        }
+
+        private async Task OrderSync()
+        {
+            _logger.LogInformation("Trendyol sipariş senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
+
+            IEnumerable<TrendyolShipmentPackageDto> trendyolShipmentPackages;
+
+            try
+            {
+                trendyolShipmentPackages = await _trendyolService.GetShipmentPackagesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Trendyol'dan siparişler alınırken bir hata oluştu.");
+                return;
+            }
+
+            if (trendyolShipmentPackages == null || !trendyolShipmentPackages.Any())
+            {
+                _logger.LogWarning("Trendyol'dan hiç sipariş alınamadı.");
+                return;
+            }
+
+            TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
+            var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
+
+            var retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
+                    onRetry: (exception, timeSpan, retryCount, context) =>
+                    {
+                        _logger.LogWarning(exception, "{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
+                    });
+
+            foreach (var order in orders)
+            {
+                if (await _orderService.ExistsByOrderNoAsync(order.OrderNo))
+                {
+                    _logger.LogInformation("'{OrderNo}' nolu sipariş zaten kayıtlı", order.OrderNo);
+
+                    continue;
+                }
+
+                try
+                {
+                    await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        var createOrder = _mapper.Map<CreateOrderDto>(order);
+                        await _orderService.CreateOrderAsync(createOrder);
+                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNo);
+                }
+            }
+
+            _logger.LogInformation("Trendyol sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
         }
 
         private async Task ProductSync()

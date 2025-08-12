@@ -25,11 +25,11 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
         public string CargoTrackingLink { get; set; }
         public string CargoSenderNumber { get; set; }
         public string CargoProviderName { get; set; }
-        public List<TrendyolOrderLineDto> Lines { get; set; }
+        public List<TrendyolOrderLineDto> Lines { get; set; } = new List<TrendyolOrderLineDto>();
         public long OrderDate { get; set; }
         public string IdentityNumber { get; set; }
         public string CurrencyCode { get; set; }
-        public List<TrendyolPackageHistoryDto> PackageHistories { get; set; }
+        public List<TrendyolPackageHistoryDto> PackageHistories { get; set; } = new List<TrendyolPackageHistoryDto>();
         public string ShipmentPackageStatus { get; set; }
         public string Status { get; set; }
         public string DeliveryType { get; set; }

@@ -11,5 +11,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
     public interface ITrendyolService
     {
         Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(int pageSize = 50);
+        Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50);
     }
 }

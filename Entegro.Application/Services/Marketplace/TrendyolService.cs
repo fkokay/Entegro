@@ -69,5 +69,41 @@ namespace Entegro.Application.Services.Marketplace
 
             return allProducts;
         }
+
+        public async Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50)
+        {
+            var allShipmentPackages = new List<TrendyolShipmentPackageDto>();
+            bool moreData = true;
+            int page = 1;
+
+            while (moreData)
+            {
+                var url = $"order/sellers/{sellerId}/orders?size={pageSize}&page={page}";
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<TrendyolResponse<TrendyolShipmentPackageDto>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (data?.content == null || !data.content.Any())
+                {
+                    break;
+                }
+
+                allShipmentPackages.AddRange(data.content);
+
+                page += 1;
+
+                if (page >= data.totalPages)
+                {
+                    moreData = false;
+                }
+            }
+
+            return allShipmentPackages;
+        }
     }
 }
