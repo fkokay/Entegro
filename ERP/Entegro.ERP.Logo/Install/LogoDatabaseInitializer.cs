@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Entegro.ERP.Abstractions.Interfaces;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Entegro.ERP.Logo.Install
 {
-    public class DatabaseInitializer
+    public class LogoDatabaseInitializer : IErpDatabaseInitializer
     {
         private readonly string _connectionString;
 
-        public DatabaseInitializer(string connectionString)
+        public LogoDatabaseInitializer(string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -21,23 +22,16 @@ namespace Entegro.ERP.Logo.Install
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('vw_LogoProducts', 'V')", connection);
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_ITEMS', 'V')", connection);
 
             var result = await checkViewCmd.ExecuteScalarAsync();
 
             if (result == DBNull.Value || result == null)
             {
                 var createViewSql = @"
-                CREATE VIEW vw_LogoProducts AS
-                SELECT 
-                    ProductId AS Id,
-                    ProductName AS Name,
-                    ProductSku AS Sku,
-                    UnitPrice AS Price,
-                    AvailableStock AS StockQuantity
-                FROM LogoProductsTable
-                WHERE IsActive = 1;
-            ";
+                CREATE VIEW ENTEGRO_ITEMS AS
+                SELECT CODE as Code,NAME as Name FROM LG_200_ITEMS WHERE CARDTYPE = 1 AND ACTIVE = 0;
+                ";
 
                 using var createCmd = new SqlCommand(createViewSql, connection);
                 await createCmd.ExecuteNonQueryAsync();

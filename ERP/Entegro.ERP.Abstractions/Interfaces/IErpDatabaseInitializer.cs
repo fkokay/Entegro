@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.ERP.Opak.Install
+namespace Entegro.ERP.Abstractions.Interfaces
 {
-    internal class DatabaseInitializer
+    public interface IErpDatabaseInitializer
     {
+        Task EnsureViewsAsync();
     }
 }

@@ -24,11 +24,11 @@ namespace Entegro.ERP.Logo.Repositories
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var countSql = @"SELECT COUNT(*) FROM LG_200_ITEMS WHERE CARDTYPE = 1 AND ACTIVE = 0";
+            var countSql = @"SELECT COUNT(*) FROM ENTEGRO_ITEMS";
             var totalCount = await connection.ExecuteScalarAsync<int>(countSql);
 
             var sql = @"
-            SELECT CODE as Code,NAME as Name FROM LG_200_ITEMS WHERE CARDTYPE = 1 AND ACTIVE = 0
+            SELECT * FROM ENTEGRO_ITEMS
             ORDER BY LOGICALREF
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 

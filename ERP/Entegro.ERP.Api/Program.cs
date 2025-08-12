@@ -1,13 +1,10 @@
 using Entegro.ERP.Abstractions.Interfaces;
 using Entegro.ERP.Application.Factories;
-using Entegro.ERP.Logo.Repositories;
-using Entegro.ERP.Netsis.Repositories;
-using Entegro.ERP.Opak.Repositories;
-using Microsoft.Extensions.Configuration;
+using Entegro.ERP.Logo.Install;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddScoped<IErpDatabaseInitializerFactory, ErpDatabaseInitializerFactory>();
 builder.Services.AddScoped<IErpProductReaderFactory, ErpProductReaderFactory>();
 
 builder.Services.AddControllers();

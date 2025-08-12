@@ -1,10 +1,7 @@
 ﻿using Entegro.ERP.Abstractions.Interfaces;
 using Entegro.ERP.Logo.Install;
-using Entegro.ERP.Logo.Repositories;
 using Entegro.ERP.Netsis.Install;
-using Entegro.ERP.Netsis.Repositories;
 using Entegro.ERP.Opak.Install;
-using Entegro.ERP.Opak.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace Entegro.ERP.Application.Factories
 {
-    public class ErpProductReaderFactory : IErpProductReaderFactory
+    public class ErpDatabaseInitializerFactory : IErpDatabaseInitializerFactory
     {
-        public IErpProductReader Create(string erpType, string connectionString)
+
+        public IErpDatabaseInitializer CreateDatabaseInitializer(string erpType, string connectionString)
         {
             return erpType.ToLower() switch
             {
-                "logo" => new LogoProductReader(connectionString),
-                "netsis" => new NetsisProductReader(connectionString),
-                "opak" => new OpakProductReader(connectionString),
+                "logo" => new LogoDatabaseInitializer(connectionString),
+                "netsis" => new NetsisDatabaseInitializer(connectionString),
+                "opak" => new OpakDatabaseInitializer(connectionString),
                 _ => throw new ArgumentException($"ERP tipi desteklenmiyor: {erpType}")
             };
         }
-
     }
 }

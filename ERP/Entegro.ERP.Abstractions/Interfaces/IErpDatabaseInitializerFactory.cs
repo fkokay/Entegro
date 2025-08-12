@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Entegro.ERP.Abstractions.Interfaces
 {
-    public interface IErpProductReaderFactory
+    public interface IErpDatabaseInitializerFactory
     {
-        IErpProductReader Create(string erpType,string connectionString);
-
+        IErpDatabaseInitializer CreateDatabaseInitializer(string erpType, string connectionString);
     }
 }
