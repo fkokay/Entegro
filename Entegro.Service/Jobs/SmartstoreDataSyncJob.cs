@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings.Commerce.Smartstore;
+using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,7 @@ namespace Entegro.Service.Jobs
 {
     public class SmartstoreDataSyncJob : IJob
     {
+        private readonly ICommerceProductWriter _commerceProductWriter;
         private readonly ISmartstoreService _smartstoreService;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
@@ -29,6 +31,7 @@ namespace Entegro.Service.Jobs
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
 
         public SmartstoreDataSyncJob(
+            ICommerceProductWriter commerceProductWriter,
             ISmartstoreService smartstoreService,
             IProductService productService,
             IOrderService orderService,
@@ -37,6 +40,7 @@ namespace Entegro.Service.Jobs
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
         {
+            _commerceProductWriter = commerceProductWriter ?? throw new ArgumentNullException(nameof(commerceProductWriter));
             _smartstoreService = smartstoreService ?? throw new ArgumentNullException(nameof(smartstoreService));
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
@@ -49,7 +53,16 @@ namespace Entegro.Service.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             //await ProductSync();
-           // await OrderSync();
+            //await OrderSync();
+            await ProductWriter();
+        }
+
+        private async Task ProductWriter()
+        {
+            _logger.LogInformation("Smartstore ürün yazma işlemi başlatıldı. Zaman: {Time}", DateTime.UtcNow);
+            var allProducts = await _productService.GetProductsAsync();
+            await _commerceProductWriter.UpsertProductsAsync(allProducts);
+            _logger.LogInformation("Smartstore ürün yazma işlemi tamamlandı. Zaman: {Time}", DateTime.UtcNow);
         }
 
         private async Task OrderSync()

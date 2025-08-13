@@ -7,6 +7,7 @@ using Entegro.Application.Mappings;
 using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
+using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Application.Services.Erp;
 using Entegro.Application.Services.Marketplace;
 using Entegro.Infrastructure.Data;
@@ -40,6 +41,9 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddScoped<ITrendyolService, TrendyolService>();
 builder.Services.AddScoped<IErpService, ErpService>();
+
+builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
+builder.Services.AddScoped<SmartstoreClient>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddQuartz(q =>
@@ -58,29 +62,29 @@ builder.Services.AddQuartz(q =>
             .RepeatForever())
         );
 
-    var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+    //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
-    q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+    //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeyTrendyol)
-        .WithIdentity("TrendyolDataSyncJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-    );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyTrendyol)
+    //    .WithIdentity("TrendyolDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //);
 
-    var jobKeyErp = new JobKey("ErpDataSyncJob");
+    //var jobKeyErp = new JobKey("ErpDataSyncJob");
 
-    q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+    //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeyErp)
-        .WithIdentity("ErpDataSyncJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-    );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyErp)
+    //    .WithIdentity("ErpDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //);
 });
 
 // Quartz hosted service

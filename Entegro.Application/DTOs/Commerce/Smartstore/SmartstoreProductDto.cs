@@ -19,9 +19,9 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public int ProductTemplateId { get; set; }
         public bool ShowOnHomePage { get; set; }
         public int HomePageDisplayOrder { get; set; }
-        public string MetaKeywords { get; set; }
-        public string MetaDescription { get; set; }
-        public string MetaTitle { get; set; }
+        public string? MetaKeywords { get; set; }
+        public string? MetaDescription { get; set; }
+        public string? MetaTitle { get; set; }
         public bool AllowCustomerReviews { get; set; }
         public int ApprovedRatingSum { get; set; }
         public int NotApprovedRatingSum { get; set; }
@@ -99,8 +99,8 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public bool Published { get; set; }
         public bool IsSystemProduct { get; set; }
         public string SystemName { get; set; }
-        public DateTime CreatedOnUtc { get; set; }
-        public DateTime UpdatedOnUtc { get; set; }
+        public DateTimeOffset CreatedOnUtc { get; set; }
+        public DateTimeOffset UpdatedOnUtc { get; set; }
         public int? DeliveryTimeId { get; set; }
         public int? QuantityUnitId { get; set; }
         public string CustomsTariffNumber { get; set; }
