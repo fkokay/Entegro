@@ -31,11 +31,9 @@ namespace Entegro.Web.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Create(CategoryViewModel model)
         {
-            // Doğrudan servis çağrısı
             await _categoryService.CreateCategoryAsync(new CreateCategoryDto
             {
                 Name = model.Name,
@@ -47,10 +45,8 @@ namespace Entegro.Web.Controllers
                 MetaKeywords = model.MetaKeywords,
             });
 
-            // AJAX için JSON formatında yanıt dön
             return Json(new { success = true });
         }
-
 
         [HttpPost]
         public async Task<IActionResult> CategoryList([FromBody] DatatableData model)
@@ -69,7 +65,6 @@ namespace Entegro.Web.Controllers
                 data = result.Items
             });
         }
-
 
         [HttpPost]
         public async Task<IActionResult> AllCateogry(int page,string term)
