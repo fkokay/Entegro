@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Marketplace.Trendyol;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
 {
     public interface IMarketplaceCargoCompanyReader
     {
+        Task<IEnumerable<TrendyolCargoCompanyDto>> GetCargoCompaniesAsync();
     }
 }

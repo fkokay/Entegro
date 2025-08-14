@@ -48,7 +48,19 @@ namespace Entegro.Service.Jobs
             //await ProductSync();
             //await OrderSync();
 
-            await CategorySync();
+            //await CategorySync();
+            //await BrandSync();
+            await CategoryAttributeSync();
+        }
+
+        private async Task CategoryAttributeSync()
+        {
+            var result = await _trendyolService.GetCategoryAttibutesAsync(411);
+        }
+
+        private async Task BrandSync()
+        {
+            var result = await _trendyolService.GetBrandsAsync();
         }
 
         private async Task CategorySync()

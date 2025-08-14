@@ -13,7 +13,6 @@
     <Folder Include="DTOs\Marketplace\Hepsiburada\" />
     <Folder Include="DTOs\Marketplace\Idefix\" />
     <Folder Include="DTOs\Marketplace\Pazarama\" />
-    <Folder Include="DTOs\ProductCategory\" />
     <Folder Include="Interfaces\Services\Invoice\" />
   </ItemGroup>
 
