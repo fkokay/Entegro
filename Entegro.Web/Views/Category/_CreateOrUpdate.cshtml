@@ -54,7 +54,8 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" })
+                                @* @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" }) *@
+                                <input type="number" class="form-control" asp-for="DisplayOrder" value="0" min="0" />
                             </div>
                         </div>
                     </div>

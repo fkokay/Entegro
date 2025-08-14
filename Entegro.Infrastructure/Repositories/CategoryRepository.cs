@@ -19,7 +19,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             category.CreatedOn = DateTime.UtcNow;
             category.UpdatedOn = DateTime.UtcNow;
-            category.TreePath = $"/{category.Id}/"; // Başlangıçta kök olarak ayarlanıyor
+            category.TreePath = $"/{category.Id}/";
 
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
