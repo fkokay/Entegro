@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Application.Mappings.Marketplace
+namespace Entegro.Application.Mappings.Marketplace.Trendyol
 {
     public class TrendyolShipmentPackageMapper
     {

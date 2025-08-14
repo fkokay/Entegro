@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
-    public interface ITrendyolService
+    public interface ITrendyolService : IMarketplaceCategoryReader
     {
         Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(int pageSize = 50);
         Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50);

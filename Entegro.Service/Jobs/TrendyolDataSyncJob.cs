@@ -4,7 +4,7 @@ using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Application.Mappings.Marketplace;
+using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Polly;
 using Quartz;
 using System;
@@ -46,7 +46,14 @@ namespace Entegro.Service.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             //await ProductSync();
-            await OrderSync();
+            //await OrderSync();
+
+            await CategorySync();
+        }
+
+        private async Task CategorySync()
+        {
+            var result = await _trendyolService.GetCategoriesAsync();
         }
 
         private async Task OrderSync()

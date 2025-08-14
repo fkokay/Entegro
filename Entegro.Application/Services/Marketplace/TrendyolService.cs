@@ -1,6 +1,9 @@
-﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +18,9 @@ namespace Entegro.Application.Services.Marketplace
     {
         private readonly HttpClient _httpClient;
         private readonly string sellerId = "474352";
+        private readonly ILogger<TrendyolService> _logger;
 
-        public TrendyolService(HttpClient httpClient)
+        public TrendyolService(HttpClient httpClient, ILogger<TrendyolService> logger)
         {
 
 
@@ -32,6 +36,29 @@ namespace Entegro.Application.Services.Marketplace
             var password = "09WZjNvN6ZJU4Tg2z53r";
             var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            _logger = logger;
+        }
+
+        public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+        {
+            var allCategories = new List<TrendyolCategoryDto>();
+
+            var url = $"product/product-categories";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<TrendyolCategoryResponse>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            allCategories.AddRange(data.Categories);
+
+            TrendyolCategoryMapper.ConfigureLogger(_logger);
+            var categories = TrendyolCategoryMapper.ToDtoList(allCategories);
+
+            return categories;
         }
 
         public async Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(int pageSize = 50)

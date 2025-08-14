@@ -19,5 +19,7 @@ namespace Entegro.Application.DTOs.Category
         public int DisplayOrder { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+
+        public List<CategoryDto> SubCategories { get; set; } = new List<CategoryDto>();
     }
 }
