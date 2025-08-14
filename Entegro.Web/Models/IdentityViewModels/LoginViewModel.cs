@@ -1,4 +1,4 @@
-﻿namespace Entegro.Application.DTOs.Auth
+﻿namespace Entegro.Web.Models.IdentityViewModels
 {
     public class LoginViewModel
     {

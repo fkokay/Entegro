@@ -1,5 +1,5 @@
-﻿using Entegro.Application.DTOs.Auth;
-using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.Interfaces.Services;
+using Entegro.Web.Models.IdentityViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
@@ -27,6 +27,22 @@ namespace Entegro.Web.Controllers
 
             return View(model);
         }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            //mail için servis gerekiyor
+
+            return View(model);
+        }
+
+
 
         [HttpGet]
         public IActionResult Logout()
