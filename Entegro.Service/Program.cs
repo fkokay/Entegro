@@ -42,8 +42,9 @@ builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddScoped<ITrendyolService, TrendyolService>();
 builder.Services.AddScoped<IErpService, ErpService>();
 
-builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
 builder.Services.AddScoped<SmartstoreClient>();
+builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
+builder.Services.AddScoped<ICommerceBrandWriter, SmartstoreManufacturerWriter>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddQuartz(q =>

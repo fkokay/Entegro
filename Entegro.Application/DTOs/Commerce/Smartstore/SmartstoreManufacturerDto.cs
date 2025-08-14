@@ -9,7 +9,7 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
     public class SmartstoreManufacturerDto
     {
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string BottomDescription { get; set; }
         public int ManufacturerTemplateId { get; set; }
         public string MetaKeywords { get; set; }

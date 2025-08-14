@@ -1,5 +1,4 @@
 ﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Commerce.Smartstore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Commerce
 {
-    public interface ICommerceBrandWriter
+    public interface ICommerceOrderReader
     {
         Task<int> CreateBrandAsync(BrandDto brand);
-        Task UpdateBrandAsync(BrandDto brand, int id);
+        Task UpdateBrandAsync(BrandDto brand);
         Task DeleteBrandAsync(int brandId);
-        Task<BrandDto?> BrandExistsAsync(string brandName);
+        Task<bool> BrandExistsAsync(string brandName);
     }
 }

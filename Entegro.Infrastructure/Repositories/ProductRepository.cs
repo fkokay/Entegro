@@ -46,7 +46,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products.Include(m => m.Brand).Include(m => m.ProductImages).ToListAsync();
         }
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)

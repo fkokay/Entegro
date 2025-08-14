@@ -1,10 +1,13 @@
-﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Mappings.Commerce.Smartstore;
+using Entegro.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -34,6 +37,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
         }
 
+        #region Product
         public async Task<ProductDto?> GetProductBySkuAsync(string sku)
         {
             try
@@ -78,6 +82,10 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     if (payload != null)
                     {
                         payload.Id = id; // Güncelleme için ID'yi ayarla
+                        foreach (var manufacturer in payload.ProductManufacturers)
+                        {
+                            manufacturer.ProductId = id;
+                        }
                         var json = JsonSerializer.Serialize(payload, _jsonOptions);
                         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -97,6 +105,26 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         {
             foreach (var product in products)
             {
+                if (product == null)
+                {
+                    throw new ArgumentNullException(nameof(product), "Product cannot be null.");
+                }
+
+                if (product.Brand != null)
+                {
+                    var manufacturer = await BrandExistsAsync(product.Brand.Name);
+                    if (manufacturer == null)
+                    {
+                        int brandId = await CreateBrandAsync(product.Brand);
+                        product.BrandId = brandId;
+                    }
+                    else
+                    {
+                        //await UpdateBrandAsync(product.Brand,manufacturer.Id);
+                        product.BrandId = manufacturer.Id;
+                    }
+                }
+
                 await UpsertProductAsync(product);
             }
         }
@@ -119,7 +147,59 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 await DeleteProductAsync(sku);
             }
         }
+        #endregion
 
+        #region Brand
+        public async Task<int> CreateBrandAsync(BrandDto brand)
+        {
+            var payload = SmartstoreManufacturerMapper.ToDto(brand);
+            var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+            var response = await _httpClient.PostAsync("manufacturers", content);
+            var result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+            var created = await response.Content.ReadFromJsonAsync<SmartstoreProductDto>();
+            return created.Id;
+        }
+
+        public async Task UpdateBrandAsync(BrandDto brand,int id)
+        {
+            var payload = SmartstoreManufacturerMapper.ToDto(brand);
+            payload.Id = id;
+            var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PutAsJsonAsync("manufacturers", content);
+            var result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task DeleteBrandAsync(int brandId)
+        {
+            var response = await _httpClient.DeleteAsync($"manufacturers({brandId})");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<BrandDto?> BrandExistsAsync(string brandName)
+        {
+            try
+            {
+                var url = $"manufacturers?$filter=name eq '{brandName}'";
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreManufacturerDto>>(json, _jsonOptions);
+
+                return data?.Value?.FirstOrDefault() is SmartstoreManufacturerDto dto ? SmartstoreManufacturerMapper.ToDto(dto) : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        #endregion
     }
 }

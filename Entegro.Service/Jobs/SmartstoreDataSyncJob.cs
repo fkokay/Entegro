@@ -22,6 +22,7 @@ namespace Entegro.Service.Jobs
     public class SmartstoreDataSyncJob : IJob
     {
         private readonly ICommerceProductWriter _commerceProductWriter;
+        private readonly ICommerceBrandWriter _commerceBrandWriter;
         private readonly ISmartstoreService _smartstoreService;
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
@@ -32,6 +33,7 @@ namespace Entegro.Service.Jobs
 
         public SmartstoreDataSyncJob(
             ICommerceProductWriter commerceProductWriter,
+            ICommerceBrandWriter commerceBrandWriter,
             ISmartstoreService smartstoreService,
             IProductService productService,
             IOrderService orderService,
@@ -41,6 +43,7 @@ namespace Entegro.Service.Jobs
             ILogger<SmartstoreDataSyncJob> logger)
         {
             _commerceProductWriter = commerceProductWriter ?? throw new ArgumentNullException(nameof(commerceProductWriter));
+            _commerceBrandWriter = commerceBrandWriter ?? throw new ArgumentNullException(nameof(commerceBrandWriter));
             _smartstoreService = smartstoreService ?? throw new ArgumentNullException(nameof(smartstoreService));
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));

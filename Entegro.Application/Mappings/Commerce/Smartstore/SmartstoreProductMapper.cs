@@ -188,6 +188,17 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.Id = 0;
 
 
+                smartstoreProduct.ProductManufacturers = new List<SmartstoreProductManufacturerDto>();
+                if (product.BrandId.HasValue && product.BrandId > 0)
+                {
+                    var productManufacturer = new SmartstoreProductManufacturerDto
+                    {
+                        ManufacturerId = product.BrandId.Value,
+                        DisplayOrder = 0
+                    };
+                    smartstoreProduct.ProductManufacturers.Add(productManufacturer);
+                }
+
                 return smartstoreProduct; 
             }
             catch (Exception ex)
