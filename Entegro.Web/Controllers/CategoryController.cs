@@ -48,7 +48,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CategoryList([FromBody] DatatableData model)
+        public async Task<IActionResult> CategoryList([FromBody] GridCommand model)
         {
             int pageNumber = model.Start / model.Length;
             int pageSize = model.Length;

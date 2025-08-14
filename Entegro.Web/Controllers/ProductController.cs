@@ -24,7 +24,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProductList([FromBody] DatatableData model)
+        public async Task<IActionResult> ProductList([FromBody] GridCommand model)
         {
             var result = await _productService.GetProductsAsync(model.Draw, model.Length);
 

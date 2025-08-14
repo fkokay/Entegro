@@ -1,7 +1,7 @@
 ﻿namespace Entegro.Web.Models
 {
 
-    public class DatatableData
+    public class GridCommand
     {
         public int Draw { get; set; }
         public int Start { get; set; }
