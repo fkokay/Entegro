@@ -13,7 +13,7 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
         public string ProductSize { get; set; }
         public string MerchantSku { get; set; }
         public string ProductName { get; set; }
-        public string ProductCode { get; set; }
+        public long ProductCode { get; set; }
         public string ProductOrigin { get; set; }
         public long MerchantId { get; set; }
         public decimal Amount { get; set; }

@@ -10,7 +10,7 @@ using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
 
-namespace Entegro.Application.Mappings
+namespace Entegro.Application.Queries
 {
     public class MappingProfile : Profile
     {
@@ -72,14 +72,30 @@ namespace Entegro.Application.Mappings
             CreateMap<Order, OrderDto>().ReverseMap();
             CreateMap<Order, CreateOrderDto>().ReverseMap();
             CreateMap<Order, UpdateOrderDto>().ReverseMap();
+
+            CreateMap<OrderDto, CreateOrderDto>().ReverseMap();
+            CreateMap<OrderDto, UpdateOrderDto>().ReverseMap();
+
+            CreateMap<CreateOrderDto, OrderDto>().ReverseMap();
+            CreateMap<UpdateOrderDto, OrderDto>().ReverseMap();
             CreateMap<PagedResult<Order>, PagedResult<OrderDto>>().ReverseMap();
+            CreateMap<PagedResult<ProductDto>, PagedResult<Product>>().ReverseMap();
             #endregion
 
             #region OrderItem
             CreateMap<OrderItem, OrderItemDto>().ReverseMap();
             CreateMap<OrderItem, CreateOrderItemDto>().ReverseMap();
             CreateMap<OrderItem, UpdateOrderItemDto>().ReverseMap();
+
+            CreateMap<OrderItemDto, CreateOrderItemDto>().ReverseMap();
+            CreateMap<OrderItemDto, UpdateOrderItemDto>().ReverseMap();
+
+            CreateMap<CreateOrderItemDto, OrderItemDto>().ReverseMap();
+            CreateMap<UpdateOrderItemDto, OrderItemDto>().ReverseMap();
+
+
             CreateMap<PagedResult<OrderItem>, PagedResult<OrderItemDto>>().ReverseMap();
+            CreateMap<PagedResult<OrderItemDto>, PagedResult<Product>>().ReverseMap();
             #endregion
 
             #region Customer

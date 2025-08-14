@@ -21,7 +21,7 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
         public long CustomerId { get; set; }
         public string CustomerLastName { get; set; }
         public long Id { get; set; } // shipmentPackageId
-        public string CargoTrackingNumber { get; set; }
+        public long CargoTrackingNumber { get; set; }
         public string CargoTrackingLink { get; set; }
         public string CargoSenderNumber { get; set; }
         public string CargoProviderName { get; set; }

@@ -1,8 +1,8 @@
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
-using Entegro.Application.Mappings;
 using Entegro.Application.Mappings.Commerce.Smartstore;
+using Entegro.Application.Queries;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Infrastructure.Data;

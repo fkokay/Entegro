@@ -3,8 +3,8 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Application.Mappings;
 using Entegro.Application.Mappings.Commerce.Smartstore;
+using Entegro.Application.Queries;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Application.Services.Commerce.Smartstore;
@@ -51,29 +51,29 @@ builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-    var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+    //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
-    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
-
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeySmartstore)
-        .WithIdentity("SmartstoreDataSyncJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-        );
-
-    //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
-
-    //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+    //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
 
     //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeyTrendyol)
-    //    .WithIdentity("TrendyolDataSyncJob-trigger")
+    //    .ForJob(jobKeySmartstore)
+    //    .WithIdentity("SmartstoreDataSyncJob-trigger")
     //    .WithSimpleSchedule(x => x
     //        .WithIntervalInMinutes(10)
     //        .RepeatForever())
-    //);
+    //    );
+
+    var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+
+    q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKeyTrendyol)
+        .WithIdentity("TrendyolDataSyncJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(10)
+            .RepeatForever())
+    );
 
     //var jobKeyErp = new JobKey("ErpDataSyncJob");
 

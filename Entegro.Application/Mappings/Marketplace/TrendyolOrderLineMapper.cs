@@ -33,7 +33,7 @@ namespace Entegro.Application.Mappings.Marketplace
             orderItem.UnitPrice = trendyolOrderLine.Amount;
             orderItem.TaxRate = trendyolOrderLine.VatBaseAmount;
             orderItem.Product = new DTOs.Product.ProductDto();
-            orderItem.Product.Code = trendyolOrderLine.ProductCode;
+            orderItem.Product.Code = trendyolOrderLine.ProductCode.ToString();
             orderItem.TaxRate = trendyolOrderLine.VatBaseAmount;
 
 

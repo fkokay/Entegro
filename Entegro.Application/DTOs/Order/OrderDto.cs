@@ -27,7 +27,8 @@ namespace Entegro.Application.DTOs.Order
             {
                 return OrderSource switch
                 {
-                    OrderSource.Smartstore => "Smartstore"
+                    OrderSource.Smartstore => "Smartstore",
+                    OrderSource.Trendyol => "Trendyol"
                 };
             }
         }

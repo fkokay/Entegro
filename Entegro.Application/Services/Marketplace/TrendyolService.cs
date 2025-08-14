@@ -74,7 +74,7 @@ namespace Entegro.Application.Services.Marketplace
         {
             var allShipmentPackages = new List<TrendyolShipmentPackageDto>();
             bool moreData = true;
-            int page = 1;
+            int page = 0;
 
             while (moreData)
             {

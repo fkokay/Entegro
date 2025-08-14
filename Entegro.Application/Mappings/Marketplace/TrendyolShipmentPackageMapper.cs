@@ -32,7 +32,7 @@ namespace Entegro.Application.Mappings.Marketplace
             order.OrderNo = trendyolShipmentPackage.OrderNumber;
             order.OrderDate = FromUnixTimeMilliseconds(trendyolShipmentPackage.OrderDate);
             order.TotalAmount = trendyolShipmentPackage.TotalPrice;
-            order.OrderSource = Domain.Enums.OrderSource.Trednyol;
+            order.OrderSource = Domain.Enums.OrderSource.Trendyol;
             order.CustomerId = 0;
             order.Deleted = false;
             order.IsTransient = true;
