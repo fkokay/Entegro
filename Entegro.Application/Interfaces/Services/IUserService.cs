@@ -1,10 +1,5 @@
-﻿using Entegro.Application.DTOs.User;
-using Entegro.Application.DTOs.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.User;
 
 namespace Entegro.Application.Interfaces.Services
 {
@@ -16,5 +11,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<int> CreateUserAsync(CreateUserDto createUser);
         Task<bool> UpdateUserAsync(UpdateUserDto updateUser);
         Task<bool> DeleteUserAsync(int userId);
+
+        Task<UserDto?> GetByEmailAndPasswordAsync(string email, string password);
     }
 }
