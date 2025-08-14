@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
-using Entegro.Application.DTOs.User;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services
 {
@@ -17,7 +11,7 @@ namespace Entegro.Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public UserService(IUserRepository userRepository,IMapper mapper) 
+        public UserService(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -40,6 +34,18 @@ namespace Entegro.Application.Services
             }
             await _userRepository.DeleteAsync(user);
             return true;
+        }
+
+        public async Task<UserDto?> GetByEmailAndPasswordAsync(string email, string password)
+        {
+            var user = await _userRepository.GetByEmailAndPasswordAsync(email, password);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with Email {email} not found.");
+            }
+            var userDto = _mapper.Map<UserDto>(user);
+            return userDto;
         }
 
         public async Task<UserDto> GetUserByIdAsync(int userId)

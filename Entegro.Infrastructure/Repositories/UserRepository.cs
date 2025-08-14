@@ -3,11 +3,6 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -16,7 +11,7 @@ namespace Entegro.Infrastructure.Repositories
         private readonly EntegroContext _context;
         public UserRepository(EntegroContext context)
         {
-           _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         public async Task AddAsync(User user)
         {
@@ -52,6 +47,11 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+        public async Task<User?> GetByEmailAndPasswordAsync(string email, string password)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
 
         public async Task<User?> GetByIdAsync(int id)
