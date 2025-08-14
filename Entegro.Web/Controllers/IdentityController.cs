@@ -27,5 +27,11 @@ namespace Entegro.Web.Controllers
 
             return View(model);
         }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            return RedirectToAction("Login", "Identity");
+        }
     }
 }
