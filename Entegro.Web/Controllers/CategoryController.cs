@@ -27,12 +27,13 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            CategoryViewModel model = new CategoryViewModel();
+            return View(model);
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCategoryViewModel model)
+        public async Task<IActionResult> Create(CategoryViewModel model)
         {
             // Doğrudan servis çağrısı
             await _categoryService.CreateCategoryAsync(new CreateCategoryDto
@@ -71,15 +72,15 @@ namespace Entegro.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CategoryListForSelect()
+        public async Task<IActionResult> AllCateogry(int page,string term)
         {
             var result = await _categoryService.GetCategoriesFormatTreePathAsync();
-            return Json(result.Select(c => new CategoryTreePathViewModel
+
+            return Json(new { results = result.Select(c => new 
             {
-                Id = c.Id,
-                Name = c.Name,
-                FormattedName = c.FormattedName
-            }));
+                id = c.Id,
+                text = c.FormattedName
+            }), pagination = new { more = false } });
         }
     }
 }

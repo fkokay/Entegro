@@ -1,4 +1,4 @@
-﻿@model CategoryDto
+﻿@model CategoryViewModel
 
 
 
@@ -29,11 +29,9 @@
                     <!-- Kategori Seçimi -->
                     <div class="col-md-12">
                         <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="category-select">Kategori Seç</label>
+                            <label class="col-sm-3 col-form-label text-sm-start" for="ParentCategoryId">Kategori Seç</label>
                             <div class="col-sm-9">
-                              
-                                <select class="form-select" id="category-select" name="ParentCategoryId">
-                                    <option selected disabled>Kategori Seçin</option>
+                                <select class="select2 form-select form-select-lg" data-allow-clear="true" asp-for="ParentCategoryId">
                                 </select>
                             </div>
                         </div>
@@ -54,8 +52,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
                             <div class="col-sm-9">
-                                @* @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" }) *@
-                                <input type="number" class="form-control" asp-for="DisplayOrder" value="0" min="0" />
+                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
                             </div>
                         </div>
                     </div>

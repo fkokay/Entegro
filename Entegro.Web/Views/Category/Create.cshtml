@@ -1,4 +1,5 @@
-﻿@{
+﻿@model CategoryViewModel
+@{
     ViewData["Title"] = "Yeni Bir Kategori Ekle";
 }
 
@@ -7,7 +8,7 @@
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Kategoriler/</span> Yeni Bir Kategori Ekle</h4>
 
         <div class="row">
-            <partial name="_CreateOrUpdate" />
+            <partial name="_CreateOrUpdate" model="Model" />
             <div class="col-lg-3 col-12 invoice-actions">
                 <div class="card mb-4">
                     <div class="card-body">
@@ -24,19 +25,13 @@
 
 
 
-@section scripts{
-    <!-- Vendors CSS -->
-    <link rel="stylesheet" href="~/assets/vendor/libs/typeahead-js/typeahead.css" />
-    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
-    <link rel="stylesheet" href="~/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
-    
+@section scripts {
     <script src="~/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js"></script>
     <script src="~/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js"></script>
     <script src="~/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js"></script>
     <script src="~/assets/vendor/libs/formvalidation/dist/js/locales/tr_tr.js"></script>
 
     <script>
-        // Form Validation Setup
         const formValidation = FormValidation.formValidation(
             document.getElementById('category-form'),
             {
@@ -90,7 +85,7 @@
 
                     instance.on('core.form.valid', function () {
                         const formData = {
-                            ParentCategoryId: $('#category-select').val(),
+                            ParentCategoryId: $('#ParentCategoryId').val(),
                             Name: $('#Name').val(),
                             DisplayOrder: $('#DisplayOrder').val(),
                             Description: $('#Description').val(),
@@ -121,25 +116,21 @@
             }
         );
 
-        // AJAX ile Kategori Listesini Çekme
-        $(document).ready(function() {
-            $.ajax({
-                url: '@Url.Action("CategoryListForSelect", "Category")', // Controller ve action
-                method: 'Post',
-                success: function (data) {
-                    var $categorySelect = $('#category-select');
-                    $categorySelect.empty();  // Önceki seçenekleri temizle
-                    $categorySelect.append('<option selected disabled>Kategori Seçin</option>');  // İlk seçeneği ekle
+        $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
+            dropdownParent: $('#ParentCategoryId').parent(),
+            ajax: {
+                url: '@Url.Action("AllCateogry", "Category")',
+                type: "POST",
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        page: params.page || 1,
+                    }
 
-                    // Gelen kategorileri select'e ekle
-                    data.forEach(function (category) {
-                        $categorySelect.append('<option value="' + category.Id + '">' + category.FormattedName + '</option>');
-                    });
-                },
-                error: function (xhr) {
-                    alert(xhr.responseText || 'Kategori listesini çekerken bir hata oluştu.');
+                    return query;
                 }
-            });
+            }
         });
     </script>
 }
