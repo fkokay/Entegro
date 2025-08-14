@@ -19,9 +19,65 @@ namespace Entegro.ERP.Logo.Install
 
         public async Task EnsureViewsAsync()
         {
-            await InitializeItems();
+            await InitializeProducts();
+            await InitializeProductPrices();
+            await InitializeProductStocks();
             await InitializeCustomers();
             await InitializeCustomerBalances();
+        }
+
+        private async Task InitializeProductStocks()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_PRODUCT_STOCKS', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_PRODUCT_STOCKS AS
+                SELECT 
+                ITEM.CODE AS ProductCode,
+                ITEM.NAME AS ProductName,
+                (SELECT ISNULL((SUM (GNSTITOT.ONHAND)-SUM (GNSTITOT.RESERVED)),0) AS STOCKAMOUNT FROM LV_200_01_GNTOTST GNSTITOT WITH(NOLOCK) WHERE (GNSTITOT.STOCKREF = ITEM.LOGICALREF) AND (GNSTITOT.INVENNO = -1)) AS Stock
+                FROM 
+                LG_200_ITEMS AS ITEM
+                WHERE (ITEM.ACTIVE=0) AND (ITEM.CARDTYPE NOT IN(4,20,21));
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task InitializeProductPrices()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_PRODUCT_PRICES', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_PRODUCT_PRICES AS
+                SELECT 
+                ITEM.CODE AS ProductCode,
+                ITEM.NAME AS ProductName,	
+                0 AS Price
+                FROM 
+                LG_200_ITEMS AS ITEM
+                WHERE (ITEM.ACTIVE=0) AND (ITEM.CARDTYPE NOT IN(4,20,21));
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
         }
 
         private async Task InitializeCustomerBalances()
@@ -78,19 +134,19 @@ namespace Entegro.ERP.Logo.Install
             }
         }
 
-        private async Task InitializeItems()
+        private async Task InitializeProducts()
         {
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_ITEMS', 'V')", connection);
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_PRODUCTS', 'V')", connection);
 
             var result = await checkViewCmd.ExecuteScalarAsync();
 
             if (result == DBNull.Value || result == null)
             {
                 var createViewSql = @"
-                CREATE VIEW ENTEGRO_ITEMS AS
+                CREATE VIEW ENTEGRO_PRODUCTS AS
                 SELECT
                     CODE AS Code, 
                     NAME AS Name, 

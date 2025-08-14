@@ -28,7 +28,7 @@ namespace Entegro.ERP.Logo.Repositories
 
             var sql = @"
             SELECT * FROM ENTEGRO_CUSTOMERS
-            ORDER BY CustomerCode
+            ORDER BY Code
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
             var customers = await connection.QueryAsync<CustomerDto>(sql, new { Offset = (page - 1) * pageSize, PageSize = pageSize });

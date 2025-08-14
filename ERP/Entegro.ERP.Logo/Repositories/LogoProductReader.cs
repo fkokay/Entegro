@@ -24,12 +24,12 @@ namespace Entegro.ERP.Logo.Repositories
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var countSql = @"SELECT COUNT(*) FROM ENTEGRO_ITEMS";
+            var countSql = @"SELECT COUNT(*) FROM ENTEGRO_PRODUCTS";
             var totalCount = await connection.ExecuteScalarAsync<int>(countSql);
 
             var sql = @"
-            SELECT * FROM ENTEGRO_ITEMS
-            ORDER BY LOGICALREF
+            SELECT * FROM ENTEGRO_PRODUCTS
+            ORDER BY Code
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
             var products = await connection.QueryAsync<ProductDto>(sql, new { Offset = (page - 1) * pageSize, PageSize = pageSize });

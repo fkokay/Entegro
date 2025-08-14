@@ -11,21 +11,30 @@ namespace Entegro.ERP.Api.Controllers
     {
         private readonly IErpDatabaseInitializerFactory _erpDatabaseInitializerFactory;
         private readonly IErpProductReaderFactory _erpProductReaderFactory;
+        private readonly IErpProductStockReaderFactory _erpProductStockReaderFactory;
+        private readonly IErpProductPriceReaderFactory _erpProductPriceReaderFactory;
         private readonly IErpCustomerReaderFactory _erpCustomerReaderFactory;
         private readonly IErpCustomerBalanceReaderFactory _erpCustomerBalanceReaderFactory;
+        private readonly IErpOrderReaderFactory _erpOrderReaderFactory;
         private readonly IConfiguration _configuration;
 
         public ErpController(
             IErpDatabaseInitializerFactory erpDatabaseInitializerFactory, 
             IErpProductReaderFactory erpProductReaderFactory, 
+            IErpProductStockReaderFactory erpProductStockReaderFactory,
+            IErpProductPriceReaderFactory erpProductPriceReaderFactory,
             IErpCustomerReaderFactory erpCustomerReaderFactory,
             IErpCustomerBalanceReaderFactory erpCustomerBalanceReaderFactory,
+            IErpOrderReaderFactory erpOrderReaderFactory,
             IConfiguration configuration)
         {
             _erpDatabaseInitializerFactory = erpDatabaseInitializerFactory;
             _erpProductReaderFactory = erpProductReaderFactory;
+            _erpProductStockReaderFactory = erpProductStockReaderFactory;
+            _erpProductPriceReaderFactory = erpProductPriceReaderFactory;
             _erpCustomerReaderFactory = erpCustomerReaderFactory;
             _erpCustomerBalanceReaderFactory = erpCustomerBalanceReaderFactory;
+            _erpOrderReaderFactory = erpOrderReaderFactory;
             _configuration = configuration;
         }
 
@@ -66,6 +75,44 @@ namespace Entegro.ERP.Api.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("product-stocks")]
+        public async Task<IActionResult> GetProductStocks([FromRoute] string erpType, int page, int pageSize)
+        {
+            string connectionString = GetConnectionString(erpType) ?? "";
+            if (connectionString.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+
+            var erpProductStockReader = _erpProductStockReaderFactory.Create(erpType, connectionString);
+
+            var productStocks = await erpProductStockReader.GetProductStocksAsync(page, pageSize);
+            if (productStocks == null) return NotFound();
+
+            return Ok(productStocks);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("product-prices")]
+        public async Task<IActionResult> GetProductPrices([FromRoute] string erpType, int page, int pageSize)
+        {
+            string connectionString = GetConnectionString(erpType) ?? "";
+            if (connectionString.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+
+            var erpProductPriceReader = _erpProductPriceReaderFactory.Create(erpType, connectionString);
+
+            var productPrices = await erpProductPriceReader.GetProductPricesAsync(page, pageSize);
+            if (productPrices == null) return NotFound();
+
+            return Ok(productPrices);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("customer")]
         public async Task<IActionResult> GetCustomers([FromRoute] string erpType, int page, int pageSize)
         {
@@ -100,6 +147,25 @@ namespace Entegro.ERP.Api.Controllers
             if (customerBalances == null) return NotFound();
 
             return Ok(customerBalances);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetOrders([FromRoute] string erpType, int page, int pageSize)
+        {
+            string connectionString = GetConnectionString(erpType) ?? "";
+            if (connectionString.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+
+            var erpOrderReader = _erpOrderReaderFactory.Create(erpType, connectionString);
+
+            var orders = await erpOrderReader.GetOrdersAsync(page, pageSize);
+            if (orders == null) return NotFound();
+
+            return Ok(orders);
         }
 
         private string? GetConnectionString(string erpType)
