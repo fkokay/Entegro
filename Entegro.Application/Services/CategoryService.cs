@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
-using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services
 {
@@ -24,8 +18,32 @@ namespace Entegro.Application.Services
         }
         public async Task<int> CreateCategoryAsync(CreateCategoryDto createCategory)
         {
+
             var category = _mapper.Map<Category>(createCategory);
-            await _categoryRepository.AddAsync(category);
+
+            // Önce ekle, böylece category.Id oluşur
+            await _categoryRepository.AddAsync(category); // ID burada artık hazır
+
+            // TreePath hesaplama
+            if (category.ParentCategoryId == 0)
+            {
+                category.TreePath = $"/{category.Id}/";
+            }
+            else
+            {
+                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId);
+                if (parentCategory != null)
+                {
+                    category.TreePath = $"{parentCategory.TreePath}{category.Id}/";
+                }
+                else
+                {
+                    category.TreePath = $"/{category.Id}/"; // Ebeveyn bulunamazsa yine kök gibi
+                }
+            }
+
+            // Güncelle ve kaydet
+            await _categoryRepository.UpdateAsync(category); // TreePath güncelleniyor
 
             return category.Id;
         }
@@ -56,6 +74,58 @@ namespace Entegro.Application.Services
             return categoryDtos;
         }
 
+        public async Task<IEnumerable<CategoryTreePathDto>> GetCategoriesFormatTreePathAsync()
+        {
+            var categories = await GetCategoriesAsync();
+
+            // Kategorileri TreePath'e göre sıralıyoruz
+            var orderedCategories = categories.OrderBy(c => c.TreePath).ToList();
+
+            // Kategorilerdeki ID'ler üzerinden isimleri bulup, TreePath formatını düzeltiyoruz
+            var categoryDtos = orderedCategories.Select(category => new CategoryDto
+            {
+                Id = category.Id,
+                ParentCategoryId = category.ParentCategoryId,
+                TreePath = category.TreePath,
+                Name = category.Name,
+                Description = category.Description,
+                MetaTitle = category.MetaTitle,
+                MetaDescription = category.MetaDescription,
+                MetaKeywords = category.MetaKeywords,
+                DisplayOrder = category.DisplayOrder,
+                CreatedOn = category.CreatedOn,
+                UpdatedOn = category.UpdatedOn
+            }).ToList();
+
+            // Burada, kategorileri TreePath'e göre formatlayacağız
+            var result = categoryDtos.Select(c => new CategoryTreePathDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                FormattedName = FormatTreePath(c.TreePath, categoryDtos)
+            }).ToList();
+
+            return result;
+        }
+        private string FormatTreePath(string treePath, List<CategoryDto> allCategories)
+        {
+            // TreePath'i id'ler üzerinden çözümleyelim
+            var pathIds = treePath.Trim('/').Split('/');
+            var categoryNames = new List<string>();
+
+            foreach (var pathId in pathIds)
+            {
+                // ID'ye karşılık gelen kategori ismini buluyoruz
+                var category = allCategories.FirstOrDefault(c => c.Id.ToString() == pathId);
+                if (category != null)
+                {
+                    categoryNames.Add(category.Name);
+                }
+            }
+
+            // Kategori isimlerini " - " ile birleştiriyoruz
+            return string.Join(" - ", categoryNames);
+        }
         public async Task<CategoryDto> GetCategoryByIdAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
