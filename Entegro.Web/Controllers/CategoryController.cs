@@ -1,5 +1,7 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Entegro.Web.Models.CategoryViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
@@ -22,18 +24,62 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateCategoryViewModel model)
+        {
+            // Doğrudan servis çağrısı
+            await _categoryService.CreateCategoryAsync(new CreateCategoryDto
+            {
+                Name = model.Name,
+                ParentCategoryId = model.ParentCategoryId,
+                Description = model.Description,
+                MetaDescription = model.MetaDescription,
+                MetaTitle = model.MetaTitle,
+                DisplayOrder = model.DisplayOrder,
+                MetaKeywords = model.MetaKeywords,
+            });
+
+            // AJAX için JSON formatında yanıt dön
+            return Json(new { success = true });
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CategoryList([FromBody] DatatableData model)
         {
-            var result = await _categoryService.GetCategoriesAsync(model.Start, model.Length);
+            int pageNumber = model.Start / model.Length;
+            int pageSize = model.Length;
+
+
+            var result = await _categoryService.GetCategoriesAsync(pageNumber, model.Length);
 
             return Json(new
             {
-                draw = result.PageNumber,
+                draw = model.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CategoryListForSelect()
+        {
+            var result = await _categoryService.GetCategoriesFormatTreePathAsync();
+            return Json(result.Select(c => new CategoryTreePathViewModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                FormattedName = c.FormattedName
+            }));
         }
     }
 }

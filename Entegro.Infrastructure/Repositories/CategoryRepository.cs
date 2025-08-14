@@ -3,11 +3,6 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -22,6 +17,10 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Category category)
         {
+            category.CreatedOn = DateTime.UtcNow;
+            category.UpdatedOn = DateTime.UtcNow;
+            category.TreePath = $"/{category.Id}/";
+
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
         }
