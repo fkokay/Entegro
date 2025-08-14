@@ -1,4 +1,4 @@
-﻿namespace Entegro.Web.Models.CategoryViewModels
+﻿namespace Entegro.Web.Models
 {
     public class CategoryViewModel
     {

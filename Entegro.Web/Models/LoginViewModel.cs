@@ -1,4 +1,4 @@
-﻿namespace Entegro.Web.Models.IdentityViewModels
+﻿namespace Entegro.Web.Models
 {
     public class LoginViewModel
     {

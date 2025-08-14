@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models.IdentityViewModels;
+using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers

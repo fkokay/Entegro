@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
-using Entegro.Web.Models.CategoryViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
