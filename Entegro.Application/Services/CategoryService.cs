@@ -16,6 +16,7 @@ namespace Entegro.Application.Services
             _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
         public async Task<int> CreateCategoryAsync(CreateCategoryDto createCategory)
         {
 
