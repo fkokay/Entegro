@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IErpDatabaseInitializerFactory, ErpDatabaseInitializerFactory>();
 builder.Services.AddScoped<IErpProductReaderFactory, ErpProductReaderFactory>();
+builder.Services.AddScoped<IErpCustomerReaderFactory, ErpCustomerReaderFactory>();
+builder.Services.AddScoped<IErpCustomerBalanceReaderFactory, ErpCustomerBalanceReaderFactory>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

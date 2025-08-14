@@ -13,6 +13,5 @@ namespace Entegro.ERP.Abstractions.DTOs
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
         public decimal Balance { get; set; }
-        public DateTime LastTransactionDate { get; set; }
     }
 }

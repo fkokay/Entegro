@@ -19,6 +19,67 @@ namespace Entegro.ERP.Logo.Install
 
         public async Task EnsureViewsAsync()
         {
+            await InitializeItems();
+            await InitializeCustomers();
+            await InitializeCustomerBalances();
+        }
+
+        private async Task InitializeCustomerBalances()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_CUSTOMER_BALANCES', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_CUSTOMER_BALANCES AS
+                SELECT
+	            CODE AS CustomerCode,
+	            DEFINITION_ AS CustomerName,
+	            ISNULL((SELECT SUM(GNTOTCL.DEBIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Debit,
+                ISNULL((SELECT SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Credit,
+                ISNULL((SELECT SUM(GNTOTCL.DEBIT)-SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Balance
+                FROM LG_200_CLCARD AS CLCARD WHERE ACTIVE=0 AND CARDTYPE <>  22;
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task InitializeCustomers()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_CUSTOMERS', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_CUSTOMERS AS
+                SELECT
+	            CODE AS Code,
+	            DEFINITION_ AS Name,
+	            ISNULL((SELECT SUM(GNTOTCL.DEBIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Debit,
+                ISNULL((SELECT SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Credit,
+                ISNULL((SELECT SUM(GNTOTCL.DEBIT)-SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Balance
+                FROM LG_200_CLCARD AS CLCARD WHERE ACTIVE=0 AND CARDTYPE <>  22;
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task InitializeItems()
+        {
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 

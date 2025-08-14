@@ -10,5 +10,8 @@ namespace Entegro.ERP.Abstractions.DTOs
     {
         public string Code { get; set; }
         public string Name { get; set; }
+        public decimal Debit { get; set; }
+        public decimal Credit { get; set; }
+        public decimal Balance { get; set; }
     }
 }
