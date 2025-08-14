@@ -107,6 +107,25 @@ namespace Entegro.Application.Services
 
             return result;
         }
+
+        public async Task<CategoryDto> GetCategoryByIdAsync(int categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            if (category == null)
+            {
+                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
+            }
+
+            var categoryDto = _mapper.Map<CategoryDto>(category);
+            return categoryDto;
+        }
+
+        public async Task<bool> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
+        {
+            await _categoryRepository.UpdateAsync(_mapper.Map<Category>(updateCategory));
+            return true;
+        }
+
         private string FormatTreePath(string treePath, List<CategoryDto> allCategories)
         {
             // TreePath'i id'ler üzerinden çözümleyelim
@@ -125,23 +144,6 @@ namespace Entegro.Application.Services
 
             // Kategori isimlerini " - " ile birleştiriyoruz
             return string.Join(" - ", categoryNames);
-        }
-        public async Task<CategoryDto> GetCategoryByIdAsync(int categoryId)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category == null)
-            {
-                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
-            }
-
-            var categoryDto = _mapper.Map<CategoryDto>(category);
-            return categoryDto;
-        }
-
-        public async Task<bool> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
-        {
-            await _categoryRepository.UpdateAsync(_mapper.Map<Category>(updateCategory));
-            return true;
         }
     }
 }

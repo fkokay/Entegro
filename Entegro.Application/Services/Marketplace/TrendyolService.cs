@@ -82,71 +82,71 @@ namespace Entegro.Application.Services.Marketplace
 
         public Task<IEnumerable<TrendyolCargoCompanyDto>> GetCargoCompaniesAsync()
         {
-            List<TrendyolCargoCompanyDto> trendyolCargoCompanyDtos = new List<TrendyolCargoCompanyDto>();
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            List<TrendyolCargoCompanyDto> trendyolCargoCompanies = new List<TrendyolCargoCompanyDto>();
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 38,
                 Code = "SENDEOMP",
                 Name = "Kolay Gelsin Marketplace",
                 TaxNumber = "2910804196"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 30,
                 Code = "BORMP",
                 Name = "Borusan Lojistik Marketplace",
                 TaxNumber = "1800038254"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 10,
                 Code = "DHLECOMMP",
                 Name = "DHL eCommerce Marketplace",
                 TaxNumber = "6080712084"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 19,
                 Code = "PTTMP",
                 Name = "PTT Kargo Marketplace",
                 TaxNumber = "7320068060"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 9,
                 Code = "SURATMP",
                 Name = "Sürat Kargo Marketplace",
                 TaxNumber = "7870233582"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 17,
                 Code = "TEXMP",
                 Name = "Trendyol Express Marketplace",
                 TaxNumber = "8590921777"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 6,
                 Code = "HOROZMP",
                 Name = "Horoz Kargo Marketplace",
                 TaxNumber = "4630097122"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 20,
                 Code = "CEVAMP",
                 Name = "CEVA Marketplace",
                 TaxNumber = "8450298557"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 4,
                 Code = "YKMP",
                 Name = "Yurtiçi Kargo Marketplace",
                 TaxNumber = "3130557669"
             });
-            trendyolCargoCompanyDtos.Add(new TrendyolCargoCompanyDto()
+            trendyolCargoCompanies.Add(new TrendyolCargoCompanyDto()
             {
                 Id = 7,
                 Code = "ARASMP",
@@ -154,7 +154,7 @@ namespace Entegro.Application.Services.Marketplace
                 TaxNumber = "720039666"
             });
 
-            return trendyolCargoCompanyDtos.ToList();
+            return Task.FromResult(trendyolCargoCompanies.AsEnumerable());
         }
 
         public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
