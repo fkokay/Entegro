@@ -7,12 +7,8 @@ using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings
 {
@@ -90,7 +86,14 @@ namespace Entegro.Application.Mappings
             CreateMap<Customer, CustomerDto>().ReverseMap();
             CreateMap<Customer, CreateCustomerDto>().ReverseMap();
             CreateMap<Customer, UpdateCustomerDto>().ReverseMap();
-            CreateMap<PagedResult<Customer>, PagedResult<CustomerDto>>().ReverseMap(); 
+            CreateMap<PagedResult<Customer>, PagedResult<CustomerDto>>().ReverseMap();
+            #endregion
+
+
+            #region user
+            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, CreateUserDto>().ReverseMap();
+            CreateMap<User, UpdateUserDto>().ReverseMap();
             #endregion
         }
     }
