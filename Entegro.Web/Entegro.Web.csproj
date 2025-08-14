@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Entegro.Infrastructure\Entegro.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Invoice\" />
+  </ItemGroup>
+
 </Project>
