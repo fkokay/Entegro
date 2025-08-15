@@ -1,14 +1,8 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Common;
 using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -51,17 +45,33 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.Include(m=>m.Brand).Include(m=>m.ProductImages).AsQueryable();
+            //var query = _context.Products.Include(m=>m.Brand).Include(m=>m.ProductImages).AsQueryable();
+
+            //var totalCount = await query.CountAsync();
+            //var products = await query
+            //    .Skip((pageNumber - 1) * pageSize)
+            //    .Take(pageSize)
+            //    .ToListAsync();
+
+            //return new PagedResult<Product>
+            //{
+            //    Items = products,
+            //    TotalCount = totalCount,
+            //    PageNumber = pageNumber,
+            //    PageSize = pageSize
+            //};
+
+            var query = _context.Products.Include(m => m.Brand).Include(m => m.ProductImages).AsQueryable(); ;
 
             var totalCount = await query.CountAsync();
-            var products = await query
-                .Skip((pageNumber - 1) * pageSize)
+            var categories = await query
+                .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             return new PagedResult<Product>
             {
-                Items = products,
+                Items = categories,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize

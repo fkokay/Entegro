@@ -1,8 +1,6 @@
 ﻿using Entegro.Application.Interfaces.Services;
-using Entegro.Infrastructure.Data;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -23,14 +21,23 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductList([FromBody] GridCommand model)
         {
-            var result = await _productService.GetProductsAsync(model.Draw, model.Length);
+            int pageNumber = model.Start / model.Length;
+            int pageSize = model.Length;
+
+
+            var result = await _productService.GetProductsAsync(pageNumber, model.Length);
 
             return Json(new
             {
-                draw = result.PageNumber,
+                draw = model.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

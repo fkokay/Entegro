@@ -77,12 +77,22 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateCategoryDto model)
+        public async Task<IActionResult> Edit(UpdateCategoryViewModel model)
         {
             if (ModelState.IsValid)
             {
-
-                await _categoryService.UpdateCategoryAsync(model);
+                var updateDto = new UpdateCategoryDto
+                {
+                    Id = model.Id,
+                    ParentCategoryId = model.ParentCategoryId,
+                    Name = model.Name,
+                    Description = model.Description,
+                    MetaDescription = model.MetaDescription,
+                    MetaTitle = model.MetaTitle,
+                    DisplayOrder = model.DisplayOrder,
+                    MetaKeywords = model.MetaKeywords,
+                };
+                await _categoryService.UpdateCategoryAsync(updateDto);
                 return Json(new { success = true });
             }
             return View(model);
