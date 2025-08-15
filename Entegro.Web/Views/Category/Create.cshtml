@@ -84,25 +84,24 @@
                     });
 
                     instance.on('core.form.valid', function () {
-                        const formData = {
-                            ParentCategoryId: $('#ParentCategoryId').val(),
-                            Name: $('#Name').val(),
-                            DisplayOrder: $('#DisplayOrder').val(),
-                            Description: $('#Description').val(),
-                            MetaTitle: $('#MetaTitle').val(),
-                            MetaKeywords: $('#MetaKeywords').val(),
-                            MetaDescription: $('#MetaDescription').val()
-                        };
+                        const formElement = document.getElementById('category-form');
+                        const formData = new FormData(formElement);
 
-                        // AJAX POST Request
+                        // FormData'yı düz JS objesine çeviriyoruz
+                        const data = {};
+                        formData.forEach((value, key) => {
+                            data[key] = value;
+                        });
+
+                        // AJAX POST
                         $.ajax({
-                            url: '@Url.Action("Create", "Category")', // Controller ve Action methodu
+                            url: '@Url.Action("Create", "Category")',
                             method: 'POST',
-                            data: formData,
+                            data: data,
                             success: function (response) {
                                 if (response.success) {
                                     alert('Kategori başarıyla kaydedildi.');
-                                    window.location.href = '@Url.Action("List", "Category")'; // Kategori listesine yönlendirme
+                                    window.location.href = '@Url.Action("List", "Category")';
                                 } else {
                                     alert('Bir hata oluştu: ' + response.message);
                                 }
@@ -116,6 +115,7 @@
             }
         );
 
+        // Select2 Ayarı
         $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
             dropdownParent: $('#ParentCategoryId').parent(),
             ajax: {
@@ -123,14 +123,13 @@
                 type: "POST",
                 dataType: 'json',
                 data: function (params) {
-                    var query = {
+                    return {
                         search: params.term,
-                        page: params.page || 1,
-                    }
-
-                    return query;
+                        page: params.page || 1
+                    };
                 }
             }
         });
     </script>
 }
+
