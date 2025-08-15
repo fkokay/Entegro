@@ -25,17 +25,27 @@ namespace Entegro.Web.Controllers
 
         public IActionResult Create()
         {
-            BrandDto model = new BrandDto();
+            BrandViewModel model = new BrandViewModel();
             model.DisplayOrder = 0;
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateBrandDto model)
+        public async Task<IActionResult> Create(BrandViewModel model)
         {
             if (ModelState.IsValid)
             {
-                await _brandService.CreateBrandAsync(model);
+                var createDto = new CreateBrandDto
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    MetaDescription = model.MetaDescription,
+                    MetaTitle = model.MetaTitle,
+                    DisplayOrder = model.DisplayOrder,
+                    MetaKeywords = model.MetaKeywords,
+                };
+
+                await _brandService.CreateBrandAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -48,15 +58,35 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            return View(brand);
+            var brandModel = new BrandViewModel
+            {
+                Id = brand.Id,
+                Name = brand.Name,
+                Description = brand.Description,
+                MetaDescription = brand.MetaDescription,
+                MetaTitle = brand.MetaTitle,
+                DisplayOrder = brand.DisplayOrder,
+                MetaKeywords = brand.MetaKeywords,
+            };
+            return View(brandModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateBrandDto model)
+        public async Task<IActionResult> Edit(UpdateBrandViewModel model)
         {
             if (ModelState.IsValid)
             {
-                await _brandService.UpdateBrandAsync(model);
+                var updateDto = new UpdateBrandDto
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    MetaDescription = model.MetaDescription,
+                    MetaTitle = model.MetaTitle,
+                    DisplayOrder = model.DisplayOrder,
+                    MetaKeywords = model.MetaKeywords,
+                };
+                await _brandService.UpdateBrandAsync(updateDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -75,15 +105,21 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> BrandList([FromBody] GridCommand model)
         {
-            var result = await _brandService.GetBrandsAsync(model.Draw, model.Length);
+
+            int pageNumber = model.Start / model.Length;
+            int pageSize = model.Length;
+
+
+            var result = await _brandService.GetBrandsAsync(pageNumber, model.Length);
 
             return Json(new
             {
-                draw = result.PageNumber,
+                draw = model.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
+
         }
     }
 }
