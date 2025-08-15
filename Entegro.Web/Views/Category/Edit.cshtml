@@ -299,34 +299,57 @@
 
 
     <script>
-                 $('#ParentCategoryId').select2({
+        $(function () {
+          const $cat = $('#ParentCategoryId');
+          // Taşma/overlay sorunlarına karşı güvenli kapsayıcı
+          if ($cat.parent().css('position') !== 'relative') {
+            $cat.wrap('<div class="position-relative"></div>');
+          }
+
+          $cat.select2({
+            width: '100%',
             placeholder: 'Kategori seçiniz',
             allowClear: true,
-            dropdownParent: $('#ParentCategoryId').parent(),
+            dropdownParent: $cat.parent(),
+            minimumInputLength: 0,     // istersen 2 yap
+            language: {
+              inputTooShort: () => 'Daha fazla karakter yazın',
+              searching:     () => 'Aranıyor...',
+              noResults:     () => 'Sonuç bulunamadı'
+            },
             ajax: {
-                url: '@Url.Action("AllCateogry", "Category")',
-                type: 'POST',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        term: params.term || '', // arama terimi
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
+              url: '@Url.Action("AllCategory", "Category")', // was: AllCateogry
+              type: 'POST',
+              dataType: 'json',
+              delay: 250,
+              data: function (params) {
+                return {
+                  term: params.term || '',
+                  page: params.page || 1
+                };
+              },
+              headers: {
+                // Antiforgery kullanıyorsan yorumu kaldır:
+                // 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+              },
+              processResults: function (data, params) {
+                params.page = params.page || 1;
 
-                    return {
-                        results: data.results,
-                        pagination: {
-                            more: data.pagination.more
-                        }
-                    };
-                },
-                cache: true
-            }
+                // Sunucu zaten { results:[{id,text}], pagination:{ more } } dönüyor
+                // Yine de korumalı döndür.
+                return {
+                  results: Array.isArray(data.results) ? data.results : [],
+                  pagination: { more: !!(data.pagination && data.pagination.more) }
+                };
+              },
+              cache: true
+            },
+            // Görünüm özelleştirme istersen:
+            templateResult: function (item) { return item.text || ''; },
+            templateSelection: function (item) { return item.text || ''; },
+            escapeMarkup: function (m) { return m; } // templateResult HTML kullanacaksan kalsın
+          });
         });
-
     </script>
+
 }

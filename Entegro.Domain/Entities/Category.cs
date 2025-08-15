@@ -17,4 +17,17 @@ namespace Entegro.Domain.Entities
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
     }
+    public sealed class CategorySlim
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+        public string? TreePath { get; set; }
+    }
+
+    public sealed class PagedResult2<T>
+    {
+        public List<T> Items { get; init; } = new();
+        public bool HasMore { get; init; }
+    }
+
 }

@@ -130,19 +130,27 @@
 
         // Eğer ParentCategoryId için Select2 kullanımı devam edecekse aşağıdaki kodu tutabilirsiniz.
         // Yoksa komple bu kısmı da kaldırabilirsiniz.
-        $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
-            dropdownParent: $('#ParentCategoryId').parent(),
-            ajax: {
-                url: '@Url.Action("AllCateogry", "Category")',
-                type: "POST",
-                dataType: 'json',
-                data: function (params) {
-                    return {
-                        search: params.term,
-                        page: params.page || 1
-                    };
-                }
+                $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
+          dropdownParent: $('#ParentCategoryId').parent(),
+          width: '100%',
+          placeholder: 'Kategori Seçin',
+          allowClear: true,
+          ajax: {
+            url: '@Url.Action("AllCategory", "Category")',
+            type: 'POST',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                term: params.term || '',
+                page: params.page || 1
+              };
+            },
+            processResults: function (data, params) {
+              params.page = params.page || 1;
+              return data; // {results:[{id,text}], pagination:{more}}
             }
+          }
         });
     </script>
 

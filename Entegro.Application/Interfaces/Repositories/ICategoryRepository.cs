@@ -13,5 +13,9 @@ namespace Entegro.Application.Interfaces.Repositories
         Task DeleteAsync(Category category);
         Task<List<Category>> GetByParentIdAsync(int parentCategoryId);
 
+
+        Task<PagedResult2<CategorySlim>> SearchPagedAsync(string? term, int page, int pageSize, CancellationToken ct = default);
+        Task<Dictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default);
+
     }
 }

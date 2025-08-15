@@ -150,19 +150,12 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AllCateogry(int page, string term)
+        public async Task<IActionResult> AllCategory([FromForm] int page = 1, [FromForm] string? term = null, CancellationToken ct = default)
         {
-            var result = await _categoryService.GetCategoriesFormatTreePathAsync();
-
-            return Json(new
-            {
-                results = result.Select(c => new
-                {
-                    id = c.Id,
-                    text = c.FormattedName
-                }),
-                pagination = new { more = false }
-            });
+            const int pageSize = 20;
+            var data = await _categoryService.GetCategoriesForSelect2Async(term, page, pageSize, ct);
+            return Json(data);
         }
+
     }
 }

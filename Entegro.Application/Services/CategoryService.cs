@@ -158,6 +158,46 @@ namespace Entegro.Application.Services
             return result;
         }
 
+        public async Task<Select2Response> GetCategoriesForSelect2Async(string? term, int page, int pageSize, CancellationToken ct = default)
+        {
+            var paged = await _categoryRepository.SearchPagedAsync(term, page, pageSize, ct);
+
+            // Sayfadaki kayıtların tüm ata ID’leri
+            var ancestorIds = paged.Items
+                .SelectMany(r => (r.TreePath ?? "/").Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries))
+                .Select(s => int.TryParse(s, out var i) ? i : 0)
+                .Where(i => i > 0)
+                .Distinct()
+                .ToList();
+
+            var names = await _categoryRepository.GetNamesByIdsAsync(ancestorIds, ct);
+
+            static string FormatTreePath(string? treePath, IReadOnlyDictionary<int, string> map, string fallback)
+            {
+                if (string.IsNullOrWhiteSpace(treePath)) return fallback;
+                var parts = treePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+                var chain = new List<string>(parts.Length);
+                foreach (var p in parts)
+                {
+                    if (int.TryParse(p, out var id) && map.TryGetValue(id, out var nm))
+                        chain.Add(nm);
+                }
+                return chain.Count > 0 ? string.Join(" - ", chain) : fallback;
+            }
+
+            var result = new Select2Response
+            {
+                results = paged.Items.Select(r => new Select2Option
+                {
+                    id = r.Id,
+                    text = FormatTreePath(r.TreePath, names, r.Name)
+                }).ToList(),
+                pagination = new Select2Response.Pagination { more = paged.HasMore }
+            };
+
+            return result;
+        }
+
         public async Task<CategoryDto> GetCategoryByIdAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
