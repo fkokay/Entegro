@@ -1,10 +1,7 @@
 ﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -43,7 +40,7 @@ namespace Entegro.Web.Controllers
             }
             return View(model);
         }
-
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var brand = await _brandService.GetBrandByIdAsync(id);

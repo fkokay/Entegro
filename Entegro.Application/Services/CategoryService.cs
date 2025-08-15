@@ -123,9 +123,30 @@ namespace Entegro.Application.Services
 
         public async Task<bool> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
         {
-            await _categoryRepository.UpdateAsync(_mapper.Map<Category>(updateCategory));
+            var category = _mapper.Map<Category>(updateCategory);
+
+            if (category.ParentCategoryId == 0)
+            {
+                category.TreePath = $"/{category.Id}/";
+            }
+            else
+            {
+                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId);
+                if (parentCategory != null)
+                {
+                    category.TreePath = $"{parentCategory.TreePath}{category.Id}/";
+                }
+                else
+                {
+                    category.TreePath = $"/{category.Id}/"; // Ebeveyn bulunamazsa kök gibi
+                }
+            }
+
+            await _categoryRepository.UpdateAsync(category);
+
             return true;
         }
+
 
         private string FormatTreePath(string treePath, List<CategoryDto> allCategories)
         {

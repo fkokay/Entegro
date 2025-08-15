@@ -1,0 +1,271 @@
+﻿@model CategoryViewModel
+@{
+    ViewData["Title"] = "Kategori Bilgilerini Düzenle - " + Model.Name;
+}
+
+<form asp-action="Edit" id="category-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Kategoriler/</span> Kategori Bilgilerini Düzenle</h4>
+
+        <div class="row">
+            <partial name="_CreateOrUpdate" />
+            <div class="col-lg-3 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        @if (Model.Id > 0)
+                        {
+                            <button type="button" id="btnDeleteCategory" class="btn btn-danger d-grid w-100 mb-2 waves-effect waves-light">
+                                <span class="d-flex align-items-center justify-content-center text-nowrap">
+                                    <i class="ti ti-trash ti-xs me-1"></i>Sil
+                                </span>
+                            </button>
+
+                        }
+                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-cancel ti-xs me-1"></i>Vazgeç</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+@section scripts {
+  
+
+    <script>
+     
+        $('#btnDeleteCategory').on('click', function () {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu kategori silinecek!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var categoryId = '@Model.Id';
+
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Category")',
+                        type: 'POST',
+                        data: { id: categoryId },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'Kategori başarıyla silindi.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-success'
+                                    },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    window.location.href = '@Url.Action("List", "Category")';
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: 'Sunucu ile bağlantı kurulamadı.',
+                                confirmButtonText: 'Tamam',
+                                customClass: {
+                                    confirmButton: 'btn btn-danger'
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        
+        const formValidation = FormValidation.formValidation(
+            document.getElementById('category-form'),
+            {
+                locale: 'tr_TR',
+                localization: FormValidation.locales.tr_TR,
+                fields: {
+                    'ParentCategoryId': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Kategori seçmek zorunludur.'
+                            }
+                        }
+                    },
+                    'Name': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Kategori adı boş bırakılamaz.'
+                            },
+                            stringLength: {
+                                min: 3,
+                                message: 'Kategori adı en az 3 karakter olmalıdır.'
+                            }
+                        }
+                    },
+                    'DisplayOrder': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Sıra boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Sıra sadece sayı olmalıdır.'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        eleValidClass: '',
+                        rowSelector: '.mb-3'
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    autoFocus: new FormValidation.plugins.AutoFocus()
+                },
+                init: instance => {
+                    instance.on('plugins.message.placed', function (e) {
+                        if (e.element.parentElement.classList.contains('input-group')) {
+                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                        }
+                    });
+
+                    instance.on('core.form.valid', function () {
+                        const $form = $('#category-form');
+                        const serializedData = $form.serialize();
+
+                        $.ajax({
+                            url: '@Url.Action("Edit", "Category")',
+                            type: 'POST',
+                            data: serializedData,
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Başarılı!',
+                                        text: 'Değişiklikler başarıyla kaydedildi.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("List", "Category")';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message || 'Bir hata oluştu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+        );
+
+        
+        const selectedCategoryId = '@Model.Id';
+
+        if (selectedCategoryId) {
+            $.ajax({
+                url: '@Url.Action("AllCateogry", "Category")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    search: '',
+                    page: 1
+                },
+                success: function (data) {
+                    $('#ParentCategoryId').empty();
+
+                    const parentCategoryId = '@Model.ParentCategoryId';
+                    const selectedOption = data.results.find(r => r.id == parentCategoryId);
+
+                    if (selectedOption) {
+                        const option = new Option(selectedOption.text, selectedOption.id, true, true);
+                        $('#ParentCategoryId').append(option).trigger('change');
+                    }
+
+                    $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
+                        dropdownParent: $('#ParentCategoryId').parent(),
+                        ajax: {
+                            url: '@Url.Action("AllCateogry", "Category")',
+                            type: "POST",
+                            dataType: 'json',
+                            data: function (params) {
+                                return {
+                                    search: params.term,
+                                    page: params.page || 1
+                                };
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
+                dropdownParent: $('#ParentCategoryId').parent(),
+                ajax: {
+                    url: '@Url.Action("AllCateogry", "Category")',
+                    type: "POST",
+                    dataType: 'json',
+                    data: function (params) {
+                        return {
+                            search: params.term,
+                            page: params.page || 1
+                        };
+                    }
+                }
+            });
+        }
+    </script>
+}

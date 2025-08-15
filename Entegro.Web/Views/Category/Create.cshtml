@@ -26,10 +26,7 @@
 
 
 @section scripts {
-    <script src="~/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js"></script>
-    <script src="~/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js"></script>
-    <script src="~/assets/vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js"></script>
-    <script src="~/assets/vendor/libs/formvalidation/dist/js/locales/tr_tr.js"></script>
+   
 
     <script>
         const formValidation = FormValidation.formValidation(
@@ -85,7 +82,7 @@
 
                     instance.on('core.form.valid', function () {
                         const $form = $('#category-form');
-                        const serializedData = $form.serialize(); // Form verilerini serialize et
+                        const serializedData = $form.serialize();
 
                         $.ajax({
                             url: '@Url.Action("Create", "Category")',
@@ -93,14 +90,42 @@
                             data: serializedData,
                             success: function (response) {
                                 if (response.success) {
-                                    alert('Kategori başarıyla kaydedildi.');
-                                    window.location.href = '@Url.Action("List", "Category")';
+                                    Swal.fire({
+                                        title: 'Başarılı!',
+                                        text: 'Kategori başarıyla kaydedildi.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("List", "Category")';
+                                    });
                                 } else {
-                                    alert('Bir hata oluştu: ' + response.message);
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message || 'Bir hata oluştu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
                                 }
                             },
                             error: function (xhr) {
-                                alert(xhr.responseText || 'İşlem sırasında bir hata oluştu.');
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
                             }
                         });
                     });
