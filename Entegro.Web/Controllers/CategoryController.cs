@@ -84,8 +84,6 @@ namespace Entegro.Web.Controllers
 
                 await _categoryService.UpdateCategoryAsync(model);
                 return Json(new { success = true });
-                //return RedirectToAction(nameof(List));
-
             }
             return View(model);
         }
