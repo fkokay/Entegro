@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
-    [Table("ProductAttribute")]
-    public class ProductAttribute : BaseEntity, IDisplayOrder
+    [Table("ProductAttributeValue")]
+    public class ProductAttributeValue : BaseEntity, IDisplayOrder
     {
+        public int ProductAttributeId { get; set; }
         public string Name { get; set; }
-        public string? Description { get; set; }
         public int DisplayOrder { get; set; }
 
-        public IList<ProductAttributeValue> ProductAttributeValues { get; set; }
+        public virtual ProductAttribute ProductAttribute { get; set; }
     }
 }
