@@ -26,7 +26,7 @@
 
 
 @section scripts {
-   
+
 
     <script>
         const formValidation = FormValidation.formValidation(
@@ -35,13 +35,6 @@
                 locale: 'tr_TR',
                 localization: FormValidation.locales.tr_TR,
                 fields: {
-                    'ParentCategoryId': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Kategori seçmek zorunludur.'
-                            }
-                        }
-                    },
                     'Name': {
                         validators: {
                             notEmpty: {
@@ -68,7 +61,7 @@
                     trigger: new FormValidation.plugins.Trigger(),
                     bootstrap5: new FormValidation.plugins.Bootstrap5({
                         eleValidClass: '',
-                        rowSelector: '.mb-3'
+                        rowSelector: '.mb-3'  // senin formdaki hata mesaj yerleri için
                     }),
                     submitButton: new FormValidation.plugins.SubmitButton(),
                     autoFocus: new FormValidation.plugins.AutoFocus()
@@ -129,11 +122,14 @@
                             }
                         });
                     });
+
+                    // ParentCategoryId validasyonu kaldırıldığı için burası da çıkarıldı
                 }
             }
         );
 
-        // Select2 Ayarı
+        // Eğer ParentCategoryId için Select2 kullanımı devam edecekse aşağıdaki kodu tutabilirsiniz.
+        // Yoksa komple bu kısmı da kaldırabilirsiniz.
         $('#ParentCategoryId').wrap('<div class="position-relative"></div>').select2({
             dropdownParent: $('#ParentCategoryId').parent(),
             ajax: {
@@ -149,6 +145,8 @@
             }
         });
     </script>
+
+
 }
 
 

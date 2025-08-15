@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entegro.Application.DTOs.Category
+﻿namespace Entegro.Application.DTOs.Category
 {
     public class CategoryDto
     {
         public int Id { get; set; }
-        public int ParentCategoryId { get; set; }
+        public int? ParentCategoryId { get; set; }
         public string TreePath { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }

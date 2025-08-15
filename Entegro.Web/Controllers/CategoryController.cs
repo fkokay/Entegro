@@ -56,6 +56,18 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
+            string formattedParentName = null;
+            var formattedCategories = await _categoryService.GetCategoriesFormatTreePathAsync();
+            if (category.ParentCategoryId != null)
+            {
+                var parent = formattedCategories.FirstOrDefault(c => c.Id == category.ParentCategoryId);
+                formattedParentName = parent?.FormattedName;
+            }
+            else
+            {
+                var self = formattedCategories.FirstOrDefault(c => c.Id == category.Id);
+                formattedParentName = self?.FormattedName ?? category.Name;
+            }
 
             var categoryModel = new CategoryViewModel
             {
@@ -70,6 +82,7 @@ namespace Entegro.Web.Controllers
                 Name = category.Name,
                 ParentCategoryId = category.ParentCategoryId,
                 TreePath = category.TreePath,
+                ParentCategoryFormattedName = formattedParentName
             };
 
 
@@ -99,15 +112,25 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, int chooseType)
         {
-            var isSuccess = await _categoryService.DeleteCategoryAsync(id);
-            if (isSuccess)
+            if (chooseType == 1)
+            {
+                var isSuccess = await _categoryService.DeleteCategoryAndChildrenAsync(id);
+                if (isSuccess)
+                {
+                    return Json(new { success = true });
+                }
+            }
+            var isSuccess2 = await _categoryService.DeleteCategoryAndReassignChildrenAsync(id);
+            if (isSuccess2)
             {
                 return Json(new { success = true });
             }
             return Json(new { success = false, message = "Silinecek Kategori Bulunamadı" });
         }
+
+
         [HttpPost]
         public async Task<IActionResult> CategoryList([FromBody] GridCommand model)
         {

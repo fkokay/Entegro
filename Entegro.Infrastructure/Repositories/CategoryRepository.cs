@@ -60,6 +60,11 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Categories.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)
+        {
+            return await _context.Categories.Where(c => c.ParentCategoryId == parentCategoryId).ToListAsync();
+        }
+
         public async Task UpdateAsync(Category category)
         {
             _context.Categories.Update(category);

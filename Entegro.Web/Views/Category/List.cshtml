@@ -52,39 +52,39 @@
 
     <script>
         $(function () {
-            $('#CategoryTable').dataTable({
+            var table = $('#CategoryTable').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
                 },
                 serverSide: true,
-                order: [[2, 'asc']], // 3. sütuna göre (Name) sıralama
+                order: [[2, 'asc']],
                 ajax: {
                     url: '/Category/CategoryList',
                     type: 'POST',
                     contentType: 'application/json',
                     data: function (d) {
-                        return JSON.stringify(d); // DataTables'ın gönderdiği veriyi JSON'a çevir
+                        return JSON.stringify(d);
                     },
                 },
                 columns: [
-                    { data: null },          // Checkbox (ilk sütun)
-                    { data: 'Id' },          // ID (ikinci sütun)
-                    { data: 'Name' },        // Kategori adı
-                    { data: 'DisplayOrder' },// Görüntüleme sırası
+                    { data: null },
+                    { data: 'Id' },
+                    { data: 'Name' },
+                    { data: 'DisplayOrder' },
                     {
-                        data: 'CreatedOn',   // Kayıt tarihi
-                        render: function (data, type, row) {
+                        data: 'CreatedOn',
+                        render: function (data, type) {
                             if (type === "sort" || type === "type") {
                                 return data;
                             }
                             return moment(data).format("DD.MM.yyyy HH:mm");
                         }
                     },
-                    { data: null }           // İşlem butonları (son sütun)
+                    { data: null }
                 ],
                 columnDefs: [
                     {
-                        targets: 0, // İlk sütun - checkbox
+                        targets: 0,
                         searchable: false,
                         orderable: false,
                         render: function () {
@@ -96,11 +96,11 @@
                         responsivePriority: 4
                     },
                     {
-                        targets: -1, // Son sütun - işlemler
+                        targets: -1,
                         title: 'İşlemler',
                         searchable: false,
                         orderable: false,
-                        render: function (data, type, full, meta) {
+                        render: function (data, type, full) {
                             return (
                                 '<div class="d-inline-block">' +
                                 '<a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">' +
@@ -109,10 +109,10 @@
                                 '<a href="javascript:;" class="dropdown-item">Detaylar</a>' +
                                 '<a href="javascript:;" class="dropdown-item">Arşiv</a>' +
                                 '<div class="dropdown-divider"></div>' +
-                                '<a href="javascript:;" class="dropdown-item text-danger delete-record">Kategori Sil</a>' +
+                                `<a href="javascript:;" class="dropdown-item text-danger delete-record" data-id="${full.Id}">Kategori Sil</a>` +
                                 '</div>' +
                                 '</div>' +
-                                '<a href="Edit?id=' + full.Id + '" class="btn btn-sm btn-icon item-edit">' +
+                                `<a href="Edit?id=${full.Id}" class="btn btn-sm btn-icon item-edit">` +
                                 '<i class="text-dark ti ti-pencil"></i></a>'
                             );
                         }
@@ -122,52 +122,78 @@
                      '<"table-responsive"t>' +
                      '<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>'
             });
-        });
-    </script>
-    <script>
-        // Category tablosundaki satır silme işlemi
-        $(document).on('click', '.delete-record', function () {
-            var table = $('#CategoryTable').DataTable();
-            var row = $(this).closest('tr');
-            var rowData = table.row(row).data();
 
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu kategori silinecek!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'İptal',
-                customClass: {
-                    confirmButton: 'btn btn-danger me-3',
-                    cancelButton: 'btn btn-secondary'
-                },
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '@Url.Action("Delete", "Category")',
-                        type: 'POST',
-                        data: { id: rowData.Id },
-                        success: function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Silindi!',
-                                    text: 'Kategori başarıyla silindi.',
-                                    confirmButtonText: 'Tamam',
-                                    customClass: {
-                                        confirmButton: 'btn btn-success'
-                                    },
-                                    buttonsStyling: false
-                                });
+            // Satır silme butonuna tıklanınca radiobuttonlu SweetAlert açılır
+            $(document).on('click', '.delete-record', function () {
+                var categoryId = $(this).data('id');
 
-                                table.ajax.reload(); // Tabloyu yenile
-                            } else {
+                Swal.fire({
+                    title: 'Silme Türünü Seçin',
+                    html: `
+                        <div style="text-align: left">
+                            <label><input type="radio" name="delete-option" value="0" checked> Sadece bağlantıyı kaldır</label><br>
+                            <label><input type="radio" name="delete-option" value="1"> Bağlantı ve alt kategorileri sil</label>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Devam Et',
+                    cancelButtonText: 'İptal',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-3',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false,
+                    preConfirm: () => {
+                        const selected = document.querySelector('input[name="delete-option"]:checked');
+                        if (!selected) {
+                            Swal.showValidationMessage('Lütfen bir seçenek seçin.');
+                            return false;
+                        }
+                        return selected.value;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const chooseType = parseInt(result.value);
+
+                        $.ajax({
+                            url: '@Url.Action("Delete", "Category")',
+                            type: 'POST',
+                            data: {
+                                id: categoryId,
+                                chooseType: chooseType
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Silindi!',
+                                        text: 'Kategori başarıyla silindi.',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        table.ajax.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Hata!',
+                                        text: response.message || 'Silme işlemi başarısız oldu.',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            },
+                            error: function () {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Hata!',
-                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    title: 'Sunucu Hatası!',
+                                    text: 'İstek gönderilirken bir hata oluştu.',
                                     confirmButtonText: 'Tamam',
                                     customClass: {
                                         confirmButton: 'btn btn-danger'
@@ -175,23 +201,13 @@
                                     buttonsStyling: false
                                 });
                             }
-                        },
-                        error: function () {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Hata!',
-                                text: 'Sunucu ile bağlantı kurulamadı.',
-                                confirmButtonText: 'Tamam',
-                                customClass: {
-                                    confirmButton: 'btn btn-danger'
-                                },
-                                buttonsStyling: false
-                            });
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             });
         });
     </script>
+
+
 
 }

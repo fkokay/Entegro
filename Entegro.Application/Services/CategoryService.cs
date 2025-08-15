@@ -23,16 +23,16 @@ namespace Entegro.Application.Services
             var category = _mapper.Map<Category>(createCategory);
 
             // Önce ekle, böylece category.Id oluşur
-            await _categoryRepository.AddAsync(category); // ID burada artık hazır
+            await _categoryRepository.AddAsync(category);
 
             // TreePath hesaplama
-            if (category.ParentCategoryId == 0)
+            if (category.ParentCategoryId == null)
             {
                 category.TreePath = $"/{category.Id}/";
             }
             else
             {
-                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId);
+                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId.Value);
                 if (parentCategory != null)
                 {
                     category.TreePath = $"{parentCategory.TreePath}{category.Id}/";
@@ -49,15 +49,64 @@ namespace Entegro.Application.Services
             return category.Id;
         }
 
+        public async Task<bool> DeleteCategoryAndChildrenAsync(int categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
+
+            // Alt kategorileri getir
+            var children = await _categoryRepository.GetByParentIdAsync(categoryId);
+
+            // Alt kategorileri rekürsif olarak sil
+            foreach (var child in children)
+            {
+                await DeleteCategoryAndChildrenAsync(child.Id);
+            }
+
+            // Kategoriyi sil
+            await _categoryRepository.DeleteAsync(category);
+            return true;
+        }
+
+
+        public async Task<bool> DeleteCategoryAndReassignChildrenAsync(int categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            if (category == null)
+                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
+
+            var children = await _categoryRepository.GetByParentIdAsync(categoryId);
+
+            foreach (var child in children)
+            {
+                // Parent bağlantısını kopar
+                child.ParentCategoryId = null;
+
+                // TreePath güncelle
+                child.TreePath = $"/{child.Id}/";
+                await _categoryRepository.UpdateAsync(child);
+
+                // Alt kategorilerin TreePath'lerini de güncelle
+                await UpdateChildTreePathsRecursivelyAsync(child);
+            }
+
+            // Parent kategoriyi sil
+            await _categoryRepository.DeleteAsync(category);
+            return true;
+        }
+
+
+
         public async Task<bool> DeleteCategoryAsync(int categoryId)
         {
-            var brand = await _categoryRepository.GetByIdAsync(categoryId);
+            Category? category = await _categoryRepository.GetByIdAsync(categoryId);
 
-            if (brand == null)
+            if (category == null)
             {
                 throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
             }
-            await _categoryRepository.DeleteAsync(brand);
+            await _categoryRepository.DeleteAsync(category);
             return true;
         }
 
@@ -125,13 +174,13 @@ namespace Entegro.Application.Services
         {
             var category = _mapper.Map<Category>(updateCategory);
 
-            if (category.ParentCategoryId == 0)
+            if (category.ParentCategoryId == null)
             {
                 category.TreePath = $"/{category.Id}/";
             }
             else
             {
-                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId);
+                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId.Value);
                 if (parentCategory != null)
                 {
                     category.TreePath = $"{parentCategory.TreePath}{category.Id}/";
@@ -167,5 +216,22 @@ namespace Entegro.Application.Services
             // Kategori isimlerini " - " ile birleştiriyoruz
             return string.Join(" - ", categoryNames);
         }
+
+        private async Task UpdateChildTreePathsRecursivelyAsync(Category parentCategory)
+        {
+            var childCategories = await _categoryRepository.GetByParentIdAsync(parentCategory.Id);
+
+            foreach (var child in childCategories)
+            {
+                // Yeni TreePath: parent'ın TreePath'i + kendi ID'si
+                child.TreePath = $"{parentCategory.TreePath}{child.Id}/";
+
+                await _categoryRepository.UpdateAsync(child);
+
+                // Alt kategoriler için kendini tekrar çağır
+                await UpdateChildTreePathsRecursivelyAsync(child);
+            }
+        }
+
     }
 }

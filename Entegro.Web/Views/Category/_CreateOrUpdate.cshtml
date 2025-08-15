@@ -26,12 +26,12 @@
                     <!-- Kategori Seçimi -->
                     <div class="col-md-12">
                         <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="ParentCategoryId">Kategori Seç</label>
+                            <label class="col-sm-3 col-form-label text-sm-start" for="ParentCategoryId">Kategori</label>
                             <div class="col-sm-9">
-                                <select class="select2 form-select form-select-lg" data-allow-clear="true" asp-for="ParentCategoryId">
-                                    @if (Model.ParantCategory != null)
+                                <select id="ParentCategoryId" name="ParentCategoryId" class="select2 form-select form-select-lg" asp-for="ParentCategoryId">
+                                    @if (Model.ParentCategoryId != null)
                                     {
-                                        <option value="@Model.ParantCategory.Id" selected>@Model.ParantCategory.Name</option>
+                                        <option value="@Model.ParentCategoryId" selected>@Model.ParentCategoryFormattedName</option>
                                     }
                                 </select>
                             </div>

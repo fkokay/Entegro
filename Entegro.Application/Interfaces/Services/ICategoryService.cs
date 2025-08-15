@@ -12,5 +12,9 @@ namespace Entegro.Application.Interfaces.Services
         Task<int> CreateCategoryAsync(CreateCategoryDto createCategory);
         Task<bool> UpdateCategoryAsync(UpdateCategoryDto updateCategory);
         Task<bool> DeleteCategoryAsync(int categoryId);
+
+
+        Task<bool> DeleteCategoryAndChildrenAsync(int categoryId);// kategori ve alt kategorileri sil
+        Task<bool> DeleteCategoryAndReassignChildrenAsync(int categoryId); // kategori ve alt kategorileri sil, alt kategorileri başka bir kategoriye ata
     }
 }
