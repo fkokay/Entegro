@@ -26,6 +26,7 @@ namespace Entegro.Infrastructure.Data
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
+        public DbSet<ProductAttributeMapping> ProductAttributeMappings { get; set; }
         public DbSet<ProductVariantAttributeCombination> ProductVariants { get; set; }
 
         public DbSet<Category> Categories { get; set; }
