@@ -14,5 +14,7 @@
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
+        public CategoryViewModel? ParantCategory { get; set; }
+
     }
 }

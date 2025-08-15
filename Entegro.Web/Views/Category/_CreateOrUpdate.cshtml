@@ -29,6 +29,10 @@
                             <label class="col-sm-3 col-form-label text-sm-start" for="ParentCategoryId">Kategori Seç</label>
                             <div class="col-sm-9">
                                 <select class="select2 form-select form-select-lg" data-allow-clear="true" asp-for="ParentCategoryId">
+                                    @if (Model.ParantCategory != null)
+                                    {
+                                        <option value="@Model.ParantCategory.Id" selected>@Model.ParantCategory.Name</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -53,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                 
+
                     <!-- Açıklama -->
                     <div class="col-md-12">
                         <div class="row">
