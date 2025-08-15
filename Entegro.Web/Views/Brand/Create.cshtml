@@ -21,3 +21,104 @@
        </div>
     </div>
 </form>
+
+@section scripts {
+    <script>
+        const formValidation = FormValidation.formValidation(
+            document.getElementById('brand-form'),
+            {
+                locale: 'tr_TR',
+                localization: FormValidation.locales.tr_TR,
+                fields: {
+                    'Name': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Marka adı boş bırakılamaz.'
+                            },
+                            stringLength: {
+                                min: 3,
+                                message: 'Marka adı en az 3 karakter olmalıdır.'
+                            }
+                        }
+                    },
+                    'DisplayOrder': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Sıra boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Sıra sadece sayı olmalıdır.'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        eleValidClass: '',
+                        rowSelector: '.mb-3'
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    autoFocus: new FormValidation.plugins.AutoFocus()
+                },
+                init: instance => {
+                    instance.on('plugins.message.placed', function (e) {
+                        if (e.element.parentElement.classList.contains('input-group')) {
+                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                        }
+                    });
+
+                    instance.on('core.form.valid', function () {
+                        const $form = $('#brand-form');
+                        const serializedData = $form.serialize();
+
+                        $.ajax({
+                            url: '@Url.Action("Create", "Brand")',
+                            type: 'POST',
+                            data: serializedData,
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Başarılı!',
+                                        text: 'Marka başarıyla kaydedildi.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("List", "Brand")';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message || 'Bir hata oluştu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+        );
+    </script>
+}

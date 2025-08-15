@@ -36,7 +36,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 await _brandService.CreateBrandAsync(model);
-                return RedirectToAction(nameof(List));
+                return Json(new { success = true });
             }
             return View(model);
         }
@@ -57,9 +57,19 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 await _brandService.UpdateBrandAsync(model);
-                return RedirectToAction(nameof(List));
+                return Json(new { success = true });
             }
             return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var isSuccess = await _brandService.DeleteBrandAsync(id);
+            if (isSuccess)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Silinecek Marka Bulunamadı" });
         }
 
         [HttpPost]
