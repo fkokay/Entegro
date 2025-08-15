@@ -84,20 +84,13 @@
                     });
 
                     instance.on('core.form.valid', function () {
-                        const formElement = document.getElementById('category-form');
-                        const formData = new FormData(formElement);
+                        const $form = $('#category-form');
+                        const serializedData = $form.serialize(); // Form verilerini serialize et
 
-                        // FormData'yı düz JS objesine çeviriyoruz
-                        const data = {};
-                        formData.forEach((value, key) => {
-                            data[key] = value;
-                        });
-
-                        // AJAX POST
                         $.ajax({
                             url: '@Url.Action("Create", "Category")',
-                            method: 'POST',
-                            data: data,
+                            type: 'POST',
+                            data: serializedData,
                             success: function (response) {
                                 if (response.success) {
                                     alert('Kategori başarıyla kaydedildi.');
@@ -132,4 +125,5 @@
         });
     </script>
 }
+
 
