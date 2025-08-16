@@ -25,6 +25,51 @@
 
 
 @section Scripts {
+    <link rel="stylesheet" href="~/assets/vendor/libs/dropzone/dropzone.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/quill/typography.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/quill/katex.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/quill/editor.css" />
+    <script src="~/assets/vendor/libs/quill/katex.js"></script>
+    <script src="~/assets/vendor/libs/quill/quill.js"></script>
+    <script src="~/assets/vendor/libs/dropzone/dropzone.js"></script>
+
+
+    <!-- Page JS -->
+    <script>
+        (function () {
+          const previewTemplate = `
+            <div class="dz-preview dz-file-preview">
+              <div class="dz-details">
+                <div class="dz-thumbnail">
+                  <img data-dz-thumbnail>
+                  <span class="dz-nopreview">No preview</span>
+                  <div class="dz-success-mark"></div>
+                  <div class="dz-error-mark"></div>
+                  <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+                  </div>
+                </div>
+                <div class="dz-filename" data-dz-name></div>
+                <div class="dz-size" data-dz-size></div>
+              </div>
+            </div>
+          `;
+
+          // Only Multiple Dropzone inside #product-form
+          const dropzoneMulti = document.querySelector('#product-form #dropzone-multi');
+          if (dropzoneMulti) {
+            new Dropzone(dropzoneMulti, {
+              url: "/upload", // Server-side upload handler
+              previewTemplate: previewTemplate,
+              parallelUploads: 1,
+              maxFilesize: 5, // MB
+              addRemoveLinks: true
+            });
+          }
+        })();
+    </script>
+
     <script>
         $(document).ready(function () {
             function toggleVatRateDropdown() {
@@ -35,7 +80,7 @@
                 }
             }
 
-            
+
             toggleVatRateDropdown();
 
 
@@ -43,5 +88,53 @@
                 toggleVatRateDropdown();
             });
         });
+    </script>
+
+    <script>
+                (function () {
+          // Full Toolbar
+          // --------------------------------------------------------------------
+          const fullToolbar = [
+            [
+              { font: [] },
+              { size: [] }
+            ],
+            ['bold', 'italic', 'underline', 'strike'],
+            [
+              { color: [] },
+              { background: [] }
+            ],
+            [
+              { script: 'super' },
+              { script: 'sub' }
+            ],
+            [
+              { header: '1' },
+              { header: '2' },
+              'blockquote',
+              'code-block'
+            ],
+            [
+              { list: 'ordered' },
+              { list: 'bullet' },
+              { indent: '-1' },
+              { indent: '+1' }
+            ],
+            [{ direction: 'rtl' }],
+            ['link', 'image', 'video', 'formula'],
+            ['clean']
+          ];
+
+          const fullEditor = new Quill('#full-editor', {
+            bounds: '#full-editor',
+            placeholder: 'Açıklama Giriniz...',
+            modules: {
+              formula: true,
+              toolbar: fullToolbar
+            },
+            theme: 'snow'
+          });
+        })();
+
     </script>
 }

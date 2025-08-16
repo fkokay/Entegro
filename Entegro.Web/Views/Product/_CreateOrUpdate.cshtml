@@ -34,15 +34,7 @@
                         </div>
                     </div>
 
-                    <!-- Açıklama -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Description">Açıklama</label>
-                            <div class="col-sm-9">
-                                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 3, @id = "Description" })
-                            </div>
-                        </div>
-                    </div>
+
 
                     <!-- Ürün Kodu -->
                     <div class="col-md-12">
@@ -107,6 +99,16 @@
                             <label class="col-sm-3 col-form-label text-sm-start" for="Unit">Birim</label>
                             <div class="col-sm-9">
                                 @Html.TextBoxFor(m => m.Unit, new { @class = "form-control", @id = "Unit" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Açıklama -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="full-editor" asp-for="Description">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -234,19 +236,23 @@
             <!-- GÖRSEL -->
             <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
                 <div class="row g-3 p-3">
-                    <div class="col-md-12 text-center">
-                        @* @if (!string.IsNullOrEmpty(Model.Image))
-                        {
-                            <img src="@Model.Image" class="img-thumbnail" alt="Ürün Görseli" style="max-width: 300px;" />
-                        }
-                        else
-                        {
-                            <p>Henüz bir görsel eklenmemiş.</p>
-                        } *@
-                        <p>Henüz bir görsel eklenmemiş.</p>
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dropzone needsclick" id="dropzone-multi">
+                                    <div class="dz-message needsclick">
+                                        Dosyaları buraya sürükleyin veya yüklemek için tıklayın
+                                    </div>
+                                    <div class="fallback">
+                                        <input name="file" type="file" multiple />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
