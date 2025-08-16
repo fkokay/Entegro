@@ -13,12 +13,14 @@ namespace Entegro.Domain.Entities
     public class IntegrationSystem : BaseEntity
     {
         public int IntegrationSystemTypeId { get; set; }
+
         [NotMapped]
         public IntegrationSystemType IntegrationSystemType
         {
             get => (IntegrationSystemType)IntegrationSystemTypeId;
             set => IntegrationSystemTypeId = (int)value;
         }
+
         [NotMapped]
         public string IntegrationSystemTypeLabelHint
         {
