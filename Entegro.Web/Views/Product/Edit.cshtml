@@ -1,0 +1,365 @@
+﻿@model ProductViewModel
+@{
+    ViewData["Title"] = "Edit";
+}
+<form asp-action="Edit" id="product-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Ürünler/</span> Ürünü Düzenle</h4>
+
+        <div class="row">
+            <partial name="_CreateOrUpdate" />
+            <div class="col-lg-3 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        @if (Model.Id > 0)
+                        {
+                            <button type="button" id="btnDeleteProduct" class="btn btn-danger d-grid w-100 mb-2 waves-effect waves-light">
+                                <span class="d-flex align-items-center justify-content-center text-nowrap">
+                                    <i class="ti ti-trash ti-xs me-1"></i>Sil
+                                </span>
+                            </button>
+                        }
+                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-cancel ti-xs me-1"></i>Vazgeç</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+
+@section Scripts {
+    <link rel="stylesheet" href="~/assets/vendor/libs/dropzone/dropzone.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/quill/typography.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/quill/katex.css" />
+    <link rel="stylesheet" href="~/assets/vendor/libs/quill/editor.css" />
+    <script src="~/assets/vendor/libs/quill/katex.js"></script>
+    <script src="~/assets/vendor/libs/quill/quill.js"></script>
+    <script src="~/assets/vendor/libs/dropzone/dropzone.js"></script>
+
+
+    <!-- Page JS -->
+    <script>
+        (function () {
+          const previewTemplate = `
+            <div class="dz-preview dz-file-preview">
+              <div class="dz-details">
+                <div class="dz-thumbnail">
+                  <img data-dz-thumbnail>
+                  <span class="dz-nopreview">No preview</span>
+                  <div class="dz-success-mark"></div>
+                  <div class="dz-error-mark"></div>
+                  <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+                  </div>
+                </div>
+                <div class="dz-filename" data-dz-name></div>
+                <div class="dz-size" data-dz-size></div>
+              </div>
+            </div>
+          `;
+
+          // Only Multiple Dropzone inside #product-form
+          const dropzoneMulti = document.querySelector('#product-form #dropzone-multi');
+          if (dropzoneMulti) {
+            new Dropzone(dropzoneMulti, {
+              url: "/upload", // Server-side upload handler
+              previewTemplate: previewTemplate,
+              parallelUploads: 1,
+              maxFilesize: 5, // MB
+              addRemoveLinks: true
+            });
+          }
+        })();
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            function toggleVatRateDropdown() {
+                if ($('#VatInc').is(':checked')) {
+                    $('#VatRate').prop('disabled', false);
+                } else {
+                    $('#VatRate').prop('disabled', true).val(''); // temizle
+                }
+            }
+
+
+            toggleVatRateDropdown();
+
+
+            $('#VatInc').on('change', function () {
+                toggleVatRateDropdown();
+            });
+        });
+    </script>
+
+    <script>
+        function focusFieldAndShowTab(el) {
+            if (!el) return;
+            const tabPane = el.closest('.tab-pane');
+            if (tabPane) {
+                const tabId = tabPane.id;
+                const trigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                if (trigger) new bootstrap.Tab(trigger).show();
+            }
+            setTimeout(() => {
+                try { el.focus({ preventScroll: true }); } catch (_) {}
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+        }
+
+        // Quill editörü global tanımla
+        let fullEditor;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Quill editör başlat
+            const fullToolbar = [
+                [{ font: [] }, { size: [] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ color: [] }, { background: [] }],
+                [{ script: 'super' }, { script: 'sub' }],
+                [{ header: '1' }, { header: '2' }, 'blockquote', 'code-block'],
+                [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                [{ direction: 'rtl' }],
+                ['link', 'image', 'video', 'formula'],
+                ['clean']
+            ];
+
+            fullEditor = new Quill('#full-editor', {
+                bounds: '#full-editor',
+                placeholder: 'Açıklama Giriniz...',
+                modules: {
+                    formula: true,
+                    toolbar: fullToolbar
+                },
+                theme: 'snow'
+            });
+
+            // Sayfaya gömülü gelen Description'ı editöre yerleştir (eğer varsa)
+            const initialDesc = document.getElementById('description-value');
+            if (initialDesc && initialDesc.value) {
+                fullEditor.root.innerHTML = initialDesc.value;
+            }
+
+            const formValidation = FormValidation.formValidation(
+                document.getElementById('product-form'),
+                {
+                    locale: 'tr_TR',
+                    localization: FormValidation.locales.tr_TR,
+                    fields: {
+                        'Name': {
+                            validators: {
+                                notEmpty: { message: 'Ürün adı boş bırakılamaz.' },
+                                stringLength: { min: 3, message: 'Ürün adı en az 3 karakter olmalıdır.' }
+                            }
+                        },
+                        'Code': {
+                            validators: {
+                                notEmpty: { message: 'Ürün kodu boş bırakılamaz.' }
+                            }
+                        },
+                        'Price': {
+                            validators: {
+                                notEmpty: { message: 'Fiyat boş bırakılamaz.' },
+                                numeric: { message: 'Fiyat yalnızca sayı olabilir.' }
+                            }
+                        },
+                        'Currency': {
+                            validators: { notEmpty: { message: 'Para birimi seçilmelidir.' } }
+                        },
+                        'StockQuantity': {
+                            validators: {
+                                notEmpty: { message: 'Stok miktarı boş bırakılamaz.' },
+                                integer: { message: 'Stok miktarı tam sayı olmalıdır.' }
+                            }
+                        },
+                        'Weight': {
+                            validators: {
+                                notEmpty: { message: 'Ağırlık boş bırakılamaz.' },
+                                numeric: { message: 'Ağırlık geçerli bir sayı olmalıdır.' }
+                            }
+                        },
+                        'Length': {
+                            validators: {
+                                notEmpty: { message: 'Uzunluk boş bırakılamaz.' },
+                                numeric: { message: 'Uzunluk geçerli bir sayı olmalıdır.' }
+                            }
+                        },
+                        'Width': {
+                            validators: {
+                                notEmpty: { message: 'Genişlik boş bırakılamaz.' },
+                                numeric: { message: 'Genişlik geçerli bir sayı olmalıdır.' }
+                            }
+                        },
+                        'Height': {
+                            validators: {
+                                notEmpty: { message: 'Yükseklik boş bırakılamaz.' },
+                                numeric: { message: 'Yükseklik geçerli bir sayı olmalıdır.' }
+                            }
+                        },
+                        'VatRate': {
+                            validators: {
+                                callback: {
+                                    message: 'KDV oranı seçilmelidir.',
+                                    callback: function (input) {
+                                        const vatInc = document.getElementById('VatInc').checked;
+                                        return !vatInc || (input.value !== '');
+                                    }
+                                }
+                            }
+                        },
+                        'Barcode': {
+                            validators: {
+                                stringLength: { max: 100, message: 'Barkod en fazla 100 karakter olabilir.' }
+                            }
+                        },
+                        'MetaTitle': {
+                            validators: {
+                                stringLength: { max: 60, message: 'Meta başlık en fazla 60 karakter olabilir.' }
+                            }
+                        },
+                        'MetaKeywords': {
+                            validators: {
+                                stringLength: { max: 150, message: 'Anahtar kelimeler en fazla 150 karakter olabilir.' }
+                            }
+                        },
+                        'MetaDescription': {
+                            validators: {
+                                stringLength: { max: 160, message: 'Meta açıklama en fazla 160 karakter olabilir.' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        trigger: new FormValidation.plugins.Trigger(),
+                        bootstrap5: new FormValidation.plugins.Bootstrap5({
+                            eleValidClass: '',
+                            rowSelector: '.mb-3'
+                        }),
+                        submitButton: new FormValidation.plugins.SubmitButton(),
+                        autoFocus: new FormValidation.plugins.AutoFocus()
+                    },
+                    init: (instance) => {
+                        instance.on('plugins.message.placed', function (e) {
+                            if (e.element.parentElement.classList.contains('input-group')) {
+                                e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                            }
+                        });
+
+                        instance.on('core.field.invalid', function (e) {
+                            const fieldEl = e.elements && e.elements.length ? e.elements[0] : null;
+                            if (fieldEl) focusFieldAndShowTab(fieldEl);
+                        });
+
+                        instance.on('core.form.invalid', function () {
+                            const invalidEl = document.querySelector('[data-field].is-invalid, .is-invalid');
+                            if (invalidEl) focusFieldAndShowTab(invalidEl);
+                        });
+
+                        const vatIncCb = document.getElementById('VatInc');
+                        const vatRateEl = document.getElementById('VatRate');
+                        const syncVatRateState = () => {
+                            const enabled = vatIncCb && vatIncCb.checked;
+                            if (vatRateEl) {
+                                vatRateEl.disabled = !enabled;
+                                if (!enabled) {
+                                    vatRateEl.value = '';
+                                    vatRateEl.dispatchEvent(new Event('change', { bubbles: true }));
+                                }
+                            }
+                        };
+                        if (vatIncCb && vatRateEl) {
+                            vatIncCb.addEventListener('change', syncVatRateState);
+                            syncVatRateState();
+                        }
+
+                        instance.on('core.form.valid', function () {
+                            const $form = $('#product-form');
+
+                            // Quill içeriğini alıp gizli input'a aktar
+                            const quillHtml = fullEditor.root.innerHTML;
+                            document.getElementById('description-value').value = quillHtml;
+
+                            const serializedData = $form.serialize();
+
+                            $.ajax({
+                                url: '@Url.Action("Edit", "Product")',
+                                type: 'POST',
+                                data: serializedData,
+                                success: function (response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            title: 'Başarılı!',
+                                            text: 'Ürün başarıyla kaydedildi.',
+                                            icon: 'success',
+                                            confirmButtonText: 'Tamam',
+                                            customClass: { confirmButton: 'btn btn-success' },
+                                            buttonsStyling: false
+                                        }).then(() => {
+                                            window.location.href = '@Url.Action("List", "Product")';
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Hata!',
+                                            text: response.message || 'Bir hata oluştu.',
+                                            icon: 'error',
+                                            confirmButtonText: 'Tamam',
+                                            customClass: { confirmButton: 'btn btn-danger' },
+                                            buttonsStyling: false
+                                        });
+                                    }
+                                },
+                                error: function (xhr) {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: { confirmButton: 'btn btn-danger' },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            });
+                        });
+                    }
+                }
+            );
+        });
+    </script>
+
+
+
+
+    <script>
+        $('#CategoryIds').wrap('<div class="position-relative"></div>').select2({
+          dropdownParent: $('#CategoryIds').parent(),
+          ajax: {
+            url: '@Url.Action("AllCategory", "Category")',
+            type: 'POST',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                term: params.term || '',
+                page: params.page || 1
+              };
+            },
+            processResults: function (data, params) {
+              params.page = params.page || 1;
+              return data; // {results:[{id,text}], pagination:{more}}
+            }
+          },
+          width: '100%',
+          placeholder: 'Kategorileri seçin',
+          multiple: true,
+          allowClear: true
+        });
+    </script>
+
+}

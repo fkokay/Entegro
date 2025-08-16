@@ -91,55 +91,54 @@
     </script>
 
     <script>
-                (function () {
-          // Full Toolbar
-          // --------------------------------------------------------------------
-          const fullToolbar = [
+        // Full Quill Toolbar
+        const fullToolbar = [
             [
-              { font: [] },
-              { size: [] }
+                { font: [] },
+                { size: [] }
             ],
             ['bold', 'italic', 'underline', 'strike'],
             [
-              { color: [] },
-              { background: [] }
+                { color: [] },
+                { background: [] }
             ],
             [
-              { script: 'super' },
-              { script: 'sub' }
+                { script: 'super' },
+                { script: 'sub' }
             ],
             [
-              { header: '1' },
-              { header: '2' },
-              'blockquote',
-              'code-block'
+                { header: '1' },
+                { header: '2' },
+                'blockquote',
+                'code-block'
             ],
             [
-              { list: 'ordered' },
-              { list: 'bullet' },
-              { indent: '-1' },
-              { indent: '+1' }
+                { list: 'ordered' },
+                { list: 'bullet' },
+                { indent: '-1' },
+                { indent: '+1' }
             ],
             [{ direction: 'rtl' }],
             ['link', 'image', 'video', 'formula'],
             ['clean']
-          ];
+        ];
 
-          const fullEditor = new Quill('#full-editor', {
+        // Quill editörü başlat ve global olarak ata
+        const fullEditor = new Quill('#full-editor', {
             bounds: '#full-editor',
             placeholder: 'Açıklama Giriniz...',
             modules: {
-              formula: true,
-              toolbar: fullToolbar
+                formula: true,
+                toolbar: fullToolbar
             },
             theme: 'snow'
-          });
-        })();
+        });
 
+        // Global erişim
+        window.fullEditor = fullEditor;
     </script>
 
     <script>
-
         function focusFieldAndShowTab(el) {
             if (!el) return;
             const tabPane = el.closest('.tab-pane');
@@ -149,7 +148,7 @@
                 if (trigger) new bootstrap.Tab(trigger).show();
             }
             setTimeout(() => {
-                try { el.focus({ preventScroll: true }); } catch (_) {}
+                try { el.focus({ preventScroll: true }); } catch (_) { }
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 50);
         }
@@ -216,7 +215,6 @@
                                 message: 'KDV oranı seçilmelidir.',
                                 callback: function (input) {
                                     const vatInc = document.getElementById('VatInc').checked;
-                                    // KDV dahil ise seçilmek zorunda; değilse boş olabilir
                                     return !vatInc || (input.value !== '');
                                 }
                             }
@@ -253,26 +251,22 @@
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 },
                 init: (instance) => {
-                    // input-group mesajını grubun dışına yerleştir
                     instance.on('plugins.message.placed', function (e) {
                         if (e.element.parentElement.classList.contains('input-group')) {
                             e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
                         }
                     });
 
-                    // Alan hatalıysa anında ilgili sekmeye geç
                     instance.on('core.field.invalid', function (e) {
                         const fieldEl = e.elements && e.elements.length ? e.elements[0] : null;
                         if (fieldEl) focusFieldAndShowTab(fieldEl);
                     });
 
-                    // Form geçersiz: ilk hatalı alanın sekmesine geç
                     instance.on('core.form.invalid', function () {
                         const invalidEl = document.querySelector('[data-field].is-invalid, .is-invalid');
                         if (invalidEl) focusFieldAndShowTab(invalidEl);
                     });
 
-                    // KDV Dahil -> sadece UI'de VatRate'i kapat/aç; validation çağrısı YOK
                     const vatIncCb = document.getElementById('VatInc');
                     const vatRateEl = document.getElementById('VatRate');
                     const syncVatRateState = () => {
@@ -281,18 +275,20 @@
                             vatRateEl.disabled = !enabled;
                             if (!enabled) {
                                 vatRateEl.value = '';
-                                // Değişiklik bildir; ama instance.validateField/revalidateField çağırma
                                 vatRateEl.dispatchEvent(new Event('change', { bubbles: true }));
                             }
                         }
                     };
                     if (vatIncCb && vatRateEl) {
                         vatIncCb.addEventListener('change', syncVatRateState);
-                        syncVatRateState(); // ilk yüklemede senkronla
+                        syncVatRateState();
                     }
 
-                    // Form geçerli: AJAX gönder
+                    // 🚀 Quill içeriğini hidden input'a aktar ve AJAX gönder
                     instance.on('core.form.valid', function () {
+                        // 🔄 Quill içeriğini input'a yaz
+                        document.getElementById('description-value').value = fullEditor.root.innerHTML;
+
                         const $form = $('#product-form');
                         const serializedData = $form.serialize();
 
@@ -339,7 +335,6 @@
             }
         );
     </script>
-  
 
     <script>
         $('#CategoryIds').wrap('<div class="position-relative"></div>').select2({

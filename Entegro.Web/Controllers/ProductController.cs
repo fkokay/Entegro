@@ -25,6 +25,7 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             ViewBag.Brands = await _brandService.GetBrandsAsync();
@@ -62,6 +63,74 @@ namespace Entegro.Web.Controllers
 
             return Json(new { success = true });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            ViewBag.Brands = await _brandService.GetBrandsAsync();
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            var productModel = new ProductViewModel
+            {
+                Id = product.Id,
+                Barcode = product.Barcode,
+                BrandId = product.BrandId,
+                Code = product.Code,
+                Currency = product.Currency,
+                Description = product.Description,
+                Height = product.Height,
+                Length = product.Length,
+                MetaDescription = product.MetaDescription,
+                MetaTitle = product.MetaTitle,
+                MetaKeywords = product.MetaKeywords,
+                Name = product.Name,
+                VatInc = product.VatInc,
+                Price = product.Price,
+                StockQuantity = product.StockQuantity,
+                Unit = product.Unit,
+                VatRate = product.VatRate,
+                Weight = product.Weight,
+                Width = product.Width,
+            };
+            return View(productModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(UpdateProductViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var updateDto = new UpdateProductDto
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    MetaDescription = model.MetaDescription,
+                    MetaTitle = model.MetaTitle,
+                    MetaKeywords = model.MetaKeywords,
+                    Price = model.Price,
+                    Currency = model.Currency,
+                    Unit = model.Unit,
+                    VatRate = model.VatRate,
+                    VatInc = model.VatInc,
+                    Barcode = model.Barcode,
+                    BrandId = model.BrandId,
+                    Code = model.Code,
+                    StockQuantity = model.StockQuantity,
+                    Height = model.Height,
+                    Length = model.Length,
+                    Width = model.Width,
+                    Weight = model.Weight,
+                };
+                await _productService.UpdateProductAsync(updateDto);
+                return Json(new { success = true });
+            }
+            return View(model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductList([FromBody] GridCommand model)
         {
