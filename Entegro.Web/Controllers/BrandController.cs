@@ -72,7 +72,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateBrandViewModel model)
+        public async Task<IActionResult> Edit(BrandViewModel model)
         {
             if (ModelState.IsValid)
             {

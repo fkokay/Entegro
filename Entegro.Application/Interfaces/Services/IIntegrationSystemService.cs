@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class IIntegrationSystemService
+    public interface IIntegrationSystemService
     {
     }
 }

@@ -90,7 +90,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateCategoryViewModel model)
+        public async Task<IActionResult> Edit(CategoryViewModel model)
         {
             if (ModelState.IsValid)
             {

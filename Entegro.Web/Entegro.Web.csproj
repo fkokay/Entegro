@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Settings\Erp.Logo.cshtml" />
+    <Content Remove="Views\Settings\Erp.Netsis.cshtml" />
+    <Content Remove="Views\Settings\Erp.Opak.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Settings\Erp.Opak.cshtml" />
+    <None Include="Views\Settings\Erp.Netsis.cshtml" />
+    <None Include="Views\Settings\Erp.Logo.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
       <PrivateAssets>all</PrivateAssets>
