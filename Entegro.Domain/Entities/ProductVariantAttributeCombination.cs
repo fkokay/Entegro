@@ -18,5 +18,7 @@ namespace Entegro.Domain.Entities
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string AttributeXml { get; set; }
+
+        public virtual Product Product { get; set; }
     }
 }
