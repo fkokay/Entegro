@@ -10,7 +10,7 @@ using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
 
-namespace Entegro.Application.Queries
+namespace Entegro.Application.Mappings
 {
     public class MappingProfile : Profile
     {
@@ -110,6 +110,15 @@ namespace Entegro.Application.Queries
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
             CreateMap<User, UpdateUserDto>().ReverseMap();
+
+            CreateMap<UserDto, CreateUserDto>().ReverseMap();
+            CreateMap<UserDto, UpdateUserDto>().ReverseMap();
+
+            CreateMap<CreateUserDto, UserDto>().ReverseMap();
+            CreateMap<UpdateUserDto, UserDto>().ReverseMap();
+
+            CreateMap<PagedResult<User>, PagedResult<UserDto>>().ReverseMap();
+            CreateMap<PagedResult<UserDto>, PagedResult<User>>().ReverseMap();
             #endregion
         }
     }

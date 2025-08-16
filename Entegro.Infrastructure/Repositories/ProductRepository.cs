@@ -45,33 +45,17 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            //var query = _context.Products.Include(m=>m.Brand).Include(m=>m.ProductImages).AsQueryable();
-
-            //var totalCount = await query.CountAsync();
-            //var products = await query
-            //    .Skip((pageNumber - 1) * pageSize)
-            //    .Take(pageSize)
-            //    .ToListAsync();
-
-            //return new PagedResult<Product>
-            //{
-            //    Items = products,
-            //    TotalCount = totalCount,
-            //    PageNumber = pageNumber,
-            //    PageSize = pageSize
-            //};
-
-            var query = _context.Products.Include(m => m.Brand).Include(m => m.ProductImages).AsQueryable(); ;
+            var query = _context.Products.Include(m => m.Brand).Include(m => m.ProductImages).AsQueryable();
 
             var totalCount = await query.CountAsync();
-            var categories = await query
+            var products = await query
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             return new PagedResult<Product>
             {
-                Items = categories,
+                Items = products,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize
