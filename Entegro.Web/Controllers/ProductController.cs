@@ -12,13 +12,12 @@ namespace Entegro.Web.Controllers
     {
         private readonly IProductService _productService;
         private readonly IProductCategoryMappingService _productCategoryMappingService;
-
         private readonly IBrandService _brandService;
-        public ProductController(IProductService productService, IBrandService brandService, IProductCategoryMappingService productCategoryMappingService)
+        public ProductController(IProductService productService, IProductCategoryMappingService productCategoryMappingService, IBrandService brandService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
-            _brandService = brandService;
-            _productCategoryMappingService = productCategoryMappingService;
+            _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
+            _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
         }
         public IActionResult Index()
         {

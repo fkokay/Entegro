@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    internal class IProductAttributeRepository
+    public interface IProductAttributeRepository
     {
     }
 }

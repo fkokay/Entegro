@@ -226,31 +226,41 @@
 
             <!-- GÖRSEL -->
             <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
-                <div class="row g-3 p-3">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="dropzone needsclick" id="dropzone-multi">
-                                    <div class="dz-message needsclick">
-                                        Dosyaları buraya sürükleyin veya yüklemek için tıklayın
-                                    </div>
-                                    <div class="fallback">
-                                        <input name="file" type="file" multiple />
+                @if (Model.Id > 0)
+                {
+                    <div class="row g-3 p-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="dropzone needsclick" id="dropzone-multi">
+                                        <div class="dz-message needsclick">
+                                            Dosyaları buraya sürükleyin veya yüklemek için tıklayın
+                                        </div>
+                                        <div class="fallback">
+                                            <input name="file" type="file" multiple />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ürüne resim yüklemek için önce ürünü kaydetmeniz gerekmektedir.
+                    </div>
+                }
             </div>
 
-            @if (Model.Id > 0)
-            {
-                <!--KATEGORİ-->
-                <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel">
+
+            <!--KATEGORİ-->
+            <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel">
+                @if (Model.Id > 0)
+                {
                     <div class="row g-3 p-3">
                         <div class="col-md-12">
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUser">
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ProductCategoryModel">
                                 Ürün Kategorisi Ekle
                             </button>
                             <div class="card mt-3">
@@ -316,54 +326,57 @@
                             </div>
                         </div>
                     </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ürüne kategori eklemek için önce ürünü kaydetmeniz gerekmektedir.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ProductCategoryModel" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Ürün Kategorisi Ekle</h3>
+
                 </div>
-
-
-                <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-                        <div class="modal-content p-3 p-md-5">
-                            <div class="modal-body">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                <div class="text-center mb-4">
-                                    <h3 class="mb-2">Ürün Kategorisi Ekle</h3>
-
-                                </div>
-                                <form id="editUserForm" class="row g-3" onsubmit="return false">
-                                    <div class="col-md-12 mt-3">
-                                        <div class="row">
-                                            <label class="col-sm-3 col-form-label text-sm-start" for="CategoryId">Kategori</label>
-                                            <div class="col-sm-9">
-                                                <select id="CategoryId"
-                                                        name="CategoryId"
-                                                        class="select2 form-select form-select-lg"
-                                                        data-value="@Model?.CategoryId">
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 mt-3">
-                                        <div class="row">
-                                            <label class="col-sm-3 col-form-label text-sm-start" for="DisplayOrder">Sıra</label>
-                                            <div class="col-sm-9">
-                                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @id = "DisplayOrder", @type = "number", @value = 0 })
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 text-center mt-3">
-                                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
-                                        <button type="reset"
-                                                class="btn btn-label-secondary"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
+                <form id="editUserForm" class="row g-3" onsubmit="return false">
+                    <div class="col-md-12 mt-3">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="CategoryId">Kategori</label>
+                            <div class="col-sm-9">
+                                <select id="CategoryId" name="CategoryId" class="select2 form-select form-select-lg">
+                                </select>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
+                    <div class="col-md-12 mt-3">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="DisplayOrder">Sıra</label>
+                            <div class="col-sm-9">
+                                <input type="number" id="DisplayOrder" name="DisplayOrder" class="form-control" value="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center mt-3">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                        <button type="reset"
+                                class="btn btn-label-secondary"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
