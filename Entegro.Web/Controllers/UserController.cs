@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Controllers
 {
-    public class ProductAttributeController : Controller
+    public class UserController : Controller
     {
         public IActionResult Index()
         {

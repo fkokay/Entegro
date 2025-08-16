@@ -71,7 +71,7 @@
             </a>
             <ul class="menu-sub">
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Invoice" asp-action="List" class="menu-link">
                         <div data-i18n="Faturalar">Faturalar</div>
                     </a>
                 </li>
@@ -86,6 +86,11 @@
                 <li class="menu-item">
                     <a asp-controller="Order" asp-action="List" class="menu-link">
                         <div data-i18n="Excel İşlemleri">Excel İşlemleri</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                        <div data-i18n="Xml İşlemleri">Xml İşlemleri</div>
                     </a>
                 </li>
             </ul>
@@ -106,12 +111,17 @@
         <li class="menu-item" style="">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons ti ti-settings"></i>
-                <div data-i18n="Raporlar">Ayarlar</div>
+                <div data-i18n="Ayarlar">Ayarlar</div>
             </a>
             <ul class="menu-sub">
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Settings" asp-action="GeneralCommon" class="menu-link">
                         <div data-i18n="Genel Ayarlar">Genel Ayarlar</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-controller="User" asp-action="List" class="menu-link">
+                        <div data-i18n="Kullanıcılar">Kullanıcılar</div>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -120,22 +130,22 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Settings" asp-action="Marketplace" class="menu-link">
                         <div data-i18n="Pazaryeri Entegrasyonu">Pazaryeri Entegrasyonu</div>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
-                        <div data-i18n="Pazaryeri Entegrasyonu">E-ticaret Entegrasyonu</div>
+                    <a asp-controller="Settings" asp-action="ECommerce" class="menu-link">
+                        <div data-i18n="E-ticaret Entegrasyonu">E-ticaret Entegrasyonu</div>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Settings" asp-action="Cargo" class="menu-link">
                         <div data-i18n="Kargo Entegrasyonu">Kargo Entegrasyonu</div>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Settings" asp-action="EInvoice" class="menu-link">
                         <div data-i18n="E-fatura Entegrasyonu">E-fatura Entegrasyonu</div>
                     </a>
                 </li>
