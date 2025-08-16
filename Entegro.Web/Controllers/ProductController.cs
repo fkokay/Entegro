@@ -1,8 +1,10 @@
 ﻿using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Entegro.Web.Controllers
 {
@@ -31,113 +33,91 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.Brands = await _brandService.GetBrandsAsync();
             ProductViewModel model = new ProductViewModel();
+            await PrepareProductModel(model, null);
             return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Create(ProductViewModel model, List<int> CategoryIds)
+        public async Task<IActionResult> Create(ProductViewModel model)
         {
-
-            var createDto = new CreateProductDto
+            if (ModelState.IsValid)
             {
-                Barcode = model.Barcode,
-                BrandId = model.BrandId,
-                Code = model.Code,
-                Currency = model.Currency,
-                Description = model.Description,
-                Height = model.Height,
-                Length = model.Length,
-                MetaDescription = model.MetaDescription,
-                MetaTitle = model.MetaTitle,
-                MetaKeywords = model.MetaKeywords,
-                Name = model.Name,
-                Price = model.Price,
-                StockQuantity = model.StockQuantity,
-                Unit = model.Unit,
-                VatInc = model.VatInc,
-                VatRate = model.VatRate,
-                Weight = model.Weight,
-                Width = model.Width,
+                var createDto = new CreateProductDto();
+                createDto.Barcode = model.Barcode;
+                createDto.BrandId = model.BrandId;
+                createDto.Code = model.Code;
+                createDto.Currency = model.Currency;
+                createDto.Description = model.Description;
+                createDto.Height = model.Height;
+                createDto.Length = model.Length;
+                createDto.MetaDescription = model.MetaDescription;
+                createDto.MetaTitle = model.MetaTitle;
+                createDto.MetaKeywords = model.MetaKeywords;
+                createDto.Name = model.Name;
+                createDto.Price = model.Price;
+                createDto.StockQuantity = model.StockQuantity;
+                createDto.Unit = model.Unit;
+                createDto.VatInc = model.VatInc;
+                createDto.VatRate = model.VatRate;
+                createDto.Weight = model.Weight;
+                createDto.Width = model.Width;
 
-            };
+                await _productService.CreateProductAsync(createDto);
 
-            await _productService.CreateProductAsync(createDto);
+                return Json(new { success = true });
+            }
 
-            return Json(new { success = true });
+            await PrepareProductModel(model, null);
+            return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            ViewBag.Brands = await _brandService.GetBrandsAsync();
+            ProductViewModel model = new ProductViewModel();
+
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
-            var productModel = new ProductViewModel
-            {
-                Id = product.Id,
-                Barcode = product.Barcode,
-                BrandId = product.BrandId,
-                Code = product.Code,
-                Currency = product.Currency,
-                Description = product.Description,
-                Height = product.Height,
-                Length = product.Length,
-                MetaDescription = product.MetaDescription,
-                MetaTitle = product.MetaTitle,
-                MetaKeywords = product.MetaKeywords,
-                Name = product.Name,
-                VatInc = product.VatInc,
-                Price = product.Price,
-                StockQuantity = product.StockQuantity,
-                Unit = product.Unit,
-                VatRate = product.VatRate,
-                Weight = product.Weight,
-                Width = product.Width,
-            };
-            return View(productModel);
+
+            await PrepareProductModel(model, product);
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateProductViewModel model)
+        public async Task<IActionResult> Edit(ProductViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateProductDto
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Description = model.Description,
-                    MetaDescription = model.MetaDescription,
-                    MetaTitle = model.MetaTitle,
-                    MetaKeywords = model.MetaKeywords,
-                    Price = model.Price,
-                    Currency = model.Currency,
-                    Unit = model.Unit,
-                    VatRate = model.VatRate,
-                    VatInc = model.VatInc,
-                    Barcode = model.Barcode,
-                    BrandId = model.BrandId,
-                    Code = model.Code,
-                    StockQuantity = model.StockQuantity,
-                    Height = model.Height,
-                    Length = model.Length,
-                    Width = model.Width,
-                    Weight = model.Weight,
-                };
+                var updateDto = new UpdateProductDto();
+                updateDto.Barcode = model.Barcode;
+                updateDto.BrandId = model.BrandId;
+                updateDto.Code = model.Code;
+                updateDto.Currency = model.Currency;
+                updateDto.Description = model.Description;
+                updateDto.Height = model.Height;
+                updateDto.Length = model.Length;
+                updateDto.MetaDescription = model.MetaDescription;
+                updateDto.MetaTitle = model.MetaTitle;
+                updateDto.MetaKeywords = model.MetaKeywords;
+                updateDto.Name = model.Name;
+                updateDto.Price = model.Price;
+                updateDto.StockQuantity = model.StockQuantity;
+                updateDto.Unit = model.Unit;
+                updateDto.VatInc = model.VatInc;
+                updateDto.VatRate = model.VatRate;
+                updateDto.Weight = model.Weight;
+                updateDto.Width = model.Width;
+
                 await _productService.UpdateProductAsync(updateDto);
 
-                await _productCategoryMappingService.CreateProductCategoryAsync(new CreateProductCategoryDto
-                {
-                    CategoryId = model.CategoryId,
-                    ProductId = model.Id,
-                    DisplayOrder = model.DisplayOrder
-                });
                 return Json(new { success = true });
             }
+
+            await PrepareProductModel(model, null);
             return View(model);
         }
 
@@ -157,6 +137,65 @@ namespace Entegro.Web.Controllers
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
+        }
+
+
+        private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
+        {
+            if (product != null)
+            {
+                model.Id = product.Id;
+                model.Barcode = product.Barcode;
+                model.BrandId = product.BrandId;
+                model.Code = product.Code;
+                model.Currency = product.Currency;
+                model.Description = product.Description;
+                model.Height = product.Height;
+                model.Length = product.Length;
+                model.MetaDescription = product.MetaDescription;
+                model.MetaTitle = product.MetaTitle;
+                model.MetaKeywords = product.MetaKeywords;
+                model.Name = product.Name;
+                model.VatInc = product.VatInc;
+                model.Price = product.Price;
+                model.StockQuantity = product.StockQuantity;
+                model.Unit = product.Unit;
+                model.VatRate = product.VatRate;
+                model.Weight = product.Weight;
+                model.Width = product.Width;
+            }
+
+            var brands = await _brandService.GetBrandsAsync();
+
+            ViewBag.Brands = brands.Select(m=> new SelectListItem()
+            {
+                Text = m.Name,
+                Value = m.Id.ToString()
+            }).ToList();
+            ViewBag.Currencies = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "TRY", Value = "TRY" },
+                new SelectListItem { Text = "USD", Value = "USD" },
+                new SelectListItem { Text = "EUR", Value = "EUR" },
+                new SelectListItem { Text = "GBP", Value = "GBP" },
+                new SelectListItem { Text = "JPY", Value = "JPY" }
+            };
+            ViewBag.VatRates = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "0%", Value = "0" },
+                new SelectListItem { Text = "1%", Value = "1" },
+                new SelectListItem { Text = "8%", Value = "8" },
+                new SelectListItem { Text = "18%", Value = "18" },
+                new SelectListItem { Text = "20%", Value = "20" }
+            };
+            ViewBag.Units = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Adet", Value = "Adet" },
+                new SelectListItem { Text = "Kg", Value = "Kg" },
+                new SelectListItem { Text = "Litre", Value = "Litre" },
+                new SelectListItem { Text = "Metre", Value = "Metre" },
+                new SelectListItem { Text = "Kutu", Value = "Kutu" }
+            };
         }
     }
 }

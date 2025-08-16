@@ -4,7 +4,7 @@
 }
 <form asp-action="Edit" id="product-form">
     <div class="container-fluid flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Ürünler/</span> Ürünü Düzenle</h4>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi /</span><span class="text-muted fw-light"> Ürünler /</span> Ürünü Bilgilerini Düzenle</h4>
 
         <div class="row">
             <partial name="_CreateOrUpdate" />
@@ -81,26 +81,6 @@
     </script>
 
     <script>
-        $(document).ready(function () {
-            function toggleVatRateDropdown() {
-                if ($('#VatInc').is(':checked')) {
-                    $('#VatRate').prop('disabled', false);
-                } else {
-                    $('#VatRate').prop('disabled', true).val(''); // temizle
-                }
-            }
-
-
-            toggleVatRateDropdown();
-
-
-            $('#VatInc').on('change', function () {
-                toggleVatRateDropdown();
-            });
-        });
-    </script>
-
-    <script>
         function focusFieldAndShowTab(el) {
             if (!el) return;
             const tabPane = el.closest('.tab-pane');
@@ -143,7 +123,7 @@
             });
 
             // Sayfaya gömülü gelen Description'ı editöre yerleştir (eğer varsa)
-            const initialDesc = document.getElementById('description-value');
+            const initialDesc = document.getElementById('Description');
             if (initialDesc && initialDesc.value) {
                 fullEditor.root.innerHTML = initialDesc.value;
             }
@@ -264,27 +244,13 @@
 
                         const vatIncCb = document.getElementById('VatInc');
                         const vatRateEl = document.getElementById('VatRate');
-                        const syncVatRateState = () => {
-                            const enabled = vatIncCb && vatIncCb.checked;
-                            if (vatRateEl) {
-                                vatRateEl.disabled = !enabled;
-                                if (!enabled) {
-                                    vatRateEl.value = '';
-                                    vatRateEl.dispatchEvent(new Event('change', { bubbles: true }));
-                                }
-                            }
-                        };
-                        if (vatIncCb && vatRateEl) {
-                            vatIncCb.addEventListener('change', syncVatRateState);
-                            syncVatRateState();
-                        }
 
                         instance.on('core.form.valid', function () {
                             const $form = $('#product-form');
 
                             // Quill içeriğini alıp gizli input'a aktar
                             const quillHtml = fullEditor.root.innerHTML;
-                            document.getElementById('description-value').value = quillHtml;
+                            document.getElementById('Description').value = quillHtml;
 
                             const serializedData = $form.serialize();
 

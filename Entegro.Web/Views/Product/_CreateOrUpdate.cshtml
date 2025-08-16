@@ -9,7 +9,7 @@
                     <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" type="button" role="tab">Genel</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-stock" type="button" role="tab">Stok & Ölçüler</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-stock" type="button" role="tab">Envanter</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-seo" type="button" role="tab">SEO</button>
@@ -27,25 +27,8 @@
             <!-- GENEL -->
             <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3 p-3">
-                    @if (Model.Id > 0)
-                    {
-                        <input type="hidden" asp-for="Id" />
-                    }
-                    <input type="hidden" asp-for="Description" id="description-value" />
-
-
-
-                    <!-- Ürün Adı -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Name">Ad</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name" })
-                            </div>
-                        </div>
-                    </div>
-
-
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Description" />
 
                     <!-- Ürün Kodu -->
                     <div class="col-md-12">
@@ -56,17 +39,26 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Fiyat -->
+                    <!-- Ürün Adı -->
                     <div class="col-md-12">
                         <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Price">Fiyat</label>
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Name">Ad</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Price, new { @class = "form-control", @type = "number", step = "0.01", @id = "Price" })
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name" })
                             </div>
                         </div>
                     </div>
-
+                    <!-- Marka -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="BrandId">Marka</label>
+                            <div class="col-sm-9">
+                                <select asp-for="BrandId" asp-items="ViewBag.Brands" class="form-select">
+                                    <option>Belirtilmemiş</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Barkod -->
                     <div class="col-md-12">
                         <div class="row">
@@ -77,42 +69,100 @@
                         </div>
                     </div>
 
-                    <!-- Marka -->
+                    <hr class="my-4 mx-n4">
+
+                    <!-- Fiyat -->
                     <div class="col-md-12">
                         <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="BrandId">Marka</label>
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Price">Fiyat</label>
                             <div class="col-sm-9">
-                                @Html.DropDownListFor(m => m.BrandId, new SelectList(ViewBag.Brands, "Id", "Name"), new { @class = "form-select", @id = "BrandId" })
+                                @Html.TextBoxFor(m => m.Price, new { @class = "form-control", @type = "number", step = "0.01", @id = "Price" })
                             </div>
                         </div>
                     </div>
-
                     <!-- Para Birimi -->
                     <div class="col-md-12">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Currency">Para Birimi</label>
                             <div class="col-sm-9">
-                                @Html.DropDownListFor(m => m.Currency, new List<SelectListItem>
-                                {
-                                    new SelectListItem { Text = "TRY", Value = "TRY" },
-                                                                new SelectListItem { Text = "USD", Value = "USD" },
-                                                                new SelectListItem { Text = "EUR", Value = "EUR" },
-                                                                new SelectListItem { Text = "GBP", Value = "GBP" },
-                                                                new SelectListItem { Text = "JPY", Value = "JPY" }
-                                                                }, new { @class = "form-select", @id = "Currency" })
+                                <select asp-for="Currency" asp-items="ViewBag.Currencies" class="form-select">
+                                    <option>Belirtilmemiş</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Kdv Dahil Mi -->
+                    <div class="col-md-12">
+                        <div class="row align-items-center">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="VatInc">KDV Dahil</label>
+                            <div class="col-sm-9">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(m => m.VatInc, new { @class = "form-check-input", @id = "VatInc" })
+                                    <label class="form-check-label" for="VatInc">Evet</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Kdv Oranı -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="VatRate">KDV Oranı (%)</label>
+                            <div class="col-sm-9">
+                                <select asp-for="VatRate" asp-items="ViewBag.VatRates" class="form-select"></select>
                             </div>
                         </div>
                     </div>
 
+                    <hr class="my-4 mx-n4">
                     <!-- Birim -->
                     <div class="col-md-12">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Unit">Birim</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Unit, new { @class = "form-control", @id = "Unit" })
+                                <select asp-for="Unit" asp-items="ViewBag.Units" class="form-select">
+                                    <option>Belirtilmemiş</option>
+                                </select>
                             </div>
                         </div>
                     </div>
+                    <!-- Ağırlık -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Weight">Ağırlık (kg)</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Weight, new { @class = "form-control", @type = "number", step = "0.01", @id = "Weight" })
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Uzunluk -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Length">Uzunluk (cm)</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Length, new { @class = "form-control", @type = "number", step = "0.01", @id = "Length" })
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Genişlik -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Width">Genişlik (cm)</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Width, new { @class = "form-control", @type = "number", step = "0.01", @id = "Width" })
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Yükseklik -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Height">Yükseklik (cm)</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Height, new { @class = "form-control", @type = "number", step = "0.01", @id = "Height" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 mx-n4">
 
                     <!-- Açıklama -->
                     <div class="col-md-12">
@@ -138,80 +188,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Ağırlık -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Weight">Ağırlık (kg)</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Weight, new { @class = "form-control", @type = "number", step = "0.01", @id = "Weight" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Uzunluk -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Length">Uzunluk (cm)</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Length, new { @class = "form-control", @type = "number", step = "0.01", @id = "Length" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Genişlik -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Width">Genişlik (cm)</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Width, new { @class = "form-control", @type = "number", step = "0.01", @id = "Width" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Yükseklik -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Height">Yükseklik (cm)</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Height, new { @class = "form-control", @type = "number", step = "0.01", @id = "Height" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="row align-items-center">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="VatInc">KDV Dahil</label>
-                            <div class="col-sm-9">
-                                <div class="form-check">
-                                    @Html.CheckBoxFor(m => m.VatInc, new { @class = "form-check-input", @id = "VatInc" })
-                                    <label class="form-check-label" for="VatInc">Evet</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- KDV Oranı (Dropdown) -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="VatRate">KDV Oranı (%)</label>
-                            <div class="col-sm-9">
-                                @Html.DropDownListFor(
-                                                                m => m.VatRate,
-                                                                new List<SelectListItem> {
-                                                                new SelectListItem { Text = "%20", Value = "20.00" },
-                                                                new SelectListItem { Text = "%18", Value = "18.00" },
-                                                                new SelectListItem { Text = "%8",  Value = "8.00"  },
-                                                                new SelectListItem { Text = "%1",  Value = "1.00"  }
-                                                                },
-                                                                "--Seçiniz--",
-                                                                new { @class = "form-select", @id = "VatRate" }
-                                                                )
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -227,7 +203,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Anahtar Kelimeler -->
                     <div class="col-md-12">
                         <div class="row">
@@ -237,7 +212,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Meta Açıklama -->
                     <div class="col-md-12">
                         <div class="row">
@@ -277,7 +251,7 @@
                     <div class="row g-3 p-3">
                         <div class="col-md-12">
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUser">
-                               Ürün Kategorisi Ekle
+                                Ürün Kategorisi Ekle
                             </button>
                             <div class="card mt-3">
                                 <h5 class="card-header">Table Basic</h5>
@@ -352,7 +326,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 <div class="text-center mb-4">
                                     <h3 class="mb-2">Ürün Kategorisi Ekle</h3>
-                                   
+
                                 </div>
                                 <form id="editUserForm" class="row g-3" onsubmit="return false">
                                     <div class="col-md-12 mt-3">

@@ -5,7 +5,7 @@
 
 <form asp-action="Create" id="product-form">
     <div class="container-fluid flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Ürünler/</span> Yeni Bir Ürün Ekle</h4>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi /</span><span class="text-muted fw-light"> Ürünler /</span> Yeni Bir Ürün Ekle</h4>
 
         <div class="row">
             <partial name="_CreateOrUpdate" model="Model" />
@@ -68,26 +68,6 @@
             });
           }
         })();
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            function toggleVatRateDropdown() {
-                if ($('#VatInc').is(':checked')) {
-                    $('#VatRate').prop('disabled', false);
-                } else {
-                    $('#VatRate').prop('disabled', true).val(''); // temizle
-                }
-            }
-
-
-            toggleVatRateDropdown();
-
-
-            $('#VatInc').on('change', function () {
-                toggleVatRateDropdown();
-            });
-        });
     </script>
 
     <script>
@@ -269,25 +249,11 @@
 
                     const vatIncCb = document.getElementById('VatInc');
                     const vatRateEl = document.getElementById('VatRate');
-                    const syncVatRateState = () => {
-                        const enabled = vatIncCb && vatIncCb.checked;
-                        if (vatRateEl) {
-                            vatRateEl.disabled = !enabled;
-                            if (!enabled) {
-                                vatRateEl.value = '';
-                                vatRateEl.dispatchEvent(new Event('change', { bubbles: true }));
-                            }
-                        }
-                    };
-                    if (vatIncCb && vatRateEl) {
-                        vatIncCb.addEventListener('change', syncVatRateState);
-                        syncVatRateState();
-                    }
 
                     // 🚀 Quill içeriğini hidden input'a aktar ve AJAX gönder
                     instance.on('core.form.valid', function () {
                         // 🔄 Quill içeriğini input'a yaz
-                        document.getElementById('description-value').value = fullEditor.root.innerHTML;
+                        document.getElementById('Description').value = fullEditor.root.innerHTML;
 
                         const $form = $('#product-form');
                         const serializedData = $form.serialize();

@@ -1,11 +1,11 @@
 ﻿@model BrandViewModel
 @{
-    ViewData["Title"] = "Üretici Bilgilerini Düzenle - " + Model.Name;
+    ViewData["Title"] = "Marka bilgilerini düzenle - " + Model.Name;
 }
 
 <form asp-action="Edit" id="brand-form">
     <div class="container-fluid flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Markalar/</span> Yeni Bir Marka Ekle</h4>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi /</span><span class="text-muted fw-light"> Markalar /</span> Marka Bilgilerini Düzenle</h4>
 
         <div class="row">
             <partial name="_CreateOrUpdate" />
