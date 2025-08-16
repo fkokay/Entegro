@@ -337,8 +337,11 @@
 
 
     <script>
-        $('#CategoryIds').wrap('<div class="position-relative"></div>').select2({
-          dropdownParent: $('#CategoryIds').parent(),
+              $('#CategoryId').wrap('<div class="position-relative"></div>').select2({
+          dropdownParent: $('#CategoryId').parent(),
+          width: '100%',
+          placeholder: 'Kategori Seçin',
+          allowClear: true,
           ajax: {
             url: '@Url.Action("AllCategory", "Category")',
             type: 'POST',
@@ -354,11 +357,7 @@
               params.page = params.page || 1;
               return data; // {results:[{id,text}], pagination:{more}}
             }
-          },
-          width: '100%',
-          placeholder: 'Kategorileri seçin',
-          multiple: true,
-          allowClear: true
+          }
         });
     </script>
 

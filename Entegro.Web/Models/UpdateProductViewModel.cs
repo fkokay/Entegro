@@ -22,5 +22,8 @@
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
         public List<ProductImageViewModel> ProductImages { get; set; } = new List<ProductImageViewModel>();
+
+        public int DisplayOrder { get; set; }
+        public int CategoryId { get; set; }
     }
 }

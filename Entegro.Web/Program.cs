@@ -51,6 +51,9 @@ builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+builder.Services.AddScoped<IProductCategoryMappingRepository, ProductCategoryMappingRepository>();
+builder.Services.AddScoped<IProductCategoryMappingService, ProductCategoryMappingService>();
+
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 

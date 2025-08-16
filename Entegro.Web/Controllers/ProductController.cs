@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +9,14 @@ namespace Entegro.Web.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
+        private readonly IProductCategoryMappingService _productCategoryMappingService;
 
         private readonly IBrandService _brandService;
-        public ProductController(IProductService productService, IBrandService brandService)
+        public ProductController(IProductService productService, IBrandService brandService, IProductCategoryMappingService productCategoryMappingService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _brandService = brandService;
+            _productCategoryMappingService = productCategoryMappingService;
         }
         public IActionResult Index()
         {
@@ -126,6 +129,13 @@ namespace Entegro.Web.Controllers
                     Weight = model.Weight,
                 };
                 await _productService.UpdateProductAsync(updateDto);
+
+                await _productCategoryMappingService.CreateProductCategoryAsync(new CreateProductCategoryDto
+                {
+                    CategoryId = model.CategoryId,
+                    ProductId = model.Id,
+                    DisplayOrder = model.DisplayOrder
+                });
                 return Json(new { success = true });
             }
             return View(model);

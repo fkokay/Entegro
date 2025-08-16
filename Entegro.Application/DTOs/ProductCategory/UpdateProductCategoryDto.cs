@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Application.DTOs.ProductCategory
 {
-    public class ProductCategoryDto
+    public class UpdateProductCategoryDto
     {
         public int Id { get; set; }
         public int CategoryId { get; set; }

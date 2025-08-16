@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.ProductCategory;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class IProductCategoryMappingService
+    public interface IProductCategoryMappingService
     {
+        Task<ProductCategoryDto> GetProductCategoryByIdAsync(int productCategoryId);
+        Task<IEnumerable<ProductCategoryDto>> GetProductCategorysAsync();
+        Task<int> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategory);
+        Task<bool> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory);
+        Task<bool> DeleteProductCategoryAsync(int productCategoryId);
+
     }
 }

@@ -6,6 +6,7 @@ using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
@@ -45,6 +46,14 @@ namespace Entegro.Application.Mappings
             CreateMap<PagedResult<ProductImageMapping>, PagedResult<ProductImageDto>>().ReverseMap();
             CreateMap<PagedResult<ProductImageDto>, PagedResult<ProductImageMapping>>().ReverseMap();
             #endregion
+
+
+            #region ProductCategoryMapping
+            CreateMap<ProductCategoryMapping, ProductCategoryDto>().ReverseMap();
+            CreateMap<ProductCategoryMapping, CreateProductCategoryDto>().ReverseMap();
+            CreateMap<ProductCategoryMapping, UpdateProductCategoryDto>().ReverseMap();
+            #endregion
+
 
             #region Brand
             CreateMap<Brand, BrandDto>().ReverseMap();
@@ -104,7 +113,6 @@ namespace Entegro.Application.Mappings
             CreateMap<Customer, UpdateCustomerDto>().ReverseMap();
             CreateMap<PagedResult<Customer>, PagedResult<CustomerDto>>().ReverseMap();
             #endregion
-
 
             #region user
             CreateMap<User, UserDto>().ReverseMap();

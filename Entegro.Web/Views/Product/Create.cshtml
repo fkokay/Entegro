@@ -336,30 +336,7 @@
         );
     </script>
 
-    <script>
-        $('#CategoryIds').wrap('<div class="position-relative"></div>').select2({
-          dropdownParent: $('#CategoryIds').parent(),
-          ajax: {
-            url: '@Url.Action("AllCategory", "Category")',
-            type: 'POST',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-              return {
-                term: params.term || '',
-                page: params.page || 1
-              };
-            },
-            processResults: function (data, params) {
-              params.page = params.page || 1;
-              return data; // {results:[{id,text}], pagination:{more}}
-            }
-          },
-          width: '100%',
-          placeholder: 'Kategorileri seçin',
-          multiple: true,
-          allowClear: true
-        });
-    </script>
 
+
+   
 }

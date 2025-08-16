@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    internal class IProductCategoryMappingRepository
+    public interface IProductCategoryMappingRepository
     {
+        Task<ProductCategoryMapping?> GetByIdAsync(int id);
+        Task<List<ProductCategoryMapping>> GetAllAsync();
+        Task AddAsync(ProductCategoryMapping productCategoryMapping);
+        Task UpdateAsync(ProductCategoryMapping productCategoryMapping);
+        Task DeleteAsync(ProductCategoryMapping productCategoryMapping);
     }
 }
