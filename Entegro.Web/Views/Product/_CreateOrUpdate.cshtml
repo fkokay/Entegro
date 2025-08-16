@@ -183,21 +183,27 @@
                         </div>
                     </div>
 
+
                     <!-- KDV Oranı (Dropdown) -->
                     <div class="col-md-12">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="VatRate">KDV Oranı (%)</label>
                             <div class="col-sm-9">
-                                @Html.DropDownListFor(m => m.VatRate, new List<SelectListItem>
-                                                                {
-                                    new SelectListItem { Text = "%20", Value = "20.00" },
+                                @Html.DropDownListFor(
+                                                                m => m.VatRate,
+                                                                new List<SelectListItem> {
+                                                                new SelectListItem { Text = "%20", Value = "20.00" },
                                                                 new SelectListItem { Text = "%18", Value = "18.00" },
-                                                                new SelectListItem { Text = "%8", Value = "8.00" },
-                                                                new SelectListItem { Text = "%1", Value = "1.00" }
-                                                                },"--Seçiniz--", new { @class = "form-select", @id = "VatRate", disabled = !Model.VatInc })
+                                                                new SelectListItem { Text = "%8",  Value = "8.00"  },
+                                                                new SelectListItem { Text = "%1",  Value = "1.00"  }
+                                                                },
+                                                                "--Seçiniz--",
+                                                                new { @class = "form-select", @id = "VatRate" } 
+                                                                )
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
