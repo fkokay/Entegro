@@ -137,4 +137,239 @@
         })();
 
     </script>
+
+
+    <script>
+                const formValidation = FormValidation.formValidation(
+            document.getElementById('product-form'),
+            {
+                locale: 'tr_TR',
+                localization: FormValidation.locales.tr_TR,
+                fields: {
+                    'Name': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Ürün adı boş bırakılamaz.'
+                            },
+                            stringLength: {
+                                min: 3,
+                                message: 'Ürün adı en az 3 karakter olmalıdır.'
+                            }
+                        }
+                    },
+                    'Code': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Ürün kodu boş bırakılamaz.'
+                            }
+                        }
+                    },
+                    'Price': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Fiyat boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Fiyat yalnızca sayı olabilir.'
+                            }
+                        }
+                    },
+                    'Currency': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Para birimi seçilmelidir.'
+                            }
+                        }
+                    },
+                    'StockQuantity': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Stok miktarı boş bırakılamaz.'
+                            },
+                            integer: {
+                                message: 'Stok miktarı tam sayı olmalıdır.'
+                            }
+                        }
+                    },
+                    'Weight': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Ağırlık boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Ağırlık geçerli bir sayı olmalıdır.'
+                            }
+                        }
+                    },
+                    'Length': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Uzunluk boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Uzunluk geçerli bir sayı olmalıdır.'
+                            }
+                        }
+                    },
+                    'Width': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Genişlik boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Genişlik geçerli bir sayı olmalıdır.'
+                            }
+                        }
+                    },
+                    'Height': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Yükseklik boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Yükseklik geçerli bir sayı olmalıdır.'
+                            }
+                        }
+                    },
+                    'VatRate': {
+                        validators: {
+                            callback: {
+                                message: 'KDV oranı seçilmelidir.',
+                                callback: function (input) {
+                                    const vatInc = document.getElementById('VatInc').checked;
+                                    return !vatInc || (input.value !== '');
+                                }
+                            }
+                        }
+                    },
+                    'Barcode': {
+                        validators: {
+                            stringLength: {
+                                max: 100,
+                                message: 'Barkod en fazla 100 karakter olabilir.'
+                            }
+                        }
+                    },
+                    'MetaTitle': {
+                        validators: {
+                            stringLength: {
+                                max: 60,
+                                message: 'Meta başlık en fazla 60 karakter olabilir.'
+                            }
+                        }
+                    },
+                    'MetaKeywords': {
+                        validators: {
+                            stringLength: {
+                                max: 150,
+                                message: 'Anahtar kelimeler en fazla 150 karakter olabilir.'
+                            }
+                        }
+                    },
+                    'MetaDescription': {
+                        validators: {
+                            stringLength: {
+                                max: 160,
+                                message: 'Meta açıklama en fazla 160 karakter olabilir.'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        eleValidClass: '',
+                        rowSelector: '.mb-3'
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    autoFocus: new FormValidation.plugins.AutoFocus()
+                },
+                init: instance => {
+                    instance.on('plugins.message.placed', function (e) {
+                        if (e.element.parentElement.classList.contains('input-group')) {
+                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                        }
+                    });
+
+                    instance.on('core.form.valid', function () {
+                        const $form = $('#product-form');
+                        const serializedData = $form.serialize();
+
+                        $.ajax({
+                            url: '@Url.Action("Create", "Product")', // Bu endpoint doğru olduğundan emin ol!
+                            type: 'POST',
+                            data: serializedData,
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Başarılı!',
+                                        text: 'Ürün başarıyla kaydedildi.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("List", "Product")';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message || 'Bir hata oluştu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+        );
+
+    </script>
+
+    <script>
+        $('#CategoryIds').wrap('<div class="position-relative"></div>').select2({
+          dropdownParent: $('#CategoryIds').parent(),
+          ajax: {
+            url: '@Url.Action("AllCategory", "Category")',
+            type: 'POST',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                term: params.term || '',
+                page: params.page || 1
+              };
+            },
+            processResults: function (data, params) {
+              params.page = params.page || 1;
+              return data; // {results:[{id,text}], pagination:{more}}
+            }
+          },
+          width: '100%',
+          placeholder: 'Kategorileri seçin',
+          multiple: true,
+          allowClear: true
+        });
+    </script>
+
 }

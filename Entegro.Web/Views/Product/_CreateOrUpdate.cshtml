@@ -17,6 +17,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-image" type="button" role="tab">Görsel</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-categories" type="button" role="tab">Kategoriler</button>
+                </li>
             </ul>
         </div>
 
@@ -247,6 +250,20 @@
                                         <input name="file" type="file" multiple />
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--KATEGORİ-->
+            <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel">
+                <div class="row g-3 p-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="CategoryIds">Kategoriler</label>
+                            <div class="col-sm-9">
+                                <select id="CategoryIds" name="CategoryIds" class="select2 form-select form-select-lg" multiple="multiple"></select>
                             </div>
                         </div>
                     </div>

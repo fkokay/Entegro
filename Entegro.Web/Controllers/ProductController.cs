@@ -1,4 +1,5 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.DTOs.Product;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +31,37 @@ namespace Entegro.Web.Controllers
             ProductViewModel model = new ProductViewModel();
             return View(model);
         }
+        [HttpPost]
+        public async Task<IActionResult> Create(ProductViewModel model, List<int> CategoryIds)
+        {
 
+            var createDto = new CreateProductDto
+            {
+                Barcode = model.Barcode,
+                BrandId = model.BrandId,
+                Code = model.Code,
+                Currency = model.Currency,
+                Description = model.Description,
+                Height = model.Height,
+                Length = model.Length,
+                MetaDescription = model.MetaDescription,
+                MetaTitle = model.MetaTitle,
+                MetaKeywords = model.MetaKeywords,
+                Name = model.Name,
+                Price = model.Price,
+                StockQuantity = model.StockQuantity,
+                Unit = model.Unit,
+                VatInc = model.VatInc,
+                VatRate = model.VatRate,
+                Weight = model.Weight,
+                Width = model.Width,
+
+            };
+
+            await _productService.CreateProductAsync(createDto);
+
+            return Json(new { success = true });
+        }
         [HttpPost]
         public async Task<IActionResult> ProductList([FromBody] GridCommand model)
         {

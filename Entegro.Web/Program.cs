@@ -7,7 +7,9 @@ using Entegro.Application.Services.Commerce;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 
@@ -62,6 +64,15 @@ builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+var supportedCultures = new[] { new CultureInfo("en-US") };
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-US"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
