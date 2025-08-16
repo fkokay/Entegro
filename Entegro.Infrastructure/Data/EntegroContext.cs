@@ -22,8 +22,8 @@ namespace Entegro.Infrastructure.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductImageMapping> ProductImages { get; set; }
+        public DbSet<ProductCategoryMapping> ProductCategories { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
         public DbSet<ProductAttributeMapping> ProductAttributeMappings { get; set; }
@@ -43,5 +43,8 @@ namespace Entegro.Infrastructure.Data
         public DbSet<IntegrationSystem> IntegrationSystems { get; set; }
         public DbSet<IntegrationSystemParameter> IntegrationSystemParameters { get; set; }
         public DbSet<IntegrationSystemLog> IntegrationSystemLogs { get; set; }
+
+        public DbSet<MediaFolder> MediaFolders{ get; set; }
+        public DbSet<MediaFile> MediaFiles { get; set; }
     }
 }

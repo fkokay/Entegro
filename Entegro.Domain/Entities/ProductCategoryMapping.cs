@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
-    [Table("ProductCategory")]
-    public class ProductCategory : BaseEntity
+    [Table("ProductCategoryMapping")]
+    public class ProductCategoryMapping : BaseEntity
     {
         public int CategoryId { get; set; }
         public int ProductId { get; set; }

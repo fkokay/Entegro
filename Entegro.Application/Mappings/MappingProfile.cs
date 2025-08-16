@@ -32,9 +32,9 @@ namespace Entegro.Application.Mappings
             #endregion
 
             #region ProductImage
-            CreateMap<ProductImage, ProductImageDto>().ReverseMap();
-            CreateMap<ProductImage, CreateProductImageDto>().ReverseMap();
-            CreateMap<ProductImage, UpdateProductImageDto>().ReverseMap();
+            CreateMap<ProductImageMapping, ProductImageDto>().ReverseMap();
+            CreateMap<ProductImageMapping, CreateProductImageDto>().ReverseMap();
+            CreateMap<ProductImageMapping, UpdateProductImageDto>().ReverseMap();
 
             CreateMap<ProductImageDto, CreateProductImageDto>().ReverseMap();
             CreateMap<ProductImageDto, UpdateProductImageDto>().ReverseMap();
@@ -42,8 +42,8 @@ namespace Entegro.Application.Mappings
             CreateMap<CreateProductImageDto, ProductImageDto>().ReverseMap();
             CreateMap<UpdateProductImageDto, ProductImageDto>().ReverseMap();
 
-            CreateMap<PagedResult<ProductImage>, PagedResult<ProductImageDto>>().ReverseMap();
-            CreateMap<PagedResult<ProductImageDto>, PagedResult<ProductImage>>().ReverseMap();
+            CreateMap<PagedResult<ProductImageMapping>, PagedResult<ProductImageDto>>().ReverseMap();
+            CreateMap<PagedResult<ProductImageDto>, PagedResult<ProductImageMapping>>().ReverseMap();
             #endregion
 
             #region Brand
