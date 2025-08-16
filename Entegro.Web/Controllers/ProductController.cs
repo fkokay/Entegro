@@ -7,9 +7,12 @@ namespace Entegro.Web.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
-        public ProductController(IProductService productService)
+
+        private readonly IBrandService _brandService;
+        public ProductController(IProductService productService, IBrandService brandService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _brandService = brandService;
         }
         public IActionResult Index()
         {
@@ -21,9 +24,11 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            ViewBag.Brands = await _brandService.GetBrandsAsync();
+            ProductViewModel model = new ProductViewModel();
+            return View(model);
         }
 
         [HttpPost]

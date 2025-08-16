@@ -1,6 +1,6 @@
-﻿namespace Entegro.Application.DTOs.ProductImage
+﻿namespace Entegro.Web.Models
 {
-    public class CreateProductImageDto
+    public class CreateProductImageViewModel
     {
         public int ProductId { get; set; }
         public string Url { get; set; }
