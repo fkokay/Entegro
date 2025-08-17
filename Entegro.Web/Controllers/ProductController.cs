@@ -91,6 +91,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var updateDto = new UpdateProductDto();
+                updateDto.Id = model.Id;
                 updateDto.Barcode = model.Barcode;
                 updateDto.BrandId = model.BrandId;
                 updateDto.Code = model.Code;
