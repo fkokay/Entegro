@@ -294,38 +294,38 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="text-center mb-4">
                     <h3 class="mb-2">Ürün Kategorisi Ekle</h3>
-
                 </div>
-                <form id="editUserForm" class="row g-3" onsubmit="return false">
+
+                <div id="productCategoryForm" class="row g-3">
+                    <input type="hidden" id="ProductId" value="@Model?.Id" />
+
                     <div class="col-md-12 mt-3">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="CategoryId">Kategori</label>
                             <div class="col-sm-9">
-                                <select id="CategoryId" name="CategoryId" class="select2 form-select form-select-lg">
-                                </select>
+                                <select id="CategoryId" class="select2 form-select form-select-lg"></select>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-12 mt-3">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="DisplayOrder">Sıra</label>
                             <div class="col-sm-9">
-                                <input type="number" id="DisplayOrder" name="DisplayOrder" class="form-control" value="0" />
+                                <input type="number" id="DisplayOrder" class="form-control" value="0" />
                             </div>
                         </div>
                     </div>
+
                     <div class="col-12 text-center mt-3">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset"
-                                class="btn btn-label-secondary"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Kapat
-                        </button>
+                        <button type="button" id="btnSaveProductCategory" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
                     </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
 

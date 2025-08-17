@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -208,6 +209,18 @@ namespace Entegro.Web.Controllers
         {
             bool isSuccess = await _productCategoryMappingService.DeleteProductCategoryAsync(id);
             return Json(new { success = isSuccess });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProductCategory([FromBody] CreateProductCategoryDto createProductCategoryDto)
+        {
+            if (ModelState.IsValid)
+            {
+                int id = await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategoryDto);
+                return Json(new { success = true, id });
+            }
+            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
         }
     }
 }

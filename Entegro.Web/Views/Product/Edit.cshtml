@@ -302,30 +302,6 @@
 
 
 
-    <script>
-              $('#CategoryId').wrap('<div class="position-relative"></div>').select2({
-          dropdownParent: $('#CategoryId').parent(),
-          width: '100%',
-          placeholder: 'Kategori Seçin',
-          allowClear: true,
-          ajax: {
-            url: '@Url.Action("AllCategory", "Category")',
-            type: 'POST',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-              return {
-                term: params.term || '',
-                page: params.page || 1
-              };
-            },
-            processResults: function (data, params) {
-              params.page = params.page || 1;
-              return data; // {results:[{id,text}], pagination:{more}}
-            }
-          }
-        });
-    </script>
 
 
 
@@ -422,4 +398,187 @@
           });
         });
     </script>
+
+    <script>
+        $(function () {
+          /* ---------------- Modal'ı body'e taşı & Select2 ---------------- */
+          const $modal = $('#ProductCategoryModel');
+          if ($modal.length) $modal.appendTo('body');
+
+          $modal.on('shown.bs.modal', function () {
+            const $cat = $('#CategoryId');
+            if (!$cat.data('select2')) {
+              $cat.select2({
+                placeholder: 'Kategori seçiniz',
+                allowClear: true,
+                dropdownParent: $modal,
+                width: '100%',
+                ajax: {
+                  url: '@Url.Action("AllCategory", "Category")',
+                  type: 'POST',
+                  dataType: 'json',
+                  delay: 250,
+                  data: function (params) {
+                    return { term: params.term || '', page: params.page || 1 };
+                  },
+                  processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                      results: data.results,                 // [{id,text}]
+                      pagination: { more: data.pagination?.more === true }
+                    };
+                  },
+                  cache: true
+                }
+              });
+            }
+            // Açılışta validation görünümlerini temizleyelim
+            clearCategoryValidationUI();
+          });
+
+          /* ---------------- Yardımcı: Validation UI ---------------- */
+          function setInvalid($el, message, feedbackId) {
+           
+            $el.addClass('is-invalid');
+
+            
+            if ($el.hasClass('select2')) {
+              $el.next('.select2').find('.select2-selection').addClass('is-invalid');
+            }
+
+            // Hata mesajını göster
+            let $fb = $('#' + feedbackId);
+            if ($fb.length === 0) {
+              // Mesajı elemanın hemen altına ekle
+              $fb = $('<div/>', { id: feedbackId, class: 'invalid-feedback d-block' }).insertAfter($el);
+            }
+            $fb.text(message);
+          }
+
+          function clearInvalid($el, feedbackId) {
+            $el.removeClass('is-invalid');
+            if ($el.hasClass('select2')) {
+              $el.next('.select2').find('.select2-selection').removeClass('is-invalid');
+            }
+            $('#' + feedbackId).remove();
+          }
+
+          function clearCategoryValidationUI() {
+            clearInvalid($('#CategoryId'), 'CategoryIdFeedback');
+            clearInvalid($('#DisplayOrder'), 'DisplayOrderFeedback');
+          }
+
+          /* ---------------- Doğrulama: Kategori & Sıra ---------------- */
+          function validateProductCategoryModal() {
+            clearCategoryValidationUI();
+
+            const errors = [];
+
+            // Kategori zorunlu
+            const categoryId = $('#CategoryId').val();
+            if (!categoryId || categoryId === '' || categoryId === '0') {
+              setInvalid($('#CategoryId'), 'Lütfen bir kategori seçiniz.', 'CategoryIdFeedback');
+              errors.push('Lütfen bir kategori seçiniz.');
+            }
+
+            // Sıra: boş olabilir ama sayı ise 0+ olmalı
+            const displayOrderRaw = $('#DisplayOrder').val();
+            if (displayOrderRaw !== '' && displayOrderRaw !== null && displayOrderRaw !== undefined) {
+              const displayOrder = Number(displayOrderRaw);
+              const isInt = Number.isInteger(displayOrder);
+              if (!isInt || displayOrder < 0) {
+                setInvalid($('#DisplayOrder'), 'Sıra 0 veya daha büyük tam sayı olmalıdır.', 'DisplayOrderFeedback');
+                errors.push('Sıra 0 veya daha büyük tam sayı olmalıdır.');
+              }
+            }
+
+            return {
+              valid: errors.length === 0,
+              errors
+            };
+          }
+
+          /* ---------------- Kaydet butonu ---------------- */
+          $(document).on('click', '#btnSaveProductCategory', function () {
+            const $btn = $(this);
+
+            // VALIDASYON
+            const v = validateProductCategoryModal();
+            if (!v.valid) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Eksik / Hatalı Bilgi',
+                html: v.errors.map(e => `<div>${e}</div>`).join(''),
+                confirmButtonText: 'Tamam',
+                customClass: { confirmButton: 'btn btn-warning' },
+                buttonsStyling: false
+              }).then(() => {
+                // Hata olan ilk alana odaklan
+                if ($('#CategoryId').hasClass('is-invalid')) {
+                  $('#CategoryId').select2('open');
+                } else if ($('#DisplayOrder').hasClass('is-invalid')) {
+                  $('#DisplayOrder').focus();
+                }
+              });
+              return;
+            }
+
+            // PAYLOAD
+            const payload = {
+              productId: Number($('#ProductId').val()) || 0,
+              categoryId: Number($('#CategoryId').val()) || 0,
+              displayOrder: Number($('#DisplayOrder').val()) || 0
+            };
+
+            $btn.prop('disabled', true);
+
+            fetch('@Url.Action("CreateProductCategory", "Product")', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(json => {
+              if (json?.success) {
+                $('#ProductCategoryModel').modal('hide');
+                // Sonraki yüklemede Kategoriler tabı açılsın
+                localStorage.setItem('productActiveTab', '#form-tabs-categories');
+
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Başarılı!',
+                  text: 'Kategori başarıyla kaydedildi.',
+                  confirmButtonText: 'Tamam',
+                  customClass: { confirmButton: 'btn btn-success' },
+                  buttonsStyling: false
+                }).then(() => location.reload());
+              } else {
+                const errs = Array.isArray(json?.errors) ? json.errors.join('\n') : (json?.errors || 'Kayıt başarısız.');
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Hata!',
+                  text: errs,
+                  confirmButtonText: 'Tamam',
+                  customClass: { confirmButton: 'btn btn-danger' },
+                  buttonsStyling: false
+                });
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              Swal.fire({
+                icon: 'error',
+                title: 'Sunucu Hatası!',
+                text: 'İşlem sırasında bir hata oluştu.',
+                confirmButtonText: 'Tamam',
+                customClass: { confirmButton: 'btn btn-danger' },
+                buttonsStyling: false
+              });
+            })
+            .finally(() => $btn.prop('disabled', false));
+          });
+        });
+    </script>
+
+
 }
