@@ -3,36 +3,14 @@
 }
 
 <div class="flex-grow-1 container-p-y container-fluid">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="mb-3">@ViewData["Title"]</h4>
+    </div>
     <div class="card">
         <div class="card-header border-bottom">
             <h5 class="card-title">Filtreler</h5>
             <div class="d-flex justify-content-between align-items-center row pt-4 gap-6 gap-md-0 g-md-6">
-                <div class="col-md-4 product_status">
-                    <select id="ProductStatus" class="form-select text-capitalize">
-                        <option value="">Status</option>
-                        <option value="Scheduled">Scheduled</option>
-                        <option value="Publish">Publish</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-                <div class="col-md-4 product_category">
-                    <select id="ProductCategory" class="form-select text-capitalize">
-                        <option value="">Category</option>
-                        <option value="Household">Household</option>
-                        <option value="Office">Office</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Shoes">Shoes</option>
-                        <option value="Accessories">Accessories</option>
-                        <option value="Game">Game</option>
-                    </select>
-                </div>
-                <div class="col-md-4 product_stock">
-                    <select id="ProductStock" class="form-select text-capitalize">
-                        <option value="">Stock</option>
-                        <option value="Out_of_Stock">Out_of_Stock</option>
-                        <option value="In_Stock">In_Stock</option>
-                    </select>
-                </div>
+                <div class="col-md-4 productFilterBrand"></div>
             </div>
         </div>
         <div class="card-datatable">
@@ -41,6 +19,7 @@
                     <tr>
                         <th></th>
                         <th></th>
+                        <th>BrandId</th>
                         <th>Ürün Adı</th>
                         <th>Ürün Kodu</th>
                         <th>Barkod</th>
@@ -54,60 +33,17 @@
     </div>
 </div>
 
-@* <div class="flex-grow-1 container-p-y container-fluid">
-    <div class="card">
-        <div class="row card-header flex-column flex-md-row border-bottom mx-0 px-3">
-            <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0">
-                <h5 class="card-title mb-0 text-md-start text-center pb-md-0 pb-6">Ürünler</h5>
-            </div>
-            <div class="d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0">
-                <div class="dt-buttons btn-group flex-wrap mb-0">
-                    <div class="btn-group">
-                        <button class="btn buttons-collection btn-label-primary dropdown-toggle me-4" tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog" aria-expanded="false">
-                            <span>
-                                <span class="d-flex align-items-center gap-2">
-                                    <i class="icon-base ti tabler-upload icon-xs me-sm-1"></i>
-                                    <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                    <a asp-action="Create" class="btn create-new btn-primary" tabindex="0">
-                        <span>
-                            <span class="d-flex align-items-center gap-2">
-                                <i class="icon-base ti tabler-plus icon-sm"></i>
-                                <span class="d-none d-sm-inline-block">Yeni Ekle</span>
-                            </span>
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="card-datatable table-responsive">
-            <table id="ProductTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th></th>
-                        <th>Id</th>
-                        <th>Ürün adı</th>
-                        <th>Ürün kodu</th>
-                        <th>Liste fiyatı</th>
-                        <th>Marka</th>
-                        <th>Kayıt tarihi</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
-</div> *@
-
 @section Scripts {
     <script>
         $(function () {
             $('#ProductTable').dataTable({
                 language: {
+                     paginate: {
+                        next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                        previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                        first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                        last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                    },
                     url: '//cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
                 },
                 serverSide: true,
@@ -122,6 +58,7 @@
                 columns: [
                     { data: 'Id' },
                     { data: 'Id', orderable: false, render: DataTable.render.select() },
+                    { data: 'BrandId',visible:false },
                     { data: 'Name' },
                     { data: 'Code' },
                     { data: 'Barcode' },
@@ -156,7 +93,7 @@
                         render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                     },
                     {
-                        targets: 2,
+                        targets: 3,
                         responsivePriority: 1,
                         render: (data, type, row) => {
                             const avatar = '<img src="https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/ecommerce-images/product-5.png" alt="Product-${id}" class="rounded">';
@@ -199,7 +136,7 @@
                     style: "multi",
                     selector: "td:nth-child(2)"
                 },
-                order: [2, "asc"],
+                order: [3, "asc"],
                 displayLength: 7,
                 layout: {
                     topStart: {
@@ -301,6 +238,12 @@
                         features: ["info"]
                     },
                     bottomEnd: "paging"
+                },
+                initComplete: function () {
+                    const api = this.api();
+                    api.columns(2).every(function () {
+                        addFilterDropdown(this, ".productFilterBrand", "Marka", [{title:"mevababy",id:83}]);
+                    });
                 }
             });
 
@@ -329,6 +272,29 @@
                     });
                 })
             }, 100);
+
+            function addFilterDropdown(column, containerSelector, placeholder, map) {
+                let select = document.createElement("select");
+                select.className = "form-select text-capitalize";
+                select.innerHTML = `<option value="">${placeholder}</option>`;
+
+                document.querySelector(containerSelector).appendChild(select);
+
+                select.addEventListener("change", function () {
+                    const val = select.value ? `^${select.value}$` : "";
+                    column.search(val, true, false).draw();
+                });
+
+                column.data().unique().sort().each(function (value) {
+                    const item = map.find(x => x.id === value);
+                    if (item) {
+                        let option = document.createElement("option");
+                        option.value = item.id;
+                        option.textContent = item.title;
+                        select.appendChild(option);
+                    }
+                });
+            }
         });
     </script>
 }

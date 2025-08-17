@@ -28526,7 +28526,7 @@ li:not(:first-child) .dropdown-item, .dropdown-menu .dropdown-item:not(:first-ch
 
             .menu-vertical .menu-item .menu-toggle: :after {
                 inset-inline-end: var(--bs-menu-vertical-link-padding-x);
-                transition: transform .3s
+                transition: transform .3s;
             }
 
         .menu-vertical .menu-item:not(.active):not(.open) .menu-link:hover {
@@ -31357,4 +31357,10 @@ body:not(.modal-open) .layout-content-navbar .layout-navbar {
 [data-bs-theme=dark] .footer.bg-dark {
     --bs-footer-brand-hover-color: color-mix(in sRGB, var(--bs-pure-black) 84%, var(--bs-dark-contrast));
     --bs-footer-link-hover-color: color-mix(in sRGB, var(--bs-pure-black) 84%, var(--bs-dark-contrast))
+}
+
+
+.menu-vertical .menu-item .menu-toggle::after {
+    inset-inline-end: var(--bs-menu-vertical-link-padding-x);
+    transition: transform .3s;
 }
