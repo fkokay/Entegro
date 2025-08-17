@@ -1,8 +1,8 @@
 ﻿@model UserViewModel
 @{
-    ViewData["Title"] = "Yeni Bir Kullanıcı Ekle";
+    ViewData["Title"] = "Kullanıcı Bilgilerini Düzenle";
 }
-<form asp-action="Create" id="user-form">
+<form asp-action="Edit" id="user-form">
     <div class="flex-grow-1 container-p-y container-fluid">
         <div class="d-flex flex-column justify-content-center">
             <h4 class="mb-3">@ViewData["Title"]</h4>
@@ -16,6 +16,14 @@
                         <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
                             <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
                         </button>
+                        @if (Model.Id > 0)
+                        {
+                            <button type="button" id="btnDeleteBrand" class="btn btn-danger d-grid w-100 mb-2 waves-effect waves-light">
+                                <span class="d-flex align-items-center justify-content-center text-nowrap">
+                                    <i class="ti ti-trash ti-xs me-1"></i>Sil
+                                </span>
+                            </button>
+                        }
                         <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">Vazgeç</a>
                     </div>
                 </div>

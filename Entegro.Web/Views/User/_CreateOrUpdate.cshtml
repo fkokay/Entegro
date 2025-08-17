@@ -1,5 +1,83 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model UserViewModel
+
+@Html.HiddenFor(m => m.Id)
+
+<div class="col-lg-9 col-12 mb-lg-0 mb-4">
+    <div class="card mb-3">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" role="tab" aria-selected="true">
+                        Genel
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content">
+            <!-- Personal Info -->
+            <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="FirstName">Ad</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="LastName">Soyadı</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control"})
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Email">Email</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control",@type="email" })
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.Id == 0)
+                    {
+                        <div class="col-md-6">
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label text-sm-start" for="Password">Şifre</label>
+                                <div class="col-sm-9">
+                                    @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="PhoneNumber">Telefon</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @type = "phone" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Active">Aktif</label>
+                            <div class="col-sm-9">
+                                <label class="switch switch-lg">
+                                    @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
+                                    <span class="switch-toggle-slider">
+                                        <span class="switch-on"></span>
+                                        <span class="switch-off"></span>
+                                    </span>
+                                </label>
+                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

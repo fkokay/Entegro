@@ -29,6 +29,7 @@ namespace Entegro.Web.Controllers
         public IActionResult Create()
         {
             UserViewModel model = new UserViewModel();
+            model.Active = true;
             return View(model);
         }
 
