@@ -6,6 +6,7 @@ namespace Entegro.Application.Interfaces.Services
     public interface IIntegrationSystemParameterService
     {
         Task<IntegrationSystemParameterDto?> GetByIdAsync(int id);
+        Task<IntegrationSystemParameterDto?> GetByKeyAsync(string key);
         Task<List<IntegrationSystemParameterDto>> GetAllAsync();
         Task<PagedResult<IntegrationSystemParameterDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<int> AddAsync(CreateIntegrationSystemParameterDto integrationSystemParameter);

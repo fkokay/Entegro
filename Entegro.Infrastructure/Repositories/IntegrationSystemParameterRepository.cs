@@ -55,6 +55,11 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.IntegrationSystemParameters.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<IntegrationSystemParameter?> GetByKeyAsync(string key)
+        {
+            return await _context.IntegrationSystemParameters.FirstOrDefaultAsync(o => o.Key == key);
+        }
+
         public async Task UpdateAsync(IntegrationSystemParameter integrationSystemParameter)
         {
             _context.IntegrationSystemParameters.Update(integrationSystemParameter);

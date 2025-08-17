@@ -22,7 +22,7 @@
                 </div>
                 <div class="row p-3">
                     <div class="mb-0">
-                        <button class="btn btn-success waves-effect waves-light w-100">
+                        <button type="button" onclick="SelectErp('Logo')" class="btn btn-success waves-effect waves-light w-100">
                             <i class="ti ti-plus me-1"></i>
                             <span class="align-middle">Aktif Et</span>
                         </button>
@@ -40,14 +40,14 @@
                         <div class="card-body">
                             <h5 class="card-title">Netsis</h5>
                             <p class="card-text">
-                                 Netis yazılım ürünleri ile entegre çalışabilmektedir.
+                                Netis yazılım ürünleri ile entegre çalışabilmektedir.
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="row p-3">
                     <div class="mb-0">
-                        <button class="btn btn-success waves-effect waves-light w-100">
+                        <button type="button" onclick="SelectErp('Netsis')" class="btn btn-success waves-effect waves-light w-100">
                             <i class="ti ti-plus me-1"></i>
                             <span class="align-middle">Aktif Et</span>
                         </button>
@@ -72,7 +72,7 @@
                 </div>
                 <div class="row p-3">
                     <div class="mb-0">
-                        <button class="btn btn-success waves-effect waves-light w-100">
+                        <button type="button" onclick="SelectErp('Opak')" class="btn btn-success waves-effect waves-light w-100">
                             <i class="ti ti-plus me-1"></i>
                             <span class="align-middle">Aktif Et</span>
                         </button>
@@ -82,3 +82,35 @@
         </div>
     </div>
 </div>
+
+@section Scripts{
+
+    <script>
+        function SelectErp(erpType){
+             $.ajax({
+                 url: '@Url.Action("Erp", "Settings")',
+                 type: 'POST',
+                 data: { erpType: erpType },
+                 success: function (response) {
+                     if(response.success){
+                         location.reload();
+                     }else{
+
+                     }
+                 },
+                 error: function () {
+                     Swal.fire({
+                         icon: 'error',
+                         title: 'Hata!',
+                         text: 'Sunucu ile bağlantı kurulamadı.',
+                         confirmButtonText: 'Tamam',
+                         customClass: {
+                             confirmButton: 'btn btn-danger'
+                         },
+                         buttonsStyling: false
+                     });
+                 }
+             });
+        }
+    </script>
+}

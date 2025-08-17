@@ -6,6 +6,7 @@ namespace Entegro.Application.Interfaces.Repositories
     public interface IIntegrationSystemRepository
     {
         Task<IntegrationSystem?> GetByIdAsync(int id);
+        Task<IntegrationSystem?> GetByTypeIdAsync(int typeId);
         Task<List<IntegrationSystem>> GetAllAsync();
         Task<PagedResult<IntegrationSystem>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(IntegrationSystem IntegrationSystem);

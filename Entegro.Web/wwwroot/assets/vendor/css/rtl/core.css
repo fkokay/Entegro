@@ -12760,11 +12760,6 @@ li:not(:first-child) .dropdown-item, .dropdown-menu .dropdown-item:not(:first-ch
     color: var(--bs-body-color)
 }
 
-.card-img-left, .card-img-right {
-    block-size: 100%;
-    object-fit: cover
-}
-
 .card-img-left {
     border-end-start-radius: .375rem;
     border-start-start-radius: .375rem;

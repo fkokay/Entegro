@@ -1,4 +1,5 @@
-﻿using Entegro.Domain.Enums;
+﻿using Entegro.Application.DTOs.IntegrationSystemParameter;
+using Entegro.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -38,5 +39,7 @@ namespace Entegro.Application.DTOs.IntegrationSystem
         }
         public string Name { get; set; }
         public string? Description { get; set; }
+
+        public List<IntegrationSystemParameterDto> Parameters { get; set; } = new();
     }
 }
