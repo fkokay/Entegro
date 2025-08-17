@@ -304,12 +304,11 @@
 
 
 
-
     <script>
         function loadProductCategories(productId) {
           const urlGet = '@Url.Action("Get", "Product")';
           const $tbody = $("#productCategoryTable tbody");
-          $tbody.html("<tr><td colspan='4'>Yükleniyor...</td></tr>");
+          $tbody.html("<tr><td colspan='3'>Yükleniyor...</td></tr>");
 
           $.ajax({
             url: urlGet,
@@ -320,7 +319,6 @@
 
               if (response && response.results && response.results.length) {
                 $.each(response.results, function (i, item) {
-
                   const row = `
                     <tr data-mapping-id="${item.id}">
                       <td>${item.text}</td>
@@ -331,21 +329,19 @@
                         </button>
                       </td>
                     </tr>`;
-
                   $tbody.append(row);
                 });
               } else {
-                $tbody.append("<tr><td colspan='4'>Kategori bulunamadı</td></tr>");
+                $tbody.append("<tr><td colspan='3'>Kategori bulunamadı</td></tr>");
               }
             },
             error: function () {
-              $tbody.html("<tr><td colspan='4'>Kategoriler yüklenirken hata oluştu</td></tr>");
+              $tbody.html("<tr><td colspan='3'>Kategoriler yüklenirken hata oluştu</td></tr>");
             }
           });
         }
 
         function confirmAndDelete(mappingId, onDone) {
-          // SweetAlert2 ile onay
           Swal.fire({
             title: 'Emin misiniz?',
             text: 'Bu ürün-kategori eşleştirmesi silinecek.',
@@ -357,14 +353,11 @@
             if (!result.isConfirmed) return;
 
             const urlDelete = '@Url.Action("DeleteProductCategory", "Product")';
-
-            // İstediğin gibi GET ile (şimdilik CSRF yok)
             $.ajax({
               url: urlDelete,
               type: 'GET',
               data: { id: mappingId },
-              success: function (res) {
-                // isSuccess döndürmüyorsun; şimdilik boş JSON. Yine de satırı kaldırıyoruz.
+              success: function () {
                 if (typeof onDone === 'function') onDone(true);
                 Swal.fire({ icon: 'success', title: 'Silindi', timer: 1200, showConfirmButton: false });
               },
@@ -389,9 +382,8 @@
 
             confirmAndDelete(mappingId, function (ok) {
               if (ok) {
-                
                 $tr.remove();
-                // istersen yeniden yükle:
+                // İstersen tüm listeyi yenile:
                 // loadProductCategories(productId);
               }
             });
@@ -424,7 +416,7 @@
                   processResults: function (data, params) {
                     params.page = params.page || 1;
                     return {
-                      results: data.results,                 // [{id,text}]
+                      results: data.results, // [{id,text}]
                       pagination: { more: data.pagination?.more === true }
                     };
                   },
@@ -432,24 +424,17 @@
                 }
               });
             }
-            // Açılışta validation görünümlerini temizleyelim
             clearCategoryValidationUI();
           });
 
           /* ---------------- Yardımcı: Validation UI ---------------- */
           function setInvalid($el, message, feedbackId) {
-           
             $el.addClass('is-invalid');
-
-            
             if ($el.hasClass('select2')) {
               $el.next('.select2').find('.select2-selection').addClass('is-invalid');
             }
-
-            // Hata mesajını göster
             let $fb = $('#' + feedbackId);
             if ($fb.length === 0) {
-              // Mesajı elemanın hemen altına ekle
               $fb = $('<div/>', { id: feedbackId, class: 'invalid-feedback d-block' }).insertAfter($el);
             }
             $fb.text(message);
@@ -471,17 +456,14 @@
           /* ---------------- Doğrulama: Kategori & Sıra ---------------- */
           function validateProductCategoryModal() {
             clearCategoryValidationUI();
-
             const errors = [];
 
-            // Kategori zorunlu
             const categoryId = $('#CategoryId').val();
             if (!categoryId || categoryId === '' || categoryId === '0') {
               setInvalid($('#CategoryId'), 'Lütfen bir kategori seçiniz.', 'CategoryIdFeedback');
               errors.push('Lütfen bir kategori seçiniz.');
             }
 
-            // Sıra: boş olabilir ama sayı ise 0+ olmalı
             const displayOrderRaw = $('#DisplayOrder').val();
             if (displayOrderRaw !== '' && displayOrderRaw !== null && displayOrderRaw !== undefined) {
               const displayOrder = Number(displayOrderRaw);
@@ -492,17 +474,13 @@
               }
             }
 
-            return {
-              valid: errors.length === 0,
-              errors
-            };
+            return { valid: errors.length === 0, errors };
           }
 
           /* ---------------- Kaydet butonu ---------------- */
           $(document).on('click', '#btnSaveProductCategory', function () {
             const $btn = $(this);
 
-            // VALIDASYON
             const v = validateProductCategoryModal();
             if (!v.valid) {
               Swal.fire({
@@ -513,7 +491,6 @@
                 customClass: { confirmButton: 'btn btn-warning' },
                 buttonsStyling: false
               }).then(() => {
-                // Hata olan ilk alana odaklan
                 if ($('#CategoryId').hasClass('is-invalid')) {
                   $('#CategoryId').select2('open');
                 } else if ($('#DisplayOrder').hasClass('is-invalid')) {
@@ -523,9 +500,8 @@
               return;
             }
 
-            // PAYLOAD
             const payload = {
-              productId: Number($('#ProductId').val()) || 0,
+              productId: Number($('#productId').val()) || 0,  // 🔧 doğru selector
               categoryId: Number($('#CategoryId').val()) || 0,
               displayOrder: Number($('#DisplayOrder').val()) || 0
             };
@@ -541,7 +517,6 @@
             .then(json => {
               if (json?.success) {
                 $('#ProductCategoryModel').modal('hide');
-                // Sonraki yüklemede Kategoriler tabı açılsın
                 localStorage.setItem('productActiveTab', '#form-tabs-categories');
 
                 Swal.fire({
@@ -551,7 +526,18 @@
                   confirmButtonText: 'Tamam',
                   customClass: { confirmButton: 'btn btn-success' },
                   buttonsStyling: false
-                }).then(() => location.reload());
+                }).then(() => {
+                  // ✅ 1) Kategoriler tabını aç
+                  activateTab('#form-tabs-categories');
+
+                  // ✅ 2) Tabloyu yenile
+                  const productId = $('#productId').val();
+                  loadProductCategories(productId);
+
+                  // (Opsiyonel) Modal alanlarını temizle
+                  $('#CategoryId').val(null).trigger('change');
+                  $('#DisplayOrder').val('');
+                });
               } else {
                 const errs = Array.isArray(json?.errors) ? json.errors.join('\n') : (json?.errors || 'Kayıt başarısız.');
                 Swal.fire({
@@ -577,8 +563,22 @@
             })
             .finally(() => $btn.prop('disabled', false));
           });
+
+          // 🔽 Yardımcı: İstenen tabı etkinleştir (Bootstrap 5)
+          function activateTab(paneSelector) {
+            const triggerEl =
+              document.querySelector(`[data-bs-target="${paneSelector}"]`) ||
+              document.querySelector(`a[href="${paneSelector}"]`);
+            if (triggerEl && window.bootstrap?.Tab) {
+              const tab = new bootstrap.Tab(triggerEl);
+              tab.show();
+              document.querySelector(paneSelector)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
         });
     </script>
+
+
 
 
 }
