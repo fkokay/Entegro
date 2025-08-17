@@ -1,8 +1,6 @@
-﻿using Entegro.Application.DTOs.IntegrationSystem;
-
-namespace Entegro.Application.DTOs.IntegrationSystemLog
+﻿namespace Entegro.Application.DTOs.IntegrationSystemLog
 {
-    public class IntegrationSystemLogDto
+    public class CreateIntegrationSystemLogDto
     {
         public int Id { get; set; }
         public int IntegrationSystemId { get; set; }
@@ -10,6 +8,5 @@ namespace Entegro.Application.DTOs.IntegrationSystemLog
         public string Message { get; set; }
         public string LogLevel { get; set; } // e.g., "Info", "Warning", "Error"
         public string? Exception { get; set; } // Optional exception details
-        public virtual IntegrationSystemDto IntegrationSystem { get; set; }
     }
 }

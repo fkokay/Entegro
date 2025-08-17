@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    internal class IIntegrationSystemRepository
+    public interface IIntegrationSystemRepository
     {
+        Task<IntegrationSystem?> GetByIdAsync(int id);
+        Task<List<IntegrationSystem>> GetAllAsync();
+        Task<PagedResult<IntegrationSystem>> GetAllAsync(int pageNumber, int pageSize);
+        Task AddAsync(IntegrationSystem IntegrationSystem);
+        Task UpdateAsync(IntegrationSystem IntegrationSystem);
+        Task DeleteAsync(IntegrationSystem IntegrationSystem);
     }
 }

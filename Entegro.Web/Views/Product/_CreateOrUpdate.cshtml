@@ -259,7 +259,12 @@
                 @if (Model.Id > 0)
                 {
                     <div class="row g-3 p-3">
-                       
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ProductCategoryModel">
+                                Ürün Kategorisi Ekle
+                            </button>
+                        </div>
+
                         <table class="table table-bordered" id="productCategoryTable">
                             <thead>
                                 <tr>
@@ -270,10 +275,8 @@
                             </thead>
                             <tbody class="table-border-bottom-3"></tbody>
                         </table>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ProductCategoryModel">
-                            Ürün Kategorisi Ekle | @Model.Name
-                        </button>
                     </div>
+
                 }
                 else
                 {

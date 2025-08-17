@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class IProductVariantAttributeCombinationService
+    public interface IProductVariantAttributeCombinationService
     {
+        Task<ProductVariantAttributeCombinationDto?> GetByIdAsync(int id);
+        Task<List<ProductVariantAttributeCombinationDto>> GetAllAsync();
+        Task<PagedResult<ProductVariantAttributeCombinationDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<int> AddAsync(ProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
+        Task<bool> UpdateAsync(ProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
+        Task<bool> DeleteAsync(int productVariantAttributeCombinationId);
     }
 }

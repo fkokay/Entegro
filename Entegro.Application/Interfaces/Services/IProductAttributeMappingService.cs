@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductAttributeMapping;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class IProductAttributeMappingService
+    public interface IProductAttributeMappingService
     {
+        Task<ProductAttributeMappingDto?> GetByIdAsync(int id);
+        Task<List<ProductAttributeMappingDto>> GetAllAsync();
+        Task<PagedResult<ProductAttributeMappingDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<int> AddAsync(ProductAttributeMappingDto productAttributeMapping);
+        Task<bool> UpdateAsync(ProductAttributeMappingDto productAttributeMapping);
+        Task<bool> DeleteAsync(int productAttributeMappingId);
     }
 }
