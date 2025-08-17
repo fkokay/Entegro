@@ -57,6 +57,20 @@ builder.Services.AddScoped<IProductCategoryMappingService, ProductCategoryMappin
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+builder.Services.AddScoped<IMediaFolderRepository, MediaFolderRepository>();
+builder.Services.AddScoped<IMediaFolderService, MediaFolderService>();
+
+
+builder.Services.AddScoped<IMediaFileRepository, MediaFileRepository>();
+builder.Services.AddScoped<IMediaFileService, MediaFileService>();
+
+
+builder.Services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+builder.Services.AddScoped<IProductAttributeService, ProductAttributeService>();
+
+builder.Services.AddScoped<IProductAttributeValueRepository, ProductAttributeValueRepository>();
+builder.Services.AddScoped<IProductAttributeValueService, ProductAttributeValueService>();
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 

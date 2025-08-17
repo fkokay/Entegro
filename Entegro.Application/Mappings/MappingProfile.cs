@@ -3,9 +3,13 @@ using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
+using Entegro.Application.DTOs.MediaFile;
+using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.User;
@@ -127,6 +131,31 @@ namespace Entegro.Application.Mappings
 
             CreateMap<PagedResult<User>, PagedResult<UserDto>>().ReverseMap();
             CreateMap<PagedResult<UserDto>, PagedResult<User>>().ReverseMap();
+            #endregion
+
+
+
+            #region mediafolder
+            CreateMap<MediaFolder, MediaFolderDto>().ReverseMap();
+            CreateMap<MediaFolder, CreateMediaFolderDto>().ReverseMap();
+            CreateMap<MediaFolder, UpdateMediaFolderDto>().ReverseMap();
+            #endregion
+            #region mediafile
+            CreateMap<MediaFile, MediaFileDto>().ReverseMap();
+            CreateMap<MediaFile, CreateMediaFileDto>().ReverseMap();
+            CreateMap<MediaFile, UpdateMediaFileDto>().ReverseMap();
+            #endregion
+
+            #region ProductAttribute
+            CreateMap<ProductAttribute, ProductAttributeDto>().ReverseMap();
+            CreateMap<ProductAttribute, CreateProductAttributeDto>().ReverseMap();
+            CreateMap<ProductAttribute, UpdateProductAttributeDto>().ReverseMap();
+            #endregion
+
+            #region ProductAttributeValue
+            CreateMap<ProductAttributeValue, ProductAttributeValueDto>().ReverseMap();
+            CreateMap<ProductAttributeValue, CreateProductAttributeValueDto>().ReverseMap();
+            CreateMap<ProductAttributeValue, UpdateProductAttributeValueDto>().ReverseMap();
             #endregion
         }
     }

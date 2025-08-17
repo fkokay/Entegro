@@ -1,11 +1,8 @@
-﻿using Entegro.Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Entegro.Domain.Entities
+﻿namespace Entegro.Application.DTOs.MediaFolder
 {
-    [Table("MediaFolder")]
-    public class MediaFolder : BaseEntity
+    public class UpdateMediaFolderDto
     {
+        public int Id { get; set; }
         public int? ParentId { get; set; }
         public string TreePath { get; set; } = null!;
         public string Name { get; set; } = null!;

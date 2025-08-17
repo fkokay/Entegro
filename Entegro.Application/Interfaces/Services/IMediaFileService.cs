@@ -1,0 +1,15 @@
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.MediaFile;
+
+namespace Entegro.Application.Interfaces.Services
+{
+    public interface IMediaFileService
+    {
+        Task<MediaFileDto?> GetByIdAsync(int id);
+        Task<List<MediaFileDto>> GetAllAsync();
+        Task<PagedResult<MediaFileDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<int> AddAsync(CreateMediaFileDto mediaFile);
+        Task<bool> UpdateAsync(UpdateMediaFileDto mediaFile);
+        Task<bool> DeleteAsync(int mediaFileId);
+    }
+}
