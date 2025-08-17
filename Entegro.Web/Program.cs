@@ -71,11 +71,28 @@ builder.Services.AddScoped<IProductAttributeService, ProductAttributeService>();
 builder.Services.AddScoped<IProductAttributeValueRepository, ProductAttributeValueRepository>();
 builder.Services.AddScoped<IProductAttributeValueService, ProductAttributeValueService>();
 
+builder.Services.AddScoped<IProductAttributeMappingRepository, ProductAttributeMappingRepository>();
+builder.Services.AddScoped<IProductAttributeMappingService, ProductAttributeMappingService>();
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+
+builder.Services.AddScoped<IProductVariantAttributeCombinationService, ProductVariantAttributeCombinationService>();
+builder.Services.AddScoped<IProductVariantAttributeCombinationRepository, ProductVariantAttributeCombinationRepository>();
+
+builder.Services.AddScoped<IIntegrationSystemRepository, IntegrationSystemRepository>();
+builder.Services.AddScoped<IIntegrationSystemService, IntegrationSystemService>();
+
+builder.Services.AddScoped<IIntegrationSystemParameterRepository, IntegrationSystemParameterRepository>();
+builder.Services.AddScoped<IIntegrationSystemParameterService, IntegrationSystemParameterService>();
+
+builder.Services.AddScoped<IIntegrationSystemLogRepository, IntegrationSystemLogRepository>();
+builder.Services.AddScoped<IIntegrationSystemLogService, IntegrationSystemLogService>();
+
 
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddHttpClient();

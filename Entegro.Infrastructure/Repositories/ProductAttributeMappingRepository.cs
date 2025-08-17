@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Repositories
 {
-    internal class ProductAttributeMappingRepository : IProductAttributeMappingRepository
+    public class ProductAttributeMappingRepository : IProductAttributeMappingRepository
     {
         private readonly EntegroContext _context;
 

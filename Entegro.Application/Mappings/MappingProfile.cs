@@ -3,6 +3,9 @@ using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
+using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.IntegrationSystemLog;
+using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.DTOs.Order;
@@ -168,6 +171,24 @@ namespace Entegro.Application.Mappings
             CreateMap<ProductVariantAttributeCombination, ProductVariantAttributeCombinationDto>().ReverseMap();
             CreateMap<ProductVariantAttributeCombination, CreateProductVariantAttributeCombinationDto>().ReverseMap();
             CreateMap<ProductVariantAttributeCombination, UpdateProductVariantAttributeCombinationDto>().ReverseMap();
+            #endregion
+
+            #region IntegrationSystemLog
+            CreateMap<IntegrationSystemLog, IntegrationSystemLogDto>().ReverseMap();
+            CreateMap<IntegrationSystemLog, CreateIntegrationSystemLogDto>().ReverseMap();
+            CreateMap<IntegrationSystemLog, UpdateIntegrationSystemLogDto>().ReverseMap();
+            #endregion
+
+            #region IntegrationSystemParameter
+            CreateMap<IntegrationSystemParameter, IntegrationSystemParameterDto>().ReverseMap();
+            CreateMap<IntegrationSystemParameter, CreateIntegrationSystemParameterDto>().ReverseMap();
+            CreateMap<IntegrationSystemParameter, UpdateIntegrationSystemParameterDto>().ReverseMap();
+            #endregion
+
+            #region IntegrationSystem
+            CreateMap<IntegrationSystem, IntegrationSystemDto>().ReverseMap();
+            CreateMap<IntegrationSystem, CreateIntegrationSystemDto>().ReverseMap();
+            CreateMap<IntegrationSystem, UpdateIntegrationSystemDto>().ReverseMap();
             #endregion
         }
     }
