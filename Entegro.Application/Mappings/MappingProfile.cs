@@ -9,9 +9,11 @@ using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
 
@@ -156,6 +158,16 @@ namespace Entegro.Application.Mappings
             CreateMap<ProductAttributeValue, ProductAttributeValueDto>().ReverseMap();
             CreateMap<ProductAttributeValue, CreateProductAttributeValueDto>().ReverseMap();
             CreateMap<ProductAttributeValue, UpdateProductAttributeValueDto>().ReverseMap();
+            #endregion
+            #region ProductAttributeMapping
+            CreateMap<ProductAttributeMapping, ProductAttributeMappingDto>().ReverseMap();
+            CreateMap<ProductAttributeMapping, CreateProductAttributeMappingDto>().ReverseMap();
+            CreateMap<ProductAttributeMapping, UpdateProductAttributeMappingDto>().ReverseMap();
+            #endregion
+            #region ProductVariantAttributeCombination
+            CreateMap<ProductVariantAttributeCombination, ProductVariantAttributeCombinationDto>().ReverseMap();
+            CreateMap<ProductVariantAttributeCombination, CreateProductVariantAttributeCombinationDto>().ReverseMap();
+            CreateMap<ProductVariantAttributeCombination, UpdateProductVariantAttributeCombinationDto>().ReverseMap();
             #endregion
         }
     }

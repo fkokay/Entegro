@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    internal class IProductVariantAttributeCombinationRepository
+    public interface IProductVariantAttributeCombinationRepository
     {
+        Task<ProductVariantAttributeCombination?> GetByIdAsync(int id);
+        Task<List<ProductVariantAttributeCombination>> GetAllAsync();
+        Task<PagedResult<ProductVariantAttributeCombination>> GetAllAsync(int pageNumber, int pageSize);
+        Task AddAsync(ProductVariantAttributeCombination productVariantAttributeCombination);
+        Task UpdateAsync(ProductVariantAttributeCombination productVariantAttributeCombination);
+        Task DeleteAsync(ProductVariantAttributeCombination productVariantAttributeCombination);
     }
 }
