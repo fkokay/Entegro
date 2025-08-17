@@ -67,13 +67,22 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Dictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
         {
-            var distinctIds = ids.Distinct().ToList();
-            if (distinctIds.Count == 0) return new Dictionary<int, string>();
 
-            return await _context.Categories.AsNoTracking()
-                .Where(c => distinctIds.Contains(c.Id))
+            var set = ids.Distinct().ToArray();
+            return await _context.Categories
+                .AsNoTracking()
+                .Where(c => set.Contains(c.Id))
                 .Select(c => new { c.Id, c.Name })
-                .ToDictionaryAsync(x => x.Id, x => x.Name, ct);
+                .ToDictionaryAsync(k => k.Id, v => v.Name, ct);
+
+
+            //var distinctIds = ids.Distinct().ToList();
+            //if (distinctIds.Count == 0) return new Dictionary<int, string>();
+
+            //return await _context.Categories.AsNoTracking()
+            //    .Where(c => distinctIds.Contains(c.Id))
+            //    .Select(c => new { c.Id, c.Name })
+            //    .ToDictionaryAsync(x => x.Id, x => x.Name, ct);
         }
 
         public async Task<PagedResult2<CategorySlim>> SearchPagedAsync(string? term, int page, int pageSize, CancellationToken ct = default)

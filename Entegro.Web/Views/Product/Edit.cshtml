@@ -327,4 +327,99 @@
         });
     </script>
 
+
+
+    <script>
+        function loadProductCategories(productId) {
+          const urlGet = '@Url.Action("Get", "Product")';
+          const $tbody = $("#productCategoryTable tbody");
+          $tbody.html("<tr><td colspan='4'>Yükleniyor...</td></tr>");
+
+          $.ajax({
+            url: urlGet,
+            type: 'GET',
+            data: { productId: productId },
+            success: function (response) {
+              $tbody.empty();
+
+              if (response && response.results && response.results.length) {
+                $.each(response.results, function (i, item) {
+
+                  const row = `
+                    <tr data-mapping-id="${item.id}">
+                      <td>${item.text}</td>
+                      <td>${item.displayOrder}</td>
+                      <td style="width:120px;">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      </td>
+                    </tr>`;
+
+                  $tbody.append(row);
+                });
+              } else {
+                $tbody.append("<tr><td colspan='4'>Kategori bulunamadı</td></tr>");
+              }
+            },
+            error: function () {
+              $tbody.html("<tr><td colspan='4'>Kategoriler yüklenirken hata oluştu</td></tr>");
+            }
+          });
+        }
+
+        function confirmAndDelete(mappingId, onDone) {
+          // SweetAlert2 ile onay
+          Swal.fire({
+            title: 'Emin misiniz?',
+            text: 'Bu ürün-kategori eşleştirmesi silinecek.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Evet, sil',
+            cancelButtonText: 'Vazgeç'
+          }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            const urlDelete = '@Url.Action("DeleteProductCategory", "Product")';
+
+            // İstediğin gibi GET ile (şimdilik CSRF yok)
+            $.ajax({
+              url: urlDelete,
+              type: 'GET',
+              data: { id: mappingId },
+              success: function (res) {
+                // isSuccess döndürmüyorsun; şimdilik boş JSON. Yine de satırı kaldırıyoruz.
+                if (typeof onDone === 'function') onDone(true);
+                Swal.fire({ icon: 'success', title: 'Silindi', timer: 1200, showConfirmButton: false });
+              },
+              error: function () {
+                if (typeof onDone === 'function') onDone(false);
+                Swal.fire({ icon: 'error', title: 'Silme başarısız', text: 'Bir hata oluştu.' });
+              }
+            });
+          });
+        }
+
+        $(function () {
+          const productId = $("#productId").val();
+          if (productId) {
+            loadProductCategories(productId);
+          }
+
+          // Sil butonu handler
+          $(document).on('click', '.btn-delete', function () {
+            const $tr = $(this).closest('tr');
+            const mappingId = $tr.data('mapping-id');
+
+            confirmAndDelete(mappingId, function (ok) {
+              if (ok) {
+                
+                $tr.remove();
+                // istersen yeniden yükle:
+                // loadProductCategories(productId);
+              }
+            });
+          });
+        });
+    </script>
 }

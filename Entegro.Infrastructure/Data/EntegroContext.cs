@@ -1,14 +1,9 @@
 ﻿using Entegro.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Data
 {
-    public class EntegroContext :DbContext
+    public class EntegroContext : DbContext
     {
         public EntegroContext(DbContextOptions<EntegroContext> options) : base(options)
         {
@@ -17,6 +12,20 @@ namespace Entegro.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ProductCategoryMapping>()
+          .HasOne(p => p.Product)
+          .WithMany()
+          .HasForeignKey(p => p.ProductId);
+
+            modelBuilder.Entity<ProductCategoryMapping>()
+              .HasOne(p => p.Category)
+              .WithMany()
+              .HasForeignKey(p => p.CategoryId);
+
+
+            modelBuilder.Entity<Category>()
+              .Property(c => c.TreePath)
+              .HasMaxLength(1024);
             base.OnModelCreating(modelBuilder);
         }
 
@@ -44,7 +53,7 @@ namespace Entegro.Infrastructure.Data
         public DbSet<IntegrationSystemParameter> IntegrationSystemParameters { get; set; }
         public DbSet<IntegrationSystemLog> IntegrationSystemLogs { get; set; }
 
-        public DbSet<MediaFolder> MediaFolders{ get; set; }
+        public DbSet<MediaFolder> MediaFolders { get; set; }
         public DbSet<MediaFile> MediaFiles { get; set; }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Entegro.Application.DTOs.Product;
-using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -166,7 +164,7 @@ namespace Entegro.Web.Controllers
 
             var brands = await _brandService.GetBrandsAsync();
 
-            ViewBag.Brands = brands.Select(m=> new SelectListItem()
+            ViewBag.Brands = brands.Select(m => new SelectListItem()
             {
                 Text = m.Name,
                 Value = m.Id.ToString()
@@ -195,6 +193,21 @@ namespace Entegro.Web.Controllers
                 new SelectListItem { Text = "Metre", Value = "Metre" },
                 new SelectListItem { Text = "Kutu", Value = "Kutu" }
             };
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get(int productId, CancellationToken ct)
+        {
+            var data = await _productCategoryMappingService.GetCategoryPathsByProductAsync(productId, ct);
+            var results = data.Select(d => new { id = d.Id, text = d.CategoryPath, displayOrder = d.DisplayOrder });
+            return Json(new { results });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteProductCategory(int id)
+        {
+            bool isSuccess = await _productCategoryMappingService.DeleteProductCategoryAsync(id);
+            return Json(new { success = isSuccess });
         }
     }
 }
