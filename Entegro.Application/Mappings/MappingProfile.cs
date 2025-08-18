@@ -59,13 +59,11 @@ namespace Entegro.Application.Mappings
             CreateMap<PagedResult<ProductImageDto>, PagedResult<ProductImageMapping>>().ReverseMap();
             #endregion
 
-
             #region ProductCategoryMapping
             CreateMap<ProductCategoryMapping, ProductCategoryDto>().ReverseMap();
             CreateMap<ProductCategoryMapping, CreateProductCategoryDto>().ReverseMap();
             CreateMap<ProductCategoryMapping, UpdateProductCategoryDto>().ReverseMap();
             #endregion
-
 
             #region Brand
             CreateMap<Brand, BrandDto>().ReverseMap();
@@ -126,7 +124,7 @@ namespace Entegro.Application.Mappings
             CreateMap<PagedResult<Customer>, PagedResult<CustomerDto>>().ReverseMap();
             #endregion
 
-            #region user
+            #region User
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
             CreateMap<User, UpdateUserDto>().ReverseMap();
@@ -141,13 +139,12 @@ namespace Entegro.Application.Mappings
             CreateMap<PagedResult<UserDto>, PagedResult<User>>().ReverseMap();
             #endregion
 
-
-
             #region mediafolder
             CreateMap<MediaFolder, MediaFolderDto>().ReverseMap();
             CreateMap<MediaFolder, CreateMediaFolderDto>().ReverseMap();
             CreateMap<MediaFolder, UpdateMediaFolderDto>().ReverseMap();
             #endregion
+
             #region mediafile
             CreateMap<MediaFile, MediaFileDto>().ReverseMap();
             CreateMap<MediaFile, CreateMediaFileDto>().ReverseMap();
@@ -173,12 +170,23 @@ namespace Entegro.Application.Mappings
             CreateMap<ProductAttributeValue, ProductAttributeValueDto>().ReverseMap();
             CreateMap<ProductAttributeValue, CreateProductAttributeValueDto>().ReverseMap();
             CreateMap<ProductAttributeValue, UpdateProductAttributeValueDto>().ReverseMap();
+
+            CreateMap<ProductAttributeValueDto, CreateProductAttributeValueDto>().ReverseMap();
+            CreateMap<ProductAttributeValueDto, UpdateProductAttributeValueDto>().ReverseMap();
+
+            CreateMap<CreateProductAttributeValueDto, ProductAttributeValueDto>().ReverseMap();
+            CreateMap<UpdateProductAttributeValueDto, ProductAttributeValueDto>().ReverseMap();
+
+            CreateMap<PagedResult<ProductAttributeValue>, PagedResult<ProductAttributeValueDto>>().ReverseMap();
+            CreateMap<PagedResult<ProductAttributeValueDto>, PagedResult<ProductAttributeValue>>().ReverseMap();
             #endregion
+
             #region ProductAttributeMapping
             CreateMap<ProductAttributeMapping, ProductAttributeMappingDto>().ReverseMap();
             CreateMap<ProductAttributeMapping, CreateProductAttributeMappingDto>().ReverseMap();
             CreateMap<ProductAttributeMapping, UpdateProductAttributeMappingDto>().ReverseMap();
             #endregion
+
             #region ProductVariantAttributeCombination
             CreateMap<ProductVariantAttributeCombination, ProductVariantAttributeCombinationDto>().ReverseMap();
             CreateMap<ProductVariantAttributeCombination, CreateProductVariantAttributeCombinationDto>().ReverseMap();
@@ -202,7 +210,6 @@ namespace Entegro.Application.Mappings
             CreateMap<IntegrationSystem, CreateIntegrationSystemDto>().ReverseMap();
             CreateMap<IntegrationSystem, UpdateIntegrationSystemDto>().ReverseMap();
             #endregion
-
 
             #region City
             CreateMap<City, CityDto>().ReverseMap();

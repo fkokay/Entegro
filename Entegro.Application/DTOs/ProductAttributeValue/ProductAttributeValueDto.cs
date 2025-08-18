@@ -1,4 +1,6 @@
-﻿namespace Entegro.Application.DTOs.ProductAttributeValue
+﻿using Entegro.Application.DTOs.ProductAttribute;
+
+namespace Entegro.Application.DTOs.ProductAttributeValue
 {
     public class ProductAttributeValueDto
     {
@@ -7,6 +9,6 @@
         public string Name { get; set; } = null!;
         public int DisplayOrder { get; set; }
 
-        public virtual ProductAttributeValueDto ProductAttribute { get; set; }
+        public virtual ProductAttributeDto ProductAttribute { get; set; }
     }
 }

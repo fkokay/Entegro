@@ -33,17 +33,32 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<ProductAttributeValue>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductAttributeValues.AsQueryable();
+            var query = _context.ProductAttributeValues
+          .AsNoTracking()
+          .Select(x => new ProductAttributeValue
+          {
+              Id = x.Id,
+              ProductAttributeId = x.ProductAttributeId,
+              Name = x.Name,
+              DisplayOrder = x.DisplayOrder,
+              ProductAttribute = new ProductAttribute
+              {
+                  Id = x.ProductAttribute.Id,
+                  Name = x.ProductAttribute.Name,
+                  Description = x.ProductAttribute.Description,
+                  DisplayOrder = x.ProductAttribute.DisplayOrder
+              }
+          });
 
             var totalCount = await query.CountAsync();
-            var customers = await query
+            var productAttributeValues = await query
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             return new PagedResult<ProductAttributeValue>
             {
-                Items = customers,
+                Items = productAttributeValues,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize

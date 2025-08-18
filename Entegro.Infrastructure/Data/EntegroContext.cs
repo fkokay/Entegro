@@ -7,7 +7,12 @@ namespace Entegro.Infrastructure.Data
     {
         public EntegroContext(DbContextOptions<EntegroContext> options) : base(options)
         {
+  
+        }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

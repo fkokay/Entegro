@@ -40,16 +40,16 @@ namespace Entegro.Application.Services
 
         public async Task<List<ProductAttributeValueDto>> GetAllAsync()
         {
-            var productAttributes = await _productAttributeValueRepository.GetAllAsync();
-            var productAttributeDtos = _mapper.Map<IEnumerable<ProductAttributeValueDto>>(productAttributes);
-            return productAttributeDtos.ToList();
+            var productAttributeValues = await _productAttributeValueRepository.GetAllAsync();
+            var productAttributeValueDtos = _mapper.Map<IEnumerable<ProductAttributeValueDto>>(productAttributeValues);
+            return productAttributeValueDtos.ToList();
         }
 
         public async Task<PagedResult<ProductAttributeValueDto>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var productAttributes = await _productAttributeValueRepository.GetAllAsync(pageNumber, pageSize);
-            var productAttributeDtos = _mapper.Map<PagedResult<ProductAttributeValueDto>>(productAttributes);
-            return productAttributeDtos;
+            var productAttributeValues = await _productAttributeValueRepository.GetAllAsync(pageNumber, pageSize);
+            var productAttributeValueDtos = _mapper.Map<PagedResult<ProductAttributeValueDto>>(productAttributeValues);
+            return productAttributeValueDtos;
         }
 
         public async Task<ProductAttributeValueDto?> GetByIdAsync(int id)
