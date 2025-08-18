@@ -34,6 +34,78 @@
     </div>
 </form>
 @section scripts {
+
+    <link rel="stylesheet" href="~/assets/vendor/libs/dropzone/dropzone.css" />
+    <script src="~/assets/vendor/libs/dropzone/dropzone.js"></script>
+
+
+    <!-- Page JS -->
+    <script>
+    const dz = new Dropzone("#dropzone-brand", {
+          url: "/Media/Upload",
+          paramName: "file",
+          autoProcessQueue: false,
+          autoQueue: true,
+          uploadMultiple: false,
+          acceptedFiles: "image/*",
+          maxFilesize: 10,
+          addRemoveLinks: true,
+          clickable: "#dropzone-brand",       // 👈 tıklanacak alanı garanti et
+          previewsContainer: "#dropzone-brand",
+          init: function() {
+            this.on("addedfile", f => {
+              console.log("added:", f.name);
+              console.log("dz.files:", this.files);
+            });
+          }
+        });
+
+        document.getElementById("btnUpload").addEventListener("click", () => {
+          console.log("queued:", dz.getQueuedFiles());
+          dz.processQueue();
+        });
+    </script>
+
+
+
+
+    @* <script>
+        (function () {
+          const previewTemplate = `
+            <div class="dz-preview dz-file-preview">
+              <div class="dz-details">
+                <div class="dz-thumbnail">
+                  <img data-dz-thumbnail>
+                  <span class="dz-nopreview">No preview</span>
+                  <div class="dz-success-mark"></div>
+                  <div class="dz-error-mark"></div>
+                  <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+                  </div>
+                </div>
+                <div class="dz-filename" data-dz-name></div>
+                <div class="dz-size" data-dz-size></div>
+              </div>
+            </div>
+          `;
+
+          // Only Multiple Dropzone inside #product-form
+          const dropzoneBasic = document.querySelector('#brand-form #dropzone-basic');
+          if (dropzoneBasic) {
+            new Dropzone(dropzoneBasic, {
+              url: "/upload", // Server-side upload handler
+              previewTemplate: previewTemplate,
+              parallelUploads: 1,
+              maxFilesize: 5, // MB
+              maxFiles: 1,
+              addRemoveLinks: true
+            });
+          }
+        })();
+    </script> *@
+
+
     <script>
         $('#btnDeleteBrand').on('click', function () {
             Swal.fire({
