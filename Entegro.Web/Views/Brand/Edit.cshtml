@@ -34,6 +34,29 @@
     </div>
 </form>
 @section scripts {
+    <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
+
+    <script>
+        Dropzone.autoDiscover = false;
+
+        const myDropzone = new Dropzone("#myDropzoneDiv", {
+            url: "/upload", // Sunucu endpoint
+            maxFiles: 5,    // Maksimum dosya sayısı
+            maxFilesize: 2, // MB cinsinden maksimum dosya boyutu
+            acceptedFiles: "image/*", // Sadece görsel kabul et
+            addRemoveLinks: true,     // Dosya kaldırma linki ekle
+            dictDefaultMessage: "Dosyaları buraya sürükleyin veya tıklayın"
+        });
+
+        // Event listener örneği
+        myDropzone.on("success", function(file, response) {
+            console.log("Yükleme başarılı:", response);
+        });
+
+        myDropzone.on("error", function(file, errorMessage) {
+            console.error("Yükleme hatası:", errorMessage);
+        });
+        </script>
     <script>
         $('#btnDeleteBrand').on('click', function () {
             Swal.fire({
