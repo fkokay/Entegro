@@ -12,9 +12,10 @@ namespace Entegro.Domain.Entities
     public class ProductImageMapping : BaseEntity, IDisplayOrder
     {
         public int ProductId { get; set; }
-        public string Url { get; set; }
+        public int MediaFileId { get; set; }
         public int DisplayOrder { get; set; }
 
         public virtual Product Product { get; set; }
+        public virtual MediaFile MediaFile { get; set; }
     }
 }
