@@ -1,6 +1,6 @@
-﻿namespace Entegro.Application.DTOs.ProductAttribute
+﻿namespace Entegro.Web.Models
 {
-    public class UpdateProductAttributeDto
+    public class UpdateProductAttributeViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

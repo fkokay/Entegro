@@ -35,6 +35,58 @@ namespace Entegro.Web.Controllers
 
             return Json(new { success = true });
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var productAttribute = await _productAttributeService.GetByIdAsync(id);
+            if (productAttribute == null)
+            {
+                return NotFound();
+            }
+
+            var productAttributeModel = new ProductAttributeViewModel
+            {
+                Description = productAttribute.Description,
+                DisplayOrder = productAttribute.DisplayOrder,
+                Name = productAttribute.Name,
+                Id = productAttribute.Id
+            };
+
+
+            return Json(productAttributeModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(UpdateProductAttributeViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var updateDto = new UpdateProductAttributeDto
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    DisplayOrder = model.DisplayOrder
+                };
+                await _productAttributeService.UpdateAsync(updateDto);
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var isSuccess = await _productAttributeService.DeleteAsync(id);
+            if (isSuccess)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Silinecek Varyant Bulunamadı" });
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductAttributeList([FromBody] GridCommand model)
         {
