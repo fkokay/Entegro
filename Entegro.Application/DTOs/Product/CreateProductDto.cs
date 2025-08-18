@@ -1,10 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.ProductImage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.Product
 {
@@ -29,6 +24,9 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
         public BrandDto? Brand { get; set; }
+        public string? ManufacturerPartNumber { get; set; }
+        public string? Gtin { get; set; }
+        public bool Published { get; set; } = true;
         public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
     }
 }

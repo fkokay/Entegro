@@ -27,7 +27,7 @@
             <!-- GENEL -->
             <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3 p-3">
-                    <input type="hidden" id="productId" value="@Model.Id" asp-for="Id"/>
+                    <input type="hidden" id="productId" value="@Model.Id" asp-for="Id" />
                     <input type="hidden" asp-for="Description" />
 
                     <!-- Ürün Kodu -->
@@ -69,6 +69,42 @@
                         </div>
                     </div>
 
+                    <!-- Üretici Numarası-->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="ManufacturerPartNumber">Üretici Numarası</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.ManufacturerPartNumber, new { @class = "form-control", @id = "ManufacturerPartNumber" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Üretici Numarası-->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Gtin">Gtin</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Gtin, new { @class = "form-control", @id = "Gtin" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Yayınlandı mı-->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Published">Yayınlandı</label>
+                            <div class="col-sm-9">
+                                <label class="switch switch-lg">
+                                    @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
+                                    <span class="switch-toggle-slider">
+                                        <span class="switch-on"></span>
+                                        <span class="switch-off"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <hr class="my-4 mx-n4">
 
                     <!-- Fiyat -->
@@ -112,7 +148,6 @@
                             </div>
                         </div>
                     </div>
-
                     <hr class="my-4 mx-n4">
                     <!-- Birim -->
                     <div class="col-md-12">

@@ -35,7 +35,9 @@
         public string? Barcode { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-
+        public string? ManufacturerPartNumber { get; set; }
+        public string? Gtin { get; set; }
+        public bool Published { get; set; } = true;
         public BrandViewModel? Brand { get; set; }
         public List<ProductImageViewModel> ProductImages { get; set; } = new List<ProductImageViewModel>();
     }

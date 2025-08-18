@@ -110,6 +110,9 @@ namespace Entegro.Web.Controllers
                 updateDto.VatRate = model.VatRate;
                 updateDto.Weight = model.Weight;
                 updateDto.Width = model.Width;
+                updateDto.ManufacturerPartNumber = model.ManufacturerPartNumber;
+                model.Gtin = model.Gtin;
+                updateDto.Published = model.Published;
 
                 await _productService.UpdateProductAsync(updateDto);
 
@@ -162,6 +165,9 @@ namespace Entegro.Web.Controllers
                 model.VatRate = product.VatRate;
                 model.Weight = product.Weight;
                 model.Width = product.Width;
+                model.Gtin = product.Gtin;
+                model.ManufacturerPartNumber = product.ManufacturerPartNumber;
+                model.Published = product.Published;
             }
 
             var brands = await _brandService.GetBrandsAsync();
