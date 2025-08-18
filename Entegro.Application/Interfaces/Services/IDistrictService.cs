@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.District;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class IDistrictService
+    public interface IDistrictService
     {
+        Task<List<DistrictDto>> GetAllAsync();
+        Task<List<DistrictDto>> GetByTownIdAsync(int townId);
+        Task<DistrictDto> GetByIdAsync(int id);
+        Task AddAsync(CreateDistrictDto dto);
+        Task UpdateAsync(UpdateDistrictDto dto);
+        Task DeleteAsync(int id);
     }
 }

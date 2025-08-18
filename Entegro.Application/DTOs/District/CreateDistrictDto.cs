@@ -1,8 +1,7 @@
 ﻿namespace Entegro.Application.DTOs.District
 {
-    public class DistrictDto
+    public class CreateDistrictDto
     {
-        public int Id { get; set; }
         public int TownId { get; set; }
         public string Name { get; set; }
         public bool Published { get; set; }

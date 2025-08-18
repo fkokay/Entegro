@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.City;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
+using Entegro.Application.DTOs.District;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemLog;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
@@ -17,6 +19,7 @@ using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.Town;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
 
@@ -190,6 +193,26 @@ namespace Entegro.Application.Mappings
             CreateMap<IntegrationSystem, CreateIntegrationSystemDto>().ReverseMap();
             CreateMap<IntegrationSystem, UpdateIntegrationSystemDto>().ReverseMap();
             #endregion
+
+
+            #region City
+            CreateMap<City, CityDto>().ReverseMap();
+            CreateMap<CreateCityDto, City>();
+            CreateMap<UpdateCityDto, City>();
+            #endregion
+
+            #region Town
+            CreateMap<Town, TownDto>().ReverseMap();
+            CreateMap<CreateTownDto, Town>();
+            CreateMap<UpdateTownDto, Town>();
+            #endregion
+
+            #region District    
+            CreateMap<District, DistrictDto>().ReverseMap();
+            CreateMap<CreateDistrictDto, District>();
+            CreateMap<UpdateDistrictDto, District>();
+            #endregion
+
         }
     }
 }

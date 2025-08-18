@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    internal class ITownRepository
+    public interface ITownRepository
     {
+        Task<Town> GetByIdAsync(int id);
+        Task<List<Town>> GetAllAsync();
+        Task<List<Town>> GetByCityIdAsync(int cityId);
+        Task AddAsync(Town town);
+        Task UpdateAsync(Town town);
+        Task DeleteAsync(int id);
     }
 }

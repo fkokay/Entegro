@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.City;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class ICityService
+    public interface ICityService
     {
+        Task<List<CityDto>> GetAllAsync();
+        Task<CityDto> GetByIdAsync(int id);
+        Task AddAsync(CreateCityDto dto);
+        Task UpdateAsync(UpdateCityDto dto);
+        Task DeleteAsync(int id);
     }
 }
