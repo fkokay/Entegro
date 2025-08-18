@@ -6,6 +6,11 @@ namespace Entegro.Web.Controllers
     {
         public IActionResult Index()
         {
+            return List();
+        }
+
+        public IActionResult List()
+        {
             return View();
         }
     }
