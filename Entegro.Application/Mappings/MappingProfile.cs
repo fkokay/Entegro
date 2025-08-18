@@ -158,6 +158,15 @@ namespace Entegro.Application.Mappings
             CreateMap<ProductAttribute, ProductAttributeDto>().ReverseMap();
             CreateMap<ProductAttribute, CreateProductAttributeDto>().ReverseMap();
             CreateMap<ProductAttribute, UpdateProductAttributeDto>().ReverseMap();
+
+            CreateMap<ProductAttributeDto, CreateProductAttributeDto>().ReverseMap();
+            CreateMap<ProductAttributeDto, UpdateProductAttributeDto>().ReverseMap();
+
+            CreateMap<CreateProductAttributeDto, ProductAttributeDto>().ReverseMap();
+            CreateMap<UpdateProductAttributeDto, ProductAttributeDto>().ReverseMap();
+
+            CreateMap<PagedResult<ProductAttribute>, PagedResult<ProductAttributeDto>>().ReverseMap();
+            CreateMap<PagedResult<ProductAttributeDto>, PagedResult<ProductAttribute>>().ReverseMap();
             #endregion
 
             #region ProductAttributeValue
