@@ -1,4 +1,5 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,19 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateProductAttributeViewModel model)
+        {
+            var createDto = new CreateProductAttributeDto
+            {
+                Name = model.Name,
+                Description = model.Description,
+                DisplayOrder = model.DisplayOrder,
+            };
+            await _productAttributeService.AddAsync(createDto);
 
+            return Json(new { success = true });
+        }
         [HttpPost]
         public async Task<IActionResult> ProductAttributeList([FromBody] GridCommand model)
         {
