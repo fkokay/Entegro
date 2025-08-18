@@ -17,6 +17,9 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-image" type="button" role="tab">Resimler</button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-products" role="tab" aria-selected="false" tabindex="-1">
                         Ürünler
                     </button>
@@ -88,6 +91,32 @@
                     </div>
                 </div>
             </div>
+            <!-- GÖRSEL -->
+            <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
+                @if (Model.Id > 0)
+                {
+                    <div class="row g-3 p-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <div id="dropzone-brand" class="dropzone">
+                                        <div class="dz-message">Dosyayı buraya sürükle bırak</div>
+                                    </div>
+                                    <button type="button" id="btnUpload">Gönder</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu markaya resim yüklemek için önce markayı kaydetmeniz gerekmektedir.
+                    </div>
+                }
+            </div>
+
             <!-- Social Links -->
             <div class="tab-pane fade" id="form-tabs-products" role="tabpanel">
             </div>
