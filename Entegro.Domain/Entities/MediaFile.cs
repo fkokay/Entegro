@@ -29,5 +29,7 @@ namespace Entegro.Domain.Entities
         public bool Deleted { get; set; }
         public bool Hidden { get; set; }
         public int Version { get; set; }
+
+        public virtual MediaFolder? Folder { get; set; }
     }
 }

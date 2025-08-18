@@ -18,5 +18,8 @@ namespace Entegro.Domain.Entities
         public decimal Price { get; set; }
         public decimal TaxRate { get; set; }
         public decimal DiscountAmount { get; set; }
+
+        public virtual Order Order { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

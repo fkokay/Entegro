@@ -17,5 +17,8 @@ namespace Entegro.Domain.Entities
         public string ResKey { get; set; } = null!;
         public bool IncludePath { get; set; }
         public int? Order { get; set; }
+
+        public virtual MediaFolder? Parent { get; set; }
+        public virtual ICollection<MediaFile> MediaFiles { get; set; } = new List<MediaFile>();
     }
 }

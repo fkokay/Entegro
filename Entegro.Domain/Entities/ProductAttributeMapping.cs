@@ -16,5 +16,9 @@ namespace Entegro.Domain.Entities
         public bool IsRequried { get; set; }
         public int AttributeControlTypeId { get; set; }
         public int DisplayOrder {get;set; }
+
+            
+        public virtual Product Product { get; set; }
+        public virtual ProductAttribute ProductAttribute { get; set; }
     }
 }

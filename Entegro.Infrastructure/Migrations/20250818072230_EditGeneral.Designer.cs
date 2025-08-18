@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250818072230_EditGeneral")]
+    partial class EditGeneral
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -447,8 +450,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
-
                     b.ToTable("MediaFolder");
                 });
 
@@ -522,8 +523,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("OrderItem");
                 });
 
@@ -551,13 +550,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<string>("Currency")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gtin")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Height")
@@ -565,9 +558,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.Property<decimal>("Length")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ManufacturerPartNumber")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MetaDescription")
                         .HasColumnType("nvarchar(max)");
@@ -582,16 +572,7 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("OldPrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("Published")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("SpecialPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("StockQuantity")
@@ -719,16 +700,11 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductId1");
 
                     b.ToTable("ProductCategoryMapping");
                 });
@@ -921,19 +897,10 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.MediaFile", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.MediaFolder", "Folder")
-                        .WithMany("MediaFiles")
+                        .WithMany()
                         .HasForeignKey("FolderId");
 
                     b.Navigation("Folder");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.MediaFolder", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.MediaFolder", "Parent")
-                        .WithMany()
-                        .HasForeignKey("ParentId");
-
-                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Order", b =>
@@ -949,21 +916,11 @@ namespace Entegro.Infrastructure.Migrations
 
             modelBuilder.Entity("Entegro.Domain.Entities.OrderItem", b =>
                 {
-                    b.HasOne("Entegro.Domain.Entities.Order", "Order")
+                    b.HasOne("Entegro.Domain.Entities.Order", null)
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Product", b =>
@@ -984,7 +941,7 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany("ProductAttributes")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1018,10 +975,6 @@ namespace Entegro.Infrastructure.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Product", null)
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId1");
 
                     b.Navigation("Category");
 
@@ -1084,11 +1037,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("Parameters");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.MediaFolder", b =>
-                {
-                    b.Navigation("MediaFiles");
-                });
-
             modelBuilder.Entity("Entegro.Domain.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
@@ -1096,12 +1044,6 @@ namespace Entegro.Infrastructure.Migrations
 
             modelBuilder.Entity("Entegro.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("OrderItems");
-
-                    b.Navigation("ProductAttributes");
-
-                    b.Navigation("ProductCategories");
-
                     b.Navigation("ProductImages");
                 });
 
