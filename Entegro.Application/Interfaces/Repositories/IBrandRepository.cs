@@ -1,10 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
@@ -18,5 +13,6 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(Brand brand);
         Task UpdateAsync(Brand brand);
         Task DeleteAsync(Brand brand);
+        Task<Brand?> GetByIdWithMediaAsync(int id);
     }
 }

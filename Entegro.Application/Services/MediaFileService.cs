@@ -11,12 +11,14 @@ namespace Entegro.Application.Services
     public class MediaFileService : IMediaFileService
     {
         private readonly IMediaFileRepository _mediaFileRepository;
+        private readonly IMediaFolderRepository _mediaFolderRepository;
         private readonly IMapper _mapper;
 
-        public MediaFileService(IMediaFileRepository mediaFileRepository, IMapper mapper)
+        public MediaFileService(IMediaFileRepository mediaFileRepository, IMapper mapper, IMediaFolderRepository mediaFolderRepository)
         {
             _mediaFileRepository = mediaFileRepository ?? throw new ArgumentNullException(nameof(mediaFileRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _mediaFolderRepository = mediaFolderRepository ?? throw new ArgumentNullException(nameof(mediaFolderRepository));
         }
 
         public async Task<int> AddAsync(CreateMediaFileDto mediaFile)
@@ -71,12 +73,25 @@ namespace Entegro.Application.Services
         public async Task<bool> DeleteAsync(int mediaFileId)
         {
             var mediaFile = await _mediaFileRepository.GetByIdAsync(mediaFileId);
-
+            var mediaFolder = await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value);
             if (mediaFile == null)
             {
                 throw new KeyNotFoundException($"MediaFile with ID {mediaFileId} not found.");
             }
+
+
+            string folderName = mediaFile.Folder?.Name ?? ""; // default Brand olabilir
+            string uploadsRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folderName);
+            string filePath = Path.Combine(uploadsRoot, mediaFile.Name);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
             await _mediaFileRepository.DeleteAsync(mediaFile);
+
+            mediaFolder.FilesCount--;
+            await _mediaFolderRepository.UpdateAsync(mediaFolder);
             return true;
         }
 

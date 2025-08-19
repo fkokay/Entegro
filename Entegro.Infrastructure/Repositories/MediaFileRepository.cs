@@ -14,15 +14,16 @@ namespace Entegro.Infrastructure.Repositories
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task AddAsync(MediaFile mediaFolder)
+        public async Task<int> AddAsync(MediaFile mediaFile)
         {
-            await _context.MediaFiles.AddAsync(mediaFolder);
+            await _context.MediaFiles.AddAsync(mediaFile);
             await _context.SaveChangesAsync();
+            return mediaFile.Id;
         }
 
-        public async Task DeleteAsync(MediaFile mediaFolder)
+        public async Task DeleteAsync(MediaFile mediaFile)
         {
-            _context.MediaFiles.Remove(mediaFolder);
+            _context.MediaFiles.Remove(mediaFile);
             await _context.SaveChangesAsync();
         }
 
@@ -58,9 +59,9 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<MediaFile?> GetByNameAndFolderAsync(string name, int folderId) => await _context.MediaFiles
                     .FirstOrDefaultAsync(x => x.Name == name && x.FolderId == folderId);
 
-        public async Task UpdateAsync(MediaFile mediaFolder)
+        public async Task UpdateAsync(MediaFile mediaFile)
         {
-            _context.MediaFiles.Update(mediaFolder);
+            _context.MediaFiles.Update(mediaFile);
             await _context.SaveChangesAsync();
         }
     }

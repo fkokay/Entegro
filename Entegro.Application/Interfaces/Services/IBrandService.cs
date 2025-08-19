@@ -1,10 +1,5 @@
-﻿using Entegro.Application.DTOs.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entegro.Application.DTOs.Brand;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 
 namespace Entegro.Application.Interfaces.Services
 {
@@ -19,5 +14,8 @@ namespace Entegro.Application.Interfaces.Services
         Task<bool> DeleteBrandAsync(int brandId);
 
         Task<bool> ExistsByNameAsync(string brandName);
+        Task UpdateBrandImageAsync(int brandId, int mediaFileId);
+        Task DeleteBrandImageAsync(int brandId);
+        Task<BrandDto?> GetByIdWithMediaAsync(int id);
     }
 }

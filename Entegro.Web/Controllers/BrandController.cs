@@ -43,6 +43,7 @@ namespace Entegro.Web.Controllers
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
                     MetaKeywords = model.MetaKeywords,
+                    MediaFileId = model.MediaFileId
                 };
 
                 await _brandService.CreateBrandAsync(createDto);
@@ -53,11 +54,12 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var brand = await _brandService.GetBrandByIdAsync(id);
+            var brand = await _brandService.GetByIdWithMediaAsync(id);
             if (brand == null)
             {
                 return NotFound();
             }
+            var size = brand.MediaFile?.Size;
             var brandModel = new BrandViewModel
             {
                 Id = brand.Id,
@@ -67,6 +69,10 @@ namespace Entegro.Web.Controllers
                 MetaTitle = brand.MetaTitle,
                 DisplayOrder = brand.DisplayOrder,
                 MetaKeywords = brand.MetaKeywords,
+                MediaFileId = brand.MediaFileId,
+                MediaFileName = brand.MediaFile?.Name,
+                MediaFileSize = size.HasValue ? (int)size.Value : 0,
+                MediaFileUrl = $"/uploads/Brand/{brand.MediaFile?.Name}",
             };
             return View(brandModel);
         }
@@ -85,6 +91,7 @@ namespace Entegro.Web.Controllers
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
                     MetaKeywords = model.MetaKeywords,
+                    MediaFileId = model.MediaFileId
                 };
                 await _brandService.UpdateBrandAsync(updateDto);
                 return Json(new { success = true });

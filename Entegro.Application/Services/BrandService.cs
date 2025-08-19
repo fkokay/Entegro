@@ -1,25 +1,22 @@
 ﻿using AutoMapper;
+using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entegro.Application.DTOs.Brand;
 
 namespace Entegro.Application.Services
 {
     public class BrandService : IBrandService
     {
         private readonly IBrandRepository _brandRepository;
+        private readonly IMediaFileRepository _mediaFileRepository;
         private readonly IMapper _mapper;
-        public BrandService(IBrandRepository brandRepository, IMapper mapper)
+        public BrandService(IBrandRepository brandRepository, IMapper mapper, IMediaFileRepository mediaFileRepository)
         {
             _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _mediaFileRepository = mediaFileRepository ?? throw new ArgumentNullException(nameof(mediaFileRepository));
         }
         public async Task<int> CreateBrandAsync(CreateBrandDto createBrand)
         {
@@ -88,6 +85,37 @@ namespace Entegro.Application.Services
         public async Task<bool> ExistsByNameAsync(string brandName)
         {
             return await _brandRepository.ExistsByNameAsync(brandName);
+        }
+
+        public async Task UpdateBrandImageAsync(int brandId, int mediaFileId)
+        {
+            var brand = await _brandRepository.GetByIdAsync(brandId);
+            if (brand != null)
+            {
+                brand.MediaFileId = mediaFileId;
+                await _brandRepository.UpdateAsync(brand);
+            }
+        }
+
+        public async Task<BrandDto?> GetByIdWithMediaAsync(int id)
+        {
+            var brand = await _brandRepository.GetByIdWithMediaAsync(id);
+            if (brand == null)
+            {
+                return null;
+            }
+            var brandDto = _mapper.Map<BrandDto>(brand);
+            return brandDto;
+        }
+
+        public async Task DeleteBrandImageAsync(int brandId)
+        {
+            var brand = await _brandRepository.GetByIdAsync(brandId);
+            if (brand != null)
+            {
+                brand.MediaFileId = null;
+                await _brandRepository.UpdateAsync(brand);
+            }
         }
     }
 }

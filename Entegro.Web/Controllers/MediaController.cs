@@ -7,20 +7,22 @@ namespace Entegro.Web.Controllers
     {
         private readonly IMediaFolderService _mediaFolderService;
         private readonly IMediaFileService _mediaFileService;
+        private readonly IBrandService _brandService;
         private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
          {
              ".jpg",".jpeg",".png",".gif",".webp",".bmp",".tiff"
          };
 
-        public MediaController(IMediaFolderService mediaFolderService, IMediaFileService mediaFileService)
+        public MediaController(IMediaFolderService mediaFolderService, IMediaFileService mediaFileService, IBrandService brandService)
         {
             _mediaFolderService = mediaFolderService;
             _mediaFileService = mediaFileService;
+            _brandService = brandService;
         }
 
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Upload(IFormFile file, [FromForm] string folder, [FromForm] bool overwrite = false)
+        public async Task<IActionResult> Upload(IFormFile file, [FromForm] string folder, [FromForm] bool overwrite = false, [FromForm] int? id = null)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Dosya yok.");
@@ -73,48 +75,57 @@ namespace Entegro.Web.Controllers
 
 
             var builtDto = await _mediaFileService.BuildMediaFileDtoAsync(file, mediaFolder.Id);
-
+            int fileId;
             if (existing != null && overwrite)
             {
                 await _mediaFileService.OverwriteByNameAsync(safeFileName, mediaFolder.Id, builtDto);
+                fileId = existing.Id;
 
 
-                return Ok(new
-                {
-                    action = "overwritten",
-                    id = existing.Id,
-                    filename = safeFileName,
-                    folder
-                });
             }
             else if (existing == null)
             {
-
                 var newId = await _mediaFileService.AddAsync(builtDto);
-
-
+                fileId = newId;
                 mediaFolder.FilesCount += 1;
                 await _mediaFolderService.UpdateFilesCountAsync(mediaFolder.Id, mediaFolder.FilesCount);
-
-                return Ok(new
-                {
-                    action = "created",
-                    id = newId,
-                    filename = safeFileName,
-                    folder
-                });
             }
             else
             {
+                fileId = existing.Id;
 
-                return Ok(new
-                {
-                    action = "noop",
-                    id = existing.Id,
-                    filename = safeFileName,
-                    folder
-                });
             }
+            if (folder.Equals("Brand", StringComparison.OrdinalIgnoreCase))
+            {
+                await _brandService.UpdateBrandImageAsync(id.Value, fileId);
+            }
+
+            return Ok(new
+            {
+                action = overwrite ? "overwritten" : (existing == null ? "created" : "noop"),
+                id = fileId,
+                filename = safeFileName,
+                folder
+            });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Delete([FromForm] string folder, [FromForm] int? mediaFolderId, [FromForm] int? id = null)
+        {
+            if (folder.Equals("Brand", StringComparison.OrdinalIgnoreCase))
+            {
+                await _brandService.DeleteBrandImageAsync(id.Value);
+
+            }
+
+            await _mediaFileService.DeleteAsync(mediaFolderId.Value);
+            return Ok(new
+            {
+                action = "deleted",
+                id = mediaFolderId,
+                folder
+            });
         }
     }
 }

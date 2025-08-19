@@ -77,6 +77,13 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Brands.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<Brand?> GetByIdWithMediaAsync(int id)
+        {
+            return await _context.Brands
+             .Include(b => b.MediaFile)
+             .FirstOrDefaultAsync(b => b.Id == id);
+        }
+
         public async Task<Brand?> GetByNameAsync(string name)
         {
             return await _context.Brands.FirstOrDefaultAsync(o => o.Name == name);

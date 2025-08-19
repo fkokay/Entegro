@@ -19,6 +19,6 @@ namespace Entegro.Domain.Entities
         public int? Order { get; set; }
 
         public virtual MediaFolder? Parent { get; set; }
-        public virtual ICollection<MediaFile> MediaFiles { get; set; } = new List<MediaFile>();
+        public virtual ICollection<MediaFile>? MediaFiles { get; set; } = new List<MediaFile>();
     }
 }
