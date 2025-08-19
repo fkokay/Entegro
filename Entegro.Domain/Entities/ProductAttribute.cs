@@ -15,6 +15,6 @@ namespace Entegro.Domain.Entities
         public string? Description { get; set; }
         public int DisplayOrder { get; set; }
 
-        public ICollection<ProductAttributeValue> ProductAttributeValues { get; set; } = new List<ProductAttributeValue>();
+        public ICollection<ProductAttributeValue> Values { get; set; } = new List<ProductAttributeValue>();
     }
 }

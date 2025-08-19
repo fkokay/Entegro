@@ -8,8 +8,8 @@ namespace Entegro.Application.Interfaces.Services
         Task<ProductAttributeMappingDto?> GetByIdAsync(int id);
         Task<List<ProductAttributeMappingDto>> GetAllAsync();
         Task<PagedResult<ProductAttributeMappingDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task<int> AddAsync(ProductAttributeMappingDto productAttributeMapping);
-        Task<bool> UpdateAsync(ProductAttributeMappingDto productAttributeMapping);
+        Task<int> AddAsync(CreateProductAttributeMappingDto productAttributeMapping);
+        Task<bool> UpdateAsync(UpdateProductAttributeMappingDto productAttributeMapping);
         Task<bool> DeleteAsync(int productAttributeMappingId);
     }
 }

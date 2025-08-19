@@ -12,6 +12,9 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-stock" type="button" role="tab">Stok</button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-variants" type="button" role="tab">Varyantlar</button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-seo" type="button" role="tab">Arama Motorları (SEO)</button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -24,7 +27,7 @@
         </div>
 
         <div class="tab-content">
-            <!-- GENEL -->
+            <!-- Ürün Bilgisi -->
             <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3 p-3">
                     <input type="hidden" id="productId" value="@Model.Id" asp-for="Id" />
@@ -211,7 +214,7 @@
                 </div>
             </div>
 
-            <!-- STOK & ÖLÇÜLER -->
+            <!-- Stok -->
             <div class="tab-pane fade" id="form-tabs-stock" role="tabpanel">
                 <div class="row g-3 p-3">
                     <!-- Stok Miktarı -->
@@ -226,7 +229,98 @@
                 </div>
             </div>
 
-            <!-- SEO -->
+            <!-- Varyantlar -->
+            <div class="tab-pane fade" id="form-tabs-variants" role="tabpanel">
+                @if (Model.Id > 0)
+                {
+                    <div class="row g-3 p-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label text-sm-start" for="SelectedProductAttributeIds">Varyantlar</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="SelectedProductAttributeIds" asp-items="ViewBag.ProductAttributes" multiple="multiple" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 p-3">
+                        <div id="ProductVariantAttributeCombinationRepeater">
+                            <div data-repeater-list="ProductVariantAttributeCombinations">
+                                <div data-repeater-item class="repeater-wrapper pt-0 pt-md-4">
+
+                                    <div class="d-flex position-relative pe-0">
+                                        <div class="row w-100 p-3">
+
+                                            <!-- Nested Attributes -->
+                                            <div class="AttributesRepeater">
+                                                <div data-repeater-list="Attributes">
+                                                    <div data-repeater-item class="repeater-wrapper row mb-2">
+                                                        @foreach (var productAttribute in Model.ProductAttributeMappings)
+                                                        {
+                                                            <input type="hidden" name="ProductAttributeId" value="@productAttribute.ProductAttributeId" />
+                                                            <div class="col-md-2 col-12 mb-md-0 mb-3">
+                                                                <p class="mb-2 repeater-title">@productAttribute.ProductAttribute</p>
+                                                                <select name="ProductAttributeValueId" class="form-select item-details mb-3">
+                                                                    @foreach (var val in productAttribute.Attribute.Values)
+                                                                    {
+                                                                        <option value="@val.Id">@val.Name</option>
+                                                                    }
+                                                                </select>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Variant Fields -->
+                                            <div class="col-md-2">
+                                                <p>Stok Kodu</p>
+                                                <input name="StokCode" type="text" class="form-control" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <p>Üretici Kodu</p>
+                                                <input name="ManufacturerPartNumber" type="text" class="form-control" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <p>Gtin</p>
+                                                <input name="Gtin" type="text" class="form-control" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <p>Fiyat</p>
+                                                <input name="Price" type="text" class="form-control" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <p>Stok Miktarı</p>
+                                                <input name="StockQuantity" type="text" class="form-control" />
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <p>&nbsp;</p>
+                                                <button data-repeater-delete type="button" class="btn btn-danger mt-4">Sil Varyant</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-2 p-3">
+                                <button type="button" class="btn btn-primary" data-repeater-create>Yeni Varyant</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ürüne varyant eklemek için önce ürünü kaydetmeniz gerekmektedir.
+                    </div>
+                }
+            </div>
+
+            <!-- Arama Motorları (SEO) -->
             <div class="tab-pane fade" id="form-tabs-seo" role="tabpanel">
                 <div class="row g-3 p-3">
                     <!-- Meta Başlık -->
@@ -259,7 +353,7 @@
                 </div>
             </div>
 
-            <!-- GÖRSEL -->
+            <!-- Resimler -->
             <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
                 @if (Model.Id > 0)
                 {
@@ -288,8 +382,7 @@
                 }
             </div>
 
-
-            <!--KATEGORİ-->
+            <!--Kategori Eşleştirmeleri-->
             <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel">
                 @if (Model.Id > 0)
                 {

@@ -6,5 +6,7 @@
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public int DisplayOrder { get; set; }
+
+        public List<ProductAttributeValueViewModel> Values { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> AddAsync(ProductAttributeMappingDto productAttributeMapping)
+        public async Task<int> AddAsync(CreateProductAttributeMappingDto productAttributeMapping)
         {
             var model = _mapper.Map<ProductAttributeMapping>(productAttributeMapping);
             await _productAttributeMappingRepository.AddAsync(model);
@@ -64,7 +64,7 @@ namespace Entegro.Application.Services
             return productAttributeMappingDto;
         }
 
-        public async Task<bool> UpdateAsync(ProductAttributeMappingDto productAttributeMapping)
+        public async Task<bool> UpdateAsync(UpdateProductAttributeMappingDto productAttributeMapping)
         {
             await _productAttributeMappingRepository.UpdateAsync(_mapper.Map<ProductAttributeMapping>(productAttributeMapping));
             return true;

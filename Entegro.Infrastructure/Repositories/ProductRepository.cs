@@ -64,7 +64,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            return await _context.Products.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.Products.Include(m => m.ProductAttributes).ThenInclude(m => m.Attribute).ThenInclude(m => m.Values).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(Product product)

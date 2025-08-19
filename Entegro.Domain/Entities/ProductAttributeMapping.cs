@@ -18,7 +18,7 @@ namespace Entegro.Domain.Entities
         public int DisplayOrder {get;set; }
 
             
-        public virtual Product Product { get; set; }
-        public virtual ProductAttribute ProductAttribute { get; set; }
+        public Product Product { get; set; }
+        public ProductAttribute Attribute { get; set; }
     }
 }

@@ -39,10 +39,11 @@
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/typography.css" />
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/katex.css" />
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/editor.css" />
-    <script src="~/assets/vendor/libs/quill/katex.js"></script>
-    <script src="~/assets/vendor/libs/quill/quill.js"></script>
-    <script src="~/assets/vendor/libs/dropzone/dropzone.js"></script>
-
+    <script src="/assets/vendor/libs/quill/katex.js"></script>
+    <script src="/assets/vendor/libs/quill/quill.js"></script>
+    <script src="/assets/vendor/libs/dropzone/dropzone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serializeJSON/3.2.0/jquery.serializejson.min.js"></script>
+    <script src="/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
 
     <!-- Page JS -->
     <script>
@@ -298,11 +299,6 @@
             );
         });
     </script>
-
-
-
-
-
 
     <script>
         function loadProductCategories(productId) {
@@ -575,6 +571,47 @@
               document.querySelector(paneSelector)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
           }
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
+
+            $("#SelectedProductAttributeIds").select2({
+                 width: '100%',
+                 placeholder: "Varyant seçiniz",
+                 allowClear: true,
+                 dropdownParent: $('#SelectedProductAttributeIds').parent(),
+            });
+
+                $('#ProductVariantAttributeCombinationRepeater').repeater({
+            initEmpty: false,
+            show: function() {
+                $(this).slideDown();
+
+                // Outer item eklendikten sonra inner repeater'ı başlat
+                $(this).find('.AttributesRepeater').repeater({
+                    initEmpty: false,
+                    show: function() { $(this).slideDown(); },
+                    hide: function(deleteElement) {
+                        if(confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement);
+                    }
+                });
+            },
+            hide: function(deleteElement) {
+                if(confirm('Varyant silinecek emin misiniz?')) $(this).slideUp(deleteElement);
+            },
+            repeaters: [{
+                // Nested repeater selector
+                selector: '.AttributesRepeater',
+                initEmpty: false,
+                show: function() { $(this).slideDown(); },
+                hide: function(deleteElement) {
+                    if(confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement);
+                }
+            }]
+        });
         });
     </script>
 

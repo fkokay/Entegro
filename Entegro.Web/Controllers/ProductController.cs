@@ -1,6 +1,8 @@
 ﻿using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,11 +14,20 @@ namespace Entegro.Web.Controllers
         private readonly IProductService _productService;
         private readonly IProductCategoryMappingService _productCategoryMappingService;
         private readonly IBrandService _brandService;
-        public ProductController(IProductService productService, IProductCategoryMappingService productCategoryMappingService, IBrandService brandService)
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeMappingService _productAttributeMappingService;
+        public ProductController(
+            IProductService productService, 
+            IProductCategoryMappingService productCategoryMappingService, 
+            IBrandService brandService,
+            IProductAttributeService productAttributeService,
+            IProductAttributeMappingService productAttributeMappingService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
+            _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
+            _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
         }
         public IActionResult Index()
         {
@@ -111,10 +122,23 @@ namespace Entegro.Web.Controllers
                 updateDto.Weight = model.Weight;
                 updateDto.Width = model.Width;
                 updateDto.ManufacturerPartNumber = model.ManufacturerPartNumber;
-                model.Gtin = model.Gtin;
+                updateDto.Gtin = model.Gtin;
                 updateDto.Published = model.Published;
 
                 await _productService.UpdateProductAsync(updateDto);
+
+                foreach (var item in model.SelectedProductAttributeIds)
+                {
+                    CreateProductAttributeMappingDto createProductAttributeMappingDto = new CreateProductAttributeMappingDto
+                    {
+                        ProductId = model.Id,
+                        ProductAttributeId = item,
+                        DisplayOrder = 0,
+                        AttributeControlTypeId = 0
+                    };
+
+                    await _productAttributeMappingService.AddAsync(createProductAttributeMappingDto);
+                }
 
                 return Json(new { success = true });
             }
@@ -168,6 +192,35 @@ namespace Entegro.Web.Controllers
                 model.Gtin = product.Gtin;
                 model.ManufacturerPartNumber = product.ManufacturerPartNumber;
                 model.Published = product.Published;
+                model.SelectedProductAttributeIds = product.ProductAttributes.Select(x => x.Id).ToArray();
+                model.ProductAttributeMappings = product.ProductAttributes.Select(m => new ProductViewModel.ProductAttributeMappingViewModel()
+                {
+                    AttributeControlTypeId = m.AttributeControlTypeId,
+                    DisplayOrder = m.DisplayOrder,
+                    Id = m.Id,
+                    IsRequried = m.IsRequried,
+                    ProductAttribute = m.Attribute.Name,
+                    ProductAttributeId = m.ProductAttributeId,
+                    ProductId = m.ProductId,
+                    Attribute = new ProductAttributeViewModel()
+                    {
+                        Id = m.Attribute.Id,
+                        Values = m.Attribute.Values.Select(x=> new ProductAttributeValueViewModel()
+                        {
+                            Id = x.Id,
+                            DisplayOrder= x.DisplayOrder,   
+                            Name = x.Name,
+                            ProductAttributeId = x.ProductAttributeId,
+                        }).ToList()
+                    }
+                }).ToList();
+
+                var productAttributes = await _productAttributeService.GetAllAsync();
+                ViewBag.ProductAttributes = productAttributes.Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                }).ToList();
             }
 
             var brands = await _brandService.GetBrandsAsync();

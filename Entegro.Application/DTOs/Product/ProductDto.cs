@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductImage;
 
 namespace Entegro.Application.DTOs.Product
@@ -43,5 +44,6 @@ namespace Entegro.Application.DTOs.Product
         public bool Published { get; set; } = true;
         public BrandDto? Brand { get; set; }
         public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
+        public List<ProductAttributeMappingDto> ProductAttributes { get; set; } = new List<ProductAttributeMappingDto>();
     }
 }
