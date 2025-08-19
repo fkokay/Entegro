@@ -91,8 +91,22 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Brand brand)
         {
-            brand.UpdatedOn = DateTime.Now;
-            _context.Brands.Update(brand);
+            var existingBrand = await _context.Brands.FindAsync(brand.Id);
+            if (existingBrand == null)
+            {
+                throw new KeyNotFoundException($"Brand with ID {brand.Id} not found.");
+            }
+
+            existingBrand.Name = brand.Name;
+            existingBrand.Description = brand.Description;
+            existingBrand.MetaDescription = brand.MetaDescription;
+            existingBrand.MetaTitle = brand.MetaTitle;
+            existingBrand.DisplayOrder = brand.DisplayOrder;
+            existingBrand.MetaKeywords = brand.MetaKeywords;
+            existingBrand.CreatedOn = brand.CreatedOn;
+            existingBrand.UpdatedOn = DateTime.Now;
+
+            _context.Brands.Update(existingBrand);
             await _context.SaveChangesAsync();
         }
     }

@@ -131,8 +131,27 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Category category)
         {
-            _context.Categories.Update(category);
+            var existingCategory = await _context.Categories.FindAsync(category.Id);
+            if (existingCategory == null)
+            {
+                throw new KeyNotFoundException($"Category with ID {category.Id} not found.");
+            }
+            existingCategory.Name = category.Name;
+            existingCategory.ParentCategoryId = category.ParentCategoryId;
+            existingCategory.Description = category.Description;
+            existingCategory.MetaDescription = category.MetaDescription;
+            existingCategory.TreePath = category.TreePath;
+            existingCategory.MetaTitle = category.MetaTitle;
+            existingCategory.MetaKeywords = category.MetaKeywords;
+            existingCategory.DisplayOrder = category.DisplayOrder;
+            existingCategory.MetaDescription = category.MetaDescription;
+            existingCategory.UpdatedOn = DateTime.UtcNow;
+            existingCategory.CreatedOn = category.CreatedOn;
+
+            _context.Categories.Update(existingCategory);
             await _context.SaveChangesAsync();
         }
     }
 }
+
+

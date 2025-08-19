@@ -90,8 +90,7 @@ namespace Entegro.Web.Controllers
                     MetaDescription = model.MetaDescription,
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
-                    MetaKeywords = model.MetaKeywords,
-                    MediaFileId = model.MediaFileId
+                    MetaKeywords = model.MetaKeywords
                 };
                 await _brandService.UpdateBrandAsync(updateDto);
                 return Json(new { success = true });

@@ -7,7 +7,7 @@ namespace Entegro.Web.Models
         public int Id { get; set; }
         public int? ParentCategoryId { get; set; }
         public int? MediaFileId { get; set; }
-        public string TreePath { get; set; }
+        public string? TreePath { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public string? MetaTitle { get; set; }
