@@ -26,6 +26,38 @@ namespace Entegro.Application.Services
             return model.Id;
         }
 
+        public async Task<MediaFolderDto> CreateFolderAsync(string folderName, int? parentId = null)
+        {
+            var folder = new MediaFolder
+            {
+                Name = folderName,
+                Slug = folderName.ToLower().Replace(" ", "-"),
+                TreePath = "pending",
+                CanDetectTracks = false,
+                Metadata = null,
+                FilesCount = 0,
+                Discriminator = "MediaAlbum",
+                ResKey = "Catalog",
+                IncludePath = true,
+                Order = null,
+                ParentId = parentId
+            };
+            int id = await _mediaFolderRepository.AddAsync(folder);
+            string treePath;
+            if (parentId == null)
+            {
+                treePath = $"/{folder.Id}/";
+            }
+            else
+            {
+                var parentPath = await _mediaFolderRepository.GetTreePathByIdAsync(parentId.Value);
+                treePath = $"{parentPath}{folder.Id}/";
+            }
+            folder.TreePath = treePath;
+            await _mediaFolderRepository.UpdateAsync(folder);
+            return _mapper.Map<MediaFolderDto>(folder);
+        }
+
         public async Task<bool> DeleteAsync(int mediaFolderId)
         {
             var mediaFolder = await _mediaFolderRepository.GetByIdAsync(mediaFolderId);
@@ -64,10 +96,32 @@ namespace Entegro.Application.Services
             return mediaFolderDto;
         }
 
+        public async Task<MediaFolderDto?> GetMediaFolderByNameAsync(string folderName)
+        {
+            var folder = await _mediaFolderRepository.GetMediaFolderByNameAsync(folderName);
+            if (folder == null)
+            {
+                return null;
+            }
+            var folderDto = _mapper.Map<MediaFolderDto>(folder);
+            return folderDto;
+        }
+
         public async Task<bool> UpdateAsync(UpdateMediaFolderDto mediaFolder)
         {
             await _mediaFolderRepository.UpdateAsync(_mapper.Map<MediaFolder>(mediaFolder));
             return true; ;
+        }
+
+        public async Task UpdateFilesCountAsync(int folderId, int filesCount)
+        {
+            var folder = await _mediaFolderRepository.GetByIdAsync(folderId);
+
+            if (folder == null)
+                throw new Exception("Klasör bulunamadı.");
+
+            folder.FilesCount = filesCount;
+            await _mediaFolderRepository.UpdateAsync(folder);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.MediaFile;
+using Microsoft.AspNetCore.Http;
 
 namespace Entegro.Application.Interfaces.Services
 {
@@ -11,5 +12,6 @@ namespace Entegro.Application.Interfaces.Services
         Task<int> AddAsync(CreateMediaFileDto mediaFile);
         Task<bool> UpdateAsync(UpdateMediaFileDto mediaFile);
         Task<bool> DeleteAsync(int mediaFileId);
+        Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, int folderId);
     }
 }

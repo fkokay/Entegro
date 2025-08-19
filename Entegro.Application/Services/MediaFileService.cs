@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Entegro.Application.Services
 {
@@ -24,6 +25,47 @@ namespace Entegro.Application.Services
             await _mediaFileRepository.AddAsync(model);
 
             return model.Id;
+        }
+
+        public async Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, int folderId)
+        {
+            var extension = Path.GetExtension(file.FileName) ?? "";
+            var mimeType = file.ContentType ?? "application/octet-stream";
+            int width = 0;
+            int height = 0;
+            int pixelSize = 0;
+            string mediaType = "image";
+
+            if (mimeType.StartsWith("image"))
+            {
+                using var image = await SixLabors.ImageSharp.Image.LoadAsync(file.OpenReadStream());
+                width = image.Width;
+                height = image.Height;
+                pixelSize = width * height;
+                mediaType = "image";
+            }
+            else { }
+
+
+            return new CreateMediaFileDto
+            {
+                FolderId = folderId,
+                Name = Path.GetFileName(file.FileName),
+                Alt = Path.GetFileNameWithoutExtension(file.FileName),
+                Title = Path.GetFileName(file.FileName),
+                Extension = extension,
+                MimeType = mimeType,
+                MediaType = mediaType,
+                Size = (int)file.Length,
+                PixelSize = pixelSize,
+                Width = width,
+                Height = height,
+                Metadata = null,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
+                IsTransient = false,
+                Deleted = false
+            };
         }
 
         public async Task<bool> DeleteAsync(int mediaFileId)

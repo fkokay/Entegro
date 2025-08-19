@@ -14,10 +14,11 @@ namespace Entegro.Infrastructure.Repositories
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task AddAsync(MediaFolder mediaFolder)
+        public async Task<int> AddAsync(MediaFolder mediaFolder)
         {
             await _context.MediaFolders.AddAsync(mediaFolder);
             await _context.SaveChangesAsync();
+            return mediaFolder.Id;
         }
 
         public async Task DeleteAsync(MediaFolder mediaFolder)
@@ -53,6 +54,19 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<MediaFolder?> GetByIdAsync(int id)
         {
             return await _context.MediaFolders.FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<MediaFolder?> GetMediaFolderByNameAsync(string folderName)
+        {
+            return await _context.MediaFolders.FirstOrDefaultAsync(o => o.Name == folderName);
+        }
+
+        public async Task<string?> GetTreePathByIdAsync(int id)
+        {
+            return await _context.MediaFolders
+             .Where(f => f.Id == id)
+             .Select(f => f.TreePath)
+             .FirstOrDefaultAsync();
         }
 
         public async Task UpdateAsync(MediaFolder mediaFolder)

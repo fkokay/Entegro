@@ -1,6 +1,6 @@
-﻿namespace Entegro.Application.DTOs.MediaFolder
+﻿namespace Entegro.Web.Models
 {
-    public class CreateMediaFolderDto
+    public class MediaFolderViewModel
     {
         public int? ParentId { get; set; }
         public string TreePath { get; set; } = null!;

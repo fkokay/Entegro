@@ -41,22 +41,30 @@
 
         const myDropzone = new Dropzone("#myDropzoneDiv", {
             url: "/upload", // Sunucu endpoint
-            maxFiles: 5,    // Maksimum dosya sayısı
+            maxFiles: 1,           // Maksimum 1 dosya
+            uploadMultiple: false, // Çoklu yüklemeyi kapa
             maxFilesize: 2, // MB cinsinden maksimum dosya boyutu
             acceptedFiles: "image/*", // Sadece görsel kabul et
             addRemoveLinks: true,     // Dosya kaldırma linki ekle
-            dictDefaultMessage: "Dosyaları buraya sürükleyin veya tıklayın"
+            dictDefaultMessage: "Dosyayı buraya sürükleyin veya tıklayın"
         });
 
-        // Event listener örneği
+        // Gönderim sırasında sabit "Brand" folder adını gönder
+        myDropzone.on("sending", function(file, xhr, formData) {
+            formData.append("folder", "Brand"); // Folder adı burada sabit olarak belirleniyor
+        });
+
+        // Yükleme başarılıysa
         myDropzone.on("success", function(file, response) {
             console.log("Yükleme başarılı:", response);
         });
 
+        // Yükleme hatası varsa
         myDropzone.on("error", function(file, errorMessage) {
             console.error("Yükleme hatası:", errorMessage);
         });
-        </script>
+    </script>
+
     <script>
         $('#btnDeleteBrand').on('click', function () {
             Swal.fire({
