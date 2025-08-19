@@ -13,5 +13,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<int> AddAsync(MediaFolder mediaFolder);
         Task UpdateAsync(MediaFolder mediaFolder);
         Task DeleteAsync(MediaFolder mediaFolder);
+
+        Task UpdateFilesCountAsync(int folderId, int filesCount);
     }
 }

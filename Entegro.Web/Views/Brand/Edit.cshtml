@@ -40,30 +40,63 @@
         Dropzone.autoDiscover = false;
 
         const myDropzone = new Dropzone("#myDropzoneDiv", {
-            url: "/upload", // Sunucu endpoint
-            maxFiles: 1,           // Maksimum 1 dosya
-            uploadMultiple: false, // Çoklu yüklemeyi kapa
-            maxFilesize: 2, // MB cinsinden maksimum dosya boyutu
-            acceptedFiles: "image/*", // Sadece görsel kabul et
-            addRemoveLinks: true,     // Dosya kaldırma linki ekle
+            url: "/upload",
+            maxFiles: 1,
+            uploadMultiple: false,
+            maxFilesize: 2,
+            acceptedFiles: "image/*",
+            addRemoveLinks: true,
             dictDefaultMessage: "Dosyayı buraya sürükleyin veya tıklayın"
         });
 
-        // Gönderim sırasında sabit "Brand" folder adını gönder
+        // Sabit folder parametresi ekle
         myDropzone.on("sending", function(file, xhr, formData) {
-            formData.append("folder", "Brand"); // Folder adı burada sabit olarak belirleniyor
+            formData.append("folder", "Brand");
+            formData.append("overwrite", false); // varsayılan: üzerine yazma
         });
 
-        // Yükleme başarılıysa
+        // Başarılı yükleme
         myDropzone.on("success", function(file, response) {
             console.log("Yükleme başarılı:", response);
         });
 
-        // Yükleme hatası varsa
-        myDropzone.on("error", function(file, errorMessage) {
-            console.error("Yükleme hatası:", errorMessage);
+       
+        myDropzone.on("error", function(file, errorMessage, xhr) {
+            if (xhr && xhr.status === 409) {
+                Swal.fire({
+                    title: "Aynı isimli dosya var!",
+                    text: "Üzerine yazmak ister misiniz?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Üzerine Yaz",
+                    cancelButtonText: "Hayır, Vazgeç"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Tekrar upload et ama overwrite=true ile
+                        let formData = new FormData();
+                        formData.append("file", file);
+                        formData.append("folder", "Brand");
+                        formData.append("overwrite", true);
+
+                        fetch("/upload", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire("Başarılı", "Dosya üzerine yazıldı", "success");
+                        })
+                        .catch(err => {
+                            Swal.fire("Hata", "Dosya yüklenemedi", "error");
+                        });
+                    }
+                });
+            } else {
+                Swal.fire("Hata", errorMessage, "error");
+            }
         });
     </script>
+
 
     <script>
         $('#btnDeleteBrand').on('click', function () {

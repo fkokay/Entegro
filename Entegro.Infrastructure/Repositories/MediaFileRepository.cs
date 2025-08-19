@@ -55,6 +55,9 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.MediaFiles.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<MediaFile?> GetByNameAndFolderAsync(string name, int folderId) => await _context.MediaFiles
+                    .FirstOrDefaultAsync(x => x.Name == name && x.FolderId == folderId);
+
         public async Task UpdateAsync(MediaFile mediaFolder)
         {
             _context.MediaFiles.Update(mediaFolder);

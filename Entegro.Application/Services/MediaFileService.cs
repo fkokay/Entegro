@@ -106,6 +106,33 @@ namespace Entegro.Application.Services
             return mediaFileDto;
         }
 
+        public async Task<MediaFileDto?> GetByNameAndFolderAsync(string name, int folderId)
+        {
+            var entity = await _mediaFileRepository.GetByNameAndFolderAsync(name, folderId);
+            return entity is null ? null : _mapper.Map<MediaFileDto>(entity);
+        }
+
+        public async Task<bool> OverwriteByNameAsync(string name, int folderId, CreateMediaFileDto builtDto)
+        {
+            var entity = await _mediaFileRepository.GetByNameAndFolderAsync(name, folderId);
+            if (entity is null) return false;
+
+
+            entity.Size = builtDto.Size;
+            entity.MimeType = builtDto.MimeType;
+            entity.MediaType = builtDto.MediaType;
+            entity.PixelSize = builtDto.PixelSize;
+            entity.Width = builtDto.Width;
+            entity.Height = builtDto.Height;
+            entity.Extension = builtDto.Extension;
+            entity.Metadata = builtDto.Metadata;
+            entity.UpdatedOn = DateTime.UtcNow;
+            entity.Version = (entity.Version <= 0 ? 1 : entity.Version + 1);
+
+            await _mediaFileRepository.UpdateAsync(entity);
+            return true;
+        }
+
         public async Task<bool> UpdateAsync(UpdateMediaFileDto mediaFile)
         {
             await _mediaFileRepository.UpdateAsync(_mapper.Map<MediaFile>(mediaFile));

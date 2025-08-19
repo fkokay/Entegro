@@ -74,5 +74,13 @@ namespace Entegro.Infrastructure.Repositories
             _context.MediaFolders.Update(mediaFolder);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateFilesCountAsync(int folderId, int filesCount)
+        {
+            var folder = await _context.MediaFolders.FirstOrDefaultAsync(x => x.Id == folderId);
+            if (folder is null) return;
+            folder.FilesCount = filesCount;
+            await _context.SaveChangesAsync();
+        }
     }
 }
