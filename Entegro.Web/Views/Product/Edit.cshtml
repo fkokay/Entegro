@@ -96,11 +96,9 @@
             }, 50);
         }
 
-        // Quill editörü global tanımla
         let fullEditor;
 
         document.addEventListener("DOMContentLoaded", function () {
-            // Quill editör başlat
             const fullToolbar = [
                 [{ font: [] }, { size: [] }],
                 ['bold', 'italic', 'underline', 'strike'],
@@ -123,7 +121,6 @@
                 theme: 'snow'
             });
 
-            // Sayfaya gömülü gelen Description'ı editöre yerleştir (eğer varsa)
             const initialDesc = document.getElementById('Description');
             if (initialDesc && initialDesc.value) {
                 fullEditor.root.innerHTML = initialDesc.value;
@@ -147,6 +144,7 @@
                             }
                         },
                         'Price': {
+                           selector: 'input[name$="[Price]"]',
                             validators: {
                                 notEmpty: { message: 'Fiyat boş bırakılamaz.' },
                                 numeric: { message: 'Fiyat yalnızca sayı olabilir.' }
@@ -389,7 +387,6 @@
 
     <script>
         $(function () {
-          /* ---------------- Modal'ı body'e taşı & Select2 ---------------- */
           const $modal = $('#ProductCategoryModel');
           if ($modal.length) $modal.appendTo('body');
 
@@ -423,7 +420,6 @@
             clearCategoryValidationUI();
           });
 
-          /* ---------------- Yardımcı: Validation UI ---------------- */
           function setInvalid($el, message, feedbackId) {
             $el.addClass('is-invalid');
             if ($el.hasClass('select2')) {
@@ -449,7 +445,6 @@
             clearInvalid($('#DisplayOrder'), 'DisplayOrderFeedback');
           }
 
-          /* ---------------- Doğrulama: Kategori & Sıra ---------------- */
           function validateProductCategoryModal() {
             clearCategoryValidationUI();
             const errors = [];
@@ -473,7 +468,6 @@
             return { valid: errors.length === 0, errors };
           }
 
-          /* ---------------- Kaydet butonu ---------------- */
           $(document).on('click', '#btnSaveProductCategory', function () {
             const $btn = $(this);
 
@@ -560,7 +554,6 @@
             .finally(() => $btn.prop('disabled', false));
           });
 
-          // 🔽 Yardımcı: İstenen tabı etkinleştir (Bootstrap 5)
           function activateTab(paneSelector) {
             const triggerEl =
               document.querySelector(`[data-bs-target="${paneSelector}"]`) ||
