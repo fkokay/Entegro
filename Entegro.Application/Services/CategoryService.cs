@@ -110,6 +110,27 @@ namespace Entegro.Application.Services
             return true;
         }
 
+        public async Task DeleteCategoryImageAsync(int categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            if (category != null)
+            {
+                category.MediaFileId = null;
+                await _categoryRepository.UpdateAsync(category);
+            }
+        }
+
+        public async Task<CategoryDto?> GetByIdWithMediaAsync(int id)
+        {
+            var category = await _categoryRepository.GetByIdWithMediaAsync(id);
+            if (category == null)
+            {
+                return null;
+            }
+            var categoryDto = _mapper.Map<CategoryDto>(category);
+            return categoryDto;
+        }
+
         public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
         {
             var categories = await _categoryRepository.GetAllAsync();
@@ -236,6 +257,15 @@ namespace Entegro.Application.Services
             return true;
         }
 
+        public async Task UpdateCategoryImageAsync(int categoryId, int mediaFileId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            if (category != null)
+            {
+                category.MediaFileId = mediaFileId;
+                await _categoryRepository.UpdateAsync(category);
+            }
+        }
 
         private string FormatTreePath(string treePath, List<CategoryDto> allCategories)
         {

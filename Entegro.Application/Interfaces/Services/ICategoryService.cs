@@ -18,5 +18,10 @@ namespace Entegro.Application.Interfaces.Services
         Task<bool> DeleteCategoryAndReassignChildrenAsync(int categoryId); // kategori ve alt kategorileri sil, alt kategorileri başka bir kategoriye ata
 
         Task<Select2Response> GetCategoriesForSelect2Async(string? term, int page, int pageSize, CancellationToken ct = default);
+
+        Task<CategoryDto?> GetByIdWithMediaAsync(int id);
+
+        Task UpdateCategoryImageAsync(int categoryId, int mediaFileId);
+        Task DeleteCategoryImageAsync(int categoryId);
     }
 }

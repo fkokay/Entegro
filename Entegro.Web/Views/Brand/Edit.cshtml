@@ -35,7 +35,7 @@
     </div>
 </form>
 @section scripts {
-   
+
 
     <link rel="stylesheet" href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" />
     <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
@@ -44,228 +44,220 @@
         #myDropzoneDiv .dz-message::before {
             display: none !important; /* Ok simgesini gizler */
         }
-</style>
+    </style>
 
 
 
-    <!-- SweetAlert2 (uyarı için) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Dropzone.autoDiscover = false;
 
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        let overwriteNext = false;
+        let currentMediaId = @((Model.MediaFileId ?? 0));
 
-   <script>
-  Dropzone.autoDiscover = false;
+        const myDropzone = new Dropzone("#myDropzoneDiv", {
+          url: "/upload",               
+          paramName: "file",
+          method: "post",
+          maxFiles: 1,
+          uploadMultiple: false,
+          maxFilesize: 2,                       // MB
+          acceptedFiles: ".jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff",
+          addRemoveLinks: true,
+          dictDefaultMessage: "Dosyayı buraya sürükleyin veya tıklayın",
+          dictRemoveFile: "❌ Sil",
+          autoProcessQueue: true,
+          init: function () {
 
-  let overwriteNext = false;
-  let currentMediaId = @((Model.MediaFileId ?? 0));
+            this.on("sending", function (file, xhr, formData) {
+              formData.append("folder", "Brand");
+              formData.append("id", String(@Model.Id));
+              formData.append("overwrite", String(overwriteNext));
+            });
 
-  const myDropzone = new Dropzone("#myDropzoneDiv", {
-          url: "/upload",                 // <-- doğru endpoint
-    paramName: "file",
-    method: "post",
-    maxFiles: 1,
-    uploadMultiple: false,
-    maxFilesize: 2,                       // MB
-    acceptedFiles: ".jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff",
-    addRemoveLinks: true,
-    dictDefaultMessage: "Dosyayı buraya sürükleyin veya tıklayın",
-    dictRemoveFile: "❌ Sil",
-    autoProcessQueue: true,
-    init: function () {
-
-      this.on("sending", function (file, xhr, formData) {
-        formData.append("folder", "Brand");
-        formData.append("id", String(@Model.Id));
-        formData.append("overwrite", String(overwriteNext));
-      });
-
-      this.on("success", function (file, response) {
-        overwriteNext = false;
-        if (response && typeof response === "object" && typeof response.id === "number") {
-          currentMediaId = response.id;
-        }
-        blockAdding();
-      });
-
-      this.on("error", function (file, errorMessage, xhr) {
-        if (xhr && xhr.status === 409) {
-          Swal.fire({
-            title: 'Üzerine yazılsın mı?',
-            text: 'Bu isimde bir dosya zaten var.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Evet, üzerine yaz',
-            cancelButtonText: 'Vazgeç'
-          }).then((r) => {
-            if (r.isConfirmed) {
-              overwriteNext = true;
-              file.status = Dropzone.QUEUED;
-              myDropzone.processFile(file);
-            } else {
+            this.on("success", function (file, response) {
               overwriteNext = false;
-            }
-          });
-        } else {
-          Swal.fire('Hata', 'Yükleme sırasında bir hata oluştu.', 'error');
-        }
-      });
+              if (response && typeof response === "object" && typeof response.id === "number") {
+                currentMediaId = response.id;
+              }
+              blockAdding();
+            });
 
-      // Her eklenen dosyada önce Dropzone'un auto-remove özelliğini iptal et, sonra kendi onayını bağla
-      this.on("addedfile", function (file) {
-        neutralizeRemoveButton(file);
-        attachConfirmToRemove(file);
-      });
+            this.on("error", function (file, errorMessage, xhr) {
+              if (xhr && xhr.status === 409) {
+                Swal.fire({
+                  title: 'Üzerine yazılsın mı?',
+                  text: 'Bu isimde bir dosya zaten var.',
+                  icon: 'question',
+                  showCancelButton: true,
+                  confirmButtonText: 'Evet, üzerine yaz',
+                  cancelButtonText: 'Vazgeç'
+                }).then((r) => {
+                  if (r.isConfirmed) {
+                    overwriteNext = true;
+                    file.status = Dropzone.QUEUED;
+                    myDropzone.processFile(file);
+                  } else {
+                    overwriteNext = false;
+                  }
+                });
+              } else {
+                Swal.fire('Hata', 'Yükleme sırasında bir hata oluştu.', 'error');
+              }
+            });
 
-      // UI temizlik: dosya gerçekten kaldırıldıysa (onaylı akış) eklemeyi aç
-      this.on("removedfile", function () {
-        if (myDropzone.files.length === 0) {
-          unblockAdding();
-        }
-      });
-    }
-  });
+            // Her eklenen dosyada önce Dropzone'un auto-remove özelliğini iptal et, sonra kendi onayını bağla
+            this.on("addedfile", function (file) {
+              neutralizeRemoveButton(file);
+              attachConfirmToRemove(file);
+            });
 
-  // Dropzone'un default remove davranışını kapatır (kritik!)
-  function neutralizeRemoveButton(file) {
-    if (!file || !file.previewElement) return;
-    // Önizlemede data-dz-remove taşıyan tüm elemanları bul ve attribute'u sök
-    file.previewElement.querySelectorAll('[data-dz-remove]').forEach(function(el) {
-      el.removeAttribute('data-dz-remove');
-      // Güvenlik için default anchor davranışını da etkisizleştir
-      if (el.tagName === 'A') el.setAttribute('href', 'javascript:void(0)');
-    });
-  }
-
-  // Silme onayı: onaya göre server + dropzone kontrolü
-  function attachConfirmToRemove(file) {
-    setTimeout(function () {
-      const btn = file.previewElement && file.previewElement.querySelector('.dz-remove');
-      if (!btn || btn._confirmBound) return;
-
-      // Capture fazında dinle ve tüm propagasyonu kes (ekstra emniyet)
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-
-        Swal.fire({
-          title: 'Emin misiniz?',
-          text: 'Bu resmi silmek istediğinize emin misiniz?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Evet, sil',
-          cancelButtonText: 'Vazgeç',
-          showLoaderOnConfirm: true,
-          allowOutsideClick: () => !Swal.isLoading(),
-          preConfirm: () => {
-            // ID yoksa sadece önizleme kaldıracağız (server'a gitmeyelim)
-            if (!currentMediaId || currentMediaId === 0) {
-              return Promise.resolve({ localOnly: true });
-            }
-            // ID varsa önce server'dan sil
-            return new Promise((resolve, reject) => {
-              $.ajax({
-                url: '/Media/Delete',
-                type: 'POST',
-                data: {
-                  folder: 'Brand',
-                  id: @Model.Id,
-                  mediaFolderId: currentMediaId
-                },
-                success: function () { resolve({ server: 'ok' }); },
-                error: function (xhr) { reject(xhr); }
-              });
+            // UI temizlik: dosya gerçekten kaldırıldıysa (onaylı akış) eklemeyi aç
+            this.on("removedfile", function () {
+              if (myDropzone.files.length === 0) {
+                unblockAdding();
+              }
             });
           }
-        }).then((result) => {
-          if (!result.isConfirmed) {
-            // Vazgeçildi → hiçbir şey yapma, önizleme kalacak
-            return;
-          }
-          // Onaylandı → server ok ya da localOnly
-          myDropzone.removeFile(file);
-          currentMediaId = 0;
-          unblockAdding();
-          showBrandImageMessage('Resim başarıyla silindi. Marka bilgileri güncellendi.', 'success');
-        }).catch(() => {
-          showBrandImageMessage('Silme sırasında bir hata oluştu.', 'danger');
         });
-      }, true); // capture=true
 
-      btn._confirmBound = true;
-    }, 0);
-  }
+        // Dropzone'un default remove davranışını kapatır (kritik!)
+        function neutralizeRemoveButton(file) {
+          if (!file || !file.previewElement) return;
+          // Önizlemede data-dz-remove taşıyan tüm elemanları bul ve attribute'u sök
+          file.previewElement.querySelectorAll('[data-dz-remove]').forEach(function(el) {
+            el.removeAttribute('data-dz-remove');
+            // Güvenlik için default anchor davranışını da etkisizleştir
+            if (el.tagName === 'A') el.setAttribute('href', 'javascript:void(0)');
+          });
+        }
 
-  // Yeni dosya eklemeyi kapat/aç
-  function blockAdding(){
-    if (myDropzone.hiddenFileInput) myDropzone.hiddenFileInput.disabled = true;
-    myDropzone.element.classList.add("dz-has-file");
-  }
-  function unblockAdding(){
-    if (myDropzone.hiddenFileInput) myDropzone.hiddenFileInput.disabled = false;
-    myDropzone.element.classList.remove("dz-has-file");
-  }
+        // Silme onayı: onaya göre server + dropzone kontrolü
+        function attachConfirmToRemove(file) {
+          setTimeout(function () {
+            const btn = file.previewElement && file.previewElement.querySelector('.dz-remove');
+            if (!btn || btn._confirmBound) return;
 
-  // Mesaj helper
-  function showBrandImageMessage(text, type) {
-    var container = document.querySelector('#form-tabs-image .card-body')
-                 || document.querySelector('#form-tabs-image')
-                 || document.body;
+            // Capture fazında dinle ve tüm propagasyonu kes (ekstra emniyet)
+            btn.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
 
-    var el = document.getElementById('brandImageAlert');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'brandImageAlert';
-      el.role = 'alert';
-      el.className = 'alert mt-3';
-      container.prepend ? container.prepend(el) : container.appendChild(el);
-    }
-    el.className = 'alert mt-3 alert-' + (type || 'success');
-    el.textContent = text;
-    el.style.display = '';
-    clearTimeout(el._hideTimer);
-    el._hideTimer = setTimeout(function () { el.style.display = 'none'; }, 3000);
-  }
+              Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu resmi silmek istediğinize emin misiniz?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, sil',
+                cancelButtonText: 'Vazgeç',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+                preConfirm: () => {
+                  // ID yoksa sadece önizleme kaldıracağız (server'a gitmeyelim)
+                  if (!currentMediaId || currentMediaId === 0) {
+                    return Promise.resolve({ localOnly: true });
+                  }
+                  // ID varsa önce server'dan sil
+                  return new Promise((resolve, reject) => {
+                    $.ajax({
+                      url: '/Media/Delete',
+                      type: 'POST',
+                      data: {
+                        folder: 'Brand',
+                        id: @Model.Id,
+                        mediaFolderId: currentMediaId
+                      },
+                      success: function () { resolve({ server: 'ok' }); },
+                      error: function (xhr) { reject(xhr); }
+                    });
+                  });
+                }
+              }).then((result) => {
+                if (!result.isConfirmed) {
+                  // Vazgeçildi → hiçbir şey yapma, önizleme kalacak
+                  return;
+                }
+                // Onaylandı → server ok ya da localOnly
+                myDropzone.removeFile(file);
+                currentMediaId = 0;
+                unblockAdding();
+                showBrandImageMessage('Resim başarıyla silindi. Marka bilgileri güncellendi.', 'success');
+              }).catch(() => {
+                showBrandImageMessage('Silme sırasında bir hata oluştu.', 'danger');
+              });
+            }, true); // capture=true
 
-  // Preload varsa göster; yoksa yükleme açık kalsın
-  @if (Model.MediaFileId.HasValue && !string.IsNullOrEmpty(Model.MediaFileUrl))
-  {
-    var encodedFileName = JavaScriptEncoder.Default.Encode(Model.MediaFileName ?? "");
-    var encodedFileUrl  = JavaScriptEncoder.Default.Encode(Model.MediaFileUrl ?? "");
-    var fileSize        = Model.MediaFileSize;
-    var mimeType        = JavaScriptEncoder.Default.Encode(Model.MediaFile?.MimeType ?? "image/jpeg");
+            btn._confirmBound = true;
+          }, 0);
+        }
 
-  <text>
-    (function preloadExisting(){
-      const mockFile = {
-        name: "@encodedFileName",
-        size: @fileSize,
-        type: "@mimeType",
-        accepted: true
-      };
-      myDropzone.emit("addedfile", mockFile);
-      myDropzone.emit("thumbnail", mockFile, "@encodedFileUrl");
-      myDropzone.emit("complete", mockFile);
-      myDropzone.files.push(mockFile);
+        // Yeni dosya eklemeyi kapat/aç
+        function blockAdding(){
+          if (myDropzone.hiddenFileInput) myDropzone.hiddenFileInput.disabled = true;
+          myDropzone.element.classList.add("dz-has-file");
+        }
+        function unblockAdding(){
+          if (myDropzone.hiddenFileInput) myDropzone.hiddenFileInput.disabled = false;
+          myDropzone.element.classList.remove("dz-has-file");
+        }
 
-      neutralizeRemoveButton(mockFile);   
-      attachConfirmToRemove(mockFile);    
-      blockAdding();
-    })();
-  </text>
-  }
-  else
-  {
-  <text>
-    (function ensureUploadEnabled(){ unblockAdding(); })();
-  </text>
-  }
-</script>
+        // Mesaj helper
+        function showBrandImageMessage(text, type) {
+          var container = document.querySelector('#form-tabs-image .card-body')
+                       || document.querySelector('#form-tabs-image')
+                       || document.body;
+
+          var el = document.getElementById('brandImageAlert');
+          if (!el) {
+            el = document.createElement('div');
+            el.id = 'brandImageAlert';
+            el.role = 'alert';
+            el.className = 'alert mt-3';
+            container.prepend ? container.prepend(el) : container.appendChild(el);
+          }
+          el.className = 'alert mt-3 alert-' + (type || 'success');
+          el.textContent = text;
+          el.style.display = '';
+          clearTimeout(el._hideTimer);
+          el._hideTimer = setTimeout(function () { el.style.display = 'none'; }, 3000);
+        }
+
+        // Preload varsa göster; yoksa yükleme açık kalsın
+        @if (Model.MediaFileId.HasValue && !string.IsNullOrEmpty(Model.MediaFileUrl))
+        {
+              var encodedFileName = JavaScriptEncoder.Default.Encode(Model.MediaFileName ?? "");
+              var encodedFileUrl = JavaScriptEncoder.Default.Encode(Model.MediaFileUrl ?? "");
+              var fileSize = Model.MediaFileSize;
+              var mimeType = JavaScriptEncoder.Default.Encode(Model.MediaFile?.MimeType ?? "image/jpeg");
+
+            <text>
+              (function preloadExisting(){
+                const mockFile = {
+                  name: "@encodedFileName",
+                  size: @fileSize,
+                  type: "@mimeType",
+                  accepted: true
+                };
+                myDropzone.emit("addedfile", mockFile);
+                myDropzone.emit("thumbnail", mockFile, "@encodedFileUrl");
+                myDropzone.emit("complete", mockFile);
+                myDropzone.files.push(mockFile);
+
+                neutralizeRemoveButton(mockFile);
+                attachConfirmToRemove(mockFile);
+                blockAdding();
+              })();
+            </text>
+        }
+        else
+        {
+            <text>
+              (function ensureUploadEnabled(){ unblockAdding(); })();
+            </text>
+        }
+    </script>
 
 
 

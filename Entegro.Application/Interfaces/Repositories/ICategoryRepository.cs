@@ -16,7 +16,7 @@ namespace Entegro.Application.Interfaces.Repositories
 
         Task<PagedResult2<CategorySlim>> SearchPagedAsync(string? term, int page, int pageSize, CancellationToken ct = default);
         Task<Dictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default);
-
+        Task<Category?> GetByIdWithMediaAsync(int id);
 
     }
 }

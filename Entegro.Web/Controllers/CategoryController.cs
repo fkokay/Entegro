@@ -51,7 +51,8 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
+            //var category = await _categoryService.GetCategoryByIdAsync(id);
+            var category = await _categoryService.GetByIdWithMediaAsync(id);
             if (category == null)
             {
                 return NotFound();
@@ -68,7 +69,7 @@ namespace Entegro.Web.Controllers
                 var self = formattedCategories.FirstOrDefault(c => c.Id == category.Id);
                 formattedParentName = self?.FormattedName ?? category.Name;
             }
-
+            var size = category.MediaFile?.Size;
             var categoryModel = new CategoryViewModel
             {
                 Id = category.Id,
@@ -82,7 +83,11 @@ namespace Entegro.Web.Controllers
                 Name = category.Name,
                 ParentCategoryId = category.ParentCategoryId,
                 TreePath = category.TreePath,
-                ParentCategoryFormattedName = formattedParentName
+                ParentCategoryFormattedName = formattedParentName,
+                MediaFileId = category.MediaFileId,
+                MediaFileName = category.MediaFile?.Name,
+                MediaFileSize = size.HasValue ? (int)size.Value : 0,
+                MediaFileUrl = $"/uploads/Category/{category.MediaFile?.Name}",
             };
 
 

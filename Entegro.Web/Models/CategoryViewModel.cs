@@ -1,9 +1,12 @@
-﻿namespace Entegro.Web.Models
+﻿using Entegro.Application.DTOs.MediaFile;
+
+namespace Entegro.Web.Models
 {
     public class CategoryViewModel
     {
         public int Id { get; set; }
         public int? ParentCategoryId { get; set; }
+        public int? MediaFileId { get; set; }
         public string TreePath { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
@@ -13,8 +16,11 @@
         public int DisplayOrder { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-
+        public string? MediaFileName { get; set; }
+        public string? MediaFileUrl { get; set; }
+        public int MediaFileSize { get; set; }
         public string? ParentCategoryFormattedName { get; set; }
+        public MediaFileDto? MediaFile { get; set; }
 
     }
 }

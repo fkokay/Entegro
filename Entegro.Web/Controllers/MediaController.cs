@@ -8,16 +8,18 @@ namespace Entegro.Web.Controllers
         private readonly IMediaFolderService _mediaFolderService;
         private readonly IMediaFileService _mediaFileService;
         private readonly IBrandService _brandService;
+        private readonly ICategoryService _categoryService;
         private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
          {
              ".jpg",".jpeg",".png",".gif",".webp",".bmp",".tiff"
          };
 
-        public MediaController(IMediaFolderService mediaFolderService, IMediaFileService mediaFileService, IBrandService brandService)
+        public MediaController(IMediaFolderService mediaFolderService, IMediaFileService mediaFileService, IBrandService brandService, ICategoryService categoryService)
         {
             _mediaFolderService = mediaFolderService;
             _mediaFileService = mediaFileService;
             _brandService = brandService;
+            _categoryService = categoryService;
         }
 
         [HttpPost("upload")]
@@ -96,9 +98,10 @@ namespace Entegro.Web.Controllers
 
             }
             if (folder.Equals("Brand", StringComparison.OrdinalIgnoreCase))
-            {
                 await _brandService.UpdateBrandImageAsync(id.Value, fileId);
-            }
+
+            else if (folder.Equals("Category", StringComparison.OrdinalIgnoreCase))
+                await _categoryService.UpdateCategoryImageAsync(id.Value, fileId);
 
             return Ok(new
             {
@@ -114,10 +117,10 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> Delete([FromForm] string folder, [FromForm] int? mediaFolderId, [FromForm] int? id = null)
         {
             if (folder.Equals("Brand", StringComparison.OrdinalIgnoreCase))
-            {
                 await _brandService.DeleteBrandImageAsync(id.Value);
 
-            }
+            else if (folder.Equals("Category", StringComparison.OrdinalIgnoreCase))
+                await _categoryService.DeleteCategoryImageAsync(id.Value);
 
             await _mediaFileService.DeleteAsync(mediaFolderId.Value);
             return Ok(new

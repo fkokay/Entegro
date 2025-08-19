@@ -60,6 +60,13 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Categories.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<Category?> GetByIdWithMediaAsync(int id)
+        {
+            return await _context.Categories
+             .Include(b => b.MediaFile)
+             .FirstOrDefaultAsync(b => b.Id == id);
+        }
+
         public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)
         {
             return await _context.Categories.Where(c => c.ParentCategoryId == parentCategoryId).ToListAsync();
