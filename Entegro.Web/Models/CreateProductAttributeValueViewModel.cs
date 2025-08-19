@@ -1,8 +1,7 @@
 ﻿namespace Entegro.Web.Models
 {
-    public class ProductAttributeValueViewModel
+    public class CreateProductAttributeValueViewModel
     {
-        public int Id { get; set; }
         public int ProductAttributeId { get; set; }
         public string Name { get; set; }
         public int DisplayOrder { get; set; }
