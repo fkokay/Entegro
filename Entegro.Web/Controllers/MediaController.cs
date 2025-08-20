@@ -66,6 +66,7 @@ namespace Entegro.Web.Controllers
             return File(fileBytes, contentType);
         }
 
+        [HttpPost]
         public async Task<IActionResult> Upload(
             string path,
             string[] typeFilter = null,

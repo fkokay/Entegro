@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Product;
+﻿using Azure;
+using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Services;
@@ -6,6 +7,7 @@ using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Net;
 
 namespace Entegro.Web.Controllers
 {
@@ -16,18 +18,21 @@ namespace Entegro.Web.Controllers
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeMappingService _productAttributeMappingService;
+        private readonly IProductImageMappingService _productImageMappingService;
         public ProductController(
-            IProductService productService, 
-            IProductCategoryMappingService productCategoryMappingService, 
+            IProductService productService,
+            IProductCategoryMappingService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
-            IProductAttributeMappingService productAttributeMappingService)
+            IProductAttributeMappingService productAttributeMappingService,
+            IProductImageMappingService productImageMappingService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
+            _productImageMappingService = productImageMappingService;
         }
         public IActionResult Index()
         {
@@ -205,10 +210,10 @@ namespace Entegro.Web.Controllers
                     Attribute = new ProductAttributeViewModel()
                     {
                         Id = m.Attribute.Id,
-                        Values = m.Attribute.Values.Select(x=> new ProductAttributeValueViewModel()
+                        Values = m.Attribute.Values.Select(x => new ProductAttributeValueViewModel()
                         {
                             Id = x.Id,
-                            DisplayOrder= x.DisplayOrder,   
+                            DisplayOrder = x.DisplayOrder,
                             Name = x.Name,
                             ProductAttributeId = x.ProductAttributeId,
                         }).ToList()
@@ -281,6 +286,48 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = true, id });
             }
             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProductMediaFilesAdd(string mediaFileIds, int entityId)
+        {
+            bool success = true;
+            var response = new List<dynamic>();
+
+            //dynamic respObj = new
+            //{
+            //    MediaFileId = id,
+            //    ProductMediaFileId = productPicture.Id,
+            //    file?.Name
+            //};
+
+            return Json(new
+            {
+                success,
+                response,
+                message = "Resim başarıyla eklendi"
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProductPictureDelete(int id)
+        {
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SortPictures(string pictures, int entityId)
+        {
+            var response = new List<dynamic>();
+
+            //dynamic file = new
+            //{
+            //    productPicture.DisplayOrder,
+            //    productPicture.MediaFileId,
+            //    EntityMediaId = productPicture.Id
+            //};
+
+            return Json(new { success = true, response });
         }
     }
 }

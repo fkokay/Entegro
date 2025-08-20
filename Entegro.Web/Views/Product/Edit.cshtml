@@ -35,52 +35,37 @@
 
 
 @section Scripts {
-    <link rel="stylesheet" href="~/assets/vendor/libs/dropzone/dropzone.css" />
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/typography.css" />
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/katex.css" />
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/editor.css" />
     <script src="/assets/vendor/libs/quill/katex.js"></script>
     <script src="/assets/vendor/libs/quill/quill.js"></script>
-    <script src="/assets/vendor/libs/dropzone/dropzone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serializeJSON/3.2.0/jquery.serializejson.min.js"></script>
     <script src="/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
 
     <!-- Page JS -->
-    <script>
-        (function () {
-          const previewTemplate = `
-            <div class="dz-preview dz-file-preview">
-              <div class="dz-details">
-                <div class="dz-thumbnail">
-                  <img data-dz-thumbnail>
-                  <span class="dz-nopreview">No preview</span>
-                  <div class="dz-success-mark"></div>
-                  <div class="dz-error-mark"></div>
-                  <div class="dz-error-message"><span data-dz-errormessage></span></div>
-                  <div class="progress">
-                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
-                  </div>
-                </div>
-                <div class="dz-filename" data-dz-name></div>
-                <div class="dz-size" data-dz-size></div>
-              </div>
-            </div>
-          `;
-
-          // Only Multiple Dropzone inside #product-form
-          const dropzoneMulti = document.querySelector('#product-form #dropzone-multi');
-          if (dropzoneMulti) {
-            new Dropzone(dropzoneMulti, {
-              url: "/upload", // Server-side upload handler
-              previewTemplate: previewTemplate,
-              parallelUploads: 1,
-              maxFilesize: 5, // MB
-              addRemoveLinks: true
+    <script data-origin="FileUploader">
+        $(function () {
+            // Init dropzone
+            $("#upload-1388498530").dropzoneWrapper({
+                onUploading: null,
+                onUploadCompleted: null,
+                onAborted: null,
+                onError: null,
+                onFileRemove: null,
+                onCompleted: null,
+                onMediaSelected: null,
+                maxFiles: 500,
+                maxFilesSize: 102400,
+                timeout: 300000,
+                clickableElement: null,
+                previewContainerId: "preview-106864758",
+                showRemoveButton: false,
+                showRemoveButtonAfterUpload: true,
+                downloadEnabled: false
             });
-          }
-        })();
+        });
     </script>
-
     <script>
         function focusFieldAndShowTab(el) {
             if (!el) return;

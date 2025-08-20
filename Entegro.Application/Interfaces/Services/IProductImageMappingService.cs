@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class IProductImageMappingService
+    public interface IProductImageMappingService
     {
     }
 }
