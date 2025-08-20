@@ -22,6 +22,22 @@ namespace Entegro.Application.DTOs.MediaFile
         public bool IsTransient { get; set; }
         public bool Deleted { get; set; }
 
+        public string Url
+        {
+            get
+            {
+                if (this.Folder == null)
+                {
+                    return $"/media/{Id}/{Name}";
+                }
+                else
+                {
+                    return $"/media/{Id}/{Folder.Name}/{Name}";
+                }
+
+            }
+        }
+
         public MediaFolderDto? Folder { get; set; }
     }
 }
