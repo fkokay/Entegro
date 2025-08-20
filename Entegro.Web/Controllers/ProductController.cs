@@ -18,21 +18,18 @@ namespace Entegro.Web.Controllers
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeMappingService _productAttributeMappingService;
-        private readonly IProductImageMappingService _productImageMappingService;
         public ProductController(
             IProductService productService,
             IProductCategoryMappingService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
-            IProductAttributeMappingService productAttributeMappingService,
-            IProductImageMappingService productImageMappingService)
+            IProductAttributeMappingService productAttributeMappingService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
-            _productImageMappingService = productImageMappingService;
         }
 
         #region Product list / create / edit / delete
