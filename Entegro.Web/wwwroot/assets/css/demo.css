@@ -110,3 +110,363 @@
     text-align: center;
     margin-top: 1rem;
 }
+
+.file-icon {
+    position: absolute;
+}
+
+.file-icon, .file-thumb {
+    align-self: center;
+    opacity: 0;
+    transition: opacity 0.65s ease;
+}
+
+    .file-icon.show, .file-thumb.show {
+        opacity: 1;
+    }
+
+.file-figure {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.fu-container {
+    position: relative
+}
+
+    .fu-container.dz-highlight .dropzone-container, .fu-container.dz-drag-hover .dropzone-container {
+        border-color: #307abe !important;
+        background-color: #f1f7fc !important;
+        pointer-events: none
+    }
+
+    .fu-container > .dz-preview {
+        display: none !important
+    }
+
+    .fu-container .fu-message {
+        cursor: pointer
+    }
+
+    .fu-container.xl .fu-message {
+        font-size: 1.125rem !important
+    }
+
+    .fu-container.xl .dropzone-file-info, .fu-container.xl .fu-fileupload {
+        justify-content: center;
+        text-align: center
+    }
+
+    .fu-container:not(.xl) .dropzone-target {
+        padding: 10px
+    }
+
+    .fu-container .fu-progress:not(.list) {
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        right: 0
+    }
+
+        .fu-container .fu-progress:not(.list) .progress {
+            height: 0.25rem;
+            background: transparent;
+            margin: 0;
+            border-radius: 0;
+            border-bottom-left-radius: .375rem;
+            border-bottom-right-radius: .375rem;
+            box-shadow: none
+        }
+
+            .fu-container .fu-progress:not(.list) .progress .progress-bar {
+                background-color: #307abe;
+                transition: width 0.25s ease, background-color 0.25s ease
+            }
+
+        .fu-container .fu-progress:not(.list).success {
+            transition-delay: 0.4s
+        }
+
+            .fu-container .fu-progress:not(.list).success .progress-bar {
+                background-color: #009e74 !important
+            }
+
+    .fu-container .customer-avatar-lg {
+        display: block
+    }
+
+    .fu-container .empty {
+        font-weight: 400 !important;
+        color: #8d9ba9 !important
+    }
+
+.dropzone-container {
+    pointer-events: initial !important;
+    transition: all .2s;
+    align-items: center;
+    display: flex;
+    position: relative;
+    border: 2px dashed #ced4da !important;
+    background: #f8f9fa !important;
+    border-radius: 5px
+}
+
+    .dropzone-container.fullscreen {
+        position: relative;
+        width: 100%;
+        height: 100%
+    }
+
+        .dropzone-container.fullscreen .fu-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%
+        }
+
+    .dropzone-container.hide {
+        display: none
+    }
+
+    .dropzone-container .dropzone {
+        border: none;
+        background: none;
+        width: 100%;
+        padding: 20px
+    }
+
+    .dropzone-container .fu-fileupload, .dropzone-container .fu-message {
+        font-size: 1rem;
+        align-self: center;
+        color: var(--primary-dark)
+    }
+
+    .dropzone-container .dz-preview, .dropzone-container .dz-message {
+        display: none
+    }
+
+    .dropzone-container .fu-thumb {
+        position: relative;
+        margin: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 90px;
+        height: 90px;
+        min-width: 90px
+    }
+
+.xl .dropzone-container .fu-thumb {
+    min-width: 120px;
+    width: 120px;
+    height: 120px
+}
+
+.dropzone-container .fu-thumb.empty {
+    border: 2px dashed #ced4da
+}
+
+    .dropzone-container .fu-thumb.empty .file-icon {
+        color: rgba(0,0,0,0.12)
+    }
+
+.dropzone-container .fu-thumb .file-figure {
+    max-width: 100%;
+    max-height: 100%
+}
+
+    .dropzone-container .fu-thumb .file-figure .file-thumb {
+        display: flex;
+        align-self: auto;
+        justify-content: center
+    }
+
+.dropzone-container .fu-thumb .file-img {
+    max-width: 100%;
+    max-height: 100%;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 calc(2px * var(--shadow-yoffset, 1)) 16px -2px rgba(var(--shadow-colorbase-rgb), calc(var(--shadow-intensity) * 0.12)),0 calc(2px * var(--shadow-yoffset, 1)) 3px -2px rgba(var(--shadow-color-rgb), calc(var(--shadow-intensity) * 0.15))
+}
+
+.dropzone-container .fu-controls {
+    flex-grow: 1;
+    overflow: hidden
+}
+
+.dropzone-container .fu-remove {
+    display: none;
+    --btn-height: 24px
+}
+
+    .dropzone-container .fu-remove .fu-remove-icon {
+        margin-top: -2px
+    }
+
+.fu-file-preview {
+    margin: 0 10px 10px 0;
+    position: relative;
+    border: 1px solid #ced4da;
+    border-radius: var(--border-radius-md);
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    overflow: hidden
+}
+
+    .fu-file-preview .main-pic-badge {
+        display: none;
+        position: absolute;
+        z-index: 1000;
+        right: 0;
+        border-top-left-radius: 0;
+        border-bottom-right-radius: 0
+    }
+
+#product-edit .fu-file-preview:first-child .main-pic-badge {
+    display: block
+}
+
+.fu-file-preview .file-figure {
+    min-width: 150px;
+    max-width: calc(150px / 9 * 16);
+    height: 150px
+}
+
+    .fu-file-preview .file-figure .file-icon:not(.show) {
+        display: none
+    }
+
+    .fu-file-preview .file-figure .file-img {
+        max-width: 100%;
+        max-height: 150px;
+        height: 150px;
+        -o-object-fit: contain;
+        object-fit: contain
+    }
+
+    .fu-file-preview .file-figure:not([data-type='image']) > img {
+        display: none !important
+    }
+
+.fu-file-preview .toolbar {
+    position: absolute;
+    bottom: 0;
+    min-width: 100%;
+    background-color: #f8f9fa;
+    visibility: hidden;
+    transition: visibility 0.1s;
+    border-top: 1px solid #aab5bf;
+    z-index: 2;
+    cursor: default
+}
+
+    .fu-file-preview .toolbar > .btn {
+        border-radius: 0 !important
+    }
+
+.fu-file-preview .fu-file-info-container {
+    position: absolute;
+    transition: opacity .3s;
+    opacity: 0;
+    visibility: visible;
+    background-color: rgba(24,80,159,0.7);
+    z-index: 2
+}
+
+    .fu-file-preview .fu-file-info-container .drag-gripper {
+        width: -webkit-fit-content;
+        width: -moz-fit-content;
+        width: fit-content;
+        cursor: move;
+        z-index: 10
+    }
+
+        .fu-file-preview .fu-file-info-container .drag-gripper .drag-icon {
+            width: 2.75rem;
+            height: 2.75rem;
+            line-height: 2.75rem
+        }
+
+    .fu-file-preview .fu-file-info-container .fu-file-info-name {
+        z-index: 2;
+        padding: 0 0.5rem;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+        line-height: 1.3;
+        max-height: calc(.875rem * 1.3 * 3);
+        max-width: 100%;
+        overflow: hidden;
+        word-break: break-all;
+        margin-bottom: .75rem
+    }
+
+    .fu-file-preview .fu-file-info-container .fu-preview-control-menu {
+        z-index: 5;
+        margin-top: -6px
+    }
+
+        .fu-file-preview .fu-file-info-container .fu-preview-control-menu > * {
+            margin-top: 6px
+        }
+
+.fu-file-preview:hover:not(.sortable-ghost) {
+    border: 1px solid #ced4da
+}
+
+    .fu-file-preview:hover:not(.sortable-ghost) .toolbar {
+        visibility: visible
+    }
+
+    .fu-file-preview:hover:not(.sortable-ghost) .fu-preview-overlay {
+        visibility: visible;
+        opacity: .5
+    }
+
+    .fu-file-preview:hover:not(.sortable-ghost) .fu-file-info-container {
+        opacity: 1;
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px)
+    }
+
+.fu-file-preview:not(.dz-success) .drag-gripper, .fu-file-preview:not(.dz-success) .fu-preview-control-menu, .fu-file-preview.dz-processing .drag-gripper, .fu-file-preview.dz-processing .fu-preview-control-menu {
+    visibility: hidden !important
+}
+
+.fu-file-preview.sortable-ghost .toolbar {
+    visibility: hidden
+}
+
+#duplicate-window .remaining-file-counter {
+    float: right;
+    padding-top: 10px
+}
+
+#duplicate-window .file-display {
+    border: 1px solid #ced4da
+}
+
+    #duplicate-window .file-display .file-info {
+        overflow: hidden
+    }
+
+    #duplicate-window .file-display .file-figure {
+        width: 100px;
+        height: 80px;
+        display: flex;
+        margin: 0;
+        align-items: center;
+        justify-content: center
+    }
+
+    #duplicate-window .file-display .file-img {
+        width: 100px;
+        height: 80px;
+        -o-object-fit: cover;
+        object-fit: cover
+    }
+
+    #duplicate-window .file-display .file-date {
+        white-space: nowrap;
+        overflow: hidden
+    }

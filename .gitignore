@@ -275,6 +275,9 @@ ServiceFabricBackup/
 *- [Bb]ackup ([0-9]).rdl
 *- [Bb]ackup ([0-9][0-9]).rdl
 
+# ASP.NET specific
+App_Data/   # <-- App_Data klasörünü ignore et
+
 # Microsoft Fakes
 FakesAssemblies/
 

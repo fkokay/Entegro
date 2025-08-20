@@ -1,4 +1,6 @@
-﻿namespace Entegro.Web.Models
+﻿using Entegro.Domain.Entities;
+
+namespace Entegro.Web.Models
 {
     public class MediaFileViewModel
     {
@@ -19,5 +21,23 @@
         public DateTime UpdatedOn { get; set; }
         public bool IsTransient { get; set; }
         public bool Deleted { get; set; }
+
+        public MediaFolderViewModel? Folder { get; set; }
+
+        public string Url
+        {
+            get
+            {
+                if (this.Folder == null)
+                {
+                    return $"/media/{Id}/{Name}";
+                }
+                else
+                {
+                    return $"/media/{Id}/{Folder.Name}/{Name}";
+                }
+               
+            }
+        }
     }
 }

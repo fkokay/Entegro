@@ -1,4 +1,6 @@
-﻿namespace Entegro.Application.DTOs.Brand
+﻿using Entegro.Application.DTOs.MediaFile;
+
+namespace Entegro.Application.DTOs.Brand
 {
     public class UpdateBrandDto
     {
@@ -10,5 +12,7 @@
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
+
+        public MediaFileDto? MediaFile { get; set; }
     }
 }

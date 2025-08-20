@@ -144,12 +144,30 @@ namespace Entegro.Application.Mappings
             CreateMap<MediaFolder, MediaFolderDto>().ReverseMap();
             CreateMap<MediaFolder, CreateMediaFolderDto>().ReverseMap();
             CreateMap<MediaFolder, UpdateMediaFolderDto>().ReverseMap();
+
+            CreateMap<MediaFolderDto, CreateMediaFolderDto>().ReverseMap();
+            CreateMap<MediaFolderDto, UpdateMediaFolderDto>().ReverseMap();
+
+            CreateMap<CreateMediaFolderDto, MediaFolderDto>().ReverseMap();
+            CreateMap<UpdateMediaFolderDto, MediaFolderDto>().ReverseMap();
+
+            CreateMap<PagedResult<MediaFolder>, PagedResult<MediaFolderDto>>().ReverseMap();
+            CreateMap<PagedResult<MediaFolderDto>, PagedResult<MediaFolder>>().ReverseMap();
             #endregion
 
             #region mediafile
             CreateMap<MediaFile, MediaFileDto>().ReverseMap();
             CreateMap<MediaFile, CreateMediaFileDto>().ReverseMap();
             CreateMap<MediaFile, UpdateMediaFileDto>().ReverseMap();
+
+            CreateMap<MediaFileDto, CreateMediaFileDto>().ReverseMap();
+            CreateMap<MediaFileDto, UpdateMediaFileDto>().ReverseMap();
+
+            CreateMap<CreateMediaFileDto, MediaFileDto>().ReverseMap();
+            CreateMap<UpdateMediaFileDto, MediaFileDto>().ReverseMap();
+
+            CreateMap<PagedResult<MediaFile>, PagedResult<MediaFileDto>>().ReverseMap();
+            CreateMap<PagedResult<MediaFileDto>, PagedResult<MediaFile>>().ReverseMap();
             #endregion
 
             #region ProductAttribute

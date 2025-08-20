@@ -16,9 +16,6 @@
                         Seo
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-image" type="button" role="tab">Resimler</button>
-                </li>
             </ul>
         </div>
 
@@ -57,6 +54,59 @@
                             <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
                             <div class="col-sm-9">
                                 @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="MediaFileId">Resim</label>
+                            <div class="col-sm-9">
+                                <div class="fu-container">
+                                    <div class="dropzone-container">
+                                        <div class="fu-thumb fu-filename rounded @(Model.MediaFileId.HasValue ? "" : "empty")" data-current-filename="@(Model.MediaFile == null ? "" : Model.MediaFile.Name)">
+                                            <figure class="file-figure">
+                                                @if (Model.MediaFile == null)
+                                                {
+                                                    <i class="file-icon show fa-5x fa-fw far fa-file-image" style="color: #e77c00"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="file-icon fa-5x fa-fw far fa-file-image" style="color: #e77c00"></i>
+                                                    <picture class="file-thumb show loaded" data-type="image">
+                                                        <img class="file-img" data-src="@Model.MediaFile.Url" src="@Model.MediaFile.Url">
+                                                    </picture>
+                                                }
+                                            </figure>
+                                        </div>
+                                        @Html.HiddenFor(m => m.MediaFileId, new { @class = "hidden" })
+                                        <div class="fu-controls">
+                                            <div>
+                                                <div class="dropzone-target">
+                                                    <div class="dropzone-file-info d-flex align-items-center">
+                                                        <div class="fu-message text-truncate empty" title="Dosya yükle">
+                                                            Dosya yükle
+                                                        </div>
+
+                                                        <a href="#" class="fu-remove remove btn btn-clear-dark btn-sm btn-no-border btn-icon rounded-circle" title="Dosyayı kaldır">
+                                                            <i class="fu-remove-icon fs-h6 p-0 text-danger">×</i>
+                                                        </a>
+                                                    </div>
+
+                                                    <div id="MediaUpload" class="fu-fileupload" data-dialog-url="/media/fileconflictresolutiondialog/" data-assignment-url="" data-remove-url="" data-sort-url="" data-entity-id="0" data-type-filter="image" data-upload-url="/media/upload/?isTransient=True&amp;path=catalog&amp;entityType=Brand" data-accept=".avif,.bmp,.gif,.ico,.jfif,.jpeg,.jpg,.png,.svg,.webp" data-show-remove-after-upload="true">
+                                                        <input type="hidden" id="MediaUpload" name="MediaUpload">
+                                                        <div class="fu-buttons"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="fu-progress">
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -101,27 +151,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- GÖRSEL -->
-            <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
-                @if (Model.Id > 0)
-                {
-                    <div class="row g-3 p-3">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div id="myDropzoneDiv" class="dropzone"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-danger">
-                        Bu kategoriye resim yüklemek için önce kategoriyi kaydetmeniz gerekmektedir.
-                    </div>
-                }
             </div>
         </div>
     </div>

@@ -11,14 +11,10 @@ namespace Entegro.Web.Models
         public string? MetaTitle { get; set; }
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
-
-        public string? MediaFileName { get; set; }
-        public string? MediaFileUrl { get; set; }
-        public int MediaFileSize { get; set; }
         public int DisplayOrder { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
-        public MediaFileDto? MediaFile { get; set; }
+        public MediaFileViewModel? MediaFile { get; set; }
     }
 }

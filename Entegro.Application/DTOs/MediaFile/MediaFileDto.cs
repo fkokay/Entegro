@@ -1,4 +1,6 @@
-﻿namespace Entegro.Application.DTOs.MediaFile
+﻿using Entegro.Application.DTOs.MediaFolder;
+
+namespace Entegro.Application.DTOs.MediaFile
 {
     public class MediaFileDto
     {
@@ -19,5 +21,23 @@
         public DateTime UpdatedOn { get; set; }
         public bool IsTransient { get; set; }
         public bool Deleted { get; set; }
+
+        public string Url
+        {
+            get
+            {
+                if (this.Folder == null)
+                {
+                    return $"/media/{Id}/{Name}";
+                }
+                else
+                {
+                    return $"/media/{Id}/{Folder.Name}/{Name}";
+                }
+
+            }
+        }
+
+        public MediaFolderDto? Folder { get; set; }
     }
 }

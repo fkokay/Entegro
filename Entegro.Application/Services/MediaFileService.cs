@@ -29,7 +29,7 @@ namespace Entegro.Application.Services
             return model.Id;
         }
 
-        public async Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, int folderId)
+        public async Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file,string fileName, int? folderId)
         {
             var extension = Path.GetExtension(file.FileName) ?? "";
             var mimeType = file.ContentType ?? "application/octet-stream";
@@ -46,15 +46,14 @@ namespace Entegro.Application.Services
                 pixelSize = width * height;
                 mediaType = "image";
             }
-            else { }
 
 
             return new CreateMediaFileDto
             {
                 FolderId = folderId,
-                Name = Path.GetFileName(file.FileName),
-                Alt = Path.GetFileNameWithoutExtension(file.FileName),
-                Title = Path.GetFileName(file.FileName),
+                Name = fileName,
+                Alt = "",
+                Title = "",
                 Extension = extension,
                 MimeType = mimeType,
                 MediaType = mediaType,
@@ -73,11 +72,12 @@ namespace Entegro.Application.Services
         public async Task<bool> DeleteAsync(int mediaFileId)
         {
             var mediaFile = await _mediaFileRepository.GetByIdAsync(mediaFileId);
-            var mediaFolder = await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value);
             if (mediaFile == null)
             {
                 throw new KeyNotFoundException($"MediaFile with ID {mediaFileId} not found.");
             }
+
+            var mediaFolder = mediaFile.FolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value) : null;
 
 
             string folderName = mediaFile.Folder?.Name ?? ""; // default Brand olabilir
@@ -90,8 +90,11 @@ namespace Entegro.Application.Services
             }
             await _mediaFileRepository.DeleteAsync(mediaFile);
 
-            mediaFolder.FilesCount--;
-            await _mediaFolderRepository.UpdateAsync(mediaFolder);
+            if (mediaFolder != null)
+            {
+                mediaFolder.FilesCount--;
+                await _mediaFolderRepository.UpdateAsync(mediaFolder);
+            }
             return true;
         }
 
@@ -121,13 +124,13 @@ namespace Entegro.Application.Services
             return mediaFileDto;
         }
 
-        public async Task<MediaFileDto?> GetByNameAndFolderAsync(string name, int folderId)
+        public async Task<MediaFileDto?> GetByNameAndFolderAsync(string name, int? folderId)
         {
             var entity = await _mediaFileRepository.GetByNameAndFolderAsync(name, folderId);
             return entity is null ? null : _mapper.Map<MediaFileDto>(entity);
         }
 
-        public async Task<bool> OverwriteByNameAsync(string name, int folderId, CreateMediaFileDto builtDto)
+        public async Task<bool> OverwriteByNameAsync(string name, int? folderId, CreateMediaFileDto builtDto)
         {
             var entity = await _mediaFileRepository.GetByNameAndFolderAsync(name, folderId);
             if (entity is null) return false;
