@@ -2,6 +2,7 @@
 {
     public class MediaFolderViewModel
     {
+        public int Id { get; set; }
         public int? ParentId { get; set; }
         public string TreePath { get; set; } = null!;
         public string Name { get; set; } = null!;

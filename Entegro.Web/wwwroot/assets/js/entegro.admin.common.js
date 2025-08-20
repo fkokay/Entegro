@@ -1,0 +1,2 @@
+﻿Entegro.Admin = {
+};

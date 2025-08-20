@@ -70,9 +70,31 @@ namespace Entegro.Web.Controllers
                 DisplayOrder = brand.DisplayOrder,
                 MetaKeywords = brand.MetaKeywords,
                 MediaFileId = brand.MediaFileId,
-                MediaFileName = brand.MediaFile?.Name,
-                MediaFileSize = size.HasValue ? (int)size.Value : 0,
-                MediaFileUrl = $"/uploads/Brand/{brand.MediaFile?.Name}",
+                MediaFile = brand.MediaFile == null ? null : new MediaFileViewModel()
+                {
+                    Alt = brand.MediaFile.Alt,
+                    CreatedOn = brand.MediaFile.CreatedOn,
+                    Deleted = brand.MediaFile.Deleted,
+                    Extension = brand.MediaFile.Extension,
+                    FolderId = brand.MediaFile.FolderId,
+                    Height = brand.MediaFile.Height,
+                    Id = brand.MediaFile.Id,
+                    IsTransient = brand.MediaFile.IsTransient,
+                    MediaType = brand.MediaFile.MediaType,
+                    Metadata = brand.MediaFile.Metadata,
+                    MimeType = brand.MediaFile.MimeType,
+                    Name = brand.MediaFile.Name,
+                    PixelSize = brand.MediaFile.PixelSize,
+                    Size = brand.MediaFile.Size,
+                    Title = brand.MediaFile.Title,
+                    UpdatedOn = brand.MediaFile.UpdatedOn,
+                    Width = brand.MediaFile.Width,
+                    Folder = brand.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    {
+                        Id = brand.MediaFile.Folder.Id,
+                        Name = brand.MediaFile.Folder.Name,
+                    }
+                }
             };
             return View(brandModel);
         }
@@ -87,10 +109,11 @@ namespace Entegro.Web.Controllers
                     Id = model.Id,
                     Name = model.Name,
                     Description = model.Description,
+                    MediaFileId = model.MediaFileId,
                     MetaDescription = model.MetaDescription,
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
-                    MetaKeywords = model.MetaKeywords
+                    MetaKeywords = model.MetaKeywords,
                 };
                 await _brandService.UpdateBrandAsync(updateDto);
                 return Json(new { success = true });

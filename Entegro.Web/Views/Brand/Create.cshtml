@@ -23,9 +23,28 @@
 </form>
 
 @section scripts {
-
-   
-
+    <script data-origin="FileUploader">
+        $(function () {
+            // Init dropzone
+            $("#MediaUpload").dropzoneWrapper({
+                onUploading: null,
+                onUploadCompleted: null,
+                onAborted: null,
+                onError: null,
+                onFileRemove: null,
+                onCompleted: null,
+                onMediaSelected: null,
+                maxFiles: 1,
+                maxFilesSize: 102400,
+                timeout: 300000,
+                clickableElement: null,
+                previewContainerId: "",
+                showRemoveButton: true,
+                showRemoveButtonAfterUpload: true,
+                downloadEnabled: false
+            });
+        });
+    </script>
     <script>
         const formValidation = FormValidation.formValidation(
             document.getElementById('brand-form'),

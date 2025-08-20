@@ -55,21 +55,6 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
-            //var query = _context.Brands.AsQueryable();
-
-            //var totalCount = await query.CountAsync();
-            //var brands = await query
-            //    .Skip((pageNumber - 1) * pageSize)
-            //    .Take(pageSize)
-            //    .ToListAsync();
-
-            //return new PagedResult<Brand>
-            //{
-            //    Items = brands,
-            //    TotalCount = totalCount,
-            //    PageNumber = pageNumber,
-            //    PageSize = pageSize
-            //};
         }
 
         public async Task<Brand?> GetByIdAsync(int id)
@@ -81,6 +66,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Brands
              .Include(b => b.MediaFile)
+             .ThenInclude(b=>b.Folder)
              .FirstOrDefaultAsync(b => b.Id == id);
         }
 
@@ -91,22 +77,9 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Brand brand)
         {
-            var existingBrand = await _context.Brands.FindAsync(brand.Id);
-            if (existingBrand == null)
-            {
-                throw new KeyNotFoundException($"Brand with ID {brand.Id} not found.");
-            }
+            brand.UpdatedOn = DateTime.Now;
 
-            existingBrand.Name = brand.Name;
-            existingBrand.Description = brand.Description;
-            existingBrand.MetaDescription = brand.MetaDescription;
-            existingBrand.MetaTitle = brand.MetaTitle;
-            existingBrand.DisplayOrder = brand.DisplayOrder;
-            existingBrand.MetaKeywords = brand.MetaKeywords;
-            existingBrand.CreatedOn = brand.CreatedOn;
-            existingBrand.UpdatedOn = DateTime.Now;
-
-            _context.Brands.Update(existingBrand);
+            _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
         }
     }

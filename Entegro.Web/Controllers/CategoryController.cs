@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,7 @@ namespace Entegro.Web.Controllers
             {
                 Name = model.Name,
                 ParentCategoryId = model.ParentCategoryId,
+                MediaFileId = model.MediaFileId,
                 Description = model.Description,
                 MetaDescription = model.MetaDescription,
                 MetaTitle = model.MetaTitle,
@@ -85,9 +87,32 @@ namespace Entegro.Web.Controllers
                 TreePath = category.TreePath,
                 ParentCategoryFormattedName = formattedParentName,
                 MediaFileId = category.MediaFileId,
-                MediaFileName = category.MediaFile?.Name,
-                MediaFileSize = size.HasValue ? (int)size.Value : 0,
-                MediaFileUrl = $"/uploads/Category/{category.MediaFile?.Name}",
+                MediaFile = category.MediaFile == null ? null : new MediaFileViewModel()
+                {
+                    Alt = category.MediaFile.Alt,
+                    CreatedOn = category.MediaFile.CreatedOn,
+                    Deleted = category.MediaFile.Deleted,
+                    Extension = category.MediaFile.Extension,
+                    FolderId = category.MediaFile.FolderId,
+                    Height = category.MediaFile.Height,
+                    Id = category.MediaFile.Id,
+                    IsTransient = category.MediaFile.IsTransient,
+                    MediaType = category.MediaFile.MediaType,
+                    Metadata = category.MediaFile.Metadata,
+                    MimeType = category.MediaFile.MimeType,
+                    Name = category.MediaFile.Name,
+                    PixelSize = category.MediaFile.PixelSize,
+                    Size = category.MediaFile.Size,
+                    Title = category.MediaFile.Title,
+                    UpdatedOn = category.MediaFile.UpdatedOn,
+                    Width = category.MediaFile.Width,
+                    Folder = category.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    {
+                        Id = category.MediaFile.Folder.Id,
+                        Name = category.MediaFile.Folder.Name,
+                    }
+                }
+
             };
 
 
@@ -104,6 +129,7 @@ namespace Entegro.Web.Controllers
                     Id = model.Id,
                     ParentCategoryId = model.ParentCategoryId,
                     Name = model.Name,
+                    MediaFileId = model.MediaFileId,
                     Description = model.Description,
                     MetaDescription = model.MetaDescription,
                     MetaTitle = model.MetaTitle,

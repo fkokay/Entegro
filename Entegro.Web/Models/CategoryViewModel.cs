@@ -16,11 +16,8 @@ namespace Entegro.Web.Models
         public int DisplayOrder { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public string? MediaFileName { get; set; }
-        public string? MediaFileUrl { get; set; }
-        public int MediaFileSize { get; set; }
         public string? ParentCategoryFormattedName { get; set; }
-        public MediaFileDto? MediaFile { get; set; }
+        public MediaFileViewModel? MediaFile { get; set; }
 
     }
 }
