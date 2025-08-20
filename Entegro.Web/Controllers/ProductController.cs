@@ -34,6 +34,8 @@ namespace Entegro.Web.Controllers
             _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
             _productImageMappingService = productImageMappingService;
         }
+
+        #region Product list / create / edit / delete
         public IActionResult Index()
         {
             return List();
@@ -169,7 +171,81 @@ namespace Entegro.Web.Controllers
                 data = result.Items
             });
         }
+        #endregion
 
+        #region Product Categories
+        [HttpPost]
+        public async Task<IActionResult> ProductCategoryList(int productId, CancellationToken ct)
+        {
+            var data = await _productCategoryMappingService.GetCategoryPathsByProductAsync(productId, ct);
+            var results = data.Select(d => new { id = d.Id, text = d.CategoryPath, displayOrder = d.DisplayOrder });
+            return Json(new { results });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProductCategoryInsert([FromBody] CreateProductCategoryDto createProductCategoryDto)
+        {
+            if (ModelState.IsValid)
+            {
+                int id = await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategoryDto);
+                return Json(new { success = true, id });
+            }
+            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProductCategoryDelete(int id)
+        {
+            bool isSuccess = await _productCategoryMappingService.DeleteProductCategoryAsync(id);
+            return Json(new { success = isSuccess });
+        }
+
+        #endregion
+
+        #region Product Pictures
+        [HttpPost]
+        public async Task<IActionResult> ProductMediaFilesAdd(string mediaFileIds, int entityId)
+        {
+            bool success = true;
+            var response = new List<dynamic>();
+
+            //dynamic respObj = new
+            //{
+            //    MediaFileId = id,
+            //    ProductMediaFileId = productPicture.Id,
+            //    file?.Name
+            //};
+
+            return Json(new
+            {
+                success,
+                response,
+                message = "Resim başarıyla eklendi"
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProductPictureDelete(int id)
+        {
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SortPictures(string pictures, int entityId)
+        {
+            var response = new List<dynamic>();
+
+            //dynamic file = new
+            //{
+            //    productPicture.DisplayOrder,
+            //    productPicture.MediaFileId,
+            //    EntityMediaId = productPicture.Id
+            //};
+
+            return Json(new { success = true, response });
+        }
+
+        #endregion
 
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
         {
@@ -259,75 +335,6 @@ namespace Entegro.Web.Controllers
                 new SelectListItem { Text = "Metre", Value = "Metre" },
                 new SelectListItem { Text = "Kutu", Value = "Kutu" }
             };
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Get(int productId, CancellationToken ct)
-        {
-            var data = await _productCategoryMappingService.GetCategoryPathsByProductAsync(productId, ct);
-            var results = data.Select(d => new { id = d.Id, text = d.CategoryPath, displayOrder = d.DisplayOrder });
-            return Json(new { results });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> DeleteProductCategory(int id)
-        {
-            bool isSuccess = await _productCategoryMappingService.DeleteProductCategoryAsync(id);
-            return Json(new { success = isSuccess });
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> CreateProductCategory([FromBody] CreateProductCategoryDto createProductCategoryDto)
-        {
-            if (ModelState.IsValid)
-            {
-                int id = await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategoryDto);
-                return Json(new { success = true, id });
-            }
-            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ProductMediaFilesAdd(string mediaFileIds, int entityId)
-        {
-            bool success = true;
-            var response = new List<dynamic>();
-
-            //dynamic respObj = new
-            //{
-            //    MediaFileId = id,
-            //    ProductMediaFileId = productPicture.Id,
-            //    file?.Name
-            //};
-
-            return Json(new
-            {
-                success,
-                response,
-                message = "Resim başarıyla eklendi"
-            });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ProductPictureDelete(int id)
-        {
-            return StatusCode((int)HttpStatusCode.OK);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SortPictures(string pictures, int entityId)
-        {
-            var response = new List<dynamic>();
-
-            //dynamic file = new
-            //{
-            //    productPicture.DisplayOrder,
-            //    productPicture.MediaFileId,
-            //    EntityMediaId = productPicture.Id
-            //};
-
-            return Json(new { success = true, response });
         }
     }
 }
