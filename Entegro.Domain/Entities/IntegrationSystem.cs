@@ -1,11 +1,6 @@
 ﻿using Entegro.Domain.Common;
 using Entegro.Domain.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
@@ -33,14 +28,14 @@ namespace Entegro.Domain.Entities
                     IntegrationSystemType.Commerce => "E-Ticareti Entegrasyonu",
                     IntegrationSystemType.Marketplace => "Pazaryeri Entegrasyonu",
                     IntegrationSystemType.Cargo => "Kargo Entegrasyonu",
-                    IntegrationSystemType.EInvoice =>"E-Fatura Entegrasyonu",
+                    IntegrationSystemType.EInvoice => "E-Fatura Entegrasyonu",
                 };
             }
         }
         public string Name { get; set; }
-        public string? Description { get; set; } 
+        public string? Description { get; set; }
 
-        public virtual ICollection<IntegrationSystemParameter> Parameters { get; set; } = new List<IntegrationSystemParameter>();
-        public virtual ICollection<IntegrationSystemLog> Logs { get; set; } = new List<IntegrationSystemLog>();
+        public ICollection<IntegrationSystemParameter> Parameters { get; set; } = new List<IntegrationSystemParameter>();
+        public ICollection<IntegrationSystemLog> Logs { get; set; } = new List<IntegrationSystemLog>();
     }
 }

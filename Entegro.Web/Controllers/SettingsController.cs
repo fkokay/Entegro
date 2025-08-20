@@ -1,12 +1,9 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
-using Entegro.Infrastructure.Migrations;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -24,7 +21,7 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
-
+        // ----------------ERP Entegrasyonları----------------
         public async Task<IActionResult> Erp()
         {
             var integrationSystemErp = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.ERP);
@@ -54,11 +51,32 @@ namespace Entegro.Web.Controllers
                     model.ApiPassword = apiPassword?.Value;
 
 
-                    return View($"Erp.Logo",model);
+                    return View($"Erp.Logo", model);
                 case "Netsis":
-                    return View($"Erp.Netsis");
+
+                    var apiUrlForNetsis = integrationSystemErp.Parameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
+                    var apiUserForNetsis = integrationSystemErp.Parameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
+                    var apiPasswordForNetsis = integrationSystemErp.Parameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
+
+                    NetsisErpSettingsViewModel modelForNetsis = new NetsisErpSettingsViewModel();
+                    modelForNetsis.IntegrationSystemId = integrationSystemErp.Id;
+                    modelForNetsis.ErpType = erpType.Value;
+                    modelForNetsis.ApiUrl = apiUrlForNetsis?.Value;
+                    modelForNetsis.ApiUser = apiUserForNetsis?.Value;
+                    modelForNetsis.ApiPassword = apiPasswordForNetsis?.Value;
+                    return View($"Erp.Netsis", modelForNetsis);
                 case "Opak":
-                    return View($"Erp.Opak");
+                    var apiUrlForOpak = integrationSystemErp.Parameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
+                    var apiUserForOpak = integrationSystemErp.Parameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
+                    var apiPasswordForOpak = integrationSystemErp.Parameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
+
+                    OpakErpSettingsViewModel modelForOpak = new OpakErpSettingsViewModel();
+                    modelForOpak.IntegrationSystemId = integrationSystemErp.Id;
+                    modelForOpak.ErpType = erpType.Value;
+                    modelForOpak.ApiUrl = apiUrlForOpak?.Value;
+                    modelForOpak.ApiUser = apiUserForOpak?.Value;
+                    modelForOpak.ApiPassword = apiPasswordForOpak?.Value;
+                    return View($"Erp.Opak", modelForOpak);
             }
 
             return NotFound();
@@ -150,13 +168,199 @@ namespace Entegro.Web.Controllers
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            return View($"Erp.{model.ErpType}",model);
+            return View($"Erp.{model.ErpType}", model);
         }
 
-        public IActionResult ECommerce()
+        [HttpPost]
+        public async Task<IActionResult> ErpDelete([FromBody] int integrationSystemId)
         {
-            return View();
+            var isSuccess = await _integrationSystemService.DeleteAsync(integrationSystemId);
+            if (isSuccess)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Silinecek Entegrasyon Bulunamadı" });
         }
+        // ----------------ERP Entegrasyonları----------------
+
+
+
+        // ----------------E-Ticaret Entegrasyonları----------------
+        [HttpGet]
+        public async Task<IActionResult> ECommerce()
+        {
+            var integrationSystemCommerce = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.Commerce);
+            if (integrationSystemCommerce == null)
+            {
+                return View();
+            }
+
+
+            var commerceType = integrationSystemCommerce.Parameters.Where(m => m.Key == "CommerceType").FirstOrDefault();
+            if (commerceType == null)
+            {
+                return NotFound();
+            }
+
+            var myCommerce = await _integrationSystemService.GetAllAsync();
+            ViewBag.MyCommerce = myCommerce.Where(x => x.IntegrationSystemTypeId == 2).
+                Select(m => new IntegrationSystemViewModel
+                {
+                    Id = m.Id,
+                    Description = m.Description,
+                    IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                    Name = m.Name
+                });
+
+
+            return View(integrationSystemCommerce);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ECommerce(CreateIntegrationSystemViewModel model)
+        {
+            var createIntegrationSystem = new CreateIntegrationSystemDto
+            {
+                Name = model.ModelCommerceName,
+                IntegrationSystemTypeId = (int)IntegrationSystemType.Commerce,
+                Description = model.ModalDescription
+            };
+
+            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
+
+            // Ana parametre
+            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
+            {
+                IntegrationSystemId = integrationSystemId,
+                Key = "CommerceType",
+                Value = model.EcommerceType
+            });
+
+
+            return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> ECommerceSettings(int integrationSystemCommerceId)
+        {
+
+            var integrationSystemCommerce = await _integrationSystemService.GetByIdAsync(integrationSystemCommerceId);
+            if (integrationSystemCommerce == null)
+            {
+                return View();
+            }
+
+
+            var commerceType = integrationSystemCommerce.Parameters.Where(m => m.Key == "CommerceType" & m.IntegrationSystemId == integrationSystemCommerceId).FirstOrDefault();
+            if (commerceType == null)
+            {
+                return NotFound();
+            }
+            switch (commerceType.Value)
+            {
+                case "Smartstore":
+
+                    var apiUrl = integrationSystemCommerce.Parameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemCommerceId).FirstOrDefault();
+                    var apiUser = integrationSystemCommerce.Parameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemCommerceId).FirstOrDefault();
+                    var apiPassword = integrationSystemCommerce.Parameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemCommerceId).FirstOrDefault();
+
+                    SmartstoreCommerceSettingsViewModel model = new SmartstoreCommerceSettingsViewModel();
+                    model.IntegrationSystemId = integrationSystemCommerceId;
+                    model.CommerceType = commerceType.Value;
+                    model.ApiUrl = apiUrl?.Value;
+                    model.ApiUser = apiUser?.Value;
+                    model.ApiPassword = apiPassword?.Value;
+
+                    return View($"ECommerce.Smartstore", model);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CommerceParameterSmartstore(SmartstoreCommerceSettingsViewModel model)
+        {
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+            if (apiUrl == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUrl";
+                createIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUrl.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUrl";
+                updateIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            //return View($"ECommerce.{model.CommerceType}", model);
+            return RedirectToAction("ecommerce");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ECommerceDelete([FromBody] int integrationSystemId)
+        {
+            var isSuccess = await _integrationSystemService.DeleteAsync(integrationSystemId);
+            if (isSuccess)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Silinecek E-Ticaret Bulunamadı" });
+        }
+
+        // ----------------E-Ticaret Entegrasyonları----------------
+
+
+
 
         public IActionResult Marketplace()
         {

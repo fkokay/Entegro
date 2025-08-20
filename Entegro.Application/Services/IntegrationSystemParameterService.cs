@@ -76,6 +76,18 @@ namespace Entegro.Application.Services
             return integrationSystemParameterDto;
         }
 
+        public async Task<IntegrationSystemParameterDto?> GetByKeyAsync(string key, int integrationSystemId)
+        {
+            var integrationSystemParameter = await _integrationSystemParameterRepository.GetByKeyAsync(key, integrationSystemId);
+            if (integrationSystemParameter == null)
+            {
+                return null;
+            }
+
+            var integrationSystemParameterDto = _mapper.Map<IntegrationSystemParameterDto>(integrationSystemParameter);
+            return integrationSystemParameterDto;
+        }
+
         public async Task<bool> UpdateAsync(UpdateIntegrationSystemParameterDto integrationSystemParameter)
         {
             await _integrationSystemParameterRepository.UpdateAsync(_mapper.Map<IntegrationSystemParameter>(integrationSystemParameter));

@@ -1,0 +1,128 @@
+﻿@model CountryViewModel
+@{
+    ViewData["Title"] = "Yeni Bir Ülke Ekle";
+}
+
+<form asp-action="Create" id="country-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ayarlar/</span><span class="text-muted fw-light"> Ülkeler /</span> Yeni Bir Ülke Ekle</h4>
+
+        <div class="row">
+            <partial name="_CreateOrUpdate" model="Model" />
+            <div class="col-lg-3 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" id="save-btn" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">Vazgeç</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script>
+        const formValidation = FormValidation.formValidation(
+            document.getElementById('country-form'),
+            {
+                locale: 'tr_TR',
+                localization: FormValidation.locales.tr_TR,
+                fields: {
+                    'Name': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Ülke adı boş bırakılamaz.'
+                            },
+                            stringLength: {
+                                min: 3,
+                                message: 'Ülke adı en az 3 karakter olmalıdır.'
+                            }
+                        }
+                    },
+                    'DisplayOrder': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Sıra boş bırakılamaz.'
+                            },
+                            numeric: {
+                                message: 'Sıra sadece sayı olmalıdır.'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        eleValidClass: '',
+                        rowSelector: '.mb-3'  
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    autoFocus: new FormValidation.plugins.AutoFocus()
+                },
+                init: instance => {
+                    instance.on('plugins.message.placed', function (e) {
+                        if (e.element.parentElement.classList.contains('input-group')) {
+                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                        }
+                    });
+
+                    instance.on('core.form.valid', function () {
+                        const $form = $('#country-form');
+                        const serializedData = $form.serialize();
+
+                        $.ajax({
+                            url: '@Url.Action("Create", "Countries")',
+                            type: 'POST',
+                            data: serializedData,
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Başarılı!',
+                                        text: 'Ülke başarıyla kaydedildi.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("List", "Countries")';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message || 'Bir hata oluştu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    });
+
+                }
+            }
+        );
+
+        
+    </script>
+}

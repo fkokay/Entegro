@@ -1,0 +1,164 @@
+﻿@model CountryViewModel
+
+@Html.HiddenFor(m => m.Id)
+
+<div class="col-lg-9 col-12 mb-lg-0 mb-4">
+    <div class="card mb-3">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" role="tab" aria-selected="true">
+                        Genel
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-city" role="tab" aria-selected="false" tabindex="-1">
+                        Şehirler
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
+                <div class="row g-3">
+                    <!-- Adı -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Ad</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Display Order -->
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Published">Yayınlandı</label>
+                            <div class="col-sm-9">
+                                <label class="switch switch-lg">
+                                    @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
+                                    <span class="switch-toggle-slider">
+                                        <span class="switch-on"></span>
+                                        <span class="switch-off"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="form-tabs-city" role="tabpanel">
+                @if (Model.Id>0)
+                {
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCity">
+                        Şehir Ekle
+                    </button>
+
+                    <div class="row g-3 p-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <h5 class="card-header">Şehirler</h5>
+                                <div class="table-responsive text-nowrap">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Şehir Adı</th>
+                                                <th>Yayınlandı</th>
+                                                <th>İşlemler</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0">
+                                            @foreach (var city in Model.Cities)
+                                            {
+                                                <tr>
+                                                    <td>@city.Id</td>
+                                                    <td>@city.Name</td>
+                                                    <td>@city.Published</td>
+                                                    <td></td>
+                                                </tr>
+                                            }
+                                            
+                                           
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ülkeye şehir eklemek için önce ülkeyi kaydetmeniz gerekmektedir.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="createCity" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Şehir Bilgileri</h3>
+                </div>
+                <form id="createCityForm" class="row g-3" onsubmit="return false">
+                    <input type="hidden" value="@Model.Id"/>
+                    <div class="col-12 col-md-12">
+                        <label class="form-label" for="cityName">Adı</label>
+                        <input type="text"
+                               id="cityName"
+                               name="cityName"
+                               class="form-control"
+                               placeholder="İstanbul" />
+                    </div>
+                    <div class="col-12 col-md-12 mt-3">
+                        <label class="form-label" for="displayOrder">Sıra</label>
+                        <input type="number"
+                               id="displayOrder"
+                               name="DisplayOrder"
+                               class="form-control"
+                               value="0" min="0" />
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label class="switch">
+                            <input type="checkbox" class="switch-input" checked/>
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on"></span>
+                                <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Yayınlandı</span>
+                        </label>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+                        <button type="reset"
+                                class="btn btn-label-secondary"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Kapat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

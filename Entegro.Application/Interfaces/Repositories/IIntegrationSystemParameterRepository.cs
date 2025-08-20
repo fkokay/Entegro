@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Repositories
     {
         Task<IntegrationSystemParameter?> GetByIdAsync(int id);
         Task<IntegrationSystemParameter?> GetByKeyAsync(string key);
+        Task<IntegrationSystemParameter?> GetByKeyAsync(string key, int integrationSystemId);
         Task<List<IntegrationSystemParameter>> GetAllAsync();
         Task<PagedResult<IntegrationSystemParameter>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(IntegrationSystemParameter integrationSystemParameter);

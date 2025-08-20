@@ -3,6 +3,7 @@ using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.City;
 using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Country;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.District;
 using Entegro.Application.DTOs.IntegrationSystem;
@@ -213,20 +214,35 @@ namespace Entegro.Application.Mappings
 
             #region City
             CreateMap<City, CityDto>().ReverseMap();
-            CreateMap<CreateCityDto, City>();
-            CreateMap<UpdateCityDto, City>();
+            CreateMap<CreateCityDto, City>().ReverseMap();
+            CreateMap<UpdateCityDto, City>().ReverseMap();
+            CreateMap<PagedResult<City>, PagedResult<CityDto>>().ReverseMap();
             #endregion
 
             #region Town
             CreateMap<Town, TownDto>().ReverseMap();
-            CreateMap<CreateTownDto, Town>();
-            CreateMap<UpdateTownDto, Town>();
+            CreateMap<CreateTownDto, Town>().ReverseMap();
+            CreateMap<UpdateTownDto, Town>().ReverseMap();
+            CreateMap<PagedResult<Town>, PagedResult<TownDto>>().ReverseMap();
             #endregion
 
             #region District    
             CreateMap<District, DistrictDto>().ReverseMap();
-            CreateMap<CreateDistrictDto, District>();
-            CreateMap<UpdateDistrictDto, District>();
+            CreateMap<CreateDistrictDto, District>().ReverseMap();
+            CreateMap<UpdateDistrictDto, District>().ReverseMap();
+            #endregion
+            #region Country    
+            CreateMap<Country, CountryDto>().ReverseMap();
+            CreateMap<Country, CreateCountryDto>().ReverseMap();
+            CreateMap<Country, UpdateCountryDto>().ReverseMap();
+            CreateMap<PagedResult<Country>, PagedResult<CountryDto>>().ReverseMap();
+            #endregion
+            #region ProductImage
+            CreateMap<ProductImageMapping, ProductImageDto>().ReverseMap();
+            CreateMap<ProductImageMapping, CreateProductImageDto>().ReverseMap();
+            CreateMap<ProductImageMapping, UpdateProductImageDto>().ReverseMap();
+            CreateMap<PagedResult<ProductImageMapping>, PagedResult<ProductImageDto>>().ReverseMap();
+
             #endregion
 
         }

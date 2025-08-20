@@ -102,6 +102,10 @@ builder.Services.AddScoped<IIntegrationSystemLogRepository, IntegrationSystemLog
 builder.Services.AddScoped<IIntegrationSystemLogService, IntegrationSystemLogService>();
 
 
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+
+
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddHttpClient();
 

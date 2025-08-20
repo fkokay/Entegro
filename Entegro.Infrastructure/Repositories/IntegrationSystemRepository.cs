@@ -52,12 +52,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<IntegrationSystem?> GetByIdAsync(int id)
         {
-            return await _context.IntegrationSystems.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.IntegrationSystems.Include(m => m.Parameters).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<IntegrationSystem?> GetByTypeIdAsync(int typeId)
         {
-            return await _context.IntegrationSystems.Include(m=>m.Parameters).FirstOrDefaultAsync(o => o.IntegrationSystemTypeId == typeId);
+            return await _context.IntegrationSystems.Include(m => m.Parameters).FirstOrDefaultAsync(o => o.IntegrationSystemTypeId == typeId);
         }
 
         public async Task UpdateAsync(IntegrationSystem integrationSystem)

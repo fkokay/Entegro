@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Country;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    internal class ICountryService
+    public interface ICountryService
     {
+        Task<PagedResult<CountryDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<List<CountryDto>> GetAllAsync();
+        Task<CountryDto> GetByIdAsync(int id);
+        Task AddAsync(CreateCountryDto dto);
+        Task UpdateAsync(UpdateCountryDto dto);
+        Task<bool> DeleteAsync(int id);
     }
 }

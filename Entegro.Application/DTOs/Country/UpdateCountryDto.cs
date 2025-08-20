@@ -1,13 +1,10 @@
-﻿using Entegro.Application.DTOs.City;
-
-namespace Entegro.Application.DTOs.Country
+﻿namespace Entegro.Application.DTOs.Country
 {
-    public class CountryDto
+    public class UpdateCountryDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public bool Published { get; set; }
         public int DisplayOrder { get; set; }
-        public List<CityDto> Cities { get; set; }
     }
 }
