@@ -872,7 +872,6 @@ namespace Entegro.Web.Controllers
         #endregion
 
 
-
         #region E-Fatura Entegrasyonları
 
         [HttpGet]
