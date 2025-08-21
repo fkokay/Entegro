@@ -7,5 +7,8 @@
         public int MediaFileId { get; set; }
         public string? Url { get; set; }
         public int DisplayOrder { get; set; }
+
+        public ProductViewModel Product { get; set; }
+        public MediaFileViewModel MediaFile { get; set; }
     }
 }

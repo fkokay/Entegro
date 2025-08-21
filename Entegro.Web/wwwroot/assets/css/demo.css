@@ -470,3 +470,22 @@
         white-space: nowrap;
         overflow: hidden
     }
+
+
+.fu-preview-control-menu .btn {
+    color: white;
+    border: 1px solid white;
+    transition-property: box-shadow, color, background-color, border-color, opacity, -webkit-transform !important;
+    transition-property: transform, box-shadow, color, background-color, border-color, opacity !important;
+    transition-property: transform, box-shadow, color, background-color, border-color, opacity, -webkit-transform !important;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1) !important;
+    transition-duration: .35s !important;
+}
+
+    .fu-preview-control-menu .btn:hover {
+        color: white;
+        border: 1px solid white;
+        -webkit-transform: translateY(-3px) !important;
+        transform: translateY(-3px) !important;
+    }
+

@@ -45,10 +45,44 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.Include(m => m.Brand).Include(m => m.ProductImages).AsQueryable();
+            var query = _context.Products.AsNoTracking().Include(m => m.Brand).Include(m => m.ProductImages).AsQueryable();
 
             var totalCount = await query.CountAsync();
-            var products = await query
+            var products = await query.Select(m => new Product()
+            {
+                Id = m.Id,
+                Barcode = m.Barcode,
+                Name = m.Name,
+                Gtin = m.Gtin,
+                Price = m.Price,
+                Brand = m.Brand,
+                BrandId = m.BrandId,
+                Code = m.Code,
+                CreatedOn = m.CreatedOn,
+                Currency = m.Currency,
+                Deleted = m.Deleted,
+                Description = m.Description,
+                Height = m.Height,
+                Length = m.Length,
+                ManufacturerPartNumber = m.ManufacturerPartNumber,
+                MetaDescription = m.MetaDescription,
+                MetaKeywords = m.MetaKeywords,
+                MetaTitle = m.MetaTitle,
+                OldPrice = m.OldPrice,
+                ProductAttributes = m.ProductAttributes,
+                ProductImages = m.ProductImages,
+                OrderItems = m.OrderItems,
+                ProductCategories = m.ProductCategories,
+                Published = m.Published,
+                SpecialPrice = m.SpecialPrice,
+                StockQuantity = m.StockQuantity,
+                Unit = m.Unit,
+                UpdatedOn = m.UpdatedOn,
+                VatInc = m.VatInc,
+                VatRate = m.VatRate,
+                Weight = m.Weight,
+                Width = m.Width
+            })
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -64,7 +98,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            return await _context.Products.Include(m => m.ProductAttributes).ThenInclude(m => m.Attribute).ThenInclude(m => m.Values).FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.Products.AsNoTracking().Include(m => m.ProductImages).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder).Include(m => m.ProductAttributes).ThenInclude(m => m.Attribute).ThenInclude(m => m.Values).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(Product product)

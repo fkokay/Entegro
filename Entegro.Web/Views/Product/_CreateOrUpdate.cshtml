@@ -356,12 +356,7 @@
                         <div class="col-12">
                             <div class="fu-container xl">
                                 <div>
-
                                     <div class="fu-controls">
-
-
-
-
                                         <div class="dropzone-container">
                                             <div class="dropzone-target">
                                                 <div class="dropzone-file-info d-flex align-items-center">
@@ -383,6 +378,40 @@
 
                                         <!-- Placeholder to paste preview container into -->
                                         <div id="preview-106864758" class="d-flex flex-wrap preview-container mt-3">
+                                            @foreach (var item in Model.ProductImages)
+                                            {
+                                                <div class="fu-file-preview dz-image-preview dz-success dz-complete shadow-sm" data-display-order="@item.DisplayOrder" data-media-id="@item.MediaFileId" data-media-name="@item.MediaFile.Name" data-entity-media-id="@item.Id">
+
+                                                    <span class="main-pic-badge badge badge-success">Ana medya dosyası</span>
+                                                    <figure class="file-figure d-flex m-0 align-items-center justify-content-center file-thumb show loaded" data-type="image">
+                                                        <i class="file-icon fa-fw show d-none"></i>
+                                                        <img class="file-img" data-dz-thumbnail="" src="@item.MediaFile.Url">
+                                                    </figure>
+                                                    <!-- Media gallery preview overlay -->
+                                                    <div class="fu-file-info-container d-flex flex-column w-100 h-100 justify-content-between">
+                                                        <div class="drag-gripper align-middle">
+                                                            <i class="drag-icon fas fa-grip-vertical fs-h5 text-white p-0 text-center"></i>
+                                                        </div>
+                                                        <div class="fu-file-info h-100 w-100 d-flex position-absolute justify-content-center align-items-center">
+                                                            <div class="fu-file-info-name text-white font-weight-medium text-center">@item.MediaFile.Name</div>
+                                                        </div>
+                                                        <div class="fu-preview-control-menu w-100 d-flex flex-wrap justify-content-between px-2 pb-2 pt-0">
+                                                            <a href="#" class="fu-preview-control-set set-main-picture btn btn-sm btn-clear btn-3d btn-action btn-icon" title="Ana resim olarak ayarla">
+                                                                <i class="fa fa-image fs-h6"></i>
+                                                            </a>
+                                                            <a href="#" class="fu-preview-control-remove delete-entity-picture btn btn-sm btn-clear btn-3d btn-action" title="Medyayı kaldır">
+                                                                <span class="fs-sm">Kaldır</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="fu-progress">
+                                                        <!-- The file progress bar -->
+                                                        <div class="progress">
+                                                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>
                                         <div class="file-preview-template d-none">
                                             <div class="fu-file-preview dz-image-preview shadow-sm">

@@ -26,7 +26,6 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             }
 
             ProductImageDto productImage = new ProductImageDto();
-            productImage.Url = trendyolProductImage.url;
             productImage.DisplayOrder = 0;
 
             return productImage; ;

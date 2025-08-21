@@ -3,6 +3,7 @@ using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -388,6 +389,38 @@ namespace Entegro.Web.Controllers
                             Name = x.Name,
                             ProductAttributeId = x.ProductAttributeId,
                         }).ToList()
+                    }
+                }).ToList();
+                model.ProductImages = product.ProductImages.Select(m => new ProductImageViewModel()
+                {
+                    Id = m.Id,
+                    DisplayOrder = m.DisplayOrder,
+                    MediaFileId = m.MediaFileId,
+                    ProductId = m.ProductId,
+                    MediaFile = new MediaFileViewModel()
+                    {
+                        Alt = m.MediaFile.Alt,
+                        CreatedOn = m.MediaFile.CreatedOn,
+                        Deleted = m.MediaFile.Deleted,
+                        Extension = m.MediaFile.Extension,
+                        FolderId = m.MediaFile.FolderId,
+                        Height = m.MediaFile.Height,
+                        Id = m.MediaFile.Id,
+                        IsTransient = m.MediaFile.IsTransient,
+                        MediaType = m.MediaFile.MediaType,
+                        Metadata = m.MediaFile.Metadata,
+                        MimeType = m.MediaFile.MimeType,
+                        Name = m.MediaFile.Name,
+                        PixelSize = m.MediaFile.PixelSize,
+                        Size = m.MediaFile.Size,
+                        Title = m.MediaFile.Title,
+                        UpdatedOn = m.MediaFile.UpdatedOn,
+                        Width = m.MediaFile.Width,
+                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                        {
+                            Id = m.MediaFile.Folder.Id,
+                            Name = m.MediaFile.Folder.Name,
+                        }
                     }
                 }).ToList();
 

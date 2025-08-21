@@ -1,4 +1,7 @@
-﻿namespace Entegro.Application.DTOs.ProductImage
+﻿using Entegro.Application.DTOs.MediaFile;
+using Entegro.Application.DTOs.Product;
+
+namespace Entegro.Application.DTOs.ProductImage
 {
     public class ProductImageDto
     {
@@ -6,7 +9,9 @@
         public int ProductId { get; set; }
         public int MediaFileId { get; set; }
         public int DisplayOrder { get; set; }
-        public string? Url { get; set; }
+
+        public ProductDto Product { get; set; }
+        public MediaFileDto MediaFile { get; set; }
 
     }
 }
