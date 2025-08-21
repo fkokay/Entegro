@@ -1,6 +1,8 @@
-﻿@model ProductViewModel
+﻿@using System.Text.Json
+@model ProductViewModel
 @{
     ViewData["Title"] = "Edit";
+    var jsonProductVariantAttributeCombinations = JsonSerializer.Serialize(Model.ProductVariantAttributeCombinations);
 }
 <form asp-action="Edit" id="product-form">
     <div class="container-fluid flex-grow-1 container-p-y">
@@ -40,7 +42,6 @@
     <link rel="stylesheet" href="~/assets/vendor/libs/quill/editor.css" />
     <script src="/assets/vendor/libs/quill/katex.js"></script>
     <script src="/assets/vendor/libs/quill/quill.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serializeJSON/3.2.0/jquery.serializejson.min.js"></script>
     <script src="/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
 
     <!-- Page JS -->
@@ -555,6 +556,7 @@
 
     <script>
         $(document).ready(function() {
+            var data = @Html.Raw(jsonProductVariantAttributeCombinations);
             $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
 
             $("#SelectedProductAttributeIds").select2({
@@ -564,34 +566,117 @@
                  dropdownParent: $('#SelectedProductAttributeIds').parent(),
             });
 
-                $('#ProductVariantAttributeCombinationRepeater').repeater({
-            initEmpty: false,
-            show: function() {
-                $(this).slideDown();
+            $('#ProductVariantAttributeCombinationRepeater').repeater({
+                initEmpty: false,
+                show: function() {
+                    $(this).slideDown();
 
-                // Outer item eklendikten sonra inner repeater'ı başlat
-                $(this).find('.AttributesRepeater').repeater({
+                    $(this).find('.AttributesRepeater').repeater({
+                        initEmpty: false,
+                        show: function() { $(this).slideDown(); },
+                        hide: function(deleteElement) {
+                            if(confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement);
+                        }
+                    });
+                },
+                hide: function(deleteElement) {
+                    if(confirm('Varyant silinecek emin misiniz?')) $(this).slideUp(deleteElement);
+                },
+                repeaters: [{
+                    // Nested repeater selector
+                    selector: '.AttributesRepeater',
                     initEmpty: false,
                     show: function() { $(this).slideDown(); },
                     hide: function(deleteElement) {
                         if(confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement);
                     }
+                }]
+            });
+
+            $('#ProductVariantAttributeCombinationRepeater').on('click', '[data-repeater-create]', function () {
+                setTimeout(updateRepeaterIndexes, 50); // repeater ekledikten sonra çalıştır
+            });
+
+            fillRepeater(data);
+            updateRepeaterIndexes();
+        });
+
+        function fillRepeater(data) {
+            var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
+            var $template = $list.find('[data-repeater-item]:first').clone(true, true);
+
+            $list.empty();
+
+            if (!data || data.length === 0) {
+                // hiç data yoksa -> boş template bırak
+                $list.append($template);
+                return;
+            }
+
+            $.each(data, function (i, item) {
+                var $row = $template.clone();
+
+                // Variant alanlarını doldur
+                $row.find('[name$="[StokCode]"]').val(item.StokCode);
+                $row.find('[name$="[ManufacturerPartNumber]"]').val(item.ManufacturerPartNumber);
+                $row.find('[name$="[Gtin]"]').val(item.Gtin);
+                $row.find('[name$="[Price]"]').val(item.Price);
+                $row.find('[name$="[StockQuantity]"]').val(item.StockQuantity);
+
+                // Attributes kısmı
+                $.each(item.Attributes, function (j, attr) {
+                    var $attrRow = $row.find('[data-attribute-id="' + attr.ProductAttributeId + '"]');
+                    if ($attrRow.length) {
+                        $attrRow.find('[name$="[ProductAttributeId]"]').val(attr.ProductAttributeId);
+                        $attrRow.find('[name$="[ProductAttributeValueId]"]').val(attr.ProductAttributeValueId);
+                    }
                 });
-            },
-            hide: function(deleteElement) {
-                if(confirm('Varyant silinecek emin misiniz?')) $(this).slideUp(deleteElement);
-            },
-            repeaters: [{
-                // Nested repeater selector
-                selector: '.AttributesRepeater',
-                initEmpty: false,
-                show: function() { $(this).slideDown(); },
-                hide: function(deleteElement) {
-                    if(confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement);
-                }
-            }]
-        });
-        });
+
+                $list.append($row);
+            });
+        }
+
+        function updateRepeaterIndexes() {
+            var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
+
+            // Dış item’lar
+            $list.children('[data-repeater-item]').each(function(i) {
+                var $row = $(this);
+
+                // Variant alanları
+                $row.find('input[name*="ProductVariantAttributeCombinations"]').each(function() {
+                    var name = $(this).attr('name');
+                    if (!name) return;
+
+                    var newName = name.replace(/ProductVariantAttributeCombinations\[\d+\]/, 'ProductVariantAttributeCombinations[' + i + ']');
+                    $(this).attr('name', newName);
+                });
+
+                // Nested Attributes
+                $row.find('[data-repeater-list="Attributes"]').children('[data-repeater-item]').each(function(j) {
+                    var $attr = $(this);
+                    var attrId = $attr.data('attribute-id');
+
+                    $attr.find('input, select').each(function() {
+                        var name = $(this).attr('name');
+                        if (!name) return;
+
+                        var newName = 'ProductVariantAttributeCombinations[' + i + '][Attributes][' + j + ']';
+                        if ($(this).attr('name').includes('ProductAttributeId')) {
+                            newName += '[ProductAttributeId]';
+                        } else if ($(this).attr('name').includes('ProductAttributeValueId')) {
+                            newName += '[ProductAttributeValueId]';
+                        }
+
+                        $(this).attr('name', newName);
+
+                        if ($(this).attr('name').includes('ProductAttributeId') && !$(this).val()) {
+                            $(this).val(attrId);
+                        }
+                    });
+                });
+            });
+        }
     </script>
 
 

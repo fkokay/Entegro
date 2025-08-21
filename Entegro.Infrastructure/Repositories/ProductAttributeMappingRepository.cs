@@ -50,6 +50,11 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
+        public async Task<ProductAttributeMapping?> GetByAttributeIdAsync(int id)
+        {
+            return await _context.ProductAttributeMappings.FirstOrDefaultAsync(o => o.ProductAttributeId == id);
+        }
+
         public async Task<ProductAttributeMapping?> GetByIdAsync(int id)
         {
             return await _context.ProductAttributeMappings.FirstOrDefaultAsync(o => o.Id == id);

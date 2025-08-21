@@ -43,6 +43,7 @@ namespace Entegro.Domain.Entities
         public virtual ICollection<ProductImageMapping> ProductImages { get; set; } = new List<ProductImageMapping>();
         public virtual ICollection<ProductCategoryMapping> ProductCategories { get; set; } = new List<ProductCategoryMapping>();
         public virtual ICollection<ProductAttributeMapping> ProductAttributes { get; set; } = new List<ProductAttributeMapping>();
+        public virtual ICollection<ProductVariantAttributeCombination> ProductVariants { get; set; } = new List<ProductVariantAttributeCombination>();
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     }

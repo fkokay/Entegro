@@ -52,6 +52,18 @@ namespace Entegro.Application.Services
             return productAttributeMappingDto;
         }
 
+        public async Task<ProductAttributeMappingDto?> GetByAttibuteIdAsync(int id)
+        {
+            var productAttributeMapping = await _productAttributeMappingRepository.GetByAttributeIdAsync(id);
+            if (productAttributeMapping == null)
+            {
+                throw new KeyNotFoundException($"ProductAttribute with ID {id} not found.");
+            }
+
+            var productAttributeMappingDto = _mapper.Map<ProductAttributeMappingDto>(productAttributeMapping);
+            return productAttributeMappingDto;
+        }
+
         public async Task<ProductAttributeMappingDto?> GetByIdAsync(int id)
         {
             var productAttributeMapping = await _productAttributeMappingRepository.GetByIdAsync(id);
@@ -63,6 +75,8 @@ namespace Entegro.Application.Services
             var productAttributeMappingDto = _mapper.Map<ProductAttributeMappingDto>(productAttributeMapping);
             return productAttributeMappingDto;
         }
+
+
 
         public async Task<bool> UpdateAsync(UpdateProductAttributeMappingDto productAttributeMapping)
         {

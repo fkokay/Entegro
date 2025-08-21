@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 
 namespace Entegro.Application.DTOs.Product
 {
@@ -27,5 +28,6 @@ namespace Entegro.Application.DTOs.Product
         public string? Gtin { get; set; }
         public bool Published { get; set; } = true;
         public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
+        public List<ProductVariantAttributeCombinationDto> ProductVariants { get; set; } = new List<ProductVariantAttributeCombinationDto>();
     }
 }

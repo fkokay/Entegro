@@ -2,12 +2,15 @@
 using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using System.Net;
+using static Entegro.Web.Models.ProductViewModel;
 
 namespace Entegro.Web.Controllers
 {
@@ -131,20 +134,36 @@ namespace Entegro.Web.Controllers
                 updateDto.ManufacturerPartNumber = model.ManufacturerPartNumber;
                 updateDto.Gtin = model.Gtin;
                 updateDto.Published = model.Published;
+                updateDto.ProductVariants = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
+                {
+                    AttributeXml = JsonConvert.SerializeObject(m.Attributes),
+                    Gtin = m.Gtin,
+                    Id = m.Id,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    ProductId = m.ProductId,
+                    StokCode = m.StokCode,
+                }).ToList();
 
                 await _productService.UpdateProductAsync(updateDto);
 
                 foreach (var item in model.SelectedProductAttributeIds)
                 {
-                    CreateProductAttributeMappingDto createProductAttributeMappingDto = new CreateProductAttributeMappingDto
-                    {
-                        ProductId = model.Id,
-                        ProductAttributeId = item,
-                        DisplayOrder = 0,
-                        AttributeControlTypeId = 0
-                    };
+                    var exist = await _productAttributeMappingService.GetByAttibuteIdAsync(item);
 
-                    await _productAttributeMappingService.AddAsync(createProductAttributeMappingDto);
+                    if (exist == null)
+                    {
+                        CreateProductAttributeMappingDto createProductAttributeMappingDto = new CreateProductAttributeMappingDto
+                        {
+                            ProductId = model.Id,
+                            ProductAttributeId = item,
+                            DisplayOrder = 0,
+                            AttributeControlTypeId = 0
+                        };
+
+                        await _productAttributeMappingService.AddAsync(createProductAttributeMappingDto);
+                    }
                 }
 
                 return Json(new { success = true });
@@ -422,6 +441,17 @@ namespace Entegro.Web.Controllers
                             Name = m.MediaFile.Folder.Name,
                         }
                     }
+                }).ToList();
+                model.ProductVariantAttributeCombinations = product.ProductVariants.Select(m => new ProductViewModel.ProductVariantAttributeCombinationViewModel()
+                {
+                    Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeViewModel>>(m.AttributeXml) ?? new List<ProductVariantAttributeViewModel>(),
+                    Gtin = m.Gtin,
+                    Id = m.Id,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    ProductId = m.ProductId,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode
                 }).ToList();
 
                 var productAttributes = await _productAttributeService.GetAllAsync();

@@ -253,9 +253,9 @@
                                             <!-- Nested Attributes -->
                                             <div class="AttributesRepeater">
                                                 <div data-repeater-list="Attributes">
-                                                    <div data-repeater-item class="repeater-wrapper row mb-2">
-                                                        @foreach (var productAttribute in Model.ProductAttributeMappings)
-                                                        {
+                                                    @foreach (var productAttribute in Model.ProductAttributeMappings)
+                                                    {
+                                                        <div data-repeater-item class="repeater-wrapper row mb-2" data-attribute-id="@productAttribute.ProductAttributeId">
                                                             <input type="hidden" name="ProductAttributeId" value="@productAttribute.ProductAttributeId" />
                                                             <div class="col-md-2 col-12 mb-md-0 mb-3">
                                                                 <p class="mb-2 repeater-title">@productAttribute.ProductAttribute</p>
@@ -266,8 +266,9 @@
                                                                     }
                                                                 </select>
                                                             </div>
-                                                        }
-                                                    </div>
+
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
 
