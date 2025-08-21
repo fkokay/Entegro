@@ -2,8 +2,8 @@
 {
     public class CreateIntegrationSystemViewModel
     {
-        public string EcommerceType { get; set; }
-        public string ModelCommerceName { get; set; }
+        public string IntegrationSystemType { get; set; }
+        public string ModalName { get; set; }
         public string ModalDescription { get; set; }
     }
 

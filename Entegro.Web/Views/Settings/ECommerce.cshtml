@@ -91,12 +91,12 @@
                     <h3 class="mb-2">Mağaza Ekle</h3>
                 </div>
                 <form id="addCommerceForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="EcommerceType" name="EcommerceType" />
+                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemType" />
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModelCommerceName">Mağaza Adı</label>
+                        <label class="form-label" for="ModalName">Mağaza Adı</label>
                         <input type="text"
-                               id="ModelCommerceName"
-                               name="ModelCommerceName"
+                               id="ModalName"
+                               name="ModalName"
                                class="form-control"
                                placeholder="Mağaza Adı" required />
                     </div>
@@ -131,8 +131,8 @@
 
 
     <script>
-        function SelectECommerce(ecommerceType) {
-            $('#EcommerceType').val(ecommerceType);
+        function SelectECommerce(integrationSystemType) {
+            $('#IntegrationSystemType').val(integrationSystemType);
             bootstrap.Modal.getOrCreateInstance(document.getElementById('addCommerce')).show();
         }
 
