@@ -382,7 +382,8 @@ namespace Entegro.Web.Controllers
                     Id = m.Id,
                     Description = m.Description,
                     IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                    Name = m.Name
+                    Name = m.Name,
+                    IntegrationSystemParameter = m.Parameters.FirstOrDefault(p => p.Key == "CargoType")
                 });
 
 
@@ -443,12 +444,179 @@ namespace Entegro.Web.Controllers
                     model.ApiPassword = apiPassword?.Value;
 
                     return View($"Cargo.Yurtici", model);
+
+                case "PTT":
+                    var apiUrlPTT = integrationSystemCargo.Parameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
+                    var apiUserPTT = integrationSystemCargo.Parameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
+                    var apiPasswordPTT = integrationSystemCargo.Parameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
+
+                    PTTCargoSettingsViewModel modelPTT = new PTTCargoSettingsViewModel();
+                    modelPTT.IntegrationSystemId = integrationSystemCargoId;
+                    modelPTT.CommerceType = commerceType.Value;
+                    modelPTT.ApiUrl = apiUrlPTT?.Value;
+                    modelPTT.ApiUser = apiUserPTT?.Value;
+                    modelPTT.ApiPassword = apiPasswordPTT?.Value;
+
+                    return View($"Cargo.PTT", modelPTT);
+
+                case "Aras":
+                    var apiUrlAras = integrationSystemCargo.Parameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
+                    var apiUserAras = integrationSystemCargo.Parameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
+                    var apiPasswordAras = integrationSystemCargo.Parameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
+
+                    ArasCargoSettingsViewModel modelAras = new ArasCargoSettingsViewModel();
+                    modelAras.IntegrationSystemId = integrationSystemCargoId;
+                    modelAras.CommerceType = commerceType.Value;
+                    modelAras.ApiUrl = apiUrlAras?.Value;
+                    modelAras.ApiUser = apiUserAras?.Value;
+                    modelAras.ApiPassword = apiPasswordAras?.Value;
+
+                    return View($"Cargo.Aras", modelAras);
+
             }
             return NotFound();
         }
 
         [HttpPost]
         public async Task<IActionResult> CargoParameterYurtici(YurticiCargoSettingsViewModel model)
+        {
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+            if (apiUrl == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUrl";
+                createIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUrl.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUrl";
+                updateIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            return RedirectToAction("cargo");
+        }
+        [HttpPost]
+        public async Task<IActionResult> CargoParameterPTT(PTTCargoSettingsViewModel model)
+        {
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+            if (apiUrl == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUrl";
+                createIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUrl.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUrl";
+                updateIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            return RedirectToAction("cargo");
+        }
+        [HttpPost]
+        public async Task<IActionResult> CargoParameterAras(ArasCargoSettingsViewModel model)
         {
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
             if (apiUrl == null)
@@ -530,7 +698,9 @@ namespace Entegro.Web.Controllers
         #endregion
 
 
+        #region Pazaryeri Entegrasyonları
 
+        #endregion
 
         public IActionResult Marketplace()
         {

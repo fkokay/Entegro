@@ -28,7 +28,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<IntegrationSystem>> GetAllAsync()
         {
-            return await _context.IntegrationSystems.ToListAsync();
+            return await _context.IntegrationSystems.Include(p => p.Parameters).ToListAsync();
         }
 
         public async Task<PagedResult<IntegrationSystem>> GetAllAsync(int pageNumber, int pageSize)

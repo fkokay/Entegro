@@ -1,10 +1,16 @@
 ﻿@{
     ViewData["Title"] = "Kargo Entegrasyonları";
     var myCargoList = ViewBag.MyCargo as IEnumerable<IntegrationSystemViewModel>;
+    var logoUrls = new Dictionary<string, string>
+    {
+        { "Yurtici", "https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg" },
+        { "PTT", "https://www.ptt.gov.tr/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F184logo.0437c82e.png&w=256&q=75" },
+        { "Aras", "https://www.araskargo.com.tr/assets/images/aras-logo.svg" }
+    };
 }
 
 <div class="flex-grow-1 container-p-y container-fluid">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Mağaza Ekle</h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Kargo Entegrasyonu Ekle</h4>
     <div class="row">
         <div class="col-4">
             <div class="card mb-3">
@@ -30,44 +36,103 @@
                 </div>
             </div>
         </div>
+        <div class="col-4">
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4 d-flex align-items-center justify-content-center">
+                        <img class="card-img card-img-left w-75" src="https://www.ptt.gov.tr/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F184logo.0437c82e.png&w=256&q=75" alt="Card image">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">PTT Kargo</h5>
+                            <p class="card-text">
+                                PTT Kargo ile entegre çalışabilmektedir.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <div class="mb-0">
+                        <button type="button" class="btn btn-success w-100" onclick="SelectCargo('PTT')">
+                            Mağaza Ekle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4 d-flex align-items-center justify-content-center">
+                        <img class="card-img card-img-left w-75" src="https://www.araskargo.com.tr/assets/images/aras-logo.svg" alt="Card image">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">Aras Kargo</h5>
+                            <p class="card-text">
+                                Aras Kargo ile entegre çalışabilmektedir.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <div class="mb-0">
+                        <button type="button" class="btn btn-success w-100" onclick="SelectCargo('Aras')">
+                            Mağaza Ekle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     @if (myCargoList != null)
     {
 
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Mağazalarım</h4>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Kargo Entegrasyonlarım</h4>
         <div class="row">
             @foreach (var cargo in myCargoList)
             {
-                <div class="col-4">
+                var value = cargo.IntegrationSystemParameter.Value;
 
+                if (!logoUrls.ContainsKey(value))
+                {
+                    continue;
+                }
+
+                var logoUrl = logoUrls[value];
+                <div class="col-4">
                     <div class="card mb-3">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center">
-                                <img class="card-img card-img-left w-75" src="https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg" alt="Card image">
+                                <img class="card-img card-img-left w-75" src="@logoUrl" alt="Card image">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h5 class="card-title">@cargo.Name</h5>
-                                    <p class="card-text">
-                                        @cargo.Description
-                                    </p>
+                                    <p class="card-text">@cargo.Description</p>
                                 </div>
                             </div>
                         </div>
                         <div class="row p-3">
                             <div class="mb-0 d-flex">
-                                <a type="button" asp-action="CargoSettings" asp-asp-controller="Settings" asp-route-integrationSystemCargoId="@cargo.Id" target="_blank" class="btn btn-success waves-effect waves-light w-50">
+                                <a type="button"
+                                   asp-action="CargoSettings"
+                                   asp-controller="Settings"
+                                   asp-route-integrationSystemCargoId="@cargo.Id"
+                                   target="_blank"
+                                   class="btn btn-success waves-effect waves-light w-50">
                                     <i class="ti ti-settings me-1"></i>
                                     <span class="align-middle">Ayarla</span>
                                 </a>
-                                <a href="javascript:void(0);" type="button" onclick="iptalEt(@cargo.Id)" class="btn btn-danger waves-effect waves-light w-50 ms-2">
+                                <a href="javascript:void(0);"
+                                   type="button"
+                                   onclick="iptalEt(@cargo.Id)"
+                                   class="btn btn-danger waves-effect waves-light w-50 ms-2">
                                     <i class="ti ti-eraser me-1"></i>
                                     <span class="align-middle">Sil</span>
                                 </a>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
