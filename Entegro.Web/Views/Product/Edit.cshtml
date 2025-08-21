@@ -139,6 +139,7 @@
                             validators: { notEmpty: { message: 'Para birimi seçilmelidir.' } }
                         },
                         'StockQuantity': {
+                            selector: '#StockQuantity',
                             validators: {
                                 notEmpty: { message: 'Stok miktarı boş bırakılamaz.' },
                                 integer: { message: 'Stok miktarı tam sayı olmalıdır.' }
@@ -285,13 +286,13 @@
 
     <script>
         function loadProductCategories(productId) {
-          const urlGet = '@Url.Action("Get", "Product")';
+          const urlGet = '@Url.Action("ProductCategoryList", "Product")';
           const $tbody = $("#productCategoryTable tbody");
           $tbody.html("<tr><td colspan='3'>Yükleniyor...</td></tr>");
 
           $.ajax({
             url: urlGet,
-            type: 'GET',
+            type: 'Post',
             data: { productId: productId },
             success: function (response) {
               $tbody.empty();
@@ -331,10 +332,10 @@
           }).then((result) => {
             if (!result.isConfirmed) return;
 
-            const urlDelete = '@Url.Action("DeleteProductCategory", "Product")';
+            const urlDelete = '@Url.Action("ProductCategoryDelete", "Product")';
             $.ajax({
               url: urlDelete,
-              type: 'GET',
+              type: 'post',
               data: { id: mappingId },
               success: function () {
                 if (typeof onDone === 'function') onDone(true);
@@ -483,7 +484,7 @@
 
             $btn.prop('disabled', true);
 
-            fetch('@Url.Action("CreateProductCategory", "Product")', {
+            fetch('@Url.Action("ProductCategoryInsert", "Product")', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)

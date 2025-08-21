@@ -1,6 +1,4 @@
-﻿using Entegro.Domain.Entities;
-
-namespace Entegro.Web.Models
+﻿namespace Entegro.Web.Models
 {
     public class ProductViewModel
     {
