@@ -873,9 +873,179 @@ namespace Entegro.Web.Controllers
 
 
 
-        public IActionResult EInvoice()
+        #region E-Fatura Entegrasyonları
+
+        [HttpGet]
+        public async Task<IActionResult> EInvoice()
         {
-            return View();
+            var integrationSystemEinvoice = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.EInvoice);
+            if (integrationSystemEinvoice == null)
+            {
+                return View();
+            }
+
+
+            var commerceType = integrationSystemEinvoice.Parameters.Where(m => m.Key == "EinvoiceType").FirstOrDefault();
+            if (commerceType == null)
+            {
+                return NotFound();
+            }
+
+            var myEinvoice = await _integrationSystemService.GetAllAsync();
+            ViewBag.MyEinvoice = myEinvoice.Where(x => x.IntegrationSystemTypeId == 5).
+                Select(m => new IntegrationSystemViewModel
+                {
+                    Id = m.Id,
+                    Description = m.Description,
+                    IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                    Name = m.Name
+                });
+
+
+            return View(integrationSystemEinvoice);
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EInvoice(CreateIntegrationSystemViewModel model)
+        {
+            var createIntegrationSystem = new CreateIntegrationSystemDto
+            {
+                Name = model.ModalName,
+                IntegrationSystemTypeId = (int)IntegrationSystemType.EInvoice,
+                Description = model.ModalDescription
+            };
+
+            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
+
+            // Ana parametre
+            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
+            {
+                IntegrationSystemId = integrationSystemId,
+                Key = "EinvoiceType",
+                Value = model.IntegrationSystemType
+            });
+
+
+            return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> EInvoiceSettings(int integrationSystemEinvoiceId)
+        {
+
+            var integrationSystemEinvoice = await _integrationSystemService.GetByIdAsync(integrationSystemEinvoiceId);
+            if (integrationSystemEinvoice == null)
+            {
+                return View();
+            }
+
+
+            var einvoiceType = integrationSystemEinvoice.Parameters.Where(m => m.Key == "EinvoiceType" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
+            if (einvoiceType == null)
+            {
+                return NotFound();
+            }
+            switch (einvoiceType.Value)
+            {
+                case "TrendyolEfaturam":
+
+                    var apiUrl = integrationSystemEinvoice.Parameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
+                    var apiUser = integrationSystemEinvoice.Parameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
+                    var apiPassword = integrationSystemEinvoice.Parameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
+
+                    TrendyolEFaturamSettingsViewModel model = new TrendyolEFaturamSettingsViewModel();
+                    model.IntegrationSystemId = integrationSystemEinvoiceId;
+                    model.CommerceType = einvoiceType.Value;
+                    model.ApiUrl = apiUrl?.Value;
+                    model.ApiUser = apiUser?.Value;
+                    model.ApiPassword = apiPassword?.Value;
+
+                    return View($"EInvoice.TrendyolEfaturam", model);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CommerceParameterTrendyolEFaturam(SmartstoreCommerceSettingsViewModel model)
+        {
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+            if (apiUrl == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUrl";
+                createIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUrl.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUrl";
+                updateIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            return RedirectToAction("einvoice");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EInvoiceDelete([FromBody] int integrationSystemId)
+        {
+            var isSuccess = await _integrationSystemService.DeleteAsync(integrationSystemId);
+            if (isSuccess)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Silinecek E-Fatura Bulunamadı" });
+        }
+        #endregion
+
     }
 }
