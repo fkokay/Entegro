@@ -3,7 +3,7 @@
     ViewData["Title"] = "PTT Kargo Entegrasyonu Ayarları";
 }
 
-<form asp-action="CommerceParameterPTT" id="cargo-setting-ptt-form">
+<form asp-action="CargoParameterPTT" id="cargo-setting-ptt-form">
     @Html.HiddenFor(m => m.IntegrationSystemId)
     @Html.HiddenFor(m => m.CommerceType)
     <div class="flex-grow-1 container-p-y container-fluid">
@@ -18,16 +18,20 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Api Url</label>
-                            @Html.TextBoxFor(m => m.ApiUrl, new { @class = "form-control" })
+                            <label class="form-label" for="basic-default-fullname">Müşteri No</label>
+                            @Html.TextBoxFor(m => m.MusteriId, new { @class = "form-control" })
                         </div>
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Api Kullanıcı</label>
-                            @Html.TextBoxFor(m => m.ApiUser, new { @class = "form-control" })
+                            <label class="form-label" for="basic-default-fullname">Şifre</label>
+                            @Html.TextBoxFor(m => m.Password, new { @class = "form-control" })
                         </div>
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Api Şifre</label>
-                            @Html.TextBoxFor(m => m.ApiPassword, new { @class = "form-control" })
+                            <label class="form-label" for="basic-default-fullname">Barkod aralığı başlangıç</label>
+                            @Html.TextBoxFor(m => m.BarkodStartPrefix, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-6">
+                            <label class="form-label" for="basic-default-fullname">Barkod aralığı bitiş</label>
+                            @Html.TextBoxFor(m => m.BarkodEndPrefix, new { @class = "form-control" })
                         </div>
                     </div>
                 </div>
