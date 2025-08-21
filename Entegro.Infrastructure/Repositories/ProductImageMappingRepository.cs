@@ -52,7 +52,14 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductImageMapping?> GetByIdAsync(int id)
         {
-            return await _context.ProductImages.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductImages.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<ProductImageMapping> GetByPictureIdProductIdAsync(int pictureId, int productId)
+        {
+            var result = await _context.ProductImages.AsNoTracking()
+                 .FirstOrDefaultAsync(o => o.Id == pictureId && o.ProductId == productId);
+            return result ?? throw new KeyNotFoundException($"ProductImage with PictureId {pictureId} and ProductId {productId} not found.");
         }
 
         public async Task UpdateAsync(ProductImageMapping productImage)

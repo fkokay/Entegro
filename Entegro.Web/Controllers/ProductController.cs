@@ -1,9 +1,8 @@
-﻿using Azure;
-using Entegro.Application.DTOs.Product;
+﻿using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
+using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,18 +17,21 @@ namespace Entegro.Web.Controllers
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeMappingService _productAttributeMappingService;
+        private readonly IProductImageMappingService _productImageMappingService;
         public ProductController(
             IProductService productService,
             IProductCategoryMappingService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
-            IProductAttributeMappingService productAttributeMappingService)
+            IProductAttributeMappingService productAttributeMappingService,
+            IProductImageMappingService productImageMappingService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
+            _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
         }
 
         #region Product list / create / edit / delete
@@ -203,27 +205,77 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ProductMediaFilesAdd(string mediaFileIds, int entityId)
         {
+
             bool success = true;
             var response = new List<dynamic>();
 
-            //dynamic respObj = new
-            //{
-            //    MediaFileId = id,
-            //    ProductMediaFileId = productPicture.Id,
-            //    file?.Name
-            //};
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(mediaFileIds))
+                {
+                    var mediaIdList = mediaFileIds
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(id => int.Parse(id.Trim()))
+                        .ToList();
+
+                    for (int i = 0; i < mediaIdList.Count; i++)
+                    {
+                        int mediaFileId = mediaIdList[i];
+
+                        // Yeni ProductMediaFile nesnesi oluştur
+                        var productPicture = new CreateProductImageDto
+                        {
+                            MediaFileId = mediaFileId,
+                            ProductId = entityId,
+                            DisplayOrder = i // Sıralamayı kaydediyoruz
+                        };
+
+                        var id = await _productImageMappingService.AddAsync(productPicture);
+
+                        // İsteğe bağlı olarak frontend’e dönecek bilgi
+                        var respObj = new
+                        {
+                            MediaFileId = mediaFileId,
+                            ProductMediaFileId = id,
+                            DisplayOrder = i
+                        };
+
+                        response.Add(respObj);
+                    }
+
+                }
+                else
+                {
+                    success = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                return Json(new
+                {
+                    success,
+                    message = "Bir hata oluştu: " + ex.Message
+                });
+            }
 
             return Json(new
             {
                 success,
                 response,
-                message = "Resim başarıyla eklendi"
+                message = "Resimler başarıyla eklendi"
             });
+
         }
 
         [HttpPost]
         public async Task<IActionResult> ProductPictureDelete(int id)
         {
+            var isSuccess = await _productImageMappingService.DeleteAsync(id);
+            if (!isSuccess)
+            {
+                return Json(new { success = false, message = "Resim silinirken bir hata oluştu." });
+            }
             return StatusCode((int)HttpStatusCode.OK);
         }
 
@@ -231,15 +283,61 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> SortPictures(string pictures, int entityId)
         {
             var response = new List<dynamic>();
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(pictures))
+                {
+                    var pictureIds = pictures
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(id => int.Parse(id.Trim()))
+                        .ToList();
 
-            //dynamic file = new
-            //{
-            //    productPicture.DisplayOrder,
-            //    productPicture.MediaFileId,
-            //    EntityMediaId = productPicture.Id
-            //};
+                    for (int i = 0; i < pictureIds.Count; i++)
+                    {
+                        int pictureId = pictureIds[i];
 
-            return Json(new { success = true, response });
+                        var productPicture = await _productImageMappingService.GetByPictureIdProductIdAsync(pictureId, entityId);
+
+                        if (productPicture != null)
+                        {
+                            productPicture.DisplayOrder = i;
+
+                            response.Add(new
+                            {
+                                productPicture.DisplayOrder,
+                                productPicture.MediaFileId,
+                                EntityMediaId = productPicture.Id
+                            });
+
+                            await _productImageMappingService.UpdateAsync(new UpdateProductImageDto
+                            {
+                                Id = pictureId,
+                                DisplayOrder = i,
+                                MediaFileId = productPicture.MediaFileId,
+                                ProductId = entityId
+                            });
+                        }
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        response,
+                        message = "Sıralama güncellendi."
+                    });
+                }
+
+                return Json(new { success = false, message = "Sıralama verisi boş." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Hata oluştu: " + ex.Message
+                });
+            }
+
         }
 
         #endregion

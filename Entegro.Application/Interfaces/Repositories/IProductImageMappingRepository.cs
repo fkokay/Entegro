@@ -11,5 +11,6 @@ namespace Entegro.Application.Interfaces.Repositories
         Task UpdateAsync(ProductImageMapping productImage);
         Task DeleteAsync(ProductImageMapping productImage);
         Task<PagedResult<ProductImageMapping>> GetAllAsync(int pageNumber, int pageSize);
+        Task<ProductImageMapping> GetByPictureIdProductIdAsync(int pictureId, int productId);
     }
 }

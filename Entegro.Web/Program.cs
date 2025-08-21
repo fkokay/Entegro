@@ -82,6 +82,10 @@ builder.Services.AddScoped<IProductAttributeValueService, ProductAttributeValueS
 builder.Services.AddScoped<IProductAttributeMappingRepository, ProductAttributeMappingRepository>();
 builder.Services.AddScoped<IProductAttributeMappingService, ProductAttributeMappingService>();
 
+
+builder.Services.AddScoped<IProductImageMappingRepository, ProductImageMappingRepository>();
+builder.Services.AddScoped<IProductImageMappingService, ProductImageMappingService>();
+
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
