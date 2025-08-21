@@ -22,6 +22,7 @@ namespace Entegro.Web.Controllers
             return View();
         }
         #region Erp Entegrasyonları
+        [HttpGet]
         public async Task<IActionResult> Erp()
         {
             var integrationSystemErp = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.ERP);
@@ -30,12 +31,68 @@ namespace Entegro.Web.Controllers
                 return View();
             }
 
+
             var erpType = integrationSystemErp.Parameters.Where(m => m.Key == "ErpType").FirstOrDefault();
             if (erpType == null)
             {
                 return NotFound();
             }
 
+            var myErp = await _integrationSystemService.GetAllAsync();
+            ViewBag.MyErp = myErp.Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.ERP).
+                Select(m => new IntegrationSystemViewModel
+                {
+                    Id = m.Id,
+                    Description = m.Description,
+                    IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                    Name = m.Name,
+                    IntegrationSystemParameter = m.Parameters.FirstOrDefault(p => p.Key == "ErpType")
+                });
+
+
+            return View(integrationSystemErp);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Erp(CreateIntegrationSystemViewModel model)
+        {
+            var createIntegrationSystem = new CreateIntegrationSystemDto
+            {
+                Name = model.ModalName,
+                IntegrationSystemTypeId = (int)IntegrationSystemType.ERP,
+                Description = model.ModalDescription
+            };
+
+            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
+
+            // Ana parametre
+            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
+            {
+                IntegrationSystemId = integrationSystemId,
+                Key = "ErpType",
+                Value = model.IntegrationSystemType
+            });
+
+
+            return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> ErpSettings(int integrationSystemErpId)
+        {
+
+            var integrationSystemErp = await _integrationSystemService.GetByIdAsync(integrationSystemErpId);
+            if (integrationSystemErp == null)
+            {
+                return View();
+            }
+
+
+            var erpType = integrationSystemErp.Parameters.Where(m => m.Key == "ErpType" & m.IntegrationSystemId == integrationSystemErpId).FirstOrDefault();
+            if (erpType == null)
+            {
+                return NotFound();
+            }
             switch (erpType.Value)
             {
                 case "Logo":
@@ -83,29 +140,9 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Erp(string erpType)
-        {
-            CreateIntegrationSystemDto createIntegrationSystem = new CreateIntegrationSystemDto();
-            createIntegrationSystem.Name = $"{erpType} ERP Entegrasyonu";
-            createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.ERP;
-            createIntegrationSystem.Description = $"{erpType} ERP Entegrasyonu için gerekli ayarlar.";
-
-            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
-
-            CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
-            createIntegrationSystemParameter.IntegrationSystemId = integrationSystemId;
-            createIntegrationSystemParameter.Key = "ErpType";
-            createIntegrationSystemParameter.Value = erpType;
-
-            await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
-
-            return Json(new { success = true });
-        }
-
-        [HttpPost]
         public async Task<IActionResult> ErpParameterLogo(LogoErpSettingsViewModel model)
         {
-            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl");
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
             if (apiUrl == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
@@ -126,7 +163,7 @@ namespace Entegro.Web.Controllers
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser");
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
             if (apiUser == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
@@ -147,7 +184,7 @@ namespace Entegro.Web.Controllers
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword");
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
             if (apiPassword == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
@@ -168,7 +205,147 @@ namespace Entegro.Web.Controllers
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            return View($"Erp.{model.ErpType}", model);
+
+            return RedirectToAction("erp");
+        }
+        [HttpPost]
+        public async Task<IActionResult> ErpParameterNetsis(NetsisErpSettingsViewModel model)
+        {
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+            if (apiUrl == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUrl";
+                createIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUrl.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUrl";
+                updateIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            return RedirectToAction("erp");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ErpParameterOpak(NetsisErpSettingsViewModel model)
+        {
+            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+            if (apiUrl == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUrl";
+                createIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUrl.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUrl";
+                updateIntegrationSystemParameter.Value = model.ApiUrl;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            return RedirectToAction("erp");
         }
 
         [HttpPost]
@@ -179,7 +356,7 @@ namespace Entegro.Web.Controllers
             {
                 return Json(new { success = true });
             }
-            return Json(new { success = false, message = "Silinecek Entegrasyon Bulunamadı" });
+            return Json(new { success = false, message = "Silinecek Erp Bulunamadı" });
         }
         #endregion
 
