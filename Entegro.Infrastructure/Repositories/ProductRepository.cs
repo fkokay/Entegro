@@ -109,7 +109,32 @@ namespace Entegro.Infrastructure.Repositories
                 VatInc = m.VatInc,
                 VatRate = m.VatRate,
                 Weight = m.Weight,
-                Width = m.Width
+                Width = m.Width,
+                MainPictureId = m.MainPictureId,
+                MainPicture = m.MainPicture == null ? null: new MediaFile()
+                {
+                    Alt = m.MainPicture.Alt,
+                    CreatedOn = m.MainPicture.CreatedOn,
+                    Deleted = m.MainPicture.Deleted,
+                    Extension = m.MainPicture.Extension,
+                    Folder = m.MainPicture.Folder,
+                    FolderId = m.MainPicture.FolderId,
+                    Height = m.MainPicture.Height,
+                    Hidden = m.MainPicture.Hidden,
+                    Id = m.MainPicture.Id,
+                    IsTransient = m.MainPicture.IsTransient,
+                    MediaType = m.MainPicture.MediaType,
+                    Metadata = m.MainPicture.Metadata,
+                    MimeType = m.MainPicture.MimeType,
+                    Name = m.MainPicture.Name,
+                    PixelSize = m.MainPicture.PixelSize,
+                    Size = m.MainPicture.Size,
+                    Title = m.MainPicture.Title,
+                    UpdatedOn = m.MainPicture.UpdatedOn,
+                    Version = m.MainPicture.Version,
+                    Width = m.MainPicture.Width
+                },
+                
             })
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)

@@ -38,6 +38,12 @@ namespace Entegro.Domain.Entities
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
         public int? MainPictureId { get; set; }
+        private MediaFile? _mainPicture;
+        public MediaFile? MainPicture
+        {
+            get => _mainPicture ?? LazyLoader?.Load(this, ref _mainPicture);
+            set => _mainPicture = value;
+        }
         public bool Published { get; set; } = true;
         public bool Deleted { get; set; } = false;
         public DateTime CreatedOn { get; set; }

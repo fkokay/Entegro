@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
@@ -34,6 +35,8 @@ namespace Entegro.Application.DTOs.Product
         public bool Published { get; set; } = true;
         public BrandDto? Brand { get; set; }
         public int? MainPictureId { get; set; }
+        public MediaFileDto? MainPicture { get; set; }
+
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
         public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
         public List<ProductVariantAttributeCombinationDto> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationDto>();

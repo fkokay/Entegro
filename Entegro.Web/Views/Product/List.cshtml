@@ -130,12 +130,12 @@
                         targets: 3,
                         responsivePriority: 1,
                         render: (data, type, row) => {
-                            const avatar = '<img src="https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/ecommerce-images/product-5.png" alt="Product" class="rounded">';
+                            const image = row.MainPicture == null ? '' : `<img src="${row.MainPicture.Url}" class="rounded">`;
                             return `
                               <div class="d-flex justify-content-start align-items-center product-name">
                                   <div class="avatar-wrapper">
                                       <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                                          ${avatar}
+                                          ${image}
                                       </div>
                                   </div>
                                   <div class="d-flex flex-column">
