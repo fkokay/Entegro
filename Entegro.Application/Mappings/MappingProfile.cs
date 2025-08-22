@@ -19,6 +19,7 @@ using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.Town;
 using Entegro.Application.DTOs.User;
@@ -261,6 +262,22 @@ namespace Entegro.Application.Mappings
             CreateMap<ProductMediaFile, UpdateProductImageDto>().ReverseMap();
             CreateMap<PagedResult<ProductMediaFile>, PagedResult<ProductImageDto>>().ReverseMap();
 
+            #endregion
+
+
+            #region ProductIntegration
+            CreateMap<ProductIntegration, ProductIntegrationDto>().ReverseMap();
+            CreateMap<ProductIntegration, CreateProductIntegrationDto>().ReverseMap();
+            CreateMap<ProductIntegration, UpdateProductIntegrationDto>().ReverseMap();
+
+            CreateMap<ProductIntegrationDto, CreateProductIntegrationDto>().ReverseMap();
+            CreateMap<ProductIntegrationDto, UpdateProductIntegrationDto>().ReverseMap();
+
+            CreateMap<CreateProductIntegrationDto, ProductIntegrationDto>().ReverseMap();
+            CreateMap<UpdateProductIntegrationDto, ProductIntegrationDto>().ReverseMap();
+
+            CreateMap<PagedResult<ProductIntegration>, PagedResult<ProductIntegrationDto>>().ReverseMap();
+            CreateMap<PagedResult<ProductIntegrationDto>, PagedResult<ProductIntegration>>().ReverseMap();
             #endregion
 
         }
