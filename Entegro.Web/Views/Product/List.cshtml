@@ -38,7 +38,7 @@
 
 @section Scripts {
     <script>
-                $(function() {
+       $(function() {
             var commerces = @Html.Raw(jsonCommerces);
             var commercesButton = [];
             $.each(commerces, function(index, item) {
@@ -126,25 +126,39 @@
                         },
                         render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                     },
-                    {
-                        targets: 3,
-                        responsivePriority: 1,
-                        render: (data, type, row) => {
-                            const avatar = '<img src="https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/ecommerce-images/product-5.png" alt="Product-${id}" class="rounded">';
+                            {
+                   targets: 3,
+                     responsivePriority: 1,
+                     render: (data, type, row) => {
+                         const avatar = '<img src="https://demos.pixinvent.com/vuexy-html-admin-template/assets/img/ecommerce-images/product-5.png" alt="Product" class="rounded">';
 
-                            return `<div class="d-flex justify-content-start align-items-center product-name">
-                                        <div class="avatar-wrapper">
-                                            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                                                ${avatar}
-                                            </div>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <h6 class="text-nowrap mb-0">${row.Name}</h6>
-                                            <small class="text-truncate d-none d-sm-block">${row.Brand?.Name}</small>
-                                        </div>
-                                    </div>`;
-                        }
-                    },
+                       
+                         let integrationHtml = "";
+                         if (row.ProductIntegrations && row.ProductIntegrations.length > 0) {
+                             row.ProductIntegrations.forEach(pi => {
+                                 if (pi.IntegrationSystem?.Name) {
+                                     integrationHtml += `<span class="badge bg-light text-dark me-1 mb-1">${pi.IntegrationSystem.Name}</span>`;
+                                 }
+                             });
+                         }
+
+                         return `
+                             <div class="d-flex justify-content-start align-items-center product-name">
+                                 <div class="avatar-wrapper">
+                                     <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                                         ${avatar}
+                                     </div>
+                                 </div>
+                                 <div class="d-flex flex-column">
+                                     <h6 class="text-nowrap mb-0">${row.Name}</h6>
+                                     <small class="text-truncate d-none d-sm-block">${row.Brand?.Name || ""}</small>
+                                     
+                                 </div>
+                             </div>
+                                ${integrationHtml ? `<div class="d-flex flex-wrap justify-content-start mt-2">${integrationHtml}</div>` : ""}
+                </div>`;
+                             
+                     }},
                     {
                         targets: -1,
                         title: "İşlemler",

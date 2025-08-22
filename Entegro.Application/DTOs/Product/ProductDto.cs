@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 
 namespace Entegro.Application.DTOs.Product
@@ -36,5 +37,6 @@ namespace Entegro.Application.DTOs.Product
         public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
         public List<ProductAttributeMappingDto> ProductAttributes { get; set; } = new List<ProductAttributeMappingDto>();
         public List<ProductVariantAttributeCombinationDto> ProductVariants { get; set; } = new List<ProductVariantAttributeCombinationDto>();
+        public List<ProductIntegrationDto> ProductIntegrations { get; set; } = new List<ProductIntegrationDto>();
     }
 }

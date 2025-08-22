@@ -76,5 +76,7 @@ namespace Entegro.Domain.Entities
             get => LazyLoader?.Load(this, ref _productIntegrations) ?? (_productIntegrations ??= new HashSet<ProductIntegration>());
             set => _productIntegrations = value;
         }
+
+
     }
 }
