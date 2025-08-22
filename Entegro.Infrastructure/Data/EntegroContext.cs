@@ -17,12 +17,12 @@ namespace Entegro.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ProductCategoryMapping>()
+            modelBuilder.Entity<ProductCategory>()
           .HasOne(p => p.Product)
           .WithMany()
           .HasForeignKey(p => p.ProductId);
 
-            modelBuilder.Entity<ProductCategoryMapping>()
+            modelBuilder.Entity<ProductCategory>()
               .HasOne(p => p.Category)
               .WithMany()
               .HasForeignKey(p => p.CategoryId);
@@ -36,11 +36,11 @@ namespace Entegro.Infrastructure.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductImageMapping> ProductImages { get; set; }
-        public DbSet<ProductCategoryMapping> ProductCategories { get; set; }
+        public DbSet<ProductMediaFile> ProductImages { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
-        public DbSet<ProductAttributeMapping> ProductAttributeMappings { get; set; }
+        public DbSet<ProductVariantAttribute> ProductAttributeMappings { get; set; }
         public DbSet<ProductVariantAttributeCombination> ProductVariants { get; set; }
 
         public DbSet<Category> Categories { get; set; }

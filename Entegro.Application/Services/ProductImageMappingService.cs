@@ -19,7 +19,7 @@ namespace Entegro.Application.Services
         }
         public async Task<int> AddAsync(CreateProductImageDto productImage)
         {
-            var createProductImage = _mapper.Map<ProductImageMapping>(productImage);
+            var createProductImage = _mapper.Map<ProductMediaFile>(productImage);
             await _productImageMappingRepository.AddAsync(createProductImage);
             return createProductImage.Id;
         }
@@ -70,7 +70,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> UpdateAsync(UpdateProductImageDto productImage)
         {
-            await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductImageMapping>(productImage));
+            await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(productImage));
             return true;
         }
     }

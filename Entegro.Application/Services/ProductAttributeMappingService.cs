@@ -20,7 +20,7 @@ namespace Entegro.Application.Services
 
         public async Task<int> AddAsync(CreateProductAttributeMappingDto productAttributeMapping)
         {
-            var model = _mapper.Map<ProductAttributeMapping>(productAttributeMapping);
+            var model = _mapper.Map<ProductVariantAttribute>(productAttributeMapping);
             await _productAttributeMappingRepository.AddAsync(model);
 
             return model.Id;
@@ -80,7 +80,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> UpdateAsync(UpdateProductAttributeMappingDto productAttributeMapping)
         {
-            await _productAttributeMappingRepository.UpdateAsync(_mapper.Map<ProductAttributeMapping>(productAttributeMapping));
+            await _productAttributeMappingRepository.UpdateAsync(_mapper.Map<ProductVariantAttribute>(productAttributeMapping));
             return true;
         }
     }

@@ -1,15 +1,11 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Entegro.Domain.Entities
 {
     [Table("Product")]
-    public class Product : BaseEntity, ISoftDeletable
+    public class Product : BaseEntity, ISoftDeletable,IAuditable
     {
         public string Code { get; set; }
         public string Name { get; set; }
@@ -24,6 +20,14 @@ namespace Entegro.Domain.Entities
         public decimal VatRate { get; set; }
         public bool VatInc { get; set; }
         public int? BrandId { get; set; }
+
+        private Brand? _brand;
+        public Brand? Brand
+        {
+            get => _brand ?? LazyLoader?.Load(this, ref _brand);
+            set => _brand = value;
+        }
+
         public int StockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }
@@ -33,18 +37,21 @@ namespace Entegro.Domain.Entities
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
+        public int? MainPictureId { get; set; }
         public bool Published { get; set; } = true;
         public bool Deleted { get; set; } = false;
-
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
-        public virtual Brand? Brand { get; set; }
-        public virtual ICollection<ProductImageMapping> ProductImages { get; set; } = new List<ProductImageMapping>();
-        public virtual ICollection<ProductCategoryMapping> ProductCategories { get; set; } = new List<ProductCategoryMapping>();
-        public virtual ICollection<ProductAttributeMapping> ProductAttributes { get; set; } = new List<ProductAttributeMapping>();
-        public virtual ICollection<ProductVariantAttributeCombination> ProductVariants { get; set; } = new List<ProductVariantAttributeCombination>();
-        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        private ICollection<ProductMediaFile> _productMediaFiles;
+        public ICollection<ProductMediaFile> ProductMediaFiles
+        {
+            get => LazyLoader?.Load(this, ref _productMediaFiles) ?? (_productMediaFiles ??= new HashSet<ProductMediaFile>());
+            set => _productMediaFiles = value;
+        }
+        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+        public ICollection<ProductVariantAttribute> ProductVariantAttribute { get; set; } = new List<ProductVariantAttribute>();
+        public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombination>();
 
     }
 }

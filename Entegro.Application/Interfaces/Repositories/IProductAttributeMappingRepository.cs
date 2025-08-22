@@ -5,12 +5,12 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IProductAttributeMappingRepository
     {
-        Task<ProductAttributeMapping?> GetByIdAsync(int id);
-        Task<ProductAttributeMapping?> GetByAttributeIdAsync(int id);
-        Task<List<ProductAttributeMapping>> GetAllAsync();
-        Task<PagedResult<ProductAttributeMapping>> GetAllAsync(int pageNumber, int pageSize);
-        Task AddAsync(ProductAttributeMapping productAttributeMapping);
-        Task UpdateAsync(ProductAttributeMapping productAttributeMapping);
-        Task DeleteAsync(ProductAttributeMapping productAttributeMapping);
+        Task<ProductVariantAttribute?> GetByIdAsync(int id);
+        Task<ProductVariantAttribute?> GetByAttributeIdAsync(int id);
+        Task<List<ProductVariantAttribute>> GetAllAsync();
+        Task<PagedResult<ProductVariantAttribute>> GetAllAsync(int pageNumber, int pageSize);
+        Task AddAsync(ProductVariantAttribute productAttributeMapping);
+        Task UpdateAsync(ProductVariantAttribute productAttributeMapping);
+        Task DeleteAsync(ProductVariantAttribute productAttributeMapping);
     }
 }

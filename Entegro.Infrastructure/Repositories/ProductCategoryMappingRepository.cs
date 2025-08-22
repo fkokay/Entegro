@@ -14,29 +14,29 @@ namespace Entegro.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(ProductCategoryMapping productCategoryMapping)
+        public async Task AddAsync(ProductCategory productCategoryMapping)
         {
             await _context.ProductCategories.AddAsync(productCategoryMapping);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(ProductCategoryMapping productCategoryMapping)
+        public async Task DeleteAsync(ProductCategory productCategoryMapping)
         {
             _context.ProductCategories.Remove(productCategoryMapping);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ProductCategoryMapping>> GetAllAsync()
+        public async Task<List<ProductCategory>> GetAllAsync()
         {
             return await _context.ProductCategories.Include(m => m.Product).Include(m => m.Category).ToListAsync();
         }
 
-        public async Task<ProductCategoryMapping?> GetByIdAsync(int id)
+        public async Task<ProductCategory?> GetByIdAsync(int id)
         {
             return await _context.ProductCategories.FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<List<ProductCategoryMapping>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds, CancellationToken ct = default)
+        public async Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds, CancellationToken ct = default)
         {
             var ids = productIds.Distinct().ToArray();
 
@@ -49,7 +49,7 @@ namespace Entegro.Infrastructure.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task<List<ProductCategoryMapping>> GetByProductWithCategoryAsync(int productId, CancellationToken ct = default)
+        public async Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId, CancellationToken ct = default)
         {
             return await _context.ProductCategories
              .AsNoTracking()
@@ -59,7 +59,7 @@ namespace Entegro.Infrastructure.Repositories
              .ToListAsync(ct);
         }
 
-        public async Task UpdateAsync(ProductCategoryMapping productCategoryMapping)
+        public async Task UpdateAsync(ProductCategory productCategoryMapping)
         {
             _context.ProductCategories.Update(productCategoryMapping);
             await _context.SaveChangesAsync();

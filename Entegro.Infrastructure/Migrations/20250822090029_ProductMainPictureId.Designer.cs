@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250822090029_ProductMainPictureId")]
+    partial class ProductMainPictureId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -648,91 +651,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.ToTable("ProductAttribute");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductAttributeValue", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductAttributeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductAttributeId");
-
-                    b.ToTable("ProductAttributeValue");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProductId1")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductId1");
-
-                    b.HasIndex(new[] { "CategoryId" }, "IX_CategoryId");
-
-                    b.HasIndex(new[] { "CategoryId", "ProductId" }, "IX_PCM_Product_and_Category");
-
-                    b.ToTable("Product_Category_Mapping");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductMediaFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MediaFileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MediaFileId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductMediaFile");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductVariantAttribute", b =>
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductAttributeMapping", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -759,11 +678,91 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasIndex("ProductAttributeId");
 
-                    b.HasIndex(new[] { "AttributeControlTypeId" }, "IX_AttributeControlTypeId");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex(new[] { "ProductId", "DisplayOrder" }, "IX_Product_ProductAttribute_Mapping_ProductId_DisplayOrder");
+                    b.ToTable("ProductAttributeMapping");
+                });
 
-                    b.ToTable("Product_ProductAttribute_Mapping");
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductAttributeValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductAttributeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductAttributeId");
+
+                    b.ToTable("ProductAttributeValue");
+                });
+
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductCategoryMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductId1")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductId1");
+
+                    b.ToTable("ProductCategoryMapping");
+                });
+
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductImageMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MediaFileId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaFileId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImageMapping");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.ProductVariantAttributeCombination", b =>
@@ -963,7 +962,7 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -982,6 +981,25 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("Brand");
                 });
 
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductAttributeMapping", b =>
+                {
+                    b.HasOne("Entegro.Domain.Entities.ProductAttribute", "Attribute")
+                        .WithMany()
+                        .HasForeignKey("ProductAttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entegro.Domain.Entities.Product", "Product")
+                        .WithMany("ProductAttributes")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attribute");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Entegro.Domain.Entities.ProductAttributeValue", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.ProductAttribute", "ProductAttribute")
@@ -993,7 +1011,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("ProductAttribute");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductCategory", b =>
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductCategoryMapping", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Category", "Category")
                         .WithMany()
@@ -1016,7 +1034,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductMediaFile", b =>
+            modelBuilder.Entity("Entegro.Domain.Entities.ProductImageMapping", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.MediaFile", "MediaFile")
                         .WithMany()
@@ -1025,7 +1043,7 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany("ProductMediaFiles")
+                        .WithMany("ProductImages")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1035,29 +1053,10 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.ProductVariantAttribute", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.ProductAttribute", "ProductAttribute")
-                        .WithMany()
-                        .HasForeignKey("ProductAttributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany("ProductVariantAttribute")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ProductAttribute");
-                });
-
             modelBuilder.Entity("Entegro.Domain.Entities.ProductVariantAttributeCombination", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany("ProductVariantAttributeCombinations")
+                        .WithMany("ProductVariants")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1103,13 +1102,15 @@ namespace Entegro.Infrastructure.Migrations
 
             modelBuilder.Entity("Entegro.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("OrderItems");
+
+                    b.Navigation("ProductAttributes");
+
                     b.Navigation("ProductCategories");
 
-                    b.Navigation("ProductMediaFiles");
+                    b.Navigation("ProductImages");
 
-                    b.Navigation("ProductVariantAttribute");
-
-                    b.Navigation("ProductVariantAttributeCombinations");
+                    b.Navigation("ProductVariants");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.ProductAttribute", b =>
