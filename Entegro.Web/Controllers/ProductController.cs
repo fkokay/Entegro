@@ -379,11 +379,12 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> CreateProductIntegration(int integrationSystemId)
         {
             var allProducts = await _productService.GetProductsAsync();
-            foreach (var product in allProducts)
+            int[] allProductIds = allProducts.Select(x => x.Id).ToArray();
+            foreach (var productId in allProductIds)
             {
                 var productIntegration = new CreateProductIntegrationDto
                 {
-                    ProductId = product.Id,
+                    ProductId = productId,
                     IntegrationSystemId = integrationSystemId,
                     Active = true,
                     LastSyncDate = null
