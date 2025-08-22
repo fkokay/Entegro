@@ -54,7 +54,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(m => m.Brand)
                 .Include(m => m.ProductMediaFiles)
                 .Include(m => m.ProductIntegrations)
-                .ThenInclude(m => m.IntegrationSystem)
+                .ThenInclude(m => m.IntegrationSystem).ThenInclude(m => m.Parameters)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -83,7 +83,27 @@ namespace Entegro.Infrastructure.Repositories
                 ProductVariantAttribute = m.ProductVariantAttribute,
                 ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
-                ProductIntegrations = m.ProductIntegrations,
+                ProductIntegrations = m.ProductIntegrations.Select(x=> new ProductIntegration
+                {
+                    Active = x.Active,
+                    Id = x.Id,
+                    IntegrationSystem = new IntegrationSystem()
+                    {
+                        Id =x.IntegrationSystem.Id,
+                        Description = x.IntegrationSystem.Description,
+                        Name = x.IntegrationSystem.Name,
+                        Parameters = x.IntegrationSystem.Parameters.Select(a=> new IntegrationSystemParameter()
+                        {
+                            Id=a.Id,
+                            IntegrationSystemId = a.IntegrationSystemId,
+                            Key = a.Key,
+                            Value = a.Value,
+                        }).ToList()
+                    },
+                    IntegrationSystemId = x.IntegrationSystemId,
+                    LastSyncDate = x.LastSyncDate,
+                    ProductId = x.ProductId,
+                }).ToList(),
                 Published = m.Published,
                 SpecialPrice = m.SpecialPrice,
                 StockQuantity = m.StockQuantity,

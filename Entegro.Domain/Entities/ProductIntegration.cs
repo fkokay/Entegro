@@ -7,15 +7,15 @@ namespace Entegro.Domain.Entities
     public class ProductIntegration : BaseEntity
     {
         public int ProductId { get; set; }
-        private Product? _product;
-        public Product? Product
+        private Product _product;
+        public Product Product
         {
             get => _product ?? LazyLoader?.Load(this, ref _product);
             set => _product = value;
         }
         public int IntegrationSystemId { get; set; }
-        private IntegrationSystem? _integrationSystem;
-        public IntegrationSystem? IntegrationSystem
+        private IntegrationSystem _integrationSystem;
+        public IntegrationSystem IntegrationSystem
         {
             get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
             set => _integrationSystem = value;

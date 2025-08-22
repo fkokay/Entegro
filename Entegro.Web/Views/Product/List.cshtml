@@ -137,7 +137,21 @@
                          if (row.ProductIntegrations && row.ProductIntegrations.length > 0) {
                              row.ProductIntegrations.forEach(pi => {
                                  if (pi.IntegrationSystem?.Name) {
-                                     integrationHtml += `<span class="badge bg-light text-dark me-1 mb-1">${pi.IntegrationSystem.Name}</span>`;
+                                           integrationHtml +=`<div class="col-3 d-flex justify-content-start align-items-center product-integration">
+                                             <div class="product-integration-image">
+                                            <img src="https://smartstore.com/Themes/HP/images/smartstore-icon.svg" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                            </div>
+                                             <div class="product-integration-info">
+                                                   <span class="name">${pi.IntegrationSystem.Name}</span>
+                                                   <span class="price">0,00 TL</span>
+                                            </div>
+                                              <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
+                                                Satışda
+                                             </span>
+                                             <span class="h-px-20 d-flex justify-content-center align-items-center me-4 product-sales-count">
+                                                 1
+                                              </span>
+                                             </div>`;
                                  }
                              });
                          }
@@ -155,8 +169,7 @@
                                      
                                  </div>
                              </div>
-                                ${integrationHtml ? `<div class="d-flex flex-wrap justify-content-start mt-2">${integrationHtml}</div>` : ""}
-                </div>`;
+                            ${integrationHtml ? `<div class="row mt-3">${integrationHtml}</div>` : ""}</div>`;
                              
                      }},
                     {
