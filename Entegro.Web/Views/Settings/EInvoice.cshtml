@@ -24,7 +24,8 @@
                 <div class="row p-3">
                     <div class="mb-0">
                         <button type="button" class="btn btn-success w-100" onclick="SelectEInvoice('TrendyolEfaturam')">
-                            Mağaza Ekle
+                            <i class="ti ti-plus me-1"></i>
+                            <span class="align-middle"> Entegrasyon Ekle</span>
                         </button>
                     </div>
                 </div>
@@ -84,20 +85,20 @@
             <div class="modal-body">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="text-center mb-4">
-                    <h3 class="mb-2">Mağaza Ekle</h3>
+                    <h3 class="mb-2">Entegrasyon Ekle</h3>
                 </div>
                 <form id="addEinvoiceForm" class="row g-3" onsubmit="return false">
                     <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemType" />
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModalName">Mağaza Adı</label>
+                        <label class="form-label" for="ModalName">Adı</label>
                         <input type="text"
                                id="ModalName"
                                name="ModalName"
                                class="form-control"
-                               placeholder="Mağaza Adı" required />
+                               placeholder="Adı" required />
                     </div>
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModalDescription">Mağaza Açıklaması</label>
+                        <label class="form-label" for="ModalDescription">Açıklaması</label>
                         <textarea type="text"
                                   id="ModalDescription"
                                   name="ModalDescription"
