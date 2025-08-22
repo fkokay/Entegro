@@ -1,6 +1,6 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Entegro.Domain.Entities
 {
     [Table("Category")]
@@ -17,8 +17,13 @@ namespace Entegro.Domain.Entities
         public int DisplayOrder { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+        private MediaFile? _mediaFile;
+        public MediaFile? MediaFile
+        {
+            get => _mediaFile ?? LazyLoader?.Load(this, ref _mediaFile);
+            set => _mediaFile = value;
+        }
 
-        public virtual MediaFile? MediaFile { get; set; }   
     }
     public sealed class CategorySlim
     {

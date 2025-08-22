@@ -1,11 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Entegro.Domain.Entities
 {
     [Table("ProductVariantAttributeCombination")]
@@ -19,6 +14,14 @@ namespace Entegro.Domain.Entities
         public int StockQuantity { get; set; }
         public string AttributeXml { get; set; }
 
-        public virtual Product Product { get; set; }
+
+        public Product _product;
+
+        public Product Product
+        {
+            get => _product ?? LazyLoader.Load(this, ref _product);
+            set => _product = value;
+        }
+
     }
 }

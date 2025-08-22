@@ -1,11 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Entegro.Domain.Entities
 {
     [Table("IntegrationSystemLog")]
@@ -16,6 +11,13 @@ namespace Entegro.Domain.Entities
         public string Message { get; set; }
         public string LogLevel { get; set; } // e.g., "Info", "Warning", "Error"
         public string? Exception { get; set; } // Optional exception details
-        public virtual IntegrationSystem IntegrationSystem { get; set; }
+
+        private IntegrationSystem? _integrationSystem;
+        public IntegrationSystem? IntegrationSystem
+        {
+            get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
+            set => _integrationSystem = value;
+        }
+
     }
 }

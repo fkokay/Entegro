@@ -100,7 +100,7 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Products.AsNoTracking()
                 .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
                 .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.Values)
-                .Include(m => m.ProductVariantAttributeCombinations).FirstOrDefaultAsync(o => o.Id == id);
+                .Include(m => m.ProductVariantAttributeCombination).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(Product product)

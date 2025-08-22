@@ -1,11 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Entegro.Domain.Entities
 {
     [Table("MediaFile")]
@@ -30,6 +25,13 @@ namespace Entegro.Domain.Entities
         public bool Hidden { get; set; }
         public int Version { get; set; }
 
-        public virtual MediaFolder? Folder { get; set; }
+
+        private MediaFolder? _folder;
+        public MediaFolder? MediaFolder
+        {
+            get => _folder ?? LazyLoader?.Load(this, ref _folder);
+            set => _folder = value;
+        }
+
     }
 }
