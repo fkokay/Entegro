@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.Erp;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
-using Entegro.Application.DTOs.ProductImage;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

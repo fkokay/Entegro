@@ -1,9 +1,9 @@
 ﻿using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 
-namespace Entegro.Application.DTOs.ProductAttributeMapping
+namespace Entegro.Application.DTOs.ProductVariantAttribute
 {
-    public class ProductAttributeMappingDto
+    public class ProductVariantAttributeDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -13,6 +13,6 @@ namespace Entegro.Application.DTOs.ProductAttributeMapping
         public int DisplayOrder { get; set; }
 
         public ProductDto Product { get; set; }
-        public ProductAttributeDto Attribute { get; set; }
+        public ProductAttributeDto ProductAttribute { get; set; }
     }
 }

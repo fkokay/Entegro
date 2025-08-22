@@ -1,9 +1,9 @@
 ﻿using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.Product;
 
-namespace Entegro.Application.DTOs.ProductImage
+namespace Entegro.Application.DTOs.ProductMediaFile
 {
-    public class ProductImageDto
+    public class ProductMediaFileDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }

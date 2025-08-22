@@ -1,8 +1,7 @@
-﻿namespace Entegro.Application.DTOs.ProductAttributeMapping
+﻿namespace Entegro.Application.DTOs.ProductVariantAttribute
 {
-    public class UpdateProductAttributeMappingDto
+    public class CreateProductVariantAttributeDto
     {
-        public int Id { get; set; }
         public int ProductId { get; set; }
         public int ProductAttributeId { get; set; }
         public bool IsRequried { get; set; }

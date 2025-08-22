@@ -10,9 +10,9 @@
         {
             get
             {
-                if (ProductImages.Any())
+                if (ProductMediaFiles.Any())
                 {
-                    return ProductImages.OrderBy(m => m.DisplayOrder).Select(m => m.Url).FirstOrDefault();
+                    return ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.Url).FirstOrDefault();
                 }
 
                 return "";
@@ -40,7 +40,7 @@
         public bool Published { get; set; } = true;
         public int[] SelectedProductAttributeIds { get; set; } = Array.Empty<int>();
         public BrandViewModel? Brand { get; set; }
-        public List<ProductImageViewModel> ProductImages { get; set; } = new List<ProductImageViewModel>();
+        public List<ProductImageViewModel> ProductMediaFiles { get; set; } = new List<ProductImageViewModel>();
         public List<ProductAttributeMappingViewModel> ProductAttributeMappings { get; set; } = new List<ProductAttributeMappingViewModel>();
         public List<ProductVariantAttributeCombinationViewModel> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationViewModel>();
 

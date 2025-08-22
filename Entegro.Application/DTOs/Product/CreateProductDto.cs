@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductMediaFile;
 
 namespace Entegro.Application.DTOs.Product
 {
@@ -27,6 +27,6 @@ namespace Entegro.Application.DTOs.Product
         public string? ManufacturerPartNumber { get; set; }
         public string? Gtin { get; set; }
         public bool Published { get; set; } = true;
-        public List<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
+        public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
     }
 }

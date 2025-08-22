@@ -15,11 +15,11 @@ using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
-using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
-using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.ProductIntegration;
+using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.Town;
 using Entegro.Application.DTOs.User;
@@ -47,18 +47,18 @@ namespace Entegro.Application.Mappings
             #endregion
 
             #region ProductImage
-            CreateMap<ProductMediaFile, ProductImageDto>().ReverseMap();
-            CreateMap<ProductMediaFile, CreateProductImageDto>().ReverseMap();
-            CreateMap<ProductMediaFile, UpdateProductImageDto>().ReverseMap();
+            CreateMap<ProductMediaFile, ProductMediaFileDto>().ReverseMap();
+            CreateMap<ProductMediaFile, CreateProductMediaFileDto>().ReverseMap();
+            CreateMap<ProductMediaFile, UpdateProductMediaFileeDto>().ReverseMap();
 
-            CreateMap<ProductImageDto, CreateProductImageDto>().ReverseMap();
-            CreateMap<ProductImageDto, UpdateProductImageDto>().ReverseMap();
+            CreateMap<ProductMediaFileDto, CreateProductMediaFileDto>().ReverseMap();
+            CreateMap<ProductMediaFileDto, UpdateProductMediaFileeDto>().ReverseMap();
 
-            CreateMap<CreateProductImageDto, ProductImageDto>().ReverseMap();
-            CreateMap<UpdateProductImageDto, ProductImageDto>().ReverseMap();
+            CreateMap<CreateProductMediaFileDto, ProductMediaFileDto>().ReverseMap();
+            CreateMap<UpdateProductMediaFileeDto, ProductMediaFileDto>().ReverseMap();
 
-            CreateMap<PagedResult<ProductMediaFile>, PagedResult<ProductImageDto>>().ReverseMap();
-            CreateMap<PagedResult<ProductImageDto>, PagedResult<ProductMediaFile>>().ReverseMap();
+            CreateMap<PagedResult<ProductMediaFile>, PagedResult<ProductMediaFileDto>>().ReverseMap();
+            CreateMap<PagedResult<ProductMediaFileDto>, PagedResult<ProductMediaFile>>().ReverseMap();
             #endregion
 
             #region ProductCategoryMapping
@@ -202,9 +202,9 @@ namespace Entegro.Application.Mappings
             #endregion
 
             #region ProductAttributeMapping
-            CreateMap<ProductVariantAttribute, ProductAttributeMappingDto>().ReverseMap();
-            CreateMap<ProductVariantAttribute, CreateProductAttributeMappingDto>().ReverseMap();
-            CreateMap<ProductVariantAttribute, UpdateProductAttributeMappingDto>().ReverseMap();
+            CreateMap<ProductVariantAttribute, ProductVariantAttributeDto>().ReverseMap();
+            CreateMap<ProductVariantAttribute, CreateProductVariantAttributeDto>().ReverseMap();
+            CreateMap<ProductVariantAttribute, UpdateProductVariantAttributeDto>().ReverseMap();
             #endregion
 
             #region ProductVariantAttributeCombination
@@ -257,10 +257,10 @@ namespace Entegro.Application.Mappings
             CreateMap<PagedResult<Country>, PagedResult<CountryDto>>().ReverseMap();
             #endregion
             #region ProductImage
-            CreateMap<ProductMediaFile, ProductImageDto>().ReverseMap();
-            CreateMap<ProductMediaFile, CreateProductImageDto>().ReverseMap();
-            CreateMap<ProductMediaFile, UpdateProductImageDto>().ReverseMap();
-            CreateMap<PagedResult<ProductMediaFile>, PagedResult<ProductImageDto>>().ReverseMap();
+            CreateMap<ProductMediaFile, ProductMediaFileDto>().ReverseMap();
+            CreateMap<ProductMediaFile, CreateProductMediaFileDto>().ReverseMap();
+            CreateMap<ProductMediaFile, UpdateProductMediaFileeDto>().ReverseMap();
+            CreateMap<PagedResult<ProductMediaFile>, PagedResult<ProductMediaFileDto>>().ReverseMap();
 
             #endregion
 

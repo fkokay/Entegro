@@ -1,8 +1,8 @@
 ﻿using Entegro.Application.DTOs.Product;
-using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
-using Entegro.Application.DTOs.ProductImage;
 using Entegro.Application.DTOs.ProductIntegration;
+using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
@@ -144,7 +144,7 @@ namespace Entegro.Web.Controllers
                 updateDto.ManufacturerPartNumber = model.ManufacturerPartNumber;
                 updateDto.Gtin = model.Gtin;
                 updateDto.Published = model.Published;
-                updateDto.ProductVariants = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
+                updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
                 {
                     AttributeXml = JsonConvert.SerializeObject(m.Attributes),
                     Gtin = m.Gtin,
@@ -164,7 +164,7 @@ namespace Entegro.Web.Controllers
 
                     if (exist == null)
                     {
-                        CreateProductAttributeMappingDto createProductAttributeMappingDto = new CreateProductAttributeMappingDto
+                        CreateProductVariantAttributeDto createProductAttributeMappingDto = new CreateProductVariantAttributeDto
                         {
                             ProductId = model.Id,
                             ProductAttributeId = item,
@@ -253,7 +253,7 @@ namespace Entegro.Web.Controllers
                         int mediaFileId = mediaIdList[i];
 
                         // Yeni ProductMediaFile nesnesi oluştur
-                        var productPicture = new CreateProductImageDto
+                        var productPicture = new CreateProductMediaFileDto
                         {
                             MediaFileId = mediaFileId,
                             ProductId = entityId,
@@ -339,7 +339,7 @@ namespace Entegro.Web.Controllers
                                 EntityMediaId = productPicture.Id
                             });
 
-                            await _productImageMappingService.UpdateAsync(new UpdateProductImageDto
+                            await _productImageMappingService.UpdateAsync(new UpdateProductMediaFileeDto
                             {
                                 Id = pictureId,
                                 DisplayOrder = i,
@@ -367,8 +367,8 @@ namespace Entegro.Web.Controllers
                         MetaTitle = product.MetaTitle,
                         Name = product.Name,
                         Price = product.Price,
-                        ProductVariants = product.ProductVariants,
-                        ProductImages = product.ProductImages,
+                        ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations,
+                        ProductMediaFiles = product.ProductMediaFiles,
                         Published = product.Published,
                         StockQuantity = product.StockQuantity,
                         Unit = product.Unit,
@@ -378,6 +378,7 @@ namespace Entegro.Web.Controllers
                         Width = product.Width,
                         MainPictureId = pictureIds[0]
                     });
+
                     return Json(new
                     {
                         success = true,
@@ -400,7 +401,6 @@ namespace Entegro.Web.Controllers
         }
 
         #endregion
-
 
         #region Product Integration
 
@@ -449,20 +449,20 @@ namespace Entegro.Web.Controllers
                 model.Gtin = product.Gtin;
                 model.ManufacturerPartNumber = product.ManufacturerPartNumber;
                 model.Published = product.Published;
-                model.SelectedProductAttributeIds = product.ProductAttributes.Select(x => x.Id).ToArray();
-                model.ProductAttributeMappings = product.ProductAttributes.Select(m => new ProductViewModel.ProductAttributeMappingViewModel()
+                model.SelectedProductAttributeIds = product.ProductVariantAttributes.Select(x => x.Id).ToArray();
+                model.ProductAttributeMappings = product.ProductVariantAttributes.Select(m => new ProductViewModel.ProductAttributeMappingViewModel()
                 {
                     AttributeControlTypeId = m.AttributeControlTypeId,
                     DisplayOrder = m.DisplayOrder,
                     Id = m.Id,
                     IsRequried = m.IsRequried,
-                    ProductAttribute = m.Attribute.Name,
+                    ProductAttribute = m.ProductAttribute.Name,
                     ProductAttributeId = m.ProductAttributeId,
                     ProductId = m.ProductId,
                     Attribute = new ProductAttributeViewModel()
                     {
-                        Id = m.Attribute.Id,
-                        Values = m.Attribute.Values.Select(x => new ProductAttributeValueViewModel()
+                        Id = m.ProductAttribute.Id,
+                        Values = m.ProductAttribute.Values.Select(x => new ProductAttributeValueViewModel()
                         {
                             Id = x.Id,
                             DisplayOrder = x.DisplayOrder,
@@ -471,7 +471,7 @@ namespace Entegro.Web.Controllers
                         }).ToList()
                     }
                 }).ToList();
-                model.ProductImages = product.ProductImages.Select(m => new ProductImageViewModel()
+                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductImageViewModel()
                 {
                     Id = m.Id,
                     DisplayOrder = m.DisplayOrder,
@@ -503,7 +503,7 @@ namespace Entegro.Web.Controllers
                         }
                     }
                 }).ToList();
-                model.ProductVariantAttributeCombinations = product.ProductVariants.Select(m => new ProductViewModel.ProductVariantAttributeCombinationViewModel()
+                model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductViewModel.ProductVariantAttributeCombinationViewModel()
                 {
                     Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeViewModel>>(m.AttributeXml) ?? new List<ProductVariantAttributeViewModel>(),
                     Gtin = m.Gtin,
