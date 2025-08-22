@@ -10,8 +10,7 @@ namespace Entegro.Domain.Entities
         public string Name { get; set; }
         public bool Published { get; set; }
 
-        public ICollection<District> _districts;
-
+        private ICollection<District> _districts;
         public ICollection<District> Districts
         {
             get => LazyLoader?.Load(this, ref _districts) ?? (_districts ??= new HashSet<District>());

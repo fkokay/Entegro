@@ -49,34 +49,34 @@ namespace Entegro.Domain.Entities
             get => LazyLoader?.Load(this, ref _productMediaFiles) ?? (_productMediaFiles ??= new HashSet<ProductMediaFile>());
             set => _productMediaFiles = value;
         }
-        public ICollection<ProductCategory> _productCategories;
+
+        private ICollection<ProductCategory> _productCategories;
         public ICollection<ProductCategory> ProductCategories
         {
             get => LazyLoader?.Load(this, ref _productCategories) ?? (_productCategories ??= new HashSet<ProductCategory>());
             set => _productCategories = value;
         }
-        public ICollection<ProductVariantAttribute> _productVariantAttribute;
+
+        private ICollection<ProductVariantAttribute> _productVariantAttribute;
         public ICollection<ProductVariantAttribute> ProductVariantAttribute
         {
             get => LazyLoader?.Load(this, ref _productVariantAttribute) ?? (_productVariantAttribute ??= new HashSet<ProductVariantAttribute>());
             set => _productVariantAttribute = value;
         }
-        public ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
 
+        private ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
         public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombination
         {
             get => LazyLoader?.Load(this, ref _productVariantAttributeCombinations) ?? (_productVariantAttributeCombinations ??= new HashSet<ProductVariantAttributeCombination>());
             set => _productVariantAttributeCombinations = value;
         }
 
-        public ICollection<ProductIntegration> _productIntegrations;
-
+        private ICollection<ProductIntegration> _productIntegrations;
         public ICollection<ProductIntegration> ProductIntegrations
         {
             get => LazyLoader?.Load(this, ref _productIntegrations) ?? (_productIntegrations ??= new HashSet<ProductIntegration>());
             set => _productIntegrations = value;
         }
-
 
     }
 }

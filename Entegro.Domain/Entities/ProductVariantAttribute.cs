@@ -12,28 +12,24 @@ namespace Entegro.Domain.Entities
     public class ProductVariantAttribute : BaseEntity, IDisplayOrder
     {
         public int ProductId { get; set; }
-        public int ProductAttributeId { get; set; }
-        public bool IsRequried { get; set; }
-        public int AttributeControlTypeId { get; set; }
-        public int DisplayOrder {get;set; }
-
 
         private Product _product;
-        [IgnoreDataMember]
         public Product Product
         {
             get => _product ?? LazyLoader.Load(this, ref _product);
             set => _product = value;
         }
+        public int ProductAttributeId { get; set; }
 
         private ProductAttribute _productAttribute;
-        /// <summary>
-        /// Gets or sets the product attribute.
-        /// </summary>
         public ProductAttribute ProductAttribute
         {
             get => _productAttribute ?? LazyLoader.Load(this, ref _productAttribute);
             set => _productAttribute = value;
         }
+        public bool IsRequried { get; set; }
+        public int AttributeControlTypeId { get; set; }
+        public int DisplayOrder {get;set; }
+
     }
 }

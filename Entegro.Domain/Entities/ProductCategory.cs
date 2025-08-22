@@ -11,15 +11,17 @@ namespace Entegro.Domain.Entities
     public class ProductCategory : BaseEntity
     {
         public int CategoryId { get; set; }
+
         private Category _category;
         public Category Category
         {
             get => _category ?? LazyLoader.Load(this, ref _category);
             set => _category = value;
         }
-        public int ProductId { get; set; }
-        private Product _product;
 
+        public int ProductId { get; set; }
+
+        private Product _product;
         public Product Product
         {
             get => _product ?? LazyLoader.Load(this, ref _product);

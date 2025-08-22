@@ -7,6 +7,7 @@ namespace Entegro.Domain.Entities
     public class ProductIntegration : BaseEntity
     {
         public int ProductId { get; set; }
+
         private Product _product;
         public Product Product
         {
@@ -14,6 +15,7 @@ namespace Entegro.Domain.Entities
             set => _product = value;
         }
         public int IntegrationSystemId { get; set; }
+
         private IntegrationSystem _integrationSystem;
         public IntegrationSystem IntegrationSystem
         {

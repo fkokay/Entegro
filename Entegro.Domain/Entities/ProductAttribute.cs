@@ -10,13 +10,11 @@ namespace Entegro.Domain.Entities
         public string? Description { get; set; }
         public int DisplayOrder { get; set; }
 
-        private ICollection<ProductAttributeValue> _productMediaFiles;
-        public ICollection<ProductAttributeValue> Values
+        private ICollection<ProductAttributeValue> _productAttributeValues;
+        public ICollection<ProductAttributeValue> ProductAttributeValues
         {
-            get => LazyLoader?.Load(this, ref _productMediaFiles) ?? (_productMediaFiles ??= new HashSet<ProductAttributeValue>());
-            set => _productMediaFiles = value;
+            get => LazyLoader?.Load(this, ref _productAttributeValues) ?? (_productAttributeValues ??= new HashSet<ProductAttributeValue>());
+            set => _productAttributeValues = value;
         }
-
-
     }
 }
