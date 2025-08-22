@@ -1,10 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
@@ -15,14 +11,19 @@ namespace Entegro.Domain.Entities
         public string? Description { get; set; }
         public int? MediaFileId { get; set; }
 
+
+        private MediaFile? _mediaFile;
+        public MediaFile? MediaFile
+        {
+            get => _mediaFile ?? LazyLoader?.Load(this, ref _mediaFile);
+            set => _mediaFile = value;
+        }
+
         public string? MetaTitle { get; set; }
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
-
         public int DisplayOrder { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-
-        public virtual MediaFile? MediaFile { get; set; }
     }
 }

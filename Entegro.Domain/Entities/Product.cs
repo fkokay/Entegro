@@ -1,11 +1,11 @@
 ﻿using Entegro.Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Domain.Entities
 {
     [Table("Product")]
-    public class Product : BaseEntity, ISoftDeletable,IAuditable
+    public class Product : BaseEntity, ISoftDeletable, IAuditable
     {
         public string Code { get; set; }
         public string Name { get; set; }
@@ -49,9 +49,32 @@ namespace Entegro.Domain.Entities
             get => LazyLoader?.Load(this, ref _productMediaFiles) ?? (_productMediaFiles ??= new HashSet<ProductMediaFile>());
             set => _productMediaFiles = value;
         }
-        public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
-        public ICollection<ProductVariantAttribute> ProductVariantAttribute { get; set; } = new List<ProductVariantAttribute>();
-        public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombination>();
+        public ICollection<ProductCategory> _productCategories;
+        public ICollection<ProductCategory> ProductCategories
+        {
+            get => LazyLoader?.Load(this, ref _productCategories) ?? (_productCategories ??= new HashSet<ProductCategory>());
+            set => _productCategories = value;
+        }
+        public ICollection<ProductVariantAttribute> _productVariantAttribute;
+        public ICollection<ProductVariantAttribute> ProductVariantAttribute
+        {
+            get => LazyLoader?.Load(this, ref _productVariantAttribute) ?? (_productVariantAttribute ??= new HashSet<ProductVariantAttribute>());
+            set => _productVariantAttribute = value;
+        }
+        public ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
 
+        public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombination
+        {
+            get => LazyLoader?.Load(this, ref _productVariantAttributeCombinations) ?? (_productVariantAttributeCombinations ??= new HashSet<ProductVariantAttributeCombination>());
+            set => _productVariantAttributeCombinations = value;
+        }
+
+        public ICollection<ProductIntegration> _productIntegrations;
+
+        public ICollection<ProductIntegration> ProductIntegrations
+        {
+            get => LazyLoader?.Load(this, ref _productIntegrations) ?? (_productIntegrations ??= new HashSet<ProductIntegration>());
+            set => _productIntegrations = value;
+        }
     }
 }

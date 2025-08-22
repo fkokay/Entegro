@@ -1,11 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Entegro.Domain.Entities
 {
     [Table("Town")]
@@ -15,6 +10,12 @@ namespace Entegro.Domain.Entities
         public string Name { get; set; }
         public bool Published { get; set; }
 
-        public List<District> Districts { get; set; }
+        public ICollection<District> _districts;
+
+        public ICollection<District> Districts
+        {
+            get => LazyLoader?.Load(this, ref _districts) ?? (_districts ??= new HashSet<District>());
+            set => _districts = value;
+        }
     }
 }

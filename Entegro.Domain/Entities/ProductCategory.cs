@@ -1,7 +1,7 @@
 ﻿using Entegro.Domain.Common;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Domain.Entities
 {
@@ -19,9 +19,7 @@ namespace Entegro.Domain.Entities
         }
         public int ProductId { get; set; }
         private Product _product;
-        /// <summary>
-        /// Gets or sets the product.
-        /// </summary>
+
         public Product Product
         {
             get => _product ?? LazyLoader.Load(this, ref _product);

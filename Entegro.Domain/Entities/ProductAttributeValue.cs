@@ -1,10 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
@@ -15,6 +11,12 @@ namespace Entegro.Domain.Entities
         public string Name { get; set; }
         public int DisplayOrder { get; set; }
 
-        public ProductAttribute ProductAttribute { get; set; }
+
+        private ProductAttribute? _productAttribute;
+        public ProductAttribute? ProductAttribute
+        {
+            get => _productAttribute ?? LazyLoader?.Load(this, ref _productAttribute);
+            set => _productAttribute = value;
+        }
     }
 }

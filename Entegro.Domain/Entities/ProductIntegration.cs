@@ -1,11 +1,6 @@
 ﻿using Entegro.Domain.Common;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Entegro.Domain.Entities
 {
     [Table("ProductIntegration")]
@@ -15,5 +10,14 @@ namespace Entegro.Domain.Entities
         public int IntegrationSystemId { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; }
+
+        //tekil product
+
+        private Product? _product;
+        public Product? Product
+        {
+            get => _product ?? LazyLoader?.Load(this, ref _product);
+            set => _product = value;
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Entegro.Application.Services
 
             var category = _mapper.Map<Category>(createCategory);
 
-            // Önce ekle, böylece category.Id oluşur
+
             await _categoryRepository.AddAsync(category);
 
             // TreePath hesaplama
@@ -43,7 +43,7 @@ namespace Entegro.Application.Services
                 }
             }
 
-            // Güncelle ve kaydet
+
             await _categoryRepository.UpdateAsync(category); // TreePath güncelleniyor
 
             return category.Id;
