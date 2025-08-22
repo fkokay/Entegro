@@ -7,6 +7,7 @@ namespace Entegro.Domain.Entities
     public class ProductIntegration : BaseEntity
     {
         public int ProductId { get; set; }
+        public decimal Price { get; set; }
 
         private Product _product;
         public Product Product
