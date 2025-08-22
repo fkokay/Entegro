@@ -38,6 +38,59 @@
     </div>
 </form>
 
+
+
+<div class="modal fade" id="createCity" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Şehir Bilgileri</h3>
+                </div>
+                <form asp-action="Create" asp-controller="City" class="row g-3" >
+                    <input type="hidden" name="countryId" value="@Model.Id" />
+                    <div class="col-12 col-md-12">
+                        <label class="form-label" for="cityName">Adı</label>
+                        <input type="text"
+                               id="cityName"
+                               name="CityName"
+                               class="form-control"
+                               placeholder="İstanbul" />
+                    </div>
+                    <div class="col-12 col-md-12 mt-3">
+                        <label class="form-label" for="displayOrder">Sıra</label>
+                        <input type="number"
+                               id="displayOrder"
+                               name="DisplayOrder"
+                               class="form-control"
+                               value="0" min="0" />
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label class="switch">
+                            @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on"></span>
+                                <span class="switch-off"></span>
+                            </span>
+                            <span class="switch-label">Yayınlandı</span>
+                        </label>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+                        <button type="reset"
+                                class="btn btn-label-secondary"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            Kapat
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         $('#btnDeleteCountry').on('click', function () {
@@ -202,5 +255,12 @@
                 }
             }
         );
+    </script>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var isChecked = document.querySelector('input[name="IsPublished"]').checked;
+            console.log('Checkbox is checked:', isChecked);
+        });
     </script>
 }
