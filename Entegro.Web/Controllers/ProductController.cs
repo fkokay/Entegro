@@ -2,15 +2,14 @@
 using Entegro.Application.DTOs.ProductAttributeMapping;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductImage;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Net;
-using System.Threading.Tasks;
 using static Entegro.Web.Models.ProductViewModel;
 
 namespace Entegro.Web.Controllers
@@ -24,6 +23,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductAttributeMappingService _productAttributeMappingService;
         private readonly IProductImageMappingService _productImageMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
+        private readonly IProductIntegrationService _productIntegrationService;
         public ProductController(
             IProductService productService,
             IProductCategoryMappingService productCategoryMappingService,
@@ -31,7 +31,8 @@ namespace Entegro.Web.Controllers
             IProductAttributeService productAttributeService,
             IProductAttributeMappingService productAttributeMappingService,
             IProductImageMappingService productImageMappingService,
-            IIntegrationSystemService integrationSystemService)
+            IIntegrationSystemService integrationSystemService,
+            IProductIntegrationService productIntegrationService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -40,6 +41,7 @@ namespace Entegro.Web.Controllers
             _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
             _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
             _integrationSystemService = integrationSystemService ?? throw new ArgumentNullException(nameof(integrationSystemService));
+            _productIntegrationService = productIntegrationService;
         }
 
         #region Product list / create / edit / delete
@@ -370,6 +372,28 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
+
+        #region Product Integration
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProductIntegration(int integrationSystemId)
+        {
+            var allProducts = await _productService.GetProductsAsync();
+            foreach (var product in allProducts)
+            {
+                var productIntegration = new CreateProductIntegrationDto
+                {
+                    ProductId = product.Id,
+                    IntegrationSystemId = integrationSystemId,
+                    Active = true,
+                    LastSyncDate = null
+                };
+
+                await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+            }
+            return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
+        }
+        #endregion
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
         {
             if (product != null)

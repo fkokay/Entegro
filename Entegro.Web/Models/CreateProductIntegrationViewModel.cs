@@ -1,10 +1,10 @@
-﻿namespace Entegro.Application.DTOs.ProductIntegration
+﻿namespace Entegro.Web.Models
 {
-    public class CreateProductIntegrationDto
+    public class CreateProductIntegrationViewModel
     {
         public int ProductId { get; set; }
         public int IntegrationSystemId { get; set; }
         public DateTime? LastSyncDate { get; set; }
-        public bool Active { get; set; }
+        public bool Active { get; set; } = true;
     }
 }

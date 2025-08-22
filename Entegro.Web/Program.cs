@@ -114,6 +114,10 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<ICityService, CityService>();
 
 
+builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();
+builder.Services.AddScoped<IProductIntegrationService, ProductIntegrationService>();
+
+
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddHttpClient();
 
