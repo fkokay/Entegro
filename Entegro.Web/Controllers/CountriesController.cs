@@ -68,7 +68,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CountryViewModel model)
+        public async Task<IActionResult> Edit(UpdateCountryViewModel model)
         {
             if (ModelState.IsValid)
             {
