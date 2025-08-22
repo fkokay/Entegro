@@ -28,7 +28,7 @@ namespace Entegro.Domain.Entities
         private ICollection<MediaFile> _mediaFiles;
         public ICollection<MediaFile> MediaFiles
         {
-            get => LazyLoader?.Load(this, ref _mediaFiles) ?? (_mediaFiles ??= new HashSet<IntegrationSystemLog>());
+            get => LazyLoader?.Load(this, ref _mediaFiles) ?? (_mediaFiles ??= new HashSet<MediaFile>());
             set => _mediaFiles = value;
         }
     }

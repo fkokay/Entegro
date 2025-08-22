@@ -38,7 +38,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Categories.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsQueryable();
+            var query = _context.Categories.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsQueryable();
 
             var totalCount = await query.CountAsync();
             var categories = await query
@@ -64,7 +64,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Categories
              .Include(b => b.MediaFile)
-             .ThenInclude(b => b.MediaFolder)
+             .ThenInclude(b => b.Folder)
              .FirstOrDefaultAsync(b => b.Id == id);
         }
 

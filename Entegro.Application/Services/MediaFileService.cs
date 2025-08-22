@@ -80,7 +80,7 @@ namespace Entegro.Application.Services
             var mediaFolder = mediaFile.FolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value) : null;
 
 
-            string folderName = mediaFile.MediaFolder?.Name ?? ""; // default Brand olabilir
+            string folderName = mediaFile.Folder?.Name ?? ""; // default Brand olabilir
             string uploadsRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folderName);
             string filePath = Path.Combine(uploadsRoot, mediaFile.Name);
 

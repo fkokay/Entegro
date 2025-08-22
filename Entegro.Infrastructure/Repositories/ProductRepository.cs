@@ -54,7 +54,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(m => m.Brand)
                 .Include(m => m.ProductMediaFiles)
                 .Include(m => m.ProductIntegrations)
-                .ThenInclude(m => m.IntegrationSystem).ThenInclude(m => m.Parameters)
+                .ThenInclude(m => m.IntegrationSystem).ThenInclude(m => m.IntegrationSystemParameters)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -92,7 +92,7 @@ namespace Entegro.Infrastructure.Repositories
                         Id =x.IntegrationSystem.Id,
                         Description = x.IntegrationSystem.Description,
                         Name = x.IntegrationSystem.Name,
-                        Parameters = x.IntegrationSystem.Parameters.Select(a=> new IntegrationSystemParameter()
+                        IntegrationSystemParameters = x.IntegrationSystem.IntegrationSystemParameters.Select(a=> new IntegrationSystemParameter()
                         {
                             Id=a.Id,
                             IntegrationSystemId = a.IntegrationSystemId,
@@ -130,8 +130,8 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Product?> GetByIdAsync(int id)
         {
             return await _context.Products.AsNoTracking()
-                .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.MediaFolder)
-                .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.Values)
+                .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+                .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
                 .Include(m => m.ProductVariantAttributeCombination).FirstOrDefaultAsync(o => o.Id == id);
         }
 
