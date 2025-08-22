@@ -68,6 +68,12 @@ namespace Entegro.Application.Services
             return await _productRepository.ExistsByNameAsync(productName);
         }
 
+        public async Task<List<int>> GetAllProductIdAsync()
+        {
+            var allProducts = await _productRepository.GetAllAsync();
+            return allProducts.Select(x => x.Id).ToList();
+        }
+
         public async Task<ProductDto> GetProductByIdAsync(int productId)
         {
             var product = await _productRepository.GetByIdAsync(productId);

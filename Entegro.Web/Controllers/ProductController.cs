@@ -378,8 +378,7 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProductIntegration(int integrationSystemId)
         {
-            var allProducts = await _productService.GetProductsAsync();
-            int[] allProductIds = allProducts.Select(x => x.Id).ToArray();
+            var allProductIds = await _productService.GetAllProductIdAsync();
             foreach (var productId in allProductIds)
             {
                 var productIntegration = new CreateProductIntegrationDto
