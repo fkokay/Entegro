@@ -1,5 +1,8 @@
-﻿@{
+﻿@using System.Text.Json
+@{
     ViewData["Title"] = "Ürünler";
+
+    var jsonCommerces = JsonSerializer.Serialize(ViewBag.Commerces);
 }
 
 <div class="flex-grow-1 container-p-y container-fluid">
@@ -36,6 +39,18 @@
 @section Scripts {
     <script>
         $(function () {
+             var commerces = @Html.Raw(jsonCommerces);
+             var commercesButton = [];
+            $.each(commerces, function(index, item) {
+                commercesButton.push({
+                    className: "dropdown-item",
+                    text: `
+                        <span class="d-flex align-items-center text-center">
+                           Tüm Ürünleri<br>${item.Name}<br> Mağzasına Bağla
+                        </span>`,
+                });
+            });
+
             $('#ProductTable').dataTable({
                 language: {
                      paginate: {
@@ -160,6 +175,18 @@
                                     text: "_MENU_"
                                 },
                                 buttons: [
+                                        {
+                                            extend: "collection",
+                                            className: "btn btn-label-secondary dropdown-toggle me-4",
+                                            text: `
+                                                <span class="d-flex align-items-center gap-1">
+                                                    <i class="icon-base ti ti-import icon-xs"></i>
+                                                    <span class="d-none d-sm-inline-block">E-Ticaret Entegrasyonu</span>
+                                                </span>`,
+                                            buttons: [
+                                                commercesButton
+                                            ]
+                                        },
                                         {
                                             extend: "collection",
                                             className: "btn btn-label-secondary dropdown-toggle me-4",
@@ -294,6 +321,10 @@
                         select.appendChild(option);
                     }
                 });
+            }
+
+            function ProductIntegration(integrationSystemId){
+
             }
         });
     </script>

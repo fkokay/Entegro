@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Net;
+using System.Threading.Tasks;
 using static Entegro.Web.Models.ProductViewModel;
 
 namespace Entegro.Web.Controllers
@@ -22,13 +23,15 @@ namespace Entegro.Web.Controllers
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeMappingService _productAttributeMappingService;
         private readonly IProductImageMappingService _productImageMappingService;
+        private readonly IIntegrationSystemService _integrationSystemService;
         public ProductController(
             IProductService productService,
             IProductCategoryMappingService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
             IProductAttributeMappingService productAttributeMappingService,
-            IProductImageMappingService productImageMappingService)
+            IProductImageMappingService productImageMappingService,
+            IIntegrationSystemService integrationSystemService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -36,16 +39,21 @@ namespace Entegro.Web.Controllers
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
             _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
+            _integrationSystemService = integrationSystemService ?? throw new ArgumentNullException(nameof(integrationSystemService));
         }
 
         #region Product list / create / edit / delete
-        public IActionResult Index()
+        public Task<IActionResult> Index()
         {
             return List();
         }
 
-        public IActionResult List()
+        public async Task<IActionResult> List()
         {
+            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
+            ViewBag.Commerces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce).Select(
+                m => new { m.Id, m.Name }
+                ).ToList();
             return View();
         }
 
