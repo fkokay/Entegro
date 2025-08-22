@@ -50,5 +50,6 @@ namespace Entegro.Domain.Entities
             get => LazyLoader?.Load(this, ref _logs) ?? (_logs ??= new HashSet<IntegrationSystemLog>());
             set => _logs = value;
         }
+
     }
 }

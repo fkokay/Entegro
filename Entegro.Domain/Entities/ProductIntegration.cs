@@ -7,17 +7,24 @@ namespace Entegro.Domain.Entities
     public class ProductIntegration : BaseEntity
     {
         public int ProductId { get; set; }
-        public int IntegrationSystemId { get; set; }
-        public DateTime? LastSyncDate { get; set; }
-        public bool Active { get; set; }
-
-        //tekil product
-
         private Product? _product;
         public Product? Product
         {
             get => _product ?? LazyLoader?.Load(this, ref _product);
             set => _product = value;
         }
+        public int IntegrationSystemId { get; set; }
+        private IntegrationSystem? _integrationSystem;
+        public IntegrationSystem? IntegrationSystem
+        {
+            get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
+            set => _integrationSystem = value;
+        }
+        public DateTime? LastSyncDate { get; set; }
+        public bool Active { get; set; }
+
+        //tekil product
+
+
     }
 }

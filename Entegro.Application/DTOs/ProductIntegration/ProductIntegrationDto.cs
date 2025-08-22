@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Product;
+﻿using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.Product;
 
 namespace Entegro.Application.DTOs.ProductIntegration
 {
@@ -10,5 +11,6 @@ namespace Entegro.Application.DTOs.ProductIntegration
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; }
         public ProductDto Product { get; set; }
+        public IntegrationSystemDto IntegrationSystem { get; set; }
     }
 }

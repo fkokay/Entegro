@@ -40,12 +40,23 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _context.Products.Include(m => m.Brand).Include(m => m.ProductMediaFiles).ToListAsync();
+            return await _context.Products
+                .Include(m => m.Brand)
+                .Include(m => m.ProductMediaFiles)
+                .Include(m => m.ProductIntegrations)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.AsNoTracking().Include(m => m.Brand).Include(m => m.ProductMediaFiles).AsQueryable();
+            var query = _context.Products
+                .Include(m => m.Brand)
+                .Include(m => m.ProductMediaFiles)
+                .Include(m => m.ProductIntegrations)
+                .ThenInclude(m => m.IntegrationSystem)
+                .AsNoTracking()
+                .AsQueryable();
 
             var totalCount = await query.CountAsync();
             var products = await query.Select(m => new Product()
@@ -72,6 +83,7 @@ namespace Entegro.Infrastructure.Repositories
                 ProductVariantAttribute = m.ProductVariantAttribute,
                 ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
+                ProductIntegrations = m.ProductIntegrations,
                 Published = m.Published,
                 SpecialPrice = m.SpecialPrice,
                 StockQuantity = m.StockQuantity,
