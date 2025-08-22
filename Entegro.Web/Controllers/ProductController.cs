@@ -349,35 +349,8 @@ namespace Entegro.Web.Controllers
                         }
                     }
 
-                    var product = await _productService.GetProductByIdAsync(entityId);
-                    await _productService.UpdateProductAsync(new UpdateProductDto
-                    {
-                        Id = product.Id,
-                        Barcode = product.Barcode,
-                        BrandId = product.BrandId,
-                        Code = product.Code,
-                        Currency = product.Currency,
-                        Description = product.Description,
-                        Gtin = product.Gtin,
-                        Height = product.Height,
-                        Length = product.Length,
-                        ManufacturerPartNumber = product.ManufacturerPartNumber,
-                        MetaDescription = product.MetaDescription,
-                        MetaKeywords = product.MetaKeywords,
-                        MetaTitle = product.MetaTitle,
-                        Name = product.Name,
-                        Price = product.Price,
-                        ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations,
-                        ProductMediaFiles = product.ProductMediaFiles,
-                        Published = product.Published,
-                        StockQuantity = product.StockQuantity,
-                        Unit = product.Unit,
-                        VatInc = product.VatInc,
-                        VatRate = product.VatRate,
-                        Weight = product.Weight,
-                        Width = product.Width,
-                        MainPictureId = pictureIds[0]
-                    });
+                    int mainPictureId = response[0].MediaFileId;
+                    await _productService.UpdateProductMainPictureIdAsync(entityId,mainPictureId);
 
                     return Json(new
                     {

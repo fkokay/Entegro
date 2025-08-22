@@ -382,7 +382,7 @@
 
                                         <!-- Placeholder to paste preview container into -->
                                         <div id="preview-106864758" class="d-flex flex-wrap preview-container mt-3">
-                                            @foreach (var item in Model.ProductMediaFiles)
+                                            @foreach (var item in Model.ProductMediaFiles.OrderBy(m=>m.DisplayOrder))
                                             {
                                                 <div class="fu-file-preview dz-image-preview dz-success dz-complete shadow-sm" data-display-order="@item.DisplayOrder" data-media-id="@item.MediaFileId" data-media-name="@item.MediaFile.Name" data-entity-media-id="@item.Id">
 

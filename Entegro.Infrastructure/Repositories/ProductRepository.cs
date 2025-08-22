@@ -138,5 +138,15 @@ namespace Entegro.Infrastructure.Repositories
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateMainPictureIdAsync(int productId, int mainPictureId)
+        {
+            var product = await _context.Products.Where(m => m.Id == productId).FirstAsync();
+            product.MainPictureId = mainPictureId;
+            product.UpdatedOn = DateTime.Now;
+
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+        }
     }
 }

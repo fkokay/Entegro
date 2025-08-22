@@ -105,5 +105,11 @@ namespace Entegro.Application.Services
             await _productRepository.UpdateAsync(_mapper.Map<Product>(updateProduct));
             return true;
         }
+
+        public async Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId)
+        {
+            await _productRepository.UpdateMainPictureIdAsync(productId,mainPictureId);
+            return true;
+        }
     }
 }

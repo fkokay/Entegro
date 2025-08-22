@@ -13,6 +13,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<PagedResult<ProductDto>> GetProductsAsync(int pageNumber, int pageSize);
         Task<int> CreateProductAsync(CreateProductDto createProduct);
         Task<bool> UpdateProductAsync(UpdateProductDto updateProduct);
+        Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId);
         Task<bool> DeleteProductAsync(int productId);
     }
 }

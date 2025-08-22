@@ -65,6 +65,17 @@
                 showRemoveButtonAfterUpload: true,
                 downloadEnabled: false
             });
+
+            $(document).on("click", ".set-main-picture", function (e) {
+                var el = $(this).closest('.dz-image-preview');
+                var previewContainer = $(this).closest(".preview-container");
+
+                // Insert choosen media file at beginning of the list.
+                el.insertBefore(previewContainer.find('.dz-image-preview').first());
+                previewContainer.trigger("sort", { item: el });
+
+                return false;
+            });
         });
     </script>
     <script>
