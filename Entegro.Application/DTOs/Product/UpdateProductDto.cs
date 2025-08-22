@@ -24,6 +24,7 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
+        public int? MainPictureId { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public string? Gtin { get; set; }
         public bool Published { get; set; } = true;
