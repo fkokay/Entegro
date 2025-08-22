@@ -28,6 +28,7 @@ namespace Entegro.Service.Jobs
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
+        private readonly IProductIntegrationService _productIntegrationService;
         private readonly IMapper _mapper;
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
 
@@ -39,6 +40,7 @@ namespace Entegro.Service.Jobs
             IOrderService orderService,
             ICustomerService customerService,
             IBrandService brandService,
+            IProductIntegrationService productIntegrationService,
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
         {
@@ -49,6 +51,7 @@ namespace Entegro.Service.Jobs
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
+            _productIntegrationService = productIntegrationService ?? throw new ArgumentNullException(nameof(productIntegrationService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -63,8 +66,13 @@ namespace Entegro.Service.Jobs
         private async Task ProductWriter()
         {
             _logger.LogInformation("Smartstore ürün yazma işlemi başlatıldı. Zaman: {Time}", DateTime.UtcNow);
-            var allProducts = await _productService.GetProductsAsync();
-            await _commerceProductWriter.UpsertProductsAsync(allProducts);
+            var productIntegrations = await _productIntegrationService.GetProductIntegrationAsync();
+            foreach (var item in productIntegrations)
+            {
+                item.Product.Price = item.Price;
+                await _commerceProductWriter.UpsertProductAsync(item.Product);
+            }
+
             _logger.LogInformation("Smartstore ürün yazma işlemi tamamlandı. Zaman: {Time}", DateTime.UtcNow);
         }
 

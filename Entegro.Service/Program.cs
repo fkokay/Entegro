@@ -26,6 +26,9 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
+builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();
+builder.Services.AddScoped<IProductIntegrationService, ProductIntegrationService>();
+
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 
@@ -37,6 +40,12 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+builder.Services.AddScoped<IMediaFileRepository, MediaFileRepository>();
+builder.Services.AddScoped<IMediaFileService, MediaFileService>();
+
+builder.Services.AddScoped<IMediaFolderRepository, MediaFolderRepository>();
+builder.Services.AddScoped<IMediaFolderService, MediaFolderService>();
 
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddScoped<ITrendyolService, TrendyolService>();
@@ -51,29 +60,29 @@ builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionJobFactory();
 
-    //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+    var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
-    //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
-
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeySmartstore)
-    //    .WithIdentity("SmartstoreDataSyncJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(10)
-    //        .RepeatForever())
-    //    );
-
-    var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
-
-    q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
 
     q.AddTrigger(opts => opts
-        .ForJob(jobKeyTrendyol)
-        .WithIdentity("TrendyolDataSyncJob-trigger")
+        .ForJob(jobKeySmartstore)
+        .WithIdentity("SmartstoreDataSyncJob-trigger")
         .WithSimpleSchedule(x => x
             .WithIntervalInMinutes(10)
             .RepeatForever())
-    );
+        );
+
+    //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+
+    //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyTrendyol)
+    //    .WithIdentity("TrendyolDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //);
 
     //var jobKeyErp = new JobKey("ErpDataSyncJob");
 

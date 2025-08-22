@@ -51,10 +51,6 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.Products
-                .Include(m => m.Brand)
-                .Include(m => m.ProductMediaFiles)
-                .Include(m => m.ProductIntegrations)
-                .ThenInclude(m => m.IntegrationSystem).ThenInclude(m => m.IntegrationSystemParameters)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -103,6 +99,7 @@ namespace Entegro.Infrastructure.Repositories
                     IntegrationSystemId = x.IntegrationSystemId,
                     LastSyncDate = x.LastSyncDate,
                     ProductId = x.ProductId,
+                    Price = x.Price,
                 }).ToList(),
                 Published = m.Published,
                 SpecialPrice = m.SpecialPrice,
