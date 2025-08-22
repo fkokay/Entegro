@@ -7,9 +7,6 @@ namespace Entegro.Domain.Entities
     public class IntegrationSystemParameter : BaseEntity
     {
         public int IntegrationSystemId { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
-
 
         private IntegrationSystem? _integrationSystem;
         public IntegrationSystem? IntegrationSystem
@@ -17,5 +14,8 @@ namespace Entegro.Domain.Entities
             get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
             set => _integrationSystem = value;
         }
+
+        public string Key { get; set; }
+        public string Value { get; set; }
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Entegro.Domain.Entities
 {
     [Table("Customer")]
-    public class Customer : BaseEntity
+    public class Customer : BaseEntity,IAuditable
     {
         public string Name { get; set; }
         public string Email { get; set; }

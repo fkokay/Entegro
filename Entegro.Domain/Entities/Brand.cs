@@ -11,7 +11,6 @@ namespace Entegro.Domain.Entities
         public string? Description { get; set; }
         public int? MediaFileId { get; set; }
 
-
         private MediaFile? _mediaFile;
         public MediaFile? MediaFile
         {

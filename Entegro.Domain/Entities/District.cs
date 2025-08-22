@@ -12,6 +12,13 @@ namespace Entegro.Domain.Entities
     public class District : BaseEntity
     {
         public int TownId { get; set; }
+        private Town? _town;
+        public Town? Town
+        {
+            get => _town ?? LazyLoader?.Load(this, ref _town);
+            set => _town = value;
+        }
+
         public string Name { get; set; }
         public bool Published { get; set; }
     }

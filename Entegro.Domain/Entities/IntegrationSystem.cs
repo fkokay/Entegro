@@ -36,19 +36,18 @@ namespace Entegro.Domain.Entities
         public string? Description { get; set; }
 
 
-        public ICollection<IntegrationSystemParameter> _parameters;
-
-        public ICollection<IntegrationSystemParameter> Parameters
+        private ICollection<IntegrationSystemParameter> _integrationSystemParameters;
+        public ICollection<IntegrationSystemParameter> IntegrationSystemParameters
         {
-            get => LazyLoader?.Load(this, ref _parameters) ?? (_parameters ??= new HashSet<IntegrationSystemParameter>());
-            set => _parameters = value;
+            get => LazyLoader?.Load(this, ref _integrationSystemParameters) ?? (_integrationSystemParameters ??= new HashSet<IntegrationSystemParameter>());
+            set => _integrationSystemParameters = value;
         }
-        public ICollection<IntegrationSystemLog> _logs;
 
-        public ICollection<IntegrationSystemLog> Logs
+        private ICollection<IntegrationSystemLog> _integrationSystemLogs;
+        public ICollection<IntegrationSystemLog> IntegrationSystemLogs
         {
-            get => LazyLoader?.Load(this, ref _logs) ?? (_logs ??= new HashSet<IntegrationSystemLog>());
-            set => _logs = value;
+            get => LazyLoader?.Load(this, ref _integrationSystemLogs) ?? (_integrationSystemLogs ??= new HashSet<IntegrationSystemLog>());
+            set => _integrationSystemLogs = value;
         }
 
     }

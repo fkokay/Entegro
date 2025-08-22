@@ -7,6 +7,12 @@ namespace Entegro.Domain.Entities
     public class MediaFile : BaseEntity, ITransient
     {
         public int? FolderId { get; set; }
+        private MediaFolder? _folder;
+        public MediaFolder? Folder
+        {
+            get => _folder ?? LazyLoader?.Load(this, ref _folder);
+            set => _folder = value;
+        }
         public string Name { get; set; }
         public string Alt { get; set; }
         public string Title { get; set; }
@@ -26,12 +32,7 @@ namespace Entegro.Domain.Entities
         public int Version { get; set; }
 
 
-        private MediaFolder? _folder;
-        public MediaFolder? MediaFolder
-        {
-            get => _folder ?? LazyLoader?.Load(this, ref _folder);
-            set => _folder = value;
-        }
+
 
     }
 }
