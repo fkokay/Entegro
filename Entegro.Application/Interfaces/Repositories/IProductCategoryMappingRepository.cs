@@ -4,14 +4,14 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IProductCategoryMappingRepository
     {
-        Task<ProductCategoryMapping?> GetByIdAsync(int id);
-        Task<List<ProductCategoryMapping>> GetAllAsync();
-        Task AddAsync(ProductCategoryMapping productCategoryMapping);
-        Task UpdateAsync(ProductCategoryMapping productCategoryMapping);
-        Task DeleteAsync(ProductCategoryMapping productCategoryMapping);
+        Task<ProductCategory?> GetByIdAsync(int id);
+        Task<List<ProductCategory>> GetAllAsync();
+        Task AddAsync(ProductCategory productCategoryMapping);
+        Task UpdateAsync(ProductCategory productCategoryMapping);
+        Task DeleteAsync(ProductCategory productCategoryMapping);
 
-        Task<List<ProductCategoryMapping>> GetByProductWithCategoryAsync(int productId, CancellationToken ct = default);
-        Task<List<ProductCategoryMapping>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds, CancellationToken ct = default);
+        Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId, CancellationToken ct = default);
+        Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds, CancellationToken ct = default);
 
     }
 }

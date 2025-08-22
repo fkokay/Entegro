@@ -14,24 +14,24 @@ namespace Entegro.Infrastructure.Repositories
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task AddAsync(ProductAttributeMapping productAttributeMapping)
+        public async Task AddAsync(ProductVariantAttribute productAttributeMapping)
         {
             await _context.ProductAttributeMappings.AddAsync(productAttributeMapping);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(ProductAttributeMapping productAttributeMapping)
+        public async Task DeleteAsync(ProductVariantAttribute productAttributeMapping)
         {
             _context.ProductAttributeMappings.Remove(productAttributeMapping);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ProductAttributeMapping>> GetAllAsync()
+        public async Task<List<ProductVariantAttribute>> GetAllAsync()
         {
             return await _context.ProductAttributeMappings.ToListAsync();
         }
 
-        public async Task<PagedResult<ProductAttributeMapping>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductVariantAttribute>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.ProductAttributeMappings.AsQueryable();
 
@@ -41,7 +41,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<ProductAttributeMapping>
+            return new PagedResult<ProductVariantAttribute>
             {
                 Items = customers,
                 TotalCount = totalCount,
@@ -50,17 +50,17 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<ProductAttributeMapping?> GetByAttributeIdAsync(int id)
+        public async Task<ProductVariantAttribute?> GetByAttributeIdAsync(int id)
         {
             return await _context.ProductAttributeMappings.FirstOrDefaultAsync(o => o.ProductAttributeId == id);
         }
 
-        public async Task<ProductAttributeMapping?> GetByIdAsync(int id)
+        public async Task<ProductVariantAttribute?> GetByIdAsync(int id)
         {
             return await _context.ProductAttributeMappings.FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task UpdateAsync(ProductAttributeMapping productAttributeMapping)
+        public async Task UpdateAsync(ProductVariantAttribute productAttributeMapping)
         {
             _context.ProductAttributeMappings.Update(productAttributeMapping);
             await _context.SaveChangesAsync();

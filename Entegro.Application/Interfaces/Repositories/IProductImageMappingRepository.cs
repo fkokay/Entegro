@@ -5,12 +5,12 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IProductImageMappingRepository
     {
-        Task<ProductImageMapping?> GetByIdAsync(int id);
-        Task<List<ProductImageMapping>> GetAllAsync();
-        Task AddAsync(ProductImageMapping productImage);
-        Task UpdateAsync(ProductImageMapping productImage);
-        Task DeleteAsync(ProductImageMapping productImage);
-        Task<PagedResult<ProductImageMapping>> GetAllAsync(int pageNumber, int pageSize);
-        Task<ProductImageMapping> GetByPictureIdProductIdAsync(int pictureId, int productId);
+        Task<ProductMediaFile?> GetByIdAsync(int id);
+        Task<List<ProductMediaFile>> GetAllAsync();
+        Task AddAsync(ProductMediaFile productImage);
+        Task UpdateAsync(ProductMediaFile productImage);
+        Task DeleteAsync(ProductMediaFile productImage);
+        Task<PagedResult<ProductMediaFile>> GetAllAsync(int pageNumber, int pageSize);
+        Task<ProductMediaFile> GetByPictureIdProductIdAsync(int pictureId, int productId);
     }
 }

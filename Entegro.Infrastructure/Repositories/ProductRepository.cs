@@ -40,12 +40,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _context.Products.Include(m => m.Brand).Include(m => m.ProductImages).ToListAsync();
+            return await _context.Products.Include(m => m.Brand).Include(m => m.ProductMediaFiles).ToListAsync();
         }
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Products.AsNoTracking().Include(m => m.Brand).Include(m => m.ProductImages).AsQueryable();
+            var query = _context.Products.AsNoTracking().Include(m => m.Brand).Include(m => m.ProductMediaFiles).AsQueryable();
 
             var totalCount = await query.CountAsync();
             var products = await query.Select(m => new Product()
@@ -69,9 +69,8 @@ namespace Entegro.Infrastructure.Repositories
                 MetaKeywords = m.MetaKeywords,
                 MetaTitle = m.MetaTitle,
                 OldPrice = m.OldPrice,
-                ProductAttributes = m.ProductAttributes,
-                ProductImages = m.ProductImages,
-                OrderItems = m.OrderItems,
+                ProductVariantAttribute = m.ProductVariantAttribute,
+                ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
                 Published = m.Published,
                 SpecialPrice = m.SpecialPrice,
@@ -98,7 +97,10 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            return await _context.Products.AsNoTracking().Include(m => m.ProductImages).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder).Include(m => m.ProductAttributes).ThenInclude(m => m.Attribute).ThenInclude(m => m.Values).Include(m=> m.ProductVariants).FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.Products.AsNoTracking()
+                .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+                .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.Values)
+                .Include(m => m.ProductVariantAttributeCombinations).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(Product product)

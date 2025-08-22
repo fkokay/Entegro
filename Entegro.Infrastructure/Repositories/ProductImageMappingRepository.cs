@@ -14,24 +14,24 @@ namespace Entegro.Infrastructure.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task AddAsync(ProductImageMapping productImage)
+        public async Task AddAsync(ProductMediaFile productImage)
         {
             await _context.ProductImages.AddAsync(productImage);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(ProductImageMapping productImage)
+        public async Task DeleteAsync(ProductMediaFile productImage)
         {
             _context.ProductImages.Remove(productImage);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ProductImageMapping>> GetAllAsync()
+        public async Task<List<ProductMediaFile>> GetAllAsync()
         {
             return await _context.ProductImages.ToListAsync();
         }
 
-        public async Task<PagedResult<ProductImageMapping>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductMediaFile>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.ProductImages.AsQueryable();
 
@@ -41,7 +41,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<ProductImageMapping>
+            return new PagedResult<ProductMediaFile>
             {
                 Items = categories,
                 TotalCount = totalCount,
@@ -50,19 +50,19 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<ProductImageMapping?> GetByIdAsync(int id)
+        public async Task<ProductMediaFile?> GetByIdAsync(int id)
         {
             return await _context.ProductImages.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<ProductImageMapping> GetByPictureIdProductIdAsync(int pictureId, int productId)
+        public async Task<ProductMediaFile> GetByPictureIdProductIdAsync(int pictureId, int productId)
         {
             var result = await _context.ProductImages.AsNoTracking()
                  .FirstOrDefaultAsync(o => o.Id == pictureId && o.ProductId == productId);
             return result ?? throw new KeyNotFoundException($"ProductImage with PictureId {pictureId} and ProductId {productId} not found.");
         }
 
-        public async Task UpdateAsync(ProductImageMapping productImage)
+        public async Task UpdateAsync(ProductMediaFile productImage)
         {
             _context.ProductImages.Update(productImage);
             await _context.SaveChangesAsync();

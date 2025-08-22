@@ -19,7 +19,7 @@ namespace Entegro.Application.Services
         }
         public async Task<int> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategoryDto)
         {
-            var createProductCategory = _mapper.Map<ProductCategoryMapping>(createProductCategoryDto);
+            var createProductCategory = _mapper.Map<ProductCategory>(createProductCategoryDto);
             await _productCategoryMappingRepository.AddAsync(createProductCategory);
 
             return createProductCategory.Id;
@@ -114,7 +114,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory)
         {
-            await _productCategoryMappingRepository.UpdateAsync(_mapper.Map<ProductCategoryMapping>(updateProductCategory));
+            await _productCategoryMappingRepository.UpdateAsync(_mapper.Map<ProductCategory>(updateProductCategory));
             return true;
         }
         private static IReadOnlyList<int> SplitTreePathIds(string? treePath)
