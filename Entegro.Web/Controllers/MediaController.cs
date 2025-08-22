@@ -1,12 +1,8 @@
-﻿using Entegro.Application.DTOs.MediaFile;
-using Entegro.Application.DTOs.MediaFolder;
+﻿using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Exceptions;
-using Entegro.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using System.Dynamic;
 
 namespace Entegro.Web.Controllers
@@ -154,7 +150,7 @@ namespace Entegro.Web.Controllers
                         int index = 1;
                         while (true)
                         {
-                            fileName = title +"-"+ index + "." + extension;
+                            fileName = title + "-" + index + "." + extension;
                             var existMediaFile = await _mediaFileService.GetByNameAndFolderAsync(fileName, mediaFolderId);
                             if (existMediaFile == null)
                             {
@@ -217,14 +213,14 @@ namespace Entegro.Web.Controllers
                     o.mime = mediaFile.MimeType;
                     o.type = mediaFile.MediaType;
                     o.createdOn = mediaFile.CreatedOn;
-                    o.path = $"{mediaFile.Folder.Name}/{mediaFile.Name}";
+                    o.path = $"{mediaFile.Folder?.Name}/{mediaFile.Name}";
                     o.version = mediaFile.UpdatedOn.Ticks;
-                    o.url = $"/media/{mediaFile.Id}/{mediaFile.Folder.Name}/{mediaFile.Name}";
-                    o.thumbUrl = $"/media/{mediaFile.Id}/{mediaFile.Folder.Name}/{mediaFile.Name}?size=256";
+                    o.url = $"/media/{mediaFile.Id}/{mediaFile.Folder?.Name}/{mediaFile.Name}";
+                    o.thumbUrl = $"/media/{mediaFile.Id}/{mediaFile.Folder?.Name}/{mediaFile.Name}?size=256";
                     o.lastUpdated = mediaFile.UpdatedOn;
                     o.size = mediaFile.Size;
                     o.name = mediaFile.Name;
-                    o.dir = mediaFile.Folder.Name;
+                    o.dir = mediaFile.Folder?.Name;
                     o.title = mediaFile.Title;
                     o.ext = mediaFile.Extension;
                     o.dimensions = $"{mediaFile.Width}, {mediaFile.Height}";
@@ -243,20 +239,20 @@ namespace Entegro.Web.Controllers
                     o.mime = dupe.MimeType;
                     o.type = dupe.MediaType;
                     o.createdOn = dupe.CreatedOn;
-                    o.path = $"{dupe.Folder.Name}/{dupe.Name}";
+                    o.path = $"{dupe.Folder?.Name}/{dupe.Name}";
                     o.version = dupe.UpdatedOn.Ticks;
-                    o.url = $"/media/{dupe.Id}/{dupe.Folder.Name}/{dupe.Name}";
-                    o.thumbUrl = $"/media/{dupe.Id}/{dupe.Folder.Name}/{dupe.Name}?size=256";
+                    o.url = $"/media/{dupe.Id}/{dupe.Folder?.Name}/{dupe.Name}";
+                    o.thumbUrl = $"/media/{dupe.Id}/{dupe.Folder?.Name}/{dupe.Name}?size=256";
                     o.lastUpdated = dupe.UpdatedOn;
                     o.size = dupe.Size;
                     o.name = dupe.Name;
-                    o.dir = dupe.Folder.Name;
+                    o.dir = dupe.Folder?.Name;
                     o.title = dupe.Title;
                     o.ext = dupe.Extension;
                     o.dimensions = $"{dupe.Width}, {dupe.Height}";
                     o.dupe = true;
                     o.errMessage = dex.Message;
-                    o.uniquePath = $"{dupe.Folder.Name}/{dupe.Name}";
+                    o.uniquePath = $"{dupe.Folder?.Name}/{dupe.Name}";
                     o.createdOn = dupe.CreatedOn.ToString();
                     o.lastUpdated = dupe.UpdatedOn.ToString();
 
