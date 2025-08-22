@@ -68,5 +68,13 @@ namespace Entegro.Domain.Entities
             get => LazyLoader?.Load(this, ref _productVariantAttributeCombinations) ?? (_productVariantAttributeCombinations ??= new HashSet<ProductVariantAttributeCombination>());
             set => _productVariantAttributeCombinations = value;
         }
+
+        public ICollection<ProductIntegration> _productIntegrations;
+
+        public ICollection<ProductIntegration> ProductIntegrations
+        {
+            get => LazyLoader?.Load(this, ref _productIntegrations) ?? (_productIntegrations ??= new HashSet<ProductIntegration>());
+            set => _productIntegrations = value;
+        }
     }
 }

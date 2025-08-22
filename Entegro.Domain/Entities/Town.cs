@@ -10,8 +10,6 @@ namespace Entegro.Domain.Entities
         public string Name { get; set; }
         public bool Published { get; set; }
 
-
-
         public ICollection<District> _districts;
 
         public ICollection<District> Districts
