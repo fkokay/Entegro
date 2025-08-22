@@ -16,24 +16,24 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(ProductVariantAttributeCombination productVariantAttributeCombination)
         {
-            await _context.ProductVariants.AddAsync(productVariantAttributeCombination);
+            await _context.ProductVariantAttributeCombinations.AddAsync(productVariantAttributeCombination);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(ProductVariantAttributeCombination productVariantAttributeCombination)
         {
-            _context.ProductVariants.Remove(productVariantAttributeCombination);
+            _context.ProductVariantAttributeCombinations.Remove(productVariantAttributeCombination);
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<ProductVariantAttributeCombination>> GetAllAsync()
         {
-            return await _context.ProductVariants.ToListAsync();
+            return await _context.ProductVariantAttributeCombinations.ToListAsync();
         }
 
         public async Task<PagedResult<ProductVariantAttributeCombination>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductVariants.AsQueryable();
+            var query = _context.ProductVariantAttributeCombinations.AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query
@@ -52,12 +52,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductVariantAttributeCombination?> GetByIdAsync(int id)
         {
-            return await _context.ProductVariants.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductVariantAttributeCombinations.FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(ProductVariantAttributeCombination productVariantAttributeCombination)
         {
-            _context.ProductVariants.Update(productVariantAttributeCombination);
+            _context.ProductVariantAttributeCombinations.Update(productVariantAttributeCombination);
             await _context.SaveChangesAsync();
         }
     }

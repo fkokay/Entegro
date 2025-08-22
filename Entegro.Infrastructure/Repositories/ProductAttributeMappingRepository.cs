@@ -16,24 +16,24 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(ProductVariantAttribute productAttributeMapping)
         {
-            await _context.ProductAttributeMappings.AddAsync(productAttributeMapping);
+            await _context.ProductVariantAttributes.AddAsync(productAttributeMapping);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(ProductVariantAttribute productAttributeMapping)
         {
-            _context.ProductAttributeMappings.Remove(productAttributeMapping);
+            _context.ProductVariantAttributes.Remove(productAttributeMapping);
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<ProductVariantAttribute>> GetAllAsync()
         {
-            return await _context.ProductAttributeMappings.ToListAsync();
+            return await _context.ProductVariantAttributes.ToListAsync();
         }
 
         public async Task<PagedResult<ProductVariantAttribute>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductAttributeMappings.AsQueryable();
+            var query = _context.ProductVariantAttributes.AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query
@@ -52,17 +52,17 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductVariantAttribute?> GetByAttributeIdAsync(int id)
         {
-            return await _context.ProductAttributeMappings.FirstOrDefaultAsync(o => o.ProductAttributeId == id);
+            return await _context.ProductVariantAttributes.FirstOrDefaultAsync(o => o.ProductAttributeId == id);
         }
 
         public async Task<ProductVariantAttribute?> GetByIdAsync(int id)
         {
-            return await _context.ProductAttributeMappings.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductVariantAttributes.FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(ProductVariantAttribute productAttributeMapping)
         {
-            _context.ProductAttributeMappings.Update(productAttributeMapping);
+            _context.ProductVariantAttributes.Update(productAttributeMapping);
             await _context.SaveChangesAsync();
         }
     }

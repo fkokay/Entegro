@@ -16,24 +16,24 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(ProductMediaFile productImage)
         {
-            await _context.ProductImages.AddAsync(productImage);
+            await _context.ProductMediaFiles.AddAsync(productImage);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(ProductMediaFile productImage)
         {
-            _context.ProductImages.Remove(productImage);
+            _context.ProductMediaFiles.Remove(productImage);
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<ProductMediaFile>> GetAllAsync()
         {
-            return await _context.ProductImages.ToListAsync();
+            return await _context.ProductMediaFiles.ToListAsync();
         }
 
         public async Task<PagedResult<ProductMediaFile>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductImages.AsQueryable();
+            var query = _context.ProductMediaFiles.AsQueryable();
 
             var totalCount = await query.CountAsync();
             var categories = await query
@@ -52,19 +52,19 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductMediaFile?> GetByIdAsync(int id)
         {
-            return await _context.ProductImages.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductMediaFiles.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<ProductMediaFile> GetByPictureIdProductIdAsync(int pictureId, int productId)
         {
-            var result = await _context.ProductImages.AsNoTracking()
+            var result = await _context.ProductMediaFiles.AsNoTracking()
                  .FirstOrDefaultAsync(o => o.Id == pictureId && o.ProductId == productId);
             return result ?? throw new KeyNotFoundException($"ProductImage with PictureId {pictureId} and ProductId {productId} not found.");
         }
 
         public async Task UpdateAsync(ProductMediaFile productImage)
         {
-            _context.ProductImages.Update(productImage);
+            _context.ProductMediaFiles.Update(productImage);
             await _context.SaveChangesAsync();
         }
     }

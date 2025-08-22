@@ -36,12 +36,13 @@ namespace Entegro.Infrastructure.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductMediaFile> ProductImages { get; set; }
+        public DbSet<ProductMediaFile> ProductMediaFiles { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
-        public DbSet<ProductVariantAttribute> ProductAttributeMappings { get; set; }
-        public DbSet<ProductVariantAttributeCombination> ProductVariants { get; set; }
+        public DbSet<ProductVariantAttribute> ProductVariantAttributes { get; set; }
+        public DbSet<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; }
+        public DbSet<ProductIntegration> ProductIntegrations { get; set; }
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Brand> Brands { get; set; }
