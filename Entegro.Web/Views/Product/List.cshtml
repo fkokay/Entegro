@@ -323,9 +323,50 @@
                 });
             }
 
-            function ProductIntegration(integrationSystemId){
+        function ProductIntegration(integrationSystemId) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Tüm ürünlere entegrasyon uygulanacak!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, uygula!',
+                cancelButtonText: 'İptal',
+                preConfirm: () => {
+                    return fetch('/product/productintegration?integrationSystemId=' + integrationSystemId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Hata: ${error}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value?.success) {
+                    Swal.fire(
+                        'Başarılı!',
+                        result.value.message,
+                        'success'
+                    );
+                } else if (result.value && !result.value.success) {
+                    Swal.fire(
+                        'Hata!',
+                        result.value.message,
+                        'error'
+                    );
+                }
+            });
+        }
 
-            }
+           
         });
     </script>
 }

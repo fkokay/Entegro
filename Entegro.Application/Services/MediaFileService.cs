@@ -29,7 +29,7 @@ namespace Entegro.Application.Services
             return model.Id;
         }
 
-        public async Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file,string fileName, int? folderId)
+        public async Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, string fileName, int? folderId)
         {
             var extension = Path.GetExtension(file.FileName) ?? "";
             var mimeType = file.ContentType ?? "application/octet-stream";
@@ -80,7 +80,7 @@ namespace Entegro.Application.Services
             var mediaFolder = mediaFile.FolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value) : null;
 
 
-            string folderName = mediaFile.Folder?.Name ?? ""; // default Brand olabilir
+            string folderName = mediaFile.MediaFolder?.Name ?? ""; // default Brand olabilir
             string uploadsRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folderName);
             string filePath = Path.Combine(uploadsRoot, mediaFile.Name);
 

@@ -98,7 +98,7 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Product?> GetByIdAsync(int id)
         {
             return await _context.Products.AsNoTracking()
-                .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+                .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.MediaFolder)
                 .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.Values)
                 .Include(m => m.ProductVariantAttributeCombination).FirstOrDefaultAsync(o => o.Id == id);
         }
