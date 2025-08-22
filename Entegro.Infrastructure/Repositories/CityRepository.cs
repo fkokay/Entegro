@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Repositories
 {
-    internal class CityRepository : ICityRepository
+    public class CityRepository : ICityRepository
     {
         private readonly EntegroContext _context;
 

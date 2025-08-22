@@ -22,11 +22,11 @@ namespace Entegro.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Create(CityViewModel model)
+        public async Task<IActionResult> Create(ModalCityViewModel model)
         {
             var createDto = new CreateCityDto
             {
-                Name = model.Name,
+                Name = model.CityName,
                 CountryId = model.CountryId,
                 Published = model.Published
             };
