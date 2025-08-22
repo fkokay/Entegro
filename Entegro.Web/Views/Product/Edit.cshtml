@@ -609,7 +609,9 @@
 
             if (!data || data.length === 0) {
                 // hiç data yoksa -> boş template bırak
-                $list.append($template);
+                if($("#SelectedProductAttributeIds").val().length > 0){
+                    $list.append($template);
+                }
                 return;
             }
 

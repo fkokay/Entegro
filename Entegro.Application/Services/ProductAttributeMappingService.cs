@@ -57,7 +57,7 @@ namespace Entegro.Application.Services
             var productAttributeMapping = await _productAttributeMappingRepository.GetByAttributeIdAsync(id);
             if (productAttributeMapping == null)
             {
-                throw new KeyNotFoundException($"ProductAttribute with ID {id} not found.");
+                return null;
             }
 
             var productAttributeMappingDto = _mapper.Map<ProductAttributeMappingDto>(productAttributeMapping);

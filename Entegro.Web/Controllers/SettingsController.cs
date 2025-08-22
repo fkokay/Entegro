@@ -21,6 +21,7 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
+
         #region Erp Entegrasyonları
         [HttpGet]
         public async Task<IActionResult> Erp()
@@ -360,7 +361,6 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
-
         #region E-Ticaret Entegrasyonları 
         [HttpGet]
         public async Task<IActionResult> ECommerce()
@@ -533,7 +533,6 @@ namespace Entegro.Web.Controllers
             return Json(new { success = false, message = "Silinecek E-Ticaret Bulunamadı" });
         }
         #endregion
-
 
         #region Kargo Entegrasyonları
         [HttpGet]
@@ -873,7 +872,6 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
-
         #region Pazaryeri Entegrasyonları
         [HttpGet]
         public async Task<IActionResult> Marketplace()
@@ -948,17 +946,16 @@ namespace Entegro.Web.Controllers
             switch (marketPlaceType.Value)
             {
                 case "Trendyol":
-
-                    var apiUrl = integrationSystemMarketplace.Parameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemMarketplaceId).FirstOrDefault();
                     var apiUser = integrationSystemMarketplace.Parameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplaceId).FirstOrDefault();
                     var apiPassword = integrationSystemMarketplace.Parameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplaceId).FirstOrDefault();
+                    var supplierId = integrationSystemMarketplace.Parameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplaceId).FirstOrDefault();
 
                     TrendyolMarketplaceSettingsViewModel model = new TrendyolMarketplaceSettingsViewModel();
                     model.IntegrationSystemId = integrationSystemMarketplaceId;
                     model.CommerceType = marketPlaceType.Value;
-                    model.ApiUrl = apiUrl?.Value;
                     model.ApiUser = apiUser?.Value;
                     model.ApiPassword = apiPassword?.Value;
+                    model.SupplierId = supplierId?.Value;
 
                     return View($"Marketplace.Trendyol", model);
             }
@@ -969,27 +966,6 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> MarketplaceParameterTrendyol(TrendyolMarketplaceSettingsViewModel model)
         {
-            var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
-            if (apiUrl == null)
-            {
-                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
-                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "ApiUrl";
-                createIntegrationSystemParameter.Value = model.ApiUrl;
-
-                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
-            }
-            else
-            {
-                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = apiUrl.Id;
-                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "ApiUrl";
-                updateIntegrationSystemParameter.Value = model.ApiUrl;
-
-                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
-            }
-
             var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
             if (apiUser == null)
             {
@@ -1032,6 +1008,27 @@ namespace Entegro.Web.Controllers
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
+            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
+            if (supplierId == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "SupplierId";
+                createIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "SupplierId";
+                updateIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
 
             return RedirectToAction("marketplace");
         }
@@ -1047,7 +1044,6 @@ namespace Entegro.Web.Controllers
             return Json(new { success = false, message = "Silinecek Pazaryeri Bulunamadı" });
         }
         #endregion
-
 
         #region E-Fatura Entegrasyonları
 

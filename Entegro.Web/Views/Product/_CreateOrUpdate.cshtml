@@ -302,9 +302,12 @@
                                 </div>
                             </div>
 
-                            <div class="col-12 mt-2 p-3">
-                                <button type="button" class="btn btn-primary" data-repeater-create>Yeni Varyant</button>
-                            </div>
+                            @if (Model.ProductAttributeMappings.Any())
+                            {
+                                <div class="col-12 mt-2 p-3">
+                                    <button type="button" class="btn btn-primary" data-repeater-create>Yeni Varyant</button>
+                                </div>
+                            }
                         </div>
                     </div>
                 }

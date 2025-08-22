@@ -18,16 +18,16 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Api Url</label>
-                            @Html.TextBoxFor(m => m.ApiUrl, new { @class = "form-control" })
-                        </div>
-                        <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Api Kullanıcı</label>
+                            <label class="form-label" for="basic-default-fullname">API Kullanıcı Adı</label>
                             @Html.TextBoxFor(m => m.ApiUser, new { @class = "form-control" })
                         </div>
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Api Şifre</label>
+                            <label class="form-label" for="basic-default-fullname">API Şifre </label>
                             @Html.TextBoxFor(m => m.ApiPassword, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-6">
+                            <label class="form-label" for="basic-default-fullname">Tedarikçi Id (SupplierId)</label>
+                            @Html.TextBoxFor(m => m.SupplierId, new { @class = "form-control" })
                         </div>
                     </div>
                 </div>
