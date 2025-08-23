@@ -35,6 +35,16 @@
         white-space: nowrap;
     }
 
+    .integration-name {
+        cursor: pointer;
+        color: #212529; /* Varsayılan metin rengi (Bootstrap'da genelde bu) */
+        transition: color 0.2s ease;
+    }
+
+        .integration-name:hover {
+            color: #0d6efd; /* Bootstrap'ın primary mavi rengi */
+            text-decoration: underline;
+        }
 </style>
 <!--Bağlantılar Dropdown cssleri-->
 
@@ -85,7 +95,7 @@
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="price">Fiyat</label>
                         <input type="number" id="price" name="Price" class="form-control"
-                               step="0.01" value="0" min="0" required/>
+                               step="0.01" value="0" min="0" required />
                     </div>
 
                     <div class="col-12 text-center">
@@ -116,7 +126,7 @@
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="editPrice">Fiyat</label>
                         <input type="number" id="editPrice" name="Price" class="form-control"
-                               step="0.01" value="0" min="0" required/>
+                               step="0.01" value="0" min="0" required />
                     </div>
 
                     <div class="col-12 text-center">
@@ -248,7 +258,7 @@
                             orderable: false,
                                     render: (data, type, row) => {
                               let integrationLinks = "";
-                              
+
                               if (commerces?.length) {
                                 integrationLinks = commerces.map(c => `
                                   <li>
@@ -587,7 +597,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-          
+
           document.body.addEventListener('click', function (e) {
             const target = e.target.closest('.open-integration');
             if (target) {
