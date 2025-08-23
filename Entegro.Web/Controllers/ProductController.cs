@@ -383,16 +383,33 @@ namespace Entegro.Web.Controllers
             var allProduct = await _productService.GetProductsAsync();
             foreach (var product in allProduct)
             {
-                var productIntegration = new CreateProductIntegrationDto
+                var productExist = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(product.Id, integrationSystemId);
+                if (productExist != null)
                 {
-                    Price = product.Price,
-                    ProductId = product.Id,
-                    IntegrationSystemId = integrationSystemId,
-                    Active = true,
-                    LastSyncDate = null
-                };
+                    await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
+                    {
+                        Id = productExist.Id,
+                        Active = productExist.Active,
+                        IntegrationSystemId = integrationSystemId,
+                        Price = productExist.Price,
+                        ProductId = productExist.ProductId,
+                        LastSyncDate = productExist.LastSyncDate
+                    });
+                }
+                else
+                {
+                    var productIntegration = new CreateProductIntegrationDto
+                    {
+                        Price = product.Price,
+                        ProductId = product.Id,
+                        IntegrationSystemId = integrationSystemId,
+                        Active = true,
+                        LastSyncDate = null
+                    };
 
-                await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+                    await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+                }
+
             }
             return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
         }
