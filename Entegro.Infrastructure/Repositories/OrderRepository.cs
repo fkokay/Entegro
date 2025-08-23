@@ -3,11 +3,6 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -42,13 +37,38 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Orders.Include(m=>m.Customer).Include(m=>m.OrderItems).AsQueryable();
+            //var query = _context.Orders.Include(m => m.Customer).Include(m => m.OrderItems).AsQueryable();
+            var query = _context.Orders.AsQueryable();
 
             var totalCount = await query.CountAsync();
-            var orders = await query
-                .Skip((pageNumber - 1) * pageSize)
+
+            var orders = await query.Select(o => new Order
+            {
+                Id = o.Id,
+                OrderNo = o.OrderNo,
+                OrderDate = o.OrderDate,
+                CustomerId = o.CustomerId,
+                TotalAmount = o.TotalAmount,
+                Deleted = o.Deleted,
+                IsTransient = o.IsTransient,
+                OrderSource = o.OrderSource,
+                OrderSourceId = o.OrderSourceId,
+                Customer = o.Customer,
+                OrderItems = o.OrderItems.Select(i => new OrderItem
+                {
+                    Id = i.Id,
+                    DiscountAmount = i.DiscountAmount,
+                    OrderId = i.OrderId,
+                    Price = i.Price,
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    TaxRate = i.TaxRate,
+                    UnitPrice = i.UnitPrice
+                }).ToList()
+            }).Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
 
             return new PagedResult<Order>
             {

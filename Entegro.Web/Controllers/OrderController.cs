@@ -1,5 +1,4 @@
 ﻿using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,11 +25,15 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> OrderList([FromBody] GridCommand model)
         {
-            var result = await _orderService.GetOrdersAsync(model.Draw, model.Length);
+            int pageNumber = model.Start / model.Length;
+            int pageSize = model.Length;
+
+
+            var result = await _orderService.GetOrdersAsync(pageNumber, model.Length);
 
             return Json(new
             {
-                draw = result.PageNumber,
+                draw = model.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items
