@@ -1,11 +1,7 @@
 ﻿using Entegro.Domain.Common;
 using Entegro.Domain.Enums;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
@@ -36,7 +32,17 @@ namespace Entegro.Domain.Entities
         public decimal TotalAmount { get; set; }
         public bool Deleted { get; set; }
         public bool IsTransient { get; set; }
-        public virtual Customer Customer { get; set; }
-        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        private Customer? _customer;
+        public Customer? Customer
+        {
+            get => _customer ?? LazyLoader?.Load(this, ref _customer);
+            set => _customer = value;
+        }
+        private ICollection<OrderItem> _orderItems;
+        public ICollection<OrderItem> OrderItems
+        {
+            get => LazyLoader?.Load(this, ref _orderItems) ?? (_orderItems ??= new HashSet<OrderItem>());
+            set => _orderItems = value;
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace Entegro.Domain.Entities
         public bool Published { get; set; }
         public int DisplayOrder { get; set; }
 
-        public ICollection<City> _cities;
+        private ICollection<City> _cities;
         public ICollection<City> Cities
         {
             get => LazyLoader?.Load(this, ref _cities) ?? (_cities ??= new HashSet<City>());

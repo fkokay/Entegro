@@ -15,7 +15,7 @@ namespace Entegro.Domain.Entities
         public string AttributeXml { get; set; }
 
 
-        public Product _product;
+        private Product _product;
 
         public Product Product
         {
