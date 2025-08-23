@@ -16,6 +16,6 @@ namespace Entegro.Application.DTOs.Brand
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
-        public virtual MediaFileDto? MediaFile { get; set; }
+        public MediaFileDto? MediaFile { get; set; }
     }
 }
