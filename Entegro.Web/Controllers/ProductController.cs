@@ -350,7 +350,7 @@ namespace Entegro.Web.Controllers
                     }
 
                     int mainPictureId = response[0].MediaFileId;
-                    await _productService.UpdateProductMainPictureIdAsync(entityId,mainPictureId);
+                    await _productService.UpdateProductMainPictureIdAsync(entityId, mainPictureId);
 
                     return Json(new
                     {
@@ -380,12 +380,13 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProductIntegration(int integrationSystemId)
         {
-            var allProductIds = await _productService.GetAllProductIdAsync();
-            foreach (var productId in allProductIds)
+            var allProduct = await _productService.GetProductsAsync();
+            foreach (var product in allProduct)
             {
                 var productIntegration = new CreateProductIntegrationDto
                 {
-                    ProductId = productId,
+                    Price = product.Price,
+                    ProductId = product.Id,
                     IntegrationSystemId = integrationSystemId,
                     Active = true,
                     LastSyncDate = null
@@ -394,6 +395,58 @@ namespace Entegro.Web.Controllers
                 await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
             }
             return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateProductIntegrationWithModel(CreateProductIntegrationViewModel model)
+        {
+            var productExist = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
+            if (productExist == null)
+            {
+                var productIntegration = new CreateProductIntegrationDto
+                {
+                    Price = model.Price,
+                    ProductId = model.ProductId,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    Active = true,
+                    LastSyncDate = null
+                };
+                await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+            }
+
+            else
+            {
+                productExist.Price = model.Price;
+                await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
+                {
+                    Id = productExist.Id,
+                    Active = productExist.Active,
+                    IntegrationSystemId = productExist.IntegrationSystemId,
+                    Price = model.Price,
+                    ProductId = productExist.ProductId,
+                    LastSyncDate = productExist.LastSyncDate
+                });
+            }
+
+            return RedirectToAction("List");
+        }
+
+        public async Task<IActionResult> GetProductIntegration(int productId, int integrationSystemId)
+        {
+            var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(productId, integrationSystemId);
+            if (productIntegration == null)
+            {
+                return Json(new { success = false, message = "Ürün entegrasyonu bulunamadı." });
+            }
+            var model = new ProductIntegrationDto
+            {
+                Id = productIntegration.Id,
+                ProductId = productIntegration.ProductId,
+                IntegrationSystemId = productIntegration.IntegrationSystemId,
+                Price = productIntegration.Price,
+                Active = productIntegration.Active,
+                LastSyncDate = productIntegration.LastSyncDate
+            };
+            return Json(new { success = true, data = model });
         }
         #endregion
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)

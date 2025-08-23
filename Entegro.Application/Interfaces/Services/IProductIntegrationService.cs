@@ -8,6 +8,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<ProductIntegrationDto> GetByIdAsync(int productIntegrationId);
         Task<IEnumerable<ProductIntegrationDto>> GetProductIntegrationAsync();
         Task<PagedResult<ProductIntegrationDto>> GetProductIntegrationAsync(int pageNumber, int pageSize);
+        Task<ProductIntegrationDto?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId);
         Task<int> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration);
         Task<bool> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration);
         Task<bool> DeleteProductIntegrationAsync(int productIntegrationId);

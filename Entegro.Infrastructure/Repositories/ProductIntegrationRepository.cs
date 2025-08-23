@@ -64,6 +64,13 @@ namespace Entegro.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        public async Task<ProductIntegration> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId)
+        {
+            return await _context.ProductIntegrations
+                .Include(c => c.Product).AsNoTracking()
+                .FirstOrDefaultAsync(t => t.ProductId == productId && t.IntegrationSystemId == integrationSystemId);
+        }
+
         public async Task UpdateAsync(ProductIntegration productIntegration)
         {
             _context.ProductIntegrations.Update(productIntegration);

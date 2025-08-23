@@ -6,5 +6,6 @@
         public int IntegrationSystemId { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
+        public decimal Price { get; set; }
     }
 }

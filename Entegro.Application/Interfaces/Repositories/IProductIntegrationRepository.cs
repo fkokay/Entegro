@@ -6,6 +6,7 @@ namespace Entegro.Application.Interfaces.Repositories
     public interface IProductIntegrationRepository
     {
         Task<ProductIntegration> GetByIdAsync(int id);
+        Task<ProductIntegration> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId);
         Task<List<ProductIntegration>> GetAllAsync();
         Task AddAsync(ProductIntegration productIntegration);
         Task UpdateAsync(ProductIntegration productIntegration);
