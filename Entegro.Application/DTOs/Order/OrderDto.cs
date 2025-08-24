@@ -36,5 +36,18 @@ namespace Entegro.Application.DTOs.Order
 
         public List<OrderItemDto> OrderItems { get; set; } = new();
         public CustomerDto? Customer { get; set; }
+
+        public decimal CalculateTotalAmount()
+        {
+            return OrderItems?.Sum(item =>
+            {
+
+                var subtotal = item.UnitPrice * item.Quantity;
+
+                return subtotal;
+            }) ?? 0;
+        }
+
+
     }
 }

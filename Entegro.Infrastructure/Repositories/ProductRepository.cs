@@ -229,9 +229,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Product>> GetAllAsync(List<int> productIds)
         {
-            var query = _context.Products.Where(p => productIds.Contains(p.Id))
-                .AsNoTracking()
-                .AsQueryable();
+            var query = _context.Products.Where(p => productIds.Contains(p.Id)).AsNoTracking().AsQueryable();
             return await query.Select(m => new Product()
             {
                 Id = m.Id,

@@ -56,6 +56,12 @@
                            
                            
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-end"><strong>Toplam Tutar:</strong></td>
+                                <td colspan="2"><strong>@Model.CalculateTotalAmount() ₺</strong></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -134,8 +140,8 @@
                         <div class="d-flex align-items-start me-4 mt-3 gap-2">
                             <span class="badge bg-label-success p-2 rounded"><i class="ti ti-basket ti-sm"></i></span>
                             <div>
-                                <p class="mb-0 fw-semibold">@Model.OrderItems.Count()</p>
-                                <small>Sipariş</small>
+                                <p class="mb-0 fw-semibold">@Model.OrderItems.Count() Sipariş</p>
+                                <small>Alındı</small>
                             </div>
                         </div>
                     </div>
