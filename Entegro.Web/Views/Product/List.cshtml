@@ -6,18 +6,19 @@
 }
 <!--Bağlantılar Dropdown cssleri-->
 <style>
-
-  
-    .integration-name {
+    .product-integration {
         cursor: pointer;
-        color: #212529; 
-        transition: color 0.2s ease;
+        background-color: #fff; 
+        transition: background-color 0.2s ease;
+        border-radius: 6px; 
+        padding: 4px 8px; 
     }
 
-        .integration-name:hover {
-            color: #0d6efd; 
-            text-decoration: underline;
+        .product-integration:hover {
+            background-color: #f1f5ff; 
         }
+
+
 </style>
 <!--Bağlantılar Dropdown cssleri-->
 
@@ -593,17 +594,18 @@
 
     <script>
 
-        $(document).on('click', '.integration-name', function () {
-            const productId = $(this).data('product-id');
-            const integrationId = $(this).data('integration-id');
-            const price = $(this).data('price');
+        $(document).on('click', '.product-integration', function () {
+               const productId = $(this).find('.integration-name').data('product-id');
+               const integrationId = $(this).find('.integration-name').data('integration-id');
+               const price = $(this).find('.integration-name').data('price');
 
-            $('#editProductId').val(productId);
-            $('#editIntegrationSystemId').val(integrationId);
-            $('#editPrice').val(price);
+               $('#editProductId').val(productId);
+               $('#editIntegrationSystemId').val(integrationId);
+               $('#editPrice').val(price);
 
-            $('#editIntegration').modal('show');
+               $('#editIntegration').modal('show');
         });
+
     </script>
 
 }
