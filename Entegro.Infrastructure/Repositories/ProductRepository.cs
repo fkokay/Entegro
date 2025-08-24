@@ -40,12 +40,90 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _context.Products
-                .Include(m => m.Brand)
-                .Include(m => m.ProductMediaFiles)
-                .Include(m => m.ProductIntegrations)
-                .AsNoTracking()
-                .ToListAsync();
+            var query = _context.Products
+              .AsNoTracking()
+              .AsQueryable();
+            return await query.Select(m => new Product()
+            {
+                Id = m.Id,
+                Barcode = m.Barcode,
+                Name = m.Name,
+                Gtin = m.Gtin,
+                Price = m.Price,
+                Brand = m.Brand,
+                BrandId = m.BrandId,
+                Code = m.Code,
+                CreatedOn = m.CreatedOn,
+                Currency = m.Currency,
+                Deleted = m.Deleted,
+                Description = m.Description,
+                Height = m.Height,
+                Length = m.Length,
+                ManufacturerPartNumber = m.ManufacturerPartNumber,
+                MetaDescription = m.MetaDescription,
+                MetaKeywords = m.MetaKeywords,
+                MetaTitle = m.MetaTitle,
+                OldPrice = m.OldPrice,
+                ProductVariantAttribute = m.ProductVariantAttribute,
+                ProductMediaFiles = m.ProductMediaFiles,
+                ProductCategories = m.ProductCategories,
+                ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
+                {
+                    Active = x.Active,
+                    Id = x.Id,
+                    IntegrationSystem = new IntegrationSystem()
+                    {
+                        Id = x.IntegrationSystem.Id,
+                        Description = x.IntegrationSystem.Description,
+                        Name = x.IntegrationSystem.Name,
+                        IntegrationSystemParameters = x.IntegrationSystem.IntegrationSystemParameters.Select(a => new IntegrationSystemParameter()
+                        {
+                            Id = a.Id,
+                            IntegrationSystemId = a.IntegrationSystemId,
+                            Key = a.Key,
+                            Value = a.Value,
+                        }).ToList()
+                    },
+                    IntegrationSystemId = x.IntegrationSystemId,
+                    LastSyncDate = x.LastSyncDate,
+                    ProductId = x.ProductId,
+                    Price = x.Price,
+                }).ToList(),
+                Published = m.Published,
+                SpecialPrice = m.SpecialPrice,
+                StockQuantity = m.StockQuantity,
+                Unit = m.Unit,
+                UpdatedOn = m.UpdatedOn,
+                VatInc = m.VatInc,
+                VatRate = m.VatRate,
+                Weight = m.Weight,
+                Width = m.Width,
+                MainPictureId = m.MainPictureId,
+                MainPicture = m.MainPicture == null ? null : new MediaFile()
+                {
+                    Alt = m.MainPicture.Alt,
+                    CreatedOn = m.MainPicture.CreatedOn,
+                    Deleted = m.MainPicture.Deleted,
+                    Extension = m.MainPicture.Extension,
+                    Folder = m.MainPicture.Folder,
+                    FolderId = m.MainPicture.FolderId,
+                    Height = m.MainPicture.Height,
+                    Hidden = m.MainPicture.Hidden,
+                    Id = m.MainPicture.Id,
+                    IsTransient = m.MainPicture.IsTransient,
+                    MediaType = m.MainPicture.MediaType,
+                    Metadata = m.MainPicture.Metadata,
+                    MimeType = m.MainPicture.MimeType,
+                    Name = m.MainPicture.Name,
+                    PixelSize = m.MainPicture.PixelSize,
+                    Size = m.MainPicture.Size,
+                    Title = m.MainPicture.Title,
+                    UpdatedOn = m.MainPicture.UpdatedOn,
+                    Version = m.MainPicture.Version,
+                    Width = m.MainPicture.Width
+                },
+
+            }).ToListAsync();
         }
 
         public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
@@ -79,18 +157,18 @@ namespace Entegro.Infrastructure.Repositories
                 ProductVariantAttribute = m.ProductVariantAttribute,
                 ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
-                ProductIntegrations = m.ProductIntegrations.Select(x=> new ProductIntegration
+                ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
                 {
                     Active = x.Active,
                     Id = x.Id,
                     IntegrationSystem = new IntegrationSystem()
                     {
-                        Id =x.IntegrationSystem.Id,
+                        Id = x.IntegrationSystem.Id,
                         Description = x.IntegrationSystem.Description,
                         Name = x.IntegrationSystem.Name,
-                        IntegrationSystemParameters = x.IntegrationSystem.IntegrationSystemParameters.Select(a=> new IntegrationSystemParameter()
+                        IntegrationSystemParameters = x.IntegrationSystem.IntegrationSystemParameters.Select(a => new IntegrationSystemParameter()
                         {
-                            Id=a.Id,
+                            Id = a.Id,
                             IntegrationSystemId = a.IntegrationSystemId,
                             Key = a.Key,
                             Value = a.Value,
@@ -111,7 +189,7 @@ namespace Entegro.Infrastructure.Repositories
                 Weight = m.Weight,
                 Width = m.Width,
                 MainPictureId = m.MainPictureId,
-                MainPicture = m.MainPicture == null ? null: new MediaFile()
+                MainPicture = m.MainPicture == null ? null : new MediaFile()
                 {
                     Alt = m.MainPicture.Alt,
                     CreatedOn = m.MainPicture.CreatedOn,
@@ -134,7 +212,7 @@ namespace Entegro.Infrastructure.Repositories
                     Version = m.MainPicture.Version,
                     Width = m.MainPicture.Width
                 },
-                
+
             })
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
@@ -147,6 +225,94 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+        public async Task<List<Product>> GetAllAsync(List<int> productIds)
+        {
+            var query = _context.Products.Where(p => productIds.Contains(p.Id))
+                .AsNoTracking()
+                .AsQueryable();
+            return await query.Select(m => new Product()
+            {
+                Id = m.Id,
+                Barcode = m.Barcode,
+                Name = m.Name,
+                Gtin = m.Gtin,
+                Price = m.Price,
+                Brand = m.Brand,
+                BrandId = m.BrandId,
+                Code = m.Code,
+                CreatedOn = m.CreatedOn,
+                Currency = m.Currency,
+                Deleted = m.Deleted,
+                Description = m.Description,
+                Height = m.Height,
+                Length = m.Length,
+                ManufacturerPartNumber = m.ManufacturerPartNumber,
+                MetaDescription = m.MetaDescription,
+                MetaKeywords = m.MetaKeywords,
+                MetaTitle = m.MetaTitle,
+                OldPrice = m.OldPrice,
+                ProductVariantAttribute = m.ProductVariantAttribute,
+                ProductMediaFiles = m.ProductMediaFiles,
+                ProductCategories = m.ProductCategories,
+                ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
+                {
+                    Active = x.Active,
+                    Id = x.Id,
+                    IntegrationSystem = new IntegrationSystem()
+                    {
+                        Id = x.IntegrationSystem.Id,
+                        Description = x.IntegrationSystem.Description,
+                        Name = x.IntegrationSystem.Name,
+                        IntegrationSystemParameters = x.IntegrationSystem.IntegrationSystemParameters.Select(a => new IntegrationSystemParameter()
+                        {
+                            Id = a.Id,
+                            IntegrationSystemId = a.IntegrationSystemId,
+                            Key = a.Key,
+                            Value = a.Value,
+                        }).ToList()
+                    },
+                    IntegrationSystemId = x.IntegrationSystemId,
+                    LastSyncDate = x.LastSyncDate,
+                    ProductId = x.ProductId,
+                    Price = x.Price,
+                }).ToList(),
+                Published = m.Published,
+                SpecialPrice = m.SpecialPrice,
+                StockQuantity = m.StockQuantity,
+                Unit = m.Unit,
+                UpdatedOn = m.UpdatedOn,
+                VatInc = m.VatInc,
+                VatRate = m.VatRate,
+                Weight = m.Weight,
+                Width = m.Width,
+                MainPictureId = m.MainPictureId,
+                MainPicture = m.MainPicture == null ? null : new MediaFile()
+                {
+                    Alt = m.MainPicture.Alt,
+                    CreatedOn = m.MainPicture.CreatedOn,
+                    Deleted = m.MainPicture.Deleted,
+                    Extension = m.MainPicture.Extension,
+                    Folder = m.MainPicture.Folder,
+                    FolderId = m.MainPicture.FolderId,
+                    Height = m.MainPicture.Height,
+                    Hidden = m.MainPicture.Hidden,
+                    Id = m.MainPicture.Id,
+                    IsTransient = m.MainPicture.IsTransient,
+                    MediaType = m.MainPicture.MediaType,
+                    Metadata = m.MainPicture.Metadata,
+                    MimeType = m.MainPicture.MimeType,
+                    Name = m.MainPicture.Name,
+                    PixelSize = m.MainPicture.PixelSize,
+                    Size = m.MainPicture.Size,
+                    Title = m.MainPicture.Title,
+                    UpdatedOn = m.MainPicture.UpdatedOn,
+                    Version = m.MainPicture.Version,
+                    Width = m.MainPicture.Width
+                },
+
+            }).ToListAsync();
         }
 
         public async Task<Product?> GetByIdAsync(int id)

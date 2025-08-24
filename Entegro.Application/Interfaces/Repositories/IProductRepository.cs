@@ -1,10 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
@@ -14,6 +9,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<bool> ExistsByNameAsync(string productName);
         Task<bool> ExistsByCodeAsync(string productCode);
         Task<List<Product>> GetAllAsync();
+        Task<List<Product>> GetAllAsync(List<int> productIds);
         Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(Product product);
         Task UpdateAsync(Product product);

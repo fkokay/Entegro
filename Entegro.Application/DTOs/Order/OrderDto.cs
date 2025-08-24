@@ -1,12 +1,7 @@
 ﻿using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Domain.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.Order
 {

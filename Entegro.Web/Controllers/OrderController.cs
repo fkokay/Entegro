@@ -39,5 +39,11 @@ namespace Entegro.Web.Controllers
                 data = result.Items
             });
         }
+        [HttpGet]
+        public async Task<IActionResult> Detail(int id)
+        {
+            var orderDetail = await _orderService.GetOrderByIdAsync(id);
+            return View(orderDetail);
+        }
     }
 }

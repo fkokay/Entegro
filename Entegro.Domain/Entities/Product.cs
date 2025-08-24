@@ -28,6 +28,7 @@ namespace Entegro.Domain.Entities
             set => _brand = value;
         }
 
+
         public int StockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }

@@ -65,6 +65,9 @@ builder.Services.AddScoped<IProductCategoryMappingService, ProductCategoryMappin
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+
 builder.Services.AddScoped<IMediaFolderRepository, MediaFolderRepository>();
 builder.Services.AddScoped<IMediaFolderService, MediaFolderService>();
 
