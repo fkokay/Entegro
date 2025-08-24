@@ -17,21 +17,9 @@ namespace Entegro.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ProductCategory>()
-          .HasOne(p => p.Product)
-          .WithMany()
-          .HasForeignKey(p => p.ProductId);
-
-            modelBuilder.Entity<ProductCategory>()
-              .HasOne(p => p.Category)
-              .WithMany()
-              .HasForeignKey(p => p.CategoryId);
-
-
-            modelBuilder.Entity<Category>()
-              .Property(c => c.TreePath)
-              .HasMaxLength(1024);
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new ProductCategoryMap());
+            modelBuilder.ApplyConfiguration(new ProductMap());
+            modelBuilder.ApplyConfiguration(new CategoryMap());
         }
 
         public DbSet<User> Users { get; set; }
@@ -43,22 +31,18 @@ namespace Entegro.Infrastructure.Data
         public DbSet<ProductVariantAttribute> ProductVariantAttributes { get; set; }
         public DbSet<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; }
         public DbSet<ProductIntegration> ProductIntegrations { get; set; }
-
         public DbSet<Category> Categories { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-
         public DbSet<Country> Countries { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Town> Towns { get; set; }
         public DbSet<District> Districts { get; set; }
-
         public DbSet<IntegrationSystem> IntegrationSystems { get; set; }
         public DbSet<IntegrationSystemParameter> IntegrationSystemParameters { get; set; }
         public DbSet<IntegrationSystemLog> IntegrationSystemLogs { get; set; }
-
         public DbSet<MediaFolder> MediaFolders { get; set; }
         public DbSet<MediaFile> MediaFiles { get; set; }
     }

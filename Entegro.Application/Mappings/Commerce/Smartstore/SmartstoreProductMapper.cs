@@ -199,6 +199,14 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                     smartstoreProduct.ProductManufacturers.Add(productManufacturer);
                 }
 
+                smartstoreProduct.ProductCategories = product.ProductCategories.Select(m => new SmartstoreProductCategoryDto
+                {
+                    CategoryId = m.CategoryId,
+                    IsFeaturedProduct = false,
+                    IsSystemMapping = false,
+                    DisplayOrder = 0,
+                }).ToList();
+
                 return smartstoreProduct; 
             }
             catch (Exception ex)

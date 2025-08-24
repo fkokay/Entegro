@@ -54,6 +54,7 @@ builder.Services.AddScoped<IErpService, ErpService>();
 builder.Services.AddScoped<SmartstoreClient>();
 builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
 builder.Services.AddScoped<ICommerceBrandWriter, SmartstoreManufacturerWriter>();
+builder.Services.AddScoped<ICommerceCategoryWriter, SmartstoreCategoryWriter>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddQuartz(q =>
@@ -68,7 +69,7 @@ builder.Services.AddQuartz(q =>
         .ForJob(jobKeySmartstore)
         .WithIdentity("SmartstoreDataSyncJob-trigger")
         .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
+            .WithIntervalInMinutes(1)
             .RepeatForever())
         );
 

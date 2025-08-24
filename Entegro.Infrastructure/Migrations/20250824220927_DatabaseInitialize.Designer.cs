@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    [Migration("20250823091546_add_1")]
-    partial class add_1
+    [Migration("20250824220927_DatabaseInitialize")]
+    partial class DatabaseInitialize
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,8 +106,7 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.Property<string>("TreePath")
                         .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
@@ -115,6 +114,8 @@ namespace Entegro.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MediaFileId");
+
+                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Category");
                 });
@@ -695,18 +696,11 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("ProductId1");
-
                     b.HasIndex(new[] { "CategoryId" }, "IX_CategoryId");
-
-                    b.HasIndex(new[] { "CategoryId", "ProductId" }, "IX_PCM_Product_and_Category");
 
                     b.ToTable("Product_Category_Mapping");
                 });
@@ -919,7 +913,14 @@ namespace Entegro.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("MediaFileId");
 
+                    b.HasOne("Entegro.Domain.Entities.Category", "ParentCategory")
+                        .WithMany()
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("MediaFile");
+
+                    b.Navigation("ParentCategory");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.City", b =>
@@ -1043,20 +1044,16 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.ProductCategory", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Category", "Category")
-                        .WithMany()
+                        .WithMany("ProductCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Entegro.Domain.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("ProductCategories")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Product", null)
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId1");
 
                     b.Navigation("Category");
 
@@ -1138,6 +1135,11 @@ namespace Entegro.Infrastructure.Migrations
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Entegro.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("ProductCategories");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.City", b =>

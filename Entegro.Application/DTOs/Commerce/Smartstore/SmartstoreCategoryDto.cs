@@ -12,20 +12,20 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public string TreePath { get; set; }
         public string Name { get; set; }
         public string FullName { get; set; }
-        public string Description { get; set; }
-        public string BottomDescription { get; set; }
-        public string ExternalLink { get; set; }
-        public string BadgeText { get; set; }
+        public string? Description { get; set; }
+        public string? BottomDescription { get; set; }
+        public string? ExternalLink { get; set; }
+        public string? BadgeText { get; set; }
         public int BadgeStyle { get; set; }
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
         public int CategoryTemplateId { get; set; }
-        public string MetaKeywords { get; set; }
-        public string MetaDescription { get; set; }
-        public string MetaTitle { get; set; }
+        public string? MetaKeywords { get; set; }
+        public string? MetaDescription { get; set; }
+        public string? MetaTitle { get; set; }
         public int? MediaFileId { get; set; }
-        public int PageSize { get; set; }
-        public bool AllowCustomersToSelectPageSize { get; set; }
-        public string PageSizeOptions { get; set; }
+        public int? PageSize { get; set; }
+        public bool? AllowCustomersToSelectPageSize { get; set; }
+        public string? PageSizeOptions { get; set; }
         public bool ShowOnHomePage { get; set; }
         public bool LimitedToStores { get; set; }
         public bool SubjectToAcl { get; set; }

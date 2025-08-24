@@ -25,7 +25,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
                 return null;
             }
 
-           ProductMediaFileDto productImage = new ProductMediaFileDto();
+            ProductMediaFileDto productImage = new ProductMediaFileDto();
             productImage.DisplayOrder = 0;
 
             return productImage; ;

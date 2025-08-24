@@ -47,7 +47,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 return null;
             }
         }
-        public static SmartstoreManufacturerDto? ToDto(BrandDto brand)
+        public static SmartstoreManufacturerDto? ToDto(BrandDto brand) 
         {
             try
             {

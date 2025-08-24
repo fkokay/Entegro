@@ -35,12 +35,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductIntegration>> GetAllAsync()
         {
-            return await _context.ProductIntegrations.Include(x => x.Product).AsNoTracking().ToListAsync();
+            return await _context.ProductIntegrations.AsNoTracking().Include(m=>m.Product).ThenInclude(m=>m.Brand).Include(m=>m.Product.ProductCategories).ThenInclude(m=>m.Category).ToListAsync();
         }
 
         public async Task<PagedResult<ProductIntegration>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductIntegrations.Include(m => m.Product).AsNoTracking().AsQueryable();
+            var query = _context.ProductIntegrations.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var orders = await query

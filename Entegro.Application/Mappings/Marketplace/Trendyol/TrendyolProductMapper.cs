@@ -51,7 +51,8 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
                 CreatedOn = DateTime.Now,
                 UpdatedOn = DateTime.Now,
             };
-            productDto.ProductMediaFiles = TrendyolProductImageMapper.ToDtoList(trendyolProduct.images).ToList();
+            
+            //productDto.ProductMediaFiles = TrendyolProductImageMapper.ToDtoList(trendyolProduct.images).ToList();
 
             return productDto; ;
 
