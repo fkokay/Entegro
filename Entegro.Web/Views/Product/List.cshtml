@@ -7,34 +7,7 @@
 <!--Bağlantılar Dropdown cssleri-->
 <style>
 
-    .dropdown-submenu {
-        position: relative;
-    }
-
-
-    .submenu-down {
-        position: absolute;
-        top: 100%;
-        left: -60px;
-        display: none;
-        z-index: 1000;
-        margin-top: 0.25rem;
-        border-radius: 0.25rem;
-        min-width: 160px;
-        padding: 0.5rem 0;
-    }
-
-
-    .dropdown-submenu:hover > .submenu-down {
-        display: block;
-    }
-
-
-    .submenu-down .dropdown-item {
-        padding: 0.25rem 1.5rem;
-        white-space: nowrap;
-    }
-
+  
     .integration-name {
         cursor: pointer;
         color: #212529; 
@@ -252,47 +225,54 @@
                             }
                         },
                         {
-                            targets: -1,
-                            title: "İşlemler",
-                            searchable: false,
-                            orderable: false,
-                                    render: (data, type, row) => {
-                              let integrationLinks = "";
+                          targets: -1,
+                          title: "İşlemler",
+                          searchable: false,
+                          orderable: false,
+                          render: (data, type, row) => {
+                            let integrationLinks = "";
 
-                              if (commerces?.length) {
-                                integrationLinks = commerces.map(c => `
-                                  <li>
-                                    <a href="javascript:void(0);"
-                                       class="dropdown-item open-integration"
-                                       data-bs-toggle="modal" data-bs-target="#addIntegration"
-                                       data-product-id="${row.Id}"
-                                       data-integration-system-id="${c.Id}">
-                                      ${c.Name} ata
-                                    </a>
-                                  </li>
-                                `).join("");
-                              }
-
-                              return `
-                                <div class="d-inline-block text-nowrap">
-                                  <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon">
-                                    <i class="icon-base ti ti-pencil icon-22px"></i>
+                            if (commerces?.length) {
+                              integrationLinks = commerces.map(c => `
+                                <li>
+                                  <a href="javascript:void(0);"
+                                     class="dropdown-item open-integration"
+                                     data-bs-toggle="modal" data-bs-target="#addIntegration"
+                                     data-product-id="${row.Id}"
+                                     data-integration-system-id="${c.Id}">
+                                    ${c.Name} ata
                                   </a>
-                                  <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                    <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                                  </button>
-                                  <div class="dropdown-menu dropdown-menu-end m-0">
-                                    <div class="dropdown-submenu dropdown-item">
-                                      <a href="#" class="dropdown-toggle">Bağlantılar</a>
-                                      <ul class="dropdown-menu submenu-down">
-                                        ${integrationLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}
-                                      </ul>
-                                    </div>
-                                    <a href="javascript:void(0);" class="dropdown-item">Suspend</a>
-                                  </div>
-                                </div>
-                              `;
-                            }}
+                                </li>
+                              `).join("");
+                            }
+
+                            return `
+                              <div class="d-inline-block text-nowrap">
+                                <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon">
+                                  <i class="icon-base ti ti-pencil icon-22px"></i>
+                                </a>
+                                <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside">
+                                  <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end m-0">
+                                  <!-- Submenu -->
+                                  <li class="dropend">
+                                    <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">
+                                      Bağlantılar
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                      ${integrationLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}
+                                    </ul>
+                                  </li>
+                                  <li><a href="javascript:void(0);" class="dropdown-item">Suspend</a></li>
+                                </ul>
+                              </div>
+                            `;
+                          }
+                        }
+
                     ],
                     select: {
                         style: "multi",
