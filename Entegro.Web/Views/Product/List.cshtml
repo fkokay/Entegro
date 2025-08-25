@@ -62,9 +62,14 @@
                     <h3 class="mb-2">Entegrasyon Bilgileri</h3>
                 </div>
 
-                <form asp-action="CreateProductIntegrationWithModel" asp-controller="Product" class="row g-3">
+                <form asp-action="CreateProductIntegration" asp-controller="Product" class="row g-3">
                     <input type="hidden" id="productId" name="ProductId" />
                     <input type="hidden" id="integrationSystemId" name="IntegrationSystemId" />
+
+                    <div class="col-12 col-md-12">
+                        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+                        <input type="text" id="IntegrationCode" name="IntegrationCode" class="form-control" required />
+                    </div>
 
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="price">Fiyat</label>
@@ -96,6 +101,11 @@
                 <form asp-action="UpdateProductIntegration" asp-controller="Product" class="row g-3">
                     <input type="hidden" id="editProductId" name="ProductId" />
                     <input type="hidden" id="editIntegrationSystemId" name="IntegrationSystemId" />
+
+                    <div class="col-12 col-md-12">
+                        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+                        <input type="text" id="IntegrationCode" name="IntegrationCode" class="form-control" required />
+                    </div>
 
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="editPrice">Fiyat</label>
@@ -540,7 +550,7 @@
                 confirmButtonText: 'Evet, uygula!',
                 cancelButtonText: 'İptal',
                 preConfirm: () => {
-                    return fetch('/Product/CreateProductIntegration', {
+                    return fetch('/Product/CreateProductIntegrationAll', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
