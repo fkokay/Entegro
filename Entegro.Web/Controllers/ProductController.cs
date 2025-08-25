@@ -378,7 +378,7 @@ namespace Entegro.Web.Controllers
         #region Product Integration
 
         [HttpPost]
-        public async Task<IActionResult> CreateProductIntegrationAll(int integrationSystemId)
+        public async Task<IActionResult> CreateOrUpdateIntegrationAll(int integrationSystemId)
         {
             var allProduct = await _productService.GetProductsAsync();
             foreach (var product in allProduct)
@@ -415,10 +415,11 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProductIntegration(CreateProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegration(CreateProductIntegrationViewModel model)
         {
-            var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
-            if (productIntegration == null)
+            var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
+
+            if (productIntegration == null || model.Id == 0)
             {
                 await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
                 {
@@ -448,25 +449,39 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("List");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateProductIntegration(UpdateProductIntegrationViewModel model)
+        [HttpGet]
+        public async Task<IActionResult> IntegrationDialog(DialogViewModel model)
         {
-            var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
+            var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+            var product = await _productService.GetProductByIdAsync(model.ProductId);
 
-            await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
+
+            if (model.ProductIntegrationId == 0)
             {
-                Id = productIntegration.Id,
-                Active = productIntegration.Active,
-                IntegrationSystemId = productIntegration.IntegrationSystemId,
-                IntegrationCode = model.IntegrationCode,
-                Price = model.Price,
-                ProductId = productIntegration.ProductId,
-                LastSyncDate = productIntegration.LastSyncDate
-            });
+                return PartialView("_IntegrationDialog", new CreateProductIntegrationViewModel()
+                {
+                    ProductId = model.ProductId,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    Price = product.Price,
+                    ProductCode = product.Code,
+                    ProductName = product.Name,
+                    ProductMainPicture = product.ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.MediaFile).FirstOrDefault()?.Url
+                });
+            }
+            var createModel = new CreateProductIntegrationViewModel
+            {
+                Id = existingProductIntegration.Id,
+                ProductId = existingProductIntegration.ProductId,
+                IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                IntegrationCode = existingProductIntegration?.IntegrationCode,
+                Price = existingProductIntegration?.Price ?? 0m,
+                ProductName = product.Name,
+                ProductCode = product.Code,
+                ProductMainPicture = product.ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.MediaFile).FirstOrDefault()?.Url
+            };
 
-            return RedirectToAction("List");
+            return PartialView("_IntegrationDialog", createModel);
         }
-
 
         #endregion
 

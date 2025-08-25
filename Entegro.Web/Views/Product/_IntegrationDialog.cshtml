@@ -1,0 +1,42 @@
+﻿@using Entegro.Application.DTOs.ProductIntegration
+@model CreateProductIntegrationViewModel
+<div class="row">
+    <div class="d-flex justify-content-start align-items-center product-name">
+        <div class="avatar-wrapper">
+            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                <img src="@Model.ProductMainPicture" alt="" />
+            </div>
+        </div>
+        <div class="d-flex flex-column">
+            <h6 class="text-nowrap mb-0">@Model.ProductName</h6>
+            <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
+
+        </div>
+    </div>
+</div>
+
+
+
+<form id="integrationDialog" asp-action="CreateOrUpdateProductIntegration" asp-controller="Product" class="row g-3 mt-3">
+    <input type="hidden" id="ProductId" asp-for="ProductId" />
+    <input type="hidden" id="IntegrationSystemId" asp-for="IntegrationSystemId" />
+    <input type="hidden" id="Id" asp-for="Id" />
+
+
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+        <input type="text" id="IntegrationCode" asp-for="IntegrationCode" class="form-control" required />
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="price">Fiyat</label>
+        <input type="number" id="Price" asp-for="Price" class="form-control"
+               step="0.01" min="0" required />
+    </div>
+
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+    </div>
+</form>

@@ -14,9 +14,9 @@
         padding: 4px 8px; 
     }
 
-        .product-integration:hover {
-            background-color: #f1f5ff; 
-        }
+     .product-integration:hover {
+         background-color: #f1f5ff; 
+     }
 
 
 </style>
@@ -61,68 +61,16 @@
                 <div class="text-center mb-4">
                     <h3 class="mb-2">Entegrasyon Bilgileri</h3>
                 </div>
-
-                <form asp-action="CreateProductIntegration" asp-controller="Product" class="row g-3">
-                    <input type="hidden" id="productId" name="ProductId" />
-                    <input type="hidden" id="integrationSystemId" name="IntegrationSystemId" />
-
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
-                        <input type="text" id="IntegrationCode" name="IntegrationCode" class="form-control" required />
-                    </div>
-
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="price">Fiyat</label>
-                        <input type="number" id="price" name="Price" class="form-control"
-                               step="0.01" value="0" min="0" required />
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
-                    </div>
-                </form>
-
+                <div id="integrationDialogContainer"></div>
             </div>
         </div>
     </div>
 </div>
 
 
-<div class="modal fade" id="editIntegration" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Entegrasyon Bilgileri Düzenle</h3>
-                </div>
 
-                <form asp-action="UpdateProductIntegration" asp-controller="Product" class="row g-3">
-                    <input type="hidden" id="editProductId" name="ProductId" />
-                    <input type="hidden" id="editIntegrationSystemId" name="IntegrationSystemId" />
 
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
-                        <input type="text" id="IntegrationCode" name="IntegrationCode" class="form-control" required />
-                    </div>
 
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="editPrice">Fiyat</label>
-                        <input type="number" id="editPrice" name="Price" class="form-control"
-                               step="0.01" value="0" min="0" required />
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
 @section Scripts {
 
     <script>
@@ -243,19 +191,25 @@
                           render: (data, type, row) => {
                             let integrationLinks = "";
 
-                            if (commerces?.length) {
-                              integrationLinks = commerces.map(c => `
-                                <li>
-                                  <a href="javascript:void(0);"
-                                     class="dropdown-item open-integration"
-                                     data-bs-toggle="modal" data-bs-target="#addIntegration"
-                                     data-product-id="${row.Id}"
-                                     data-integration-system-id="${c.Id}">
-                                    ${c.Name} ata
-                                  </a>
-                                </li>
-                              `).join("");
-                            }
+                                  if (commerces?.length) {
+                                      integrationLinks = commerces.map(c => {
+                                        // row.ProductIntegrations içinden bu integration sistemine ait kaydı bul
+                                        const match = row.ProductIntegrations?.find(pi => pi.IntegrationSystem.Id === c.Id);
+
+                                        return `
+                                          <li>
+                                            <a href="javascript:void(0);"
+                                               class="dropdown-item open-integration"
+                                               data-bs-toggle="modal" data-bs-target="#addIntegration"
+                                               data-product-id="${row.Id}"
+                                               data-integration-system-id="${c.Id}"
+                                               data-product-integration-id="${match?.Id || ''}">
+                                              ${c.Name} ata
+                                            </a>
+                                          </li>
+                                        `;
+                                      }).join("");
+                                    }
 
                             return `
                               <div class="d-inline-block text-nowrap">
@@ -438,8 +392,8 @@
 
                                                         <span class="name integration-name"
                                                               data-product-id="${row.data().Id}"
-                                                              data-integration-id="${pi.IntegrationSystem.Id}"
-                                                              data-price="${pi.Price}">
+                                                              data-product-integration-id="${pi.Id}"
+                                                              data-integration-system-id="${pi.IntegrationSystem.Id}">
                                                              ${pi.IntegrationSystem.Name}(${1784})
                                                         </span>
                                                        <span class="price">${pi.Price.toLocaleString("tr-TR", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} TL</span>
@@ -550,7 +504,7 @@
                 confirmButtonText: 'Evet, uygula!',
                 cancelButtonText: 'İptal',
                 preConfirm: () => {
-                    return fetch('/Product/CreateProductIntegrationAll', {
+                    return fetch('/Product/CreateOrUpdateIntegrationAll', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -587,35 +541,70 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        $(document).on('click', '.product-integration, .open-integration', function (e) {
+          e.preventDefault();
 
-          document.body.addEventListener('click', function (e) {
-            const target = e.target.closest('.open-integration');
-            if (target) {
-              const productId = target.getAttribute('data-product-id');
-              const integrationSystemId = target.getAttribute('data-integration-system-id');
+          const $el = $(this).find('.integration-name');
+          const ProductId = $(this).data('product-id') || $el.data('product-id');
+          const IntegrationSystemId = $(this).data('integration-system-id') || $el.data('integration-system-id');
 
-              document.getElementById('productId').value = productId;
-              document.getElementById('integrationSystemId').value = integrationSystemId;
+         
+          const ProductIntegrationId = $(this).hasClass('open-integration')
+            ? 0
+            : ($(this).data('product-integration-id') || $el.data('product-integration-id'));
+
+          $.ajax({
+            url: '/Product/integrationDialog',
+            type: 'GET',
+            dataType: 'html',
+            data: { ProductIntegrationId, IntegrationSystemId, ProductId },
+            success: function (html) {
+              $('#integrationDialogContainer').html(html);
+
+              if ($.validator && $.validator.unobtrusive) {
+                $.validator.unobtrusive.parse('#integrationDialog');
+              }
+
+              $('#addIntegration').modal('show');
+            },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              alert('Form yüklenemedi.');
             }
           });
         });
-    </script>
 
-    <script>
+        $(document).off('submit.integration')
+                   .on('submit.integration', '#integrationDialog', function (e) {
+          e.preventDefault();
 
-        $(document).on('click', '.product-integration', function () {
-               const productId = $(this).find('.integration-name').data('product-id');
-               const integrationId = $(this).find('.integration-name').data('integration-id');
-               const price = $(this).find('.integration-name').data('price');
+          const $form = $(this);
+          if ($form.valid && !$form.valid()) return;
+          if ($form.data('submitting')) return;
 
-               $('#editProductId').val(productId);
-               $('#editIntegrationSystemId').val(integrationId);
-               $('#editPrice').val(price);
+          $form.data('submitting', true);
 
-               $('#editIntegration').modal('show');
+          const $buttons = $form.find('button[type="submit"], input[type="submit"]');
+          $buttons.prop('disabled', true);
+
+          $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function () {
+              $('#addIntegration').modal('hide');
+              window.location.reload();
+            },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              alert('Kayıt sırasında hata oluştu.');
+            },
+            complete: function () {
+              $form.data('submitting', false);
+              $buttons.prop('disabled', false);
+            }
+          });
         });
-
     </script>
 
 }
