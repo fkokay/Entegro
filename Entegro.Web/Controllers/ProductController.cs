@@ -417,31 +417,31 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProductIntegration(CreateProductIntegrationViewModel model)
         {
-            var productExist = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
-            if (productExist == null)
+            var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
+            if (productIntegration == null)
             {
-                var productIntegration = new CreateProductIntegrationDto
+                await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
                 {
+                    IntegrationCode = model.IntegrationCode,
                     Price = model.Price,
                     ProductId = model.ProductId,
                     IntegrationSystemId = model.IntegrationSystemId,
                     Active = true,
                     LastSyncDate = null
-                };
-                await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+                });
             }
 
             else
             {
-                productExist.Price = model.Price;
                 await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
                 {
-                    Id = productExist.Id,
-                    Active = productExist.Active,
-                    IntegrationSystemId = productExist.IntegrationSystemId,
+                    Id = productIntegration.Id,
+                    Active = productIntegration.Active,
+                    IntegrationSystemId = productIntegration.IntegrationSystemId,
+                    IntegrationCode = model.IntegrationCode,
                     Price = model.Price,
-                    ProductId = productExist.ProductId,
-                    LastSyncDate = productExist.LastSyncDate
+                    ProductId = productIntegration.ProductId,
+                    LastSyncDate = productIntegration.LastSyncDate
                 });
             }
 
