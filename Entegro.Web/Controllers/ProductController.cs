@@ -417,10 +417,9 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegration(CreateProductIntegrationViewModel model)
         {
-            var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
+            var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
 
-
-            if (productIntegration == null)
+            if (productIntegration == null || model.Id == 0)
             {
                 await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
                 {
@@ -453,22 +452,32 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> IntegrationDialog(DialogViewModel model)
         {
-            var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.productIntegrationSystemId);
+            var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+            var product = await _productService.GetProductByIdAsync(model.ProductId);
 
-            if (model.productIntegrationSystemId == 0)
+
+            if (model.ProductIntegrationId == 0)
             {
                 return PartialView("_IntegrationDialog", new CreateProductIntegrationViewModel()
                 {
-                    ProductId = model.productId,
-                    IntegrationSystemId = model.integrationSystemId
+                    ProductId = model.ProductId,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    Price = product.Price,
+                    ProductCode = product.Code,
+                    ProductName = product.Name,
+                    ProductMainPicture = product.ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.MediaFile).FirstOrDefault()?.Url
                 });
             }
             var createModel = new CreateProductIntegrationViewModel
             {
+                Id = existingProductIntegration.Id,
                 ProductId = existingProductIntegration.ProductId,
                 IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
                 IntegrationCode = existingProductIntegration?.IntegrationCode,
-                Price = existingProductIntegration?.Price ?? 0m
+                Price = existingProductIntegration?.Price ?? 0m,
+                ProductName = product.Name,
+                ProductCode = product.Code,
+                ProductMainPicture = product.ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.MediaFile).FirstOrDefault()?.Url
             };
 
             return PartialView("_IntegrationDialog", createModel);

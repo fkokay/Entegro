@@ -392,7 +392,8 @@
 
                                                         <span class="name integration-name"
                                                               data-product-id="${row.data().Id}"
-                                                              data-product-integration-id="${pi.Id}">
+                                                              data-product-integration-id="${pi.Id}"
+                                                              data-integration-system-id="${pi.IntegrationSystem.Id}">
                                                              ${pi.IntegrationSystem.Name}(${1784})
                                                         </span>
                                                        <span class="price">${pi.Price.toLocaleString("tr-TR", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} TL</span>
@@ -544,11 +545,11 @@
           e.preventDefault();
 
           const $el = $(this).find('.integration-name');
-          const productId = $(this).data('product-id') || $el.data('product-id');
-          const integrationSystemId = $(this).data('integration-system-id') || $el.data('integration-system-id');
+          const ProductId = $(this).data('product-id') || $el.data('product-id');
+          const IntegrationSystemId = $(this).data('integration-system-id') || $el.data('integration-system-id');
 
-          // Eğer .open-integration class'ı ile tetiklendiyse productIntegrationSystemId = 0 gönder
-          const productIntegrationSystemId = $(this).hasClass('open-integration')
+         
+          const ProductIntegrationId = $(this).hasClass('open-integration')
             ? 0
             : ($(this).data('product-integration-id') || $el.data('product-integration-id'));
 
@@ -556,7 +557,7 @@
             url: '/Product/integrationDialog',
             type: 'GET',
             dataType: 'html',
-            data: { productIntegrationSystemId, integrationSystemId, productId },
+            data: { ProductIntegrationId, IntegrationSystemId, ProductId },
             success: function (html) {
               $('#integrationDialogContainer').html(html);
 

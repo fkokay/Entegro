@@ -3,9 +3,9 @@
     public class DialogViewModel
     {
 
-        public int productIntegrationSystemId { get; set; }
-        public int integrationSystemId { get; set; }
-        public int productId { get; set; }
+        public int ProductIntegrationId { get; set; }
+        public int IntegrationSystemId { get; set; }
+        public int ProductId { get; set; }
 
     }
 }
