@@ -30,7 +30,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
 
             ProductDto productDto = new ProductDto();
             productDto.Name = trendyolProduct.title;
-            productDto.Code = trendyolProduct.stockCode;
+            productDto.Code = trendyolProduct.barcode;
             productDto.Description = trendyolProduct.description;
             productDto.Price = trendyolProduct.listPrice;
             productDto.MetaKeywords = "";

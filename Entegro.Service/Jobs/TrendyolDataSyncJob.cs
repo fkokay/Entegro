@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
@@ -19,6 +20,7 @@ namespace Entegro.Service.Jobs
     {
         private readonly ITrendyolService _trendyolService;
         private readonly IProductService _productService;
+        private readonly IProductIntegrationService _productIntegrationService;
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
@@ -28,6 +30,7 @@ namespace Entegro.Service.Jobs
         public TrendyolDataSyncJob(
             ITrendyolService trendyolService,
             IProductService productService,
+            IProductIntegrationService productIntegrationService,
             IOrderService orderService,
             ICustomerService customerService,
             IBrandService brandService,
@@ -36,6 +39,7 @@ namespace Entegro.Service.Jobs
         {
             _trendyolService = trendyolService ?? throw new ArgumentNullException(nameof(trendyolService));
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _productIntegrationService = productIntegrationService ?? throw new ArgumentNullException(nameof(productIntegrationService));
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
@@ -45,7 +49,7 @@ namespace Entegro.Service.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            await ProductSync();
+            //await ProductSync();
             await OrderSync();
 
             //await CategorySync();
@@ -91,17 +95,24 @@ namespace Entegro.Service.Jobs
             }
 
             TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
-            var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
+            var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages).ToList();
             foreach (var order in orders)
             {
                 foreach (var item in order.OrderItems)
                 {
                     if (item.Product != null)
                     {
-                        var product = await _productService.GetProductByCodeAsync(item.Product.Code);
-                        if (product != null)
+                        var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(item.Product.Code);
+                        if (productIntegration != null)
                         {
-                            item.ProductId = product.Id;
+                            item.Product.Id = productIntegration.Id;
+                            item.ProductId = productIntegration.ProductId;
+                        }
+                        else
+                        {
+                            _logger.LogWarning(
+                                "Sipariş {OrderNo} içindeki '{ProductCode}' kodlu ürün eşleştirilmesi yapılmamış",
+                                order.OrderNo, item.Product.Code);
                         }
                     }
                 }
@@ -197,7 +208,17 @@ namespace Entegro.Service.Jobs
                     await retryPolicy.ExecuteAsync(async () =>
                     {
                         var createProduct = _mapper.Map<CreateProductDto>(product);
-                        await _productService.CreateProductAsync(createProduct);
+                        var productId = await _productService.CreateProductAsync(createProduct);
+
+                        CreateProductIntegrationDto productIntegration = new CreateProductIntegrationDto();
+                        productIntegration.ProductId = productId;
+                        productIntegration.IntegrationSystemId = 2;
+                        productIntegration.Active = true;
+                        productIntegration.Price = createProduct.Price;
+                        productIntegration.IntegrationCode = product.Code;
+
+                        await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+
                         _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
                     });
                 }

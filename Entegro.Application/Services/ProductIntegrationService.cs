@@ -35,12 +35,24 @@ namespace Entegro.Application.Services
             return true;
         }
 
-        public async Task<ProductIntegrationDto> GetByIdAsync(int productIntegrationId)
+        public async Task<ProductIntegrationDto?> GetByIdAsync(int productIntegrationId)
         {
             var productIntegration = await _productIntegrationRepository.GetByIdAsync(productIntegrationId);
             if (productIntegration == null)
             {
-                throw new KeyNotFoundException($"Category with ID {productIntegrationId} not found.");
+                return null;
+            }
+
+            var productIntegrationDto = _mapper.Map<ProductIntegrationDto>(productIntegration);
+            return productIntegrationDto;
+        }
+
+        public async Task<ProductIntegrationDto?> GetByIntegrationCodeAsync(string productIntegrationCode)
+        {
+            var productIntegration = await _productIntegrationRepository.GetByIntegrationCodeAsync(productIntegrationCode);
+            if (productIntegration == null)
+            {
+                return null;
             }
 
             var productIntegrationDto = _mapper.Map<ProductIntegrationDto>(productIntegration);

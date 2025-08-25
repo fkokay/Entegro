@@ -57,14 +57,21 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<ProductIntegration> GetByIdAsync(int id)
+        public async Task<ProductIntegration?> GetByIdAsync(int id)
         {
             return await _context.ProductIntegrations
                 .Include(c => c.Product).AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<ProductIntegration> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId)
+        public async Task<ProductIntegration?> GetByIntegrationCodeAsync(string integrationCode)
+        {
+            return await _context.ProductIntegrations
+                .Include(c => c.Product).AsNoTracking()
+                .FirstOrDefaultAsync(t => t.IntegrationCode == integrationCode);
+        }
+
+        public async Task<ProductIntegration?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId)
         {
             return await _context.ProductIntegrations
                 .Include(c => c.Product).AsNoTracking()
