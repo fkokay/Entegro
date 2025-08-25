@@ -418,6 +418,8 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> CreateOrUpdateProductIntegration(CreateProductIntegrationViewModel model)
         {
             var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
+
+
             if (productIntegration == null)
             {
                 await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
@@ -448,7 +450,29 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("List");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> IntegrationDialog(DialogViewModel model)
+        {
+            var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.productIntegrationSystemId);
 
+            if (model.productIntegrationSystemId == 0)
+            {
+                return PartialView("_IntegrationDialog", new CreateProductIntegrationViewModel()
+                {
+                    ProductId = model.productId,
+                    IntegrationSystemId = model.integrationSystemId
+                });
+            }
+            var createModel = new CreateProductIntegrationViewModel
+            {
+                ProductId = existingProductIntegration.ProductId,
+                IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                IntegrationCode = existingProductIntegration?.IntegrationCode,
+                Price = existingProductIntegration?.Price ?? 0m
+            };
+
+            return PartialView("_IntegrationDialog", createModel);
+        }
 
         #endregion
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)

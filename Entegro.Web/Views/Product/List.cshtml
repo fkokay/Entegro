@@ -61,31 +61,12 @@
                 <div class="text-center mb-4">
                     <h3 class="mb-2">Entegrasyon Bilgileri</h3>
                 </div>
-                <form asp-action="CreateOrUpdateProductIntegration" asp-controller="Product" class="row g-3">
-                    <input type="hidden" id="ProductId" name="ProductId" />
-                    <input type="hidden" id="IntegrationSystemId" name="IntegrationSystemId" />
-
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
-                        <input type="text" id="IntegrationCode" name="IntegrationCode" class="form-control" required />
-                    </div>
-
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="price">Fiyat</label>
-                        <input type="number" id="Price" name="Price" class="form-control"
-                               step="0.01" value="0" min="0" required />
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
-                    </div>
-                </form>
-
+                <div id="integrationDialogContainer"></div>
             </div>
         </div>
     </div>
 </div>
+
 
 
 
@@ -210,19 +191,25 @@
                           render: (data, type, row) => {
                             let integrationLinks = "";
 
-                            if (commerces?.length) {
-                              integrationLinks = commerces.map(c => `
-                                <li>
-                                  <a href="javascript:void(0);"
-                                     class="dropdown-item open-integration"
-                                     data-bs-toggle="modal" data-bs-target="#addIntegration"
-                                     data-product-id="${row.Id}"
-                                     data-integration-system-id="${c.Id}">
-                                    ${c.Name} ata
-                                  </a>
-                                </li>
-                              `).join("");
-                            }
+                                  if (commerces?.length) {
+                                      integrationLinks = commerces.map(c => {
+                                        // row.ProductIntegrations içinden bu integration sistemine ait kaydı bul
+                                        const match = row.ProductIntegrations?.find(pi => pi.IntegrationSystem.Id === c.Id);
+
+                                        return `
+                                          <li>
+                                            <a href="javascript:void(0);"
+                                               class="dropdown-item open-integration"
+                                               data-bs-toggle="modal" data-bs-target="#addIntegration"
+                                               data-product-id="${row.Id}"
+                                               data-integration-system-id="${c.Id}"
+                                               data-product-integration-id="${match?.Id || ''}">
+                                              ${c.Name} ata
+                                            </a>
+                                          </li>
+                                        `;
+                                      }).join("");
+                                    }
 
                             return `
                               <div class="d-inline-block text-nowrap">
@@ -405,9 +392,7 @@
 
                                                         <span class="name integration-name"
                                                               data-product-id="${row.data().Id}"
-                                                              data-integration-id="${pi.IntegrationSystem.Id}"
-                                                              data-price="${pi.Price}"
-                                                              data-integration-code="${pi.IntegrationCode}">
+                                                              data-product-integration-id="${pi.Id}">
                                                              ${pi.IntegrationSystem.Name}(${1784})
                                                         </span>
                                                        <span class="price">${pi.Price.toLocaleString("tr-TR", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} TL</span>
@@ -555,38 +540,70 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          document.body.addEventListener('click', function (e) {
-            const target = e.target.closest('.open-integration');
-            if (target) {
-              const productId = target.getAttribute('data-product-id');
-              const integrationSystemId = target.getAttribute('data-integration-system-id');
+        $(document).on('click', '.product-integration, .open-integration', function (e) {
+          e.preventDefault();
 
-              document.getElementById('ProductId').value = productId;
-              document.getElementById('IntegrationSystemId').value = integrationSystemId;
+          const $el = $(this).find('.integration-name');
+          const productId = $(this).data('product-id') || $el.data('product-id');
+          const integrationSystemId = $(this).data('integration-system-id') || $el.data('integration-system-id');
+
+          // Eğer .open-integration class'ı ile tetiklendiyse productIntegrationSystemId = 0 gönder
+          const productIntegrationSystemId = $(this).hasClass('open-integration')
+            ? 0
+            : ($(this).data('product-integration-id') || $el.data('product-integration-id'));
+
+          $.ajax({
+            url: '/Product/integrationDialog',
+            type: 'GET',
+            dataType: 'html',
+            data: { productIntegrationSystemId, integrationSystemId, productId },
+            success: function (html) {
+              $('#integrationDialogContainer').html(html);
+
+              if ($.validator && $.validator.unobtrusive) {
+                $.validator.unobtrusive.parse('#integrationDialog');
+              }
+
+              $('#addIntegration').modal('show');
+            },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              alert('Form yüklenemedi.');
+            }
+          });
+        });
+
+        $(document).off('submit.integration')
+                   .on('submit.integration', '#integrationDialog', function (e) {
+          e.preventDefault();
+
+          const $form = $(this);
+          if ($form.valid && !$form.valid()) return;
+          if ($form.data('submitting')) return;
+
+          $form.data('submitting', true);
+
+          const $buttons = $form.find('button[type="submit"], input[type="submit"]');
+          $buttons.prop('disabled', true);
+
+          $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            success: function () {
+              $('#addIntegration').modal('hide');
+              window.location.reload();
+            },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              alert('Kayıt sırasında hata oluştu.');
+            },
+            complete: function () {
+              $form.data('submitting', false);
+              $buttons.prop('disabled', false);
             }
           });
         });
     </script>
-
-    <script>
-        $(document).on('click', '.product-integration', function () {
-            const integrationElement = $(this).find('.integration-name');
-
-            const productId = integrationElement.data('product-id');
-            const integrationId = integrationElement.data('integration-id');
-            const price = integrationElement.data('price');
-            const integrationCode = integrationElement.data('integration-code'); 
-            alert(integrationCode);
-
-            $('#ProductId').val(productId);
-            $('#IntegrationSystemId').val(integrationId);
-            $('#Price').val(price);
-            $('#IntegrationCode').val(integrationCode); 
-
-            $('#addIntegration').modal('show');
-        });
-    </script>
-
 
 }

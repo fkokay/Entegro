@@ -1,0 +1,23 @@
+﻿@using Entegro.Application.DTOs.ProductIntegration
+@model CreateProductIntegrationViewModel
+
+<form id="integrationDialog" asp-action="CreateOrUpdateProductIntegration" asp-controller="Product" class="row g-3">
+    <input type="hidden" id="ProductId" asp-for="ProductId" />
+    <input type="hidden" id="IntegrationSystemId" asp-for="IntegrationSystemId" />
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+        <input type="text" id="IntegrationCode" asp-for="IntegrationCode" class="form-control" required />
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="price">Fiyat</label>
+        <input type="number" id="Price" asp-for="Price" class="form-control"
+               step="0.01"  min="0" required />
+    </div>
+
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+    </div>
+</form>
