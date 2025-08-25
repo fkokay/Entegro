@@ -74,6 +74,18 @@ namespace Entegro.Application.Services
             return allProducts.Select(x => x.Id).ToList();
         }
 
+        public async Task<ProductDto> GetProductByCodeAsync(string productCode)
+        {
+            var product = await _productRepository.GetByCodeAsync(productCode);
+            if (product == null)
+            {
+                throw new KeyNotFoundException($"Product with ID {productCode} not found.");
+            }
+
+            var productDto = _mapper.Map<ProductDto>(product);
+            return productDto;
+        }
+
         public async Task<ProductDto> GetProductByIdAsync(int productId)
         {
             var product = await _productRepository.GetByIdAsync(productId);

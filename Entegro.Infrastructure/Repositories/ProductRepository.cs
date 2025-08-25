@@ -313,6 +313,14 @@ namespace Entegro.Infrastructure.Repositories
             }).ToListAsync();
         }
 
+        public async Task<Product?> GetByCodeAsync(string productCode)
+        {
+            return await _context.Products.AsNoTracking()
+     .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+     .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
+     .Include(m => m.ProductVariantAttributeCombination).FirstOrDefaultAsync(o => o.Code == productCode);
+        }
+
         public async Task<Product?> GetByIdAsync(int id)
         {
             return await _context.Products.AsNoTracking()

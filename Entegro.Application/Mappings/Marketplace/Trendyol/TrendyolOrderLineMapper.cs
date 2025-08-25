@@ -26,6 +26,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             }
 
 
+
             OrderItemDto orderItem = new OrderItemDto();
             orderItem.Quantity = trendyolOrderLine.Quantity;
             orderItem.DiscountAmount = trendyolOrderLine.Discount;
@@ -33,7 +34,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             orderItem.UnitPrice = trendyolOrderLine.Amount;
             orderItem.TaxRate = trendyolOrderLine.VatBaseAmount;
             orderItem.Product = new DTOs.Product.ProductDto();
-            orderItem.Product.Code = trendyolOrderLine.ProductCode.ToString();
+            orderItem.Product.Code = trendyolOrderLine.Barcode;
             orderItem.TaxRate = trendyolOrderLine.VatBaseAmount;
 
 

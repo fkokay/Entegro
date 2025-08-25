@@ -46,7 +46,7 @@ namespace Entegro.Service.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             await ProductSync();
-            //await OrderSync();
+            await OrderSync();
 
             //await CategorySync();
             //await BrandSync();
@@ -92,6 +92,20 @@ namespace Entegro.Service.Jobs
 
             TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
             var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
+            foreach (var order in orders)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    if (item.Product != null)
+                    {
+                        var product = await _productService.GetProductByCodeAsync(item.Product.Code);
+                        if (product != null)
+                        {
+                            item.ProductId = product.Id;
+                        }
+                    }
+                }
+            }
 
             var retryPolicy = Policy
                 .Handle<Exception>()

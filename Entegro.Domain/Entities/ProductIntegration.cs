@@ -23,6 +23,7 @@ namespace Entegro.Domain.Entities
             get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
             set => _integrationSystem = value;
         }
+        public string IntegrationCode { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; }
 

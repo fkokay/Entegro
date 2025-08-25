@@ -378,43 +378,44 @@ namespace Entegro.Web.Controllers
         #region Product Integration
 
         [HttpPost]
-        public async Task<IActionResult> CreateProductIntegration(int integrationSystemId)
+        public async Task<IActionResult> CreateProductIntegrationAll(int integrationSystemId)
         {
             var allProduct = await _productService.GetProductsAsync();
             foreach (var product in allProduct)
             {
-                var productExist = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(product.Id, integrationSystemId);
-                if (productExist != null)
+                var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(product.Id, integrationSystemId);
+                if (productIntegration != null)
                 {
                     await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
                     {
-                        Id = productExist.Id,
-                        Active = productExist.Active,
+                        Id = productIntegration.Id,
+                        Active = productIntegration.Active,
                         IntegrationSystemId = integrationSystemId,
-                        Price = productExist.Price,
-                        ProductId = productExist.ProductId,
-                        LastSyncDate = productExist.LastSyncDate
+                        IntegrationCode = product.Code,
+                        Price = product.Price,
+                        ProductId = productIntegration.ProductId,
+                        LastSyncDate = productIntegration.LastSyncDate
                     });
                 }
                 else
                 {
-                    var productIntegration = new CreateProductIntegrationDto
+                    await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
                     {
+                        IntegrationCode = product.Code,
                         Price = product.Price,
                         ProductId = product.Id,
                         IntegrationSystemId = integrationSystemId,
                         Active = true,
                         LastSyncDate = null
-                    };
-
-                    await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+                    });
                 }
 
             }
             return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
         }
+
         [HttpPost]
-        public async Task<IActionResult> CreateProductIntegrationWithModel(CreateProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateProductIntegration(CreateProductIntegrationViewModel model)
         {
             var productExist = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
             if (productExist == null)
@@ -446,19 +447,21 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("List");
         }
+
         [HttpPost]
         public async Task<IActionResult> UpdateProductIntegration(UpdateProductIntegrationViewModel model)
         {
-            var productExist = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
+            var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(model.ProductId, model.IntegrationSystemId);
 
             await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
             {
-                Id = productExist.Id,
-                Active = productExist.Active,
-                IntegrationSystemId = productExist.IntegrationSystemId,
+                Id = productIntegration.Id,
+                Active = productIntegration.Active,
+                IntegrationSystemId = productIntegration.IntegrationSystemId,
+                IntegrationCode = model.IntegrationCode,
                 Price = model.Price,
-                ProductId = productExist.ProductId,
-                LastSyncDate = productExist.LastSyncDate
+                ProductId = productIntegration.ProductId,
+                LastSyncDate = productIntegration.LastSyncDate
             });
 
             return RedirectToAction("List");
