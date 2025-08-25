@@ -420,15 +420,14 @@ namespace Entegro.Web.Controllers
 
             try
             {
-                var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemIdandIntegrationCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
-                if (existingProductIntegration != null)
-                {
-                    return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {existingProductIntegration.Product.Name}" });
-                }
-
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
                 if (productIntegration == null || model.Id == 0)
                 {
+                    var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemIdandIntegrationCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
+                    if (existingProductIntegration != null)
+                    {
+                        return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {existingProductIntegration.Product.Name}" });
+                    }
                     await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
                     {
                         IntegrationCode = model.IntegrationCode,
@@ -444,7 +443,7 @@ namespace Entegro.Web.Controllers
                     await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
                     {
                         Id = productIntegration.Id,
-                        Active = productIntegration.Active,
+                        Active = model.Active,
                         IntegrationSystemId = productIntegration.IntegrationSystemId,
                         IntegrationCode = model.IntegrationCode,
                         Price = model.Price,
@@ -478,6 +477,7 @@ namespace Entegro.Web.Controllers
                     Price = product.Price,
                     ProductCode = product.Code,
                     ProductName = product.Name,
+                    Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.MediaFile).FirstOrDefault()?.Url
                 });
             }
@@ -490,6 +490,7 @@ namespace Entegro.Web.Controllers
                 Price = existingProductIntegration?.Price ?? 0m,
                 ProductName = product.Name,
                 ProductCode = product.Code,
+                Active = existingProductIntegration.Active,
                 ProductMainPicture = product.ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.MediaFile).FirstOrDefault()?.Url
             };
 
