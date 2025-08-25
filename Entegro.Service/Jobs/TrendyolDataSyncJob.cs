@@ -8,11 +8,6 @@ using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Polly;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Service.Jobs
 {
@@ -212,7 +207,7 @@ namespace Entegro.Service.Jobs
 
                         CreateProductIntegrationDto productIntegration = new CreateProductIntegrationDto();
                         productIntegration.ProductId = productId;
-                        productIntegration.IntegrationSystemId = 2;
+                        productIntegration.IntegrationSystemId = 7;
                         productIntegration.Active = true;
                         productIntegration.Price = createProduct.Price;
                         productIntegration.IntegrationCode = product.Code;

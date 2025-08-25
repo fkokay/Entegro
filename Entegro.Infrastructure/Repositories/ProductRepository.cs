@@ -176,6 +176,7 @@ namespace Entegro.Infrastructure.Repositories
                     },
                     IntegrationSystemId = x.IntegrationSystemId,
                     LastSyncDate = x.LastSyncDate,
+                    IntegrationCode = x.IntegrationCode,
                     ProductId = x.ProductId,
                     Price = x.Price,
                 }).ToList(),

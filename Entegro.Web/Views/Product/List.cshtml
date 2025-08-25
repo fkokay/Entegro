@@ -14,9 +14,9 @@
         padding: 4px 8px; 
     }
 
-        .product-integration:hover {
-            background-color: #f1f5ff; 
-        }
+     .product-integration:hover {
+         background-color: #f1f5ff; 
+     }
 
 
 </style>
@@ -61,10 +61,9 @@
                 <div class="text-center mb-4">
                     <h3 class="mb-2">Entegrasyon Bilgileri</h3>
                 </div>
-
-                <form asp-action="CreateProductIntegration" asp-controller="Product" class="row g-3">
-                    <input type="hidden" id="productId" name="ProductId" />
-                    <input type="hidden" id="integrationSystemId" name="IntegrationSystemId" />
+                <form asp-action="CreateOrUpdateProductIntegration" asp-controller="Product" class="row g-3">
+                    <input type="hidden" id="ProductId" name="ProductId" />
+                    <input type="hidden" id="IntegrationSystemId" name="IntegrationSystemId" />
 
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
@@ -73,7 +72,7 @@
 
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="price">Fiyat</label>
-                        <input type="number" id="price" name="Price" class="form-control"
+                        <input type="number" id="Price" name="Price" class="form-control"
                                step="0.01" value="0" min="0" required />
                     </div>
 
@@ -89,40 +88,8 @@
 </div>
 
 
-<div class="modal fade" id="editIntegration" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Entegrasyon Bilgileri Düzenle</h3>
-                </div>
 
-                <form asp-action="UpdateProductIntegration" asp-controller="Product" class="row g-3">
-                    <input type="hidden" id="editProductId" name="ProductId" />
-                    <input type="hidden" id="editIntegrationSystemId" name="IntegrationSystemId" />
 
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
-                        <input type="text" id="IntegrationCode" name="IntegrationCode" class="form-control" required />
-                    </div>
-
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="editPrice">Fiyat</label>
-                        <input type="number" id="editPrice" name="Price" class="form-control"
-                               step="0.01" value="0" min="0" required />
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
 @section Scripts {
 
     <script>
@@ -439,7 +406,8 @@
                                                         <span class="name integration-name"
                                                               data-product-id="${row.data().Id}"
                                                               data-integration-id="${pi.IntegrationSystem.Id}"
-                                                              data-price="${pi.Price}">
+                                                              data-price="${pi.Price}"
+                                                              data-integration-code="${pi.IntegrationCode}">
                                                              ${pi.IntegrationSystem.Name}(${1784})
                                                         </span>
                                                        <span class="price">${pi.Price.toLocaleString("tr-TR", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} TL</span>
@@ -550,7 +518,7 @@
                 confirmButtonText: 'Evet, uygula!',
                 cancelButtonText: 'İptal',
                 preConfirm: () => {
-                    return fetch('/Product/CreateProductIntegrationAll', {
+                    return fetch('/Product/CreateOrUpdateIntegrationAll', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -588,34 +556,37 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
           document.body.addEventListener('click', function (e) {
             const target = e.target.closest('.open-integration');
             if (target) {
               const productId = target.getAttribute('data-product-id');
               const integrationSystemId = target.getAttribute('data-integration-system-id');
 
-              document.getElementById('productId').value = productId;
-              document.getElementById('integrationSystemId').value = integrationSystemId;
+              document.getElementById('ProductId').value = productId;
+              document.getElementById('IntegrationSystemId').value = integrationSystemId;
             }
           });
         });
     </script>
 
     <script>
-
         $(document).on('click', '.product-integration', function () {
-               const productId = $(this).find('.integration-name').data('product-id');
-               const integrationId = $(this).find('.integration-name').data('integration-id');
-               const price = $(this).find('.integration-name').data('price');
+            const integrationElement = $(this).find('.integration-name');
 
-               $('#editProductId').val(productId);
-               $('#editIntegrationSystemId').val(integrationId);
-               $('#editPrice').val(price);
+            const productId = integrationElement.data('product-id');
+            const integrationId = integrationElement.data('integration-id');
+            const price = integrationElement.data('price');
+            const integrationCode = integrationElement.data('integration-code'); // YENİ
+            alert(integrationCode);
 
-               $('#editIntegration').modal('show');
+            $('#ProductId').val(productId);
+            $('#IntegrationSystemId').val(integrationId);
+            $('#Price').val(price);
+            $('#IntegrationCode').val(integrationCode); // YENİ
+
+            $('#addIntegration').modal('show');
         });
-
     </script>
+
 
 }
