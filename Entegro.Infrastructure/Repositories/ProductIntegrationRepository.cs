@@ -76,6 +76,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             var productIntegration = await _context.ProductIntegrations
                .Include(p => p.Product)
+               .AsNoTracking()
                .FirstOrDefaultAsync(p =>
                    p.IntegrationSystemId == integrationSystemId &&
                    p.IntegrationCode == integrationCode);
