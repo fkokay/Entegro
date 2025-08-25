@@ -17,6 +17,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(ProductIntegration productIntegration)
         {
+
             await _context.ProductIntegrations.AddAsync(productIntegration);
             await _context.SaveChangesAsync();
         }
@@ -69,6 +70,16 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.ProductIntegrations
                 .Include(c => c.Product).AsNoTracking()
                 .FirstOrDefaultAsync(t => t.IntegrationCode == integrationCode);
+        }
+
+        public async Task<ProductIntegration?> GetByIntegrationSystemIdandIntegrationCodeAsync(int integrationSystemId, string integrationCode)
+        {
+            var productIntegration = await _context.ProductIntegrations
+               .Include(p => p.Product)
+               .FirstOrDefaultAsync(p =>
+                   p.IntegrationSystemId == integrationSystemId &&
+                   p.IntegrationCode == integrationCode);
+            return productIntegration;
         }
 
         public async Task<ProductIntegration?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId)

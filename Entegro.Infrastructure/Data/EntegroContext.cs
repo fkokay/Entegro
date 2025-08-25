@@ -7,7 +7,7 @@ namespace Entegro.Infrastructure.Data
     {
         public EntegroContext(DbContextOptions<EntegroContext> options) : base(options)
         {
-  
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -20,6 +20,10 @@ namespace Entegro.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ProductCategoryMap());
             modelBuilder.ApplyConfiguration(new ProductMap());
             modelBuilder.ApplyConfiguration(new CategoryMap());
+
+            modelBuilder.Entity<ProductIntegration>()
+                .HasIndex(p => new { p.IntegrationSystemId, p.IntegrationCode })
+                .IsUnique();
         }
 
         public DbSet<User> Users { get; set; }

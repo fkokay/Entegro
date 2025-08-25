@@ -574,36 +574,52 @@
           });
         });
 
+        
+    </script>
+
+    <script>
         $(document).off('submit.integration')
                    .on('submit.integration', '#integrationDialog', function (e) {
-          e.preventDefault();
+            e.preventDefault();
 
-          const $form = $(this);
-          if ($form.valid && !$form.valid()) return;
-          if ($form.data('submitting')) return;
+            const $form = $(this);
+            if ($form.valid && !$form.valid()) return;
+            if ($form.data('submitting')) return;
 
-          $form.data('submitting', true);
+            $form.data('submitting', true);
+            const $buttons = $form.find('button[type="submit"], input[type="submit"]');
+            $buttons.prop('disabled', true);
 
-          const $buttons = $form.find('button[type="submit"], input[type="submit"]');
-          $buttons.prop('disabled', true);
-
-          $.ajax({
-            url: $form.attr('action'),
-            type: 'POST',
-            data: $form.serialize(),
-            success: function () {
-              $('#addIntegration').modal('hide');
-              window.location.reload();
-            },
-            error: function (xhr) {
-              console.error(xhr.responseText);
-              alert('Kayıt sırasında hata oluştu.');
-            },
-            complete: function () {
-              $form.data('submitting', false);
-              $buttons.prop('disabled', false);
-            }
-          });
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: $form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $('#addIntegration').modal('hide');
+                        window.location.reload();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata',
+                            text: response.message || 'Bilinmeyen bir hata oluştu.',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sunucu Hatası',
+                        text: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.'
+                    });
+                },
+                complete: function () {
+                    $form.data('submitting', false);
+                    $buttons.prop('disabled', false);
+                }
+            });
         });
     </script>
 

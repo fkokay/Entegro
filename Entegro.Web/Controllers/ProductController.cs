@@ -417,36 +417,50 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegration(CreateProductIntegrationViewModel model)
         {
-            var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
 
-            if (productIntegration == null || model.Id == 0)
+            try
             {
-                await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
+                var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemIdandIntegrationCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
+                if (existingProductIntegration != null)
                 {
-                    IntegrationCode = model.IntegrationCode,
-                    Price = model.Price,
-                    ProductId = model.ProductId,
-                    IntegrationSystemId = model.IntegrationSystemId,
-                    Active = true,
-                    LastSyncDate = null
-                });
+                    return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {existingProductIntegration.Product.Name}" });
+                }
+
+                var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
+                if (productIntegration == null || model.Id == 0)
+                {
+                    await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
+                    {
+                        IntegrationCode = model.IntegrationCode,
+                        Price = model.Price,
+                        ProductId = model.ProductId,
+                        IntegrationSystemId = model.IntegrationSystemId,
+                        Active = true,
+                        LastSyncDate = null
+                    });
+                }
+                else
+                {
+                    await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
+                    {
+                        Id = productIntegration.Id,
+                        Active = productIntegration.Active,
+                        IntegrationSystemId = productIntegration.IntegrationSystemId,
+                        IntegrationCode = model.IntegrationCode,
+                        Price = model.Price,
+                        ProductId = productIntegration.ProductId,
+                        LastSyncDate = productIntegration.LastSyncDate
+                    });
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Bir hata oluştu: " + ex.Message });
             }
 
-            else
-            {
-                await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
-                {
-                    Id = productIntegration.Id,
-                    Active = productIntegration.Active,
-                    IntegrationSystemId = productIntegration.IntegrationSystemId,
-                    IntegrationCode = model.IntegrationCode,
-                    Price = model.Price,
-                    ProductId = productIntegration.ProductId,
-                    LastSyncDate = productIntegration.LastSyncDate
-                });
-            }
 
-            return RedirectToAction("List");
         }
 
         [HttpGet]
@@ -454,7 +468,6 @@ namespace Entegro.Web.Controllers
         {
             var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
             var product = await _productService.GetProductByIdAsync(model.ProductId);
-
 
             if (model.ProductIntegrationId == 0)
             {

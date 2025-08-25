@@ -27,8 +27,5 @@ namespace Entegro.Domain.Entities
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; }
 
-        //tekil product
-
-
     }
 }
