@@ -12,8 +12,11 @@ namespace Entegro.Application.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly IBrandService _brandService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeValueService _productAttributeValueService;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, IBrandService brandService, IMapper mapper)
+        public ProductService(IProductRepository productRepository, IBrandService brandService, IProductAttributeService productAttributeService, IMapper mapper)
         {
             _productRepository = productRepository;
             _brandService = brandService;
@@ -21,6 +24,7 @@ namespace Entegro.Application.Services
         }
         public async Task<int> CreateProductAsync(CreateProductDto createProduct)
         {
+            #region Marka
             if (createProduct.BrandId == null && createProduct.Brand != null)
             {
                 if (await _brandService.ExistsByNameAsync(createProduct.Brand.Name))
@@ -38,6 +42,7 @@ namespace Entegro.Application.Services
                     createProduct.Brand = null;
                 }
             }
+            #endregion
 
             var product = _mapper.Map<Product>(createProduct);
             await _productRepository.AddAsync(product);
@@ -120,7 +125,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId)
         {
-            await _productRepository.UpdateMainPictureIdAsync(productId,mainPictureId);
+            await _productRepository.UpdateMainPictureIdAsync(productId, mainPictureId);
             return true;
         }
     }

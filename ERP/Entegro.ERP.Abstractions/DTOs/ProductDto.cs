@@ -23,5 +23,8 @@ namespace Entegro.ERP.Abstractions.DTOs
         public string Category2 { get; set; }
         public string Category3 { get; set; }
         public string Category4 { get; set; }
+        public decimal StockQunatity { get; set; }
+
+        public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
     }
 }

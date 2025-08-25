@@ -9,6 +9,6 @@ namespace Entegro.Application.DTOs.ProductAttribute
         public string? Description { get; set; }
         public int DisplayOrder { get; set; }
 
-        public IList<ProductAttributeValueDto> Values { get; set; }
+        public IList<ProductAttributeValueDto> ProductAttributeValues { get; set; } = new List<ProductAttributeValueDto>();
     }
 }

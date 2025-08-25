@@ -64,7 +64,7 @@ namespace Entegro.Infrastructure.Repositories
                 MetaKeywords = m.MetaKeywords,
                 MetaTitle = m.MetaTitle,
                 OldPrice = m.OldPrice,
-                ProductVariantAttribute = m.ProductVariantAttribute,
+                ProductVariantAttributes = m.ProductVariantAttributes,
                 ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
                 ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
@@ -154,7 +154,7 @@ namespace Entegro.Infrastructure.Repositories
                 MetaKeywords = m.MetaKeywords,
                 MetaTitle = m.MetaTitle,
                 OldPrice = m.OldPrice,
-                ProductVariantAttribute = m.ProductVariantAttribute,
+                ProductVariantAttributes = m.ProductVariantAttributes,
                 ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
                 ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
@@ -251,7 +251,7 @@ namespace Entegro.Infrastructure.Repositories
                 MetaKeywords = m.MetaKeywords,
                 MetaTitle = m.MetaTitle,
                 OldPrice = m.OldPrice,
-                ProductVariantAttribute = m.ProductVariantAttribute,
+                ProductVariantAttributes = m.ProductVariantAttributes,
                 ProductMediaFiles = m.ProductMediaFiles,
                 ProductCategories = m.ProductCategories,
                 ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
@@ -317,7 +317,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Products.AsNoTracking()
      .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
-     .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
+     .Include(m => m.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
      .Include(m => m.ProductVariantAttributeCombination).FirstOrDefaultAsync(o => o.Code == productCode);
         }
 
@@ -325,7 +325,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Products.AsNoTracking()
                 .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
-                .Include(m => m.ProductVariantAttribute).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
+                .Include(m => m.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
                 .Include(m => m.ProductVariantAttributeCombination).FirstOrDefaultAsync(o => o.Id == id);
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.ProductVariantAttribute;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +24,7 @@ namespace Entegro.Application.DTOs.Erp
         public string Category2 { get; set; }
         public string Category3 { get; set; }
         public string Category4 { get; set; }
+
+        public List<ErpProductVariantDto> ProductVariantAttributes { get; set; } = new List<ErpProductVariantDto>();
     }
 }

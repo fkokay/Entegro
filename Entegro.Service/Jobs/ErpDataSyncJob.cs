@@ -2,11 +2,15 @@
 using Entegro.Application.DTOs.Erp;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Erp;
 using Entegro.Application.Mappings.Marketplace;
+using Entegro.Domain.Entities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Polly;
 using Quartz;
 using System;
@@ -24,6 +28,8 @@ namespace Entegro.Service.Jobs
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IMapper _mapper;
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
 
@@ -33,6 +39,8 @@ namespace Entegro.Service.Jobs
             IOrderService orderService,
             ICustomerService customerService,
             IBrandService brandService,
+            IProductAttributeService productAttributeService,
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
         {
@@ -41,13 +49,15 @@ namespace Entegro.Service.Jobs
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
+            _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService ?? throw new ArgumentNullException(nameof(productVariantAttributeCombinationService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            string erpType = "logo";
+            string erpType = "netsis";
             await ProductSync(erpType);
         }
 
@@ -55,11 +65,11 @@ namespace Entegro.Service.Jobs
         {
             _logger.LogInformation("{erpType} ürün senkronizasyonu başlatıldı. Zaman: {Time}", erpType, DateTime.UtcNow);
 
-            IEnumerable<ErpProductDto> erpProducts;
+            List<ErpProductDto> erpProducts;
 
             try
             {
-                erpProducts = await _erpService.GetProductsAsync(erpType);
+                erpProducts = (await _erpService.GetProductsAsync(erpType)).ToList();
             }
             catch (Exception ex)
             {
@@ -104,7 +114,21 @@ namespace Entegro.Service.Jobs
                     await retryPolicy.ExecuteAsync(async () =>
                     {
                         var createProduct = _mapper.Map<CreateProductDto>(product);
-                        await _productService.CreateProductAsync(createProduct);
+                        var productId = await _productService.CreateProductAsync(createProduct);
+
+                        var p = await _productService.GetProductByIdAsync(productId);
+                        foreach (var item in product.ProductVariantAttributeCombinations)
+                        {
+                            var values = p.ProductVariantAttributes.Select(m => m.ProductAttribute.ProductAttributeValues.Select(m => new { ProductAttributeId = m.ProductAttributeId, ProductAttributeValueId = m.Id }).ToList()).ToList();
+                            foreach (var value in values)
+                            {
+                                item.AttributeXml = JsonConvert.SerializeObject(value[0]);
+                                item.ProductId = productId;
+                                await _productVariantAttributeCombinationService.AddAsync(item);
+                            }
+
+                          
+                        }
                         _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
                     });
                 }

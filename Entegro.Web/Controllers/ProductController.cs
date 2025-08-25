@@ -469,6 +469,7 @@ namespace Entegro.Web.Controllers
 
 
         #endregion
+
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
         {
             if (product != null)
@@ -495,7 +496,7 @@ namespace Entegro.Web.Controllers
                 model.Gtin = product.Gtin;
                 model.ManufacturerPartNumber = product.ManufacturerPartNumber;
                 model.Published = product.Published;
-                model.SelectedProductAttributeIds = product.ProductVariantAttributes.Select(x => x.Id).ToArray();
+                model.SelectedProductAttributeIds = product.ProductVariantAttributes.Select(x => x.ProductAttributeId).ToArray();
                 model.ProductAttributeMappings = product.ProductVariantAttributes.Select(m => new ProductViewModel.ProductAttributeMappingViewModel()
                 {
                     AttributeControlTypeId = m.AttributeControlTypeId,
@@ -508,7 +509,7 @@ namespace Entegro.Web.Controllers
                     Attribute = new ProductAttributeViewModel()
                     {
                         Id = m.ProductAttribute.Id,
-                        Values = m.ProductAttribute.Values.Select(x => new ProductAttributeValueViewModel()
+                        Values = m.ProductAttribute.ProductAttributeValues.Select(x => new ProductAttributeValueViewModel()
                         {
                             Id = x.Id,
                             DisplayOrder = x.DisplayOrder,
@@ -565,7 +566,8 @@ namespace Entegro.Web.Controllers
                 ViewBag.ProductAttributes = productAttributes.Select(x => new SelectListItem
                 {
                     Text = x.Name,
-                    Value = x.Id.ToString()
+                    Value = x.Id.ToString(),
+                    Selected = model.SelectedProductAttributeIds.Contains(x.Id)
                 }).ToList();
             }
 

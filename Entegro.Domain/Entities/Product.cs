@@ -77,11 +77,11 @@ namespace Entegro.Domain.Entities
             set => _productCategories = value;
         }
 
-        private ICollection<ProductVariantAttribute> _productVariantAttribute;
-        public ICollection<ProductVariantAttribute> ProductVariantAttribute
+        private ICollection<ProductVariantAttribute> _productVariantAttributes;
+        public ICollection<ProductVariantAttribute> ProductVariantAttributes
         {
-            get => LazyLoader?.Load(this, ref _productVariantAttribute) ?? (_productVariantAttribute ??= new HashSet<ProductVariantAttribute>());
-            set => _productVariantAttribute = value;
+            get => LazyLoader?.Load(this, ref _productVariantAttributes) ?? (_productVariantAttributes ??= new HashSet<ProductVariantAttribute>());
+            set => _productVariantAttributes = value;
         }
 
         private ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
