@@ -1219,5 +1219,275 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
+
+        #region E-Posta Entegrasyonları
+        [HttpGet]
+        public async Task<IActionResult> Mail()
+        {
+            var integrationSystemMail = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.EMail);
+            if (integrationSystemMail == null)
+            {
+                return View();
+            }
+
+
+            var emailType = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "EMailType").FirstOrDefault();
+            if (emailType == null)
+            {
+                return NotFound();
+            }
+
+            var myMail = await _integrationSystemService.GetAllAsync();
+            ViewBag.MyMail = myMail.Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.EMail).
+                Select(m => new IntegrationSystemViewModel
+                {
+                    Id = m.Id,
+                    Description = m.Description,
+                    IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                    Name = m.Name,
+                    IntegrationSystemParameter = m.IntegrationSystemParameters.FirstOrDefault(p => p.Key == "EMailType")
+                });
+
+
+            return View(integrationSystemMail);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Mail(CreateIntegrationSystemViewModel model)
+        {
+            var createIntegrationSystem = new CreateIntegrationSystemDto
+            {
+                Name = model.ModalName,
+                IntegrationSystemTypeId = (int)IntegrationSystemType.EMail,
+                Description = model.ModalDescription
+            };
+
+            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
+
+            // Ana parametre
+            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
+            {
+                IntegrationSystemId = integrationSystemId,
+                Key = "EMailType",
+                Value = model.IntegrationSystemType
+            });
+
+
+            return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> MailSettings(int integrationSystemMailId)
+        {
+
+            var integrationSystemMail = await _integrationSystemService.GetByIdAsync(integrationSystemMailId);
+            if (integrationSystemMail == null)
+            {
+                return View();
+            }
+
+
+            var emailType = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "EMailType" & m.IntegrationSystemId == integrationSystemMailId).FirstOrDefault();
+            if (emailType == null)
+            {
+                return NotFound();
+            }
+            switch (emailType.Value)
+            {
+                case "Mail":
+                    var email = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "Email").FirstOrDefault();
+                    var emailDisplayName = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "EmailDisplayName").FirstOrDefault();
+                    var host = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "Host").FirstOrDefault();
+                    var port = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "Port").FirstOrDefault();
+                    var username = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "Username").FirstOrDefault();
+                    var password = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "Password").FirstOrDefault();
+                    var encryptionType = integrationSystemMail.IntegrationSystemParameters.Where(m => m.Key == "EncryptionType").FirstOrDefault();
+
+                    MailSettingsViewModel model = new MailSettingsViewModel();
+                    model.IntegrationSystemId = integrationSystemMail.Id;
+                    model.EmailDisplayName = emailDisplayName?.Value;
+                    model.Email = email?.Value;
+                    model.Host = host?.Value;
+                    model.Port = Convert.ToInt32(port?.Value);
+                    model.Username = username?.Value;
+                    model.Password = password?.Value;
+                    model.EncryptionType = encryptionType?.Value;
+                    model.MailType = emailType.Value;
+
+
+                    return View($"Mail.Mail", model);
+
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MailParameter(MailSettingsViewModel model)
+        {
+            var email = await _integrationSystemParameterService.GetByKeyAsync("Email", model.IntegrationSystemId);
+            if (email == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "Email";
+                createIntegrationSystemParameter.Value = model.Email;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = email.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "Email";
+                updateIntegrationSystemParameter.Value = model.Email;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var emailDisplayName = await _integrationSystemParameterService.GetByKeyAsync("EmailDisplayName", model.IntegrationSystemId);
+            if (emailDisplayName == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "EmailDisplayName";
+                createIntegrationSystemParameter.Value = model.EmailDisplayName;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = emailDisplayName.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "EmailDisplayName";
+                updateIntegrationSystemParameter.Value = model.EmailDisplayName;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var host = await _integrationSystemParameterService.GetByKeyAsync("Host", model.IntegrationSystemId);
+            if (host == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "Host";
+                createIntegrationSystemParameter.Value = model.Host;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = host.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "Host";
+                updateIntegrationSystemParameter.Value = model.Host;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            var port = await _integrationSystemParameterService.GetByKeyAsync("Port", model.IntegrationSystemId);
+            if (port == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "Port";
+                createIntegrationSystemParameter.Value = model.Port.ToString();
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = port.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "Port";
+                updateIntegrationSystemParameter.Value = model.Port.ToString();
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            var username = await _integrationSystemParameterService.GetByKeyAsync("Username", model.IntegrationSystemId);
+            if (username == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "Username";
+                createIntegrationSystemParameter.Value = model.Username;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = username.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "Username";
+                updateIntegrationSystemParameter.Value = model.Username;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var password = await _integrationSystemParameterService.GetByKeyAsync("Password", model.IntegrationSystemId);
+            if (password == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "Password";
+                createIntegrationSystemParameter.Value = model.Password;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = password.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "Password";
+                updateIntegrationSystemParameter.Value = model.Password;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var encryptionType = await _integrationSystemParameterService.GetByKeyAsync("EncryptionType", model.IntegrationSystemId);
+            if (encryptionType == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "EncryptionType";
+                createIntegrationSystemParameter.Value = model.EncryptionType;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = encryptionType.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "EncryptionType";
+                updateIntegrationSystemParameter.Value = model.EncryptionType;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+
+            return RedirectToAction("mail");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MailDelete([FromBody] int integrationSystemId)
+        {
+            var isSuccess = await _integrationSystemService.DeleteAsync(integrationSystemId);
+            if (isSuccess)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Silinecek Mail Bulunamadı" });
+        }
+        #endregion
+
     }
 }
