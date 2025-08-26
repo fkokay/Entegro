@@ -203,10 +203,10 @@ namespace Entegro.Service.Jobs
                     await retryPolicy.ExecuteAsync(async () =>
                     {
                         var createProduct = _mapper.Map<CreateProductDto>(product);
-                        var productId = await _productService.CreateProductAsync(createProduct);
+                        var productDto = await _productService.CreateProductAsync(createProduct);
 
                         CreateProductIntegrationDto productIntegration = new CreateProductIntegrationDto();
-                        productIntegration.ProductId = productId;
+                        productIntegration.ProductId = productDto.Id;
                         productIntegration.IntegrationSystemId = 7;
                         productIntegration.Active = true;
                         productIntegration.Price = createProduct.Price;

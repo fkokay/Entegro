@@ -28,14 +28,19 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsByBarcodeAsync(string productBarcode)
+        {
+            return await _context.Products.AsNoTracking().AnyAsync(p => p.Code == productBarcode);
+        }
+
         public async Task<bool> ExistsByCodeAsync(string productCode)
         {
-            return await _context.Products.AnyAsync(p => p.Code == productCode);
+            return await _context.Products.AsNoTracking().AnyAsync(p => p.Code == productCode);
         }
 
         public async Task<bool> ExistsByNameAsync(string productName)
         {
-            return await _context.Products.AnyAsync(p => p.Name == productName);
+            return await _context.Products.AsNoTracking().AnyAsync(p => p.Name == productName);
         }
 
         public async Task<List<Product>> GetAllAsync()
@@ -312,6 +317,14 @@ namespace Entegro.Infrastructure.Repositories
                 },
 
             }).ToListAsync();
+        }
+
+        public async Task<Product?> GetByBarcodeAsync(string productBarcode)
+        {
+            return await _context.Products.AsNoTracking()
+     .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+     .Include(m => m.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
+     .Include(m => m.ProductVariantAttributeCombinations).FirstOrDefaultAsync(o => o.Barcode == productBarcode);
         }
 
         public async Task<Product?> GetByCodeAsync(string productCode)

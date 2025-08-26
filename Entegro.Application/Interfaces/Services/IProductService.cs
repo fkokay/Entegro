@@ -5,16 +5,18 @@ namespace Entegro.Application.Interfaces.Services
 {
     public interface IProductService
     {
-        Task<ProductDto> GetProductByIdAsync(int productId);
-        Task<ProductDto> GetProductByCodeAsync(string productCode);
         Task<bool> ExistsByNameAsync(string productName);
         Task<bool> ExistsByCodeAsync(string productCode);
+        Task<bool> ExistsByBarcodeAsync(string productBarcode);
+        Task<ProductDto?> GetProductByIdAsync(int productId);
+        Task<ProductDto?> GetProductByCodeAsync(string productCode);
+        Task<ProductDto?> GetByBarcodeAsync(string productBarcode);
         Task<IEnumerable<ProductDto>> GetProductsAsync();
         Task<List<int>> GetAllProductIdAsync();
-        Task<PagedResult<ProductDto>> GetProductsAsync(int pageNumber, int pageSize);
-        Task<int> CreateProductAsync(CreateProductDto createProduct);
-        Task<bool> UpdateProductAsync(UpdateProductDto updateProduct);
+        Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<ProductDto> CreateProductAsync(CreateProductDto createProduct);
+        Task<ProductDto> UpdateProductAsync(UpdateProductDto updateProduct);
         Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId);
-        Task<bool> DeleteProductAsync(int productId);
+        Task DeleteProductAsync(int productId);
     }
 }

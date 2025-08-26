@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Entegro.Application.DTOs.Erp;
-using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
@@ -9,21 +8,10 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
-using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Erp;
-using Entegro.Application.Mappings.Marketplace;
-using Entegro.Application.Services;
-using Entegro.Domain.Entities;
-using Entegro.Infrastructure.Migrations;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Polly;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Service.Jobs
 {
@@ -135,7 +123,7 @@ namespace Entegro.Service.Jobs
                         else
                         {
                             var createProduct = _mapper.Map<CreateProductDto>(product);
-                            var productId = await _productService.CreateProductAsync(createProduct);
+                            var productDTO = await _productService.CreateProductAsync(createProduct);
 
 
                             var erpProduct = erpProducts.Where(m => m.Code == product.Code).FirstOrDefault();
@@ -185,14 +173,14 @@ namespace Entegro.Service.Jobs
                                     #endregion
 
                                     #region ProductVariantAttribute
-                                    var productVariantAttributeExist = await _productVariantAttributeService.GetByAttibuteIdAsync(productId, productAttributeId);
+                                    var productVariantAttributeExist = await _productVariantAttributeService.GetByAttibuteIdAsync(productDTO.Id, productAttributeId);
                                     int productVariantAttributeId = 0;
                                     if (productVariantAttributeExist == null)
                                     {
                                         CreateProductVariantAttributeDto productVariantAttribute = new CreateProductVariantAttributeDto();
                                         productVariantAttribute.AttributeControlTypeId = 0;
                                         productVariantAttribute.DisplayOrder = 0;
-                                        productVariantAttribute.ProductId = productId;
+                                        productVariantAttribute.ProductId = productDTO.Id;
                                         productVariantAttribute.ProductAttributeId = productAttributeId;
 
                                         productVariantAttributeId = await _productVariantAttributeService.AddAsync(productVariantAttribute);
@@ -266,14 +254,14 @@ namespace Entegro.Service.Jobs
                                     #endregion
 
                                     #region ProductVariantAttribute
-                                    var productVariantAttributeExist = _productVariantAttributeService.GetByAttibuteIdAsync(productId, productAttributeId);
+                                    var productVariantAttributeExist = _productVariantAttributeService.GetByAttibuteIdAsync(productDTO.Id, productAttributeId);
                                     int productVariantAttributeId = 0;
                                     if (productVariantAttributeExist == null)
                                     {
                                         CreateProductVariantAttributeDto productVariantAttribute = new CreateProductVariantAttributeDto();
                                         productVariantAttribute.AttributeControlTypeId = 0;
                                         productVariantAttribute.DisplayOrder = 0;
-                                        productVariantAttribute.ProductId = productId;
+                                        productVariantAttribute.ProductId = productDTO.Id;
                                         productVariantAttribute.ProductAttributeId = productAttributeId;
 
                                         productVariantAttributeId = await _productVariantAttributeService.AddAsync(productVariantAttribute);
@@ -307,7 +295,7 @@ namespace Entegro.Service.Jobs
                                 ProductVariantAttributeCombinationDto productVariantAttributeCombination = new ProductVariantAttributeCombinationDto()
                                 {
                                     Id = 0,
-                                    ProductId = productId,
+                                    ProductId = productDTO.Id,
                                     Gtin = "",
                                     ManufacturerPartNumber = "",
                                     Price = item.Price,

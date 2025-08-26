@@ -19,10 +19,10 @@ namespace Entegro.Application.Services
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IMapper _mapper;
         public ProductService(
-            IProductRepository productRepository, 
-            IBrandService brandService, 
+            IProductRepository productRepository,
+            IBrandService brandService,
             ICategoryService categoryService,
-            IProductAttributeService productAttributeService, 
+            IProductAttributeService productAttributeService,
             IMapper mapper)
         {
             _productRepository = productRepository;
@@ -30,8 +30,12 @@ namespace Entegro.Application.Services
             _categoryService = categoryService;
             _mapper = mapper;
         }
-        public async Task<int> CreateProductAsync(CreateProductDto createProduct)
+        public async Task<ProductDto> CreateProductAsync(CreateProductDto createProduct)
         {
+
+            if (createProduct == null)
+                throw new ArgumentNullException(nameof(createProduct));
+
             #region Marka
             if ((createProduct.BrandId == null || createProduct.BrandId == 0) && createProduct.Brand != null)
             {
@@ -66,7 +70,7 @@ namespace Entegro.Application.Services
             var product = _mapper.Map<Product>(createProduct);
             await _productRepository.AddAsync(product);
 
-            return product.Id;
+            return _mapper.Map<ProductDto>(product);
         }
 
         private async Task<int> CreateCategoryWithChildrenAsync(CategoryDto categoryDto)
@@ -90,16 +94,20 @@ namespace Entegro.Application.Services
         }
 
 
-        public async Task<bool> DeleteProductAsync(int productId)
+        public async Task DeleteProductAsync(int productId)
         {
+
+            if (productId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(productId));
+
             var product = await _productRepository.GetByIdAsync(productId);
 
             if (product == null)
             {
                 throw new KeyNotFoundException($"Product with ID {productId} not found.");
             }
+
             await _productRepository.DeleteAsync(product);
-            return true;
         }
 
         public async Task<bool> ExistsByCodeAsync(string productCode)
@@ -149,23 +157,44 @@ namespace Entegro.Application.Services
             return productDtos;
         }
 
-        public async Task<PagedResult<ProductDto>> GetProductsAsync(int pageNumber, int pageSize)
-        {
-            var products = await _productRepository.GetAllAsync(pageNumber, pageSize);
-            var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
-            return productDtos;
-        }
 
-        public async Task<bool> UpdateProductAsync(UpdateProductDto updateProduct)
+        public async Task<ProductDto> UpdateProductAsync(UpdateProductDto updateProduct)
         {
-            await _productRepository.UpdateAsync(_mapper.Map<Product>(updateProduct));
-            return true;
+            if (updateProduct == null)
+                throw new ArgumentNullException(nameof(updateProduct));
+
+            var existingProduct = await _productRepository.GetByIdAsync(updateProduct.Id);
+            if (existingProduct == null)
+                throw new KeyNotFoundException($"ID {updateProduct.Id} ile Product bulunamadı.");
+
+            _mapper.Map(updateProduct, existingProduct);
+            await _productRepository.UpdateAsync(existingProduct);
+
+            return _mapper.Map<ProductDto>(existingProduct);
         }
 
         public async Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId)
         {
             await _productRepository.UpdateMainPictureIdAsync(productId, mainPictureId);
             return true;
+        }
+
+        public async Task<bool> ExistsByBarcodeAsync(string productBarcode)
+        {
+            return await _productRepository.ExistsByBarcodeAsync(productBarcode);
+        }
+
+        public async Task<ProductDto?> GetByBarcodeAsync(string productBarcode)
+        {
+            var productDto = await _productRepository.GetByBarcodeAsync(productBarcode);
+            return _mapper.Map<ProductDto>(productDto);
+        }
+
+        public async Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
+        {
+            var products = await _productRepository.GetAllAsync(pageNumber, pageSize);
+            var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
+            return productDtos;
         }
     }
 }

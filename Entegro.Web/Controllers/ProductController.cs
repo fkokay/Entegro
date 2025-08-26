@@ -194,7 +194,7 @@ namespace Entegro.Web.Controllers
             int pageSize = model.Length;
 
 
-            var result = await _productService.GetProductsAsync(pageNumber, model.Length);
+            var result = await _productService.GetPagedAsync(pageNumber, model.Length);
 
             return Json(new
             {
