@@ -17,7 +17,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<List<CityDto>> GetAllAsync()
+        public async Task<IEnumerable<CityDto>> GetAllAsync()
         {
             var cities = await _cityRepository.GetAllAsync();
             return _mapper.Map<List<CityDto>>(cities);

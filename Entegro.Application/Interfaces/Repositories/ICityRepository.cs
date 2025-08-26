@@ -9,5 +9,6 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(City city);
         Task UpdateAsync(City city);
         Task DeleteAsync(int id);
+
     }
 }
