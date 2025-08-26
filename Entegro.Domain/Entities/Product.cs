@@ -85,7 +85,7 @@ namespace Entegro.Domain.Entities
         }
 
         private ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
-        public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombination
+        public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations
         {
             get => LazyLoader?.Load(this, ref _productVariantAttributeCombinations) ?? (_productVariantAttributeCombinations ??= new HashSet<ProductVariantAttributeCombination>());
             set => _productVariantAttributeCombinations = value;
