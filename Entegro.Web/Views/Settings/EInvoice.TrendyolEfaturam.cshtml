@@ -6,6 +6,44 @@
 <form asp-action="CommerceParameterTrendyolEFaturam" id="einvoice-setting-trendyol-form">
     @Html.HiddenFor(m => m.IntegrationSystemId)
     @Html.HiddenFor(m => m.CommerceType)
+    @Html.HiddenFor(m => m.IntegrationSystemTypeId)
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="flex-grow-1 container-p-y container-fluid">
+        <div class="d-flex flex-column justify-content-center">
+            <h4 class="mb-3">@ViewData["Title"]</h4>
+        </div>
+        <div class="row">
+            <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Mağaza Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-6">
+                            <label class="form-label" for="basic-default-fullname">Adı</label>
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-6">
+                            <label class="form-label" for="basic-default-fullname">Açıklaması</label>
+                            @Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-12 cargo-setting-ptt-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        <a href="/settings/Einvoice" class="btn btn-label-secondary d-grid w-100 waves-effect">İptal Et</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="flex-grow-1 container-p-y container-fluid">
         <div class="d-flex flex-column justify-content-center">
             <h4 class="mb-3">@ViewData["Title"]</h4>
@@ -19,26 +57,16 @@
                     <div class="card-body">
                         <div class="mb-6">
                             <label class="form-label" for="basic-default-fullname">Api Url</label>
-                            @Html.TextBoxFor(m => m.ApiUrl, new { @class = "form-control" })
+                            @Html.TextBoxFor(m => m.ApiUrl, new { @class = "form-control",required="required" })
                         </div>
                         <div class="mb-6">
                             <label class="form-label" for="basic-default-fullname">Api Kullanıcı</label>
-                            @Html.TextBoxFor(m => m.ApiUser, new { @class = "form-control" })
+                            @Html.TextBoxFor(m => m.ApiUser, new { @class = "form-control",required="required" })
                         </div>
                         <div class="mb-6">
                             <label class="form-label" for="basic-default-fullname">Api Şifre</label>
-                            @Html.TextBoxFor(m => m.ApiPassword, new { @class = "form-control" })
+                            @Html.TextBoxFor(m => m.ApiPassword, new { @class = "form-control",required="required" })
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-12 einvoice-setting-trendyol-actions">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
-                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
-                        </button>
-                        <a href="/settings/Einvoice" class="btn btn-label-secondary d-grid w-100 waves-effect">İptal Et</a>
                     </div>
                 </div>
             </div>
