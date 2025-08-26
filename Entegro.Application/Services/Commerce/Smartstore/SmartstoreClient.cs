@@ -62,7 +62,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
         public async Task UpsertProductAsync(ProductDto product)
         {
-            // Öncelikle ürünün Smartstore’da var olup olmadığını kontrol et
             try
             {
                 if (product.Brand != null)
@@ -75,7 +74,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     }
                     else
                     {
-                        //await UpdateBrandAsync(product.Brand, manufacturer.Id);
                         product.BrandId = manufacturer.Id;
                     }
                 }
@@ -90,7 +88,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     }
                     else
                     {
-                        //await UpdateCategoryAsync(item.Category, category.Id);
                         item.CategoryId = category.Id;
                     }
                 }
@@ -117,7 +114,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                 if (existing == null)
                 {
-                    // Yoksa POST ile yeni ürün ekle
                     var payload = SmartstoreProductMapper.ToDto(product);
                     var json = JsonSerializer.Serialize(payload, _jsonOptions);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
