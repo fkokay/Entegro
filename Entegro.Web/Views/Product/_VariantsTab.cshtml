@@ -1,0 +1,79 @@
+﻿@model ProductViewModel
+
+<div class="row g-3 p-3">
+    <div class="col-md-12">
+        <div class="row">
+            <label class="col-sm-3 col-form-label text-sm-start" for="SelectedProductAttributeIds">Varyantlar</label>
+            <div class="col-sm-9">
+                <select asp-for="SelectedProductAttributeIds" asp-items="ViewBag.ProductAttributes" multiple="multiple" class="form-select">
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-3 p-3">
+    <div id="ProductVariantAttributeCombinationRepeater">
+        <div data-repeater-list="ProductVariantAttributeCombinations">
+            <div data-repeater-item class="repeater-wrapper pt-0 pt-md-4">
+                <div class="d-flex border rounded position-relative pe-0">
+                    <div class="row w-100 p-3">
+                        <!-- Nested Attributes -->
+                        <div class="AttributesRepeater">
+                            <div data-repeater-list="Attributes">
+                                @foreach (var productAttribute in Model.ProductAttributeMappings)
+                                {
+                                    <div data-repeater-item class="repeater-wrapper row mb-2" data-attribute-id="@productAttribute.ProductAttributeId">
+                                        <input type="hidden" name="ProductAttributeId" value="@productAttribute.ProductAttributeId" />
+                                        <div class="col-md-2 col-12 mb-md-0 mb-3">
+                                            <p class="mb-2 repeater-title">@productAttribute.ProductAttribute</p>
+                                            <select name="ProductAttributeValueId" class="form-select item-details mb-3">
+                                                @foreach (var val in productAttribute.Attribute.Values)
+                                                {
+                                                    <option value="@val.Id">@val.Name</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Variant Fields -->
+                        <div class="col-md-2">
+                            <p>Stok Kodu</p>
+                            <input name="StokCode" type="text" class="form-control" />
+                        </div>
+                        <div class="col-md-2">
+                            <p>Üretici Kodu</p>
+                            <input name="ManufacturerPartNumber" type="text" class="form-control" />
+                        </div>
+                        <div class="col-md-2">
+                            <p>Gtin</p>
+                            <input name="Gtin" type="text" class="form-control" />
+                        </div>
+                        <div class="col-md-2">
+                            <p>Fiyat</p>
+                            <input name="Price" type="text" class="form-control" />
+                        </div>
+                        <div class="col-md-2">
+                            <p>Stok Miktarı</p>
+                            <input name="StockQuantity" type="text" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-center justify-content-between border-start p-2">
+                        <i class="icon-base ti ti-x icon-lg cursor-pointer" data-repeater-delete=""></i>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        @if (Model.ProductAttributeMappings.Any())
+        {
+            <div class="col-12 mt-2 p-3">
+                <button type="button" class="btn btn-primary" data-repeater-create>Yeni Varyant</button>
+            </div>
+        }
+    </div>
+</div>

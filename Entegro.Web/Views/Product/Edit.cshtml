@@ -711,4 +711,69 @@
         }
     </script>
 
+    <script>
+        (function () {
+          const variantsPane = document.getElementById('form-tabs-variants');
+          const variantsBtn  = document.getElementById('tab-variants-btn');
+
+
+          document.addEventListener('shown.bs.tab', async function (e) {
+            if (e.target !== variantsBtn) return;
+
+            const loaded = variantsPane.getAttribute('data-loaded') === 'true';
+            if (loaded) return;
+
+            const url = variantsBtn.getAttribute('data-url');
+            if (!url) return;
+
+
+            const loading = document.getElementById('variants-loading');
+            if (loading) loading.style.display = 'block';
+
+            try {
+              const res = await fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+              if (!res.ok) throw new Error('Sunucu hatası: ' + res.status);
+              const html = await res.text();
+
+              variantsPane.innerHTML = html;
+              variantsPane.setAttribute('data-loaded', 'true');
+
+              initVariantsTab(variantsPane);
+
+            } catch (err) {
+              variantsPane.innerHTML = `
+                <div class="alert alert-danger m-3">
+                  Varyant içeriği yüklenemedi. Detay: ${err.message}
+                </div>`;
+            }
+          });
+
+
+          window.initVariantsTab = function (rootEl) {
+
+            if (window.$ && $.fn.repeater) {
+              $(rootEl).find('#ProductVariantAttributeCombinationRepeater').repeater({
+                initEmpty: false,
+                defaultValues: {},
+                show: function () { $(this).slideDown(150); },
+                hide: function (deleteElement) { $(this).slideUp(150, deleteElement); }
+              });
+            }
+
+
+            if (window.$ && $.fn.select2) {
+              $(rootEl).find('select[multiple], select.form-select').each(function () {
+                const $el = $(this);
+                if (!$el.data('select2')) {
+                  $el.select2({ width: '100%' });
+                }
+              });
+            }
+
+          };
+
+        })();
+    </script>
+
+
 }

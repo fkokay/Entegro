@@ -216,6 +216,19 @@ namespace Entegro.Web.Controllers
             await PrepareProductModel(model, product);
             return PartialView("_ProductImages", model);
         }
+        public async Task<IActionResult> VariantsPartial(int id)
+        {
+            ProductViewModel model = new ProductViewModel();
+
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            await PrepareProductModel(model, product);
+            return PartialView("_VariantsTab", model);
+        }
         #endregion
 
         #region Product Categories
