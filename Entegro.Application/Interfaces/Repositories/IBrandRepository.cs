@@ -5,10 +5,10 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IBrandRepository
     {
-        Task<Brand?> GetByIdAsync(int id);
-        Task<Brand?> GetByNameAsync(string name);
         Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
+        Task<Brand?> GetByIdAsync(int id);
+        Task<Brand?> GetByNameAsync(string name);
         Task<List<Brand>> GetAllAsync();
         Task<PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(Brand brand);
