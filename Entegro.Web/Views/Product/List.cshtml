@@ -725,7 +725,7 @@
 				if (result.isConfirmed) {
 					$.ajax({
 						url: `/Product/Delete/${productId}`, // <- URL'yi backendine göre düzenle
-						type: 'POST', // Veya DELETE, backendine göre
+						type: 'POST', 
 						success: function (response) {
 							Swal.fire({
 								title: 'Silindi!',
@@ -735,8 +735,8 @@
 								showConfirmButton: false
 							});
 
-							// Tabloyu yenile (örneğin DataTable kullanıyorsan)
-							$('#yourTableId').DataTable().ajax.reload(null, false); // 2. parametre: sayfayı değiştirme
+							// // Tabloyu yenile (örneğin DataTable kullanıyorsan)
+							// $('#yourTableId').DataTable().ajax.reload(null, false); // 2. parametre: sayfayı değiştirme
 						},
 						error: function (xhr) {
 							Swal.fire({
