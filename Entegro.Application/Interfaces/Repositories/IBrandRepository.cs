@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Repositories
     {
         Task<Brand?> GetByIdAsync(int id);
         Task<Brand?> GetByNameAsync(string name);
+        Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
         Task<List<Brand>> GetAllAsync();
         Task<PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize);

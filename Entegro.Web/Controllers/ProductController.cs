@@ -637,7 +637,7 @@ namespace Entegro.Web.Controllers
                 }).ToList();
             }
 
-            var brands = await _brandService.GetBrandsAsync();
+            var brands = await _brandService.GetAllAsync();
 
             ViewBag.Brands = brands.Select(m => new SelectListItem()
             {

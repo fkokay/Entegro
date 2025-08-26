@@ -46,7 +46,7 @@ namespace Entegro.Web.Controllers
                     MediaFileId = model.MediaFileId
                 };
 
-                await _brandService.CreateBrandAsync(createDto);
+                await _brandService.CreateAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -54,7 +54,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var brand = await _brandService.GetByIdWithMediaAsync(id);
+            var brand = await _brandService.GetByIdAsync(id);
             if (brand == null)
             {
                 return NotFound();
@@ -115,7 +115,7 @@ namespace Entegro.Web.Controllers
                     DisplayOrder = model.DisplayOrder,
                     MetaKeywords = model.MetaKeywords,
                 };
-                await _brandService.UpdateBrandAsync(updateDto);
+                await _brandService.UpdateAsync(updateDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -123,12 +123,15 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var isSuccess = await _brandService.DeleteBrandAsync(id);
-            if (isSuccess)
+            try
             {
+                await _brandService.DeleteAsync(id);
                 return Json(new { success = true });
             }
-            return Json(new { success = false, message = "Silinecek Marka Bulunamadı" });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -139,7 +142,7 @@ namespace Entegro.Web.Controllers
             int pageSize = model.Length;
 
 
-            var result = await _brandService.GetBrandsAsync(pageNumber, model.Length);
+            var result = await _brandService.GetPagedAsync(pageNumber, model.Length);
 
             return Json(new
             {
