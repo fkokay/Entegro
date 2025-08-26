@@ -97,11 +97,18 @@ namespace Entegro.Web.Controllers
             switch (erpType.Value)
             {
                 case "Logo":
+                    var id = integrationSystemErp.Id;
+                    var name = integrationSystemErp.Name;
+                    var description = integrationSystemErp.Description;
                     var apiUrl = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
                     var apiUser = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
                     var apiPassword = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
 
                     LogoErpSettingsViewModel model = new LogoErpSettingsViewModel();
+                    model.Id = id;
+                    model.Name = name;
+                    model.Description = description;
+                    model.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
                     model.IntegrationSystemId = integrationSystemErp.Id;
                     model.ErpType = erpType.Value;
                     model.ApiUrl = apiUrl?.Value;
@@ -111,12 +118,18 @@ namespace Entegro.Web.Controllers
 
                     return View($"Erp.Logo", model);
                 case "Netsis":
-
+                    var idForNetsis = integrationSystemErp.Id;
+                    var nameForNetsis = integrationSystemErp.Name;
+                    var descriptionForNetsis = integrationSystemErp.Description;
                     var apiUrlForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
                     var apiUserForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
                     var apiPasswordForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
 
                     NetsisErpSettingsViewModel modelForNetsis = new NetsisErpSettingsViewModel();
+                    modelForNetsis.Id = idForNetsis;
+                    modelForNetsis.Name = nameForNetsis;
+                    modelForNetsis.Description = descriptionForNetsis;
+                    modelForNetsis.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
                     modelForNetsis.IntegrationSystemId = integrationSystemErp.Id;
                     modelForNetsis.ErpType = erpType.Value;
                     modelForNetsis.ApiUrl = apiUrlForNetsis?.Value;
@@ -124,11 +137,18 @@ namespace Entegro.Web.Controllers
                     modelForNetsis.ApiPassword = apiPasswordForNetsis?.Value;
                     return View($"Erp.Netsis", modelForNetsis);
                 case "Opak":
+                    var idForOpak = integrationSystemErp.Id;
+                    var nameForOpak = integrationSystemErp.Name;
+                    var descriptionForOpak = integrationSystemErp.Description;
                     var apiUrlForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
                     var apiUserForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
                     var apiPasswordForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
 
                     OpakErpSettingsViewModel modelForOpak = new OpakErpSettingsViewModel();
+                    modelForOpak.Id = idForOpak;
+                    modelForOpak.Name = nameForOpak;
+                    modelForOpak.Description = descriptionForOpak;
+                    modelForOpak.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
                     modelForOpak.IntegrationSystemId = integrationSystemErp.Id;
                     modelForOpak.ErpType = erpType.Value;
                     modelForOpak.ApiUrl = apiUrlForOpak?.Value;
@@ -144,13 +164,22 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> ErpParameterLogo(LogoErpSettingsViewModel model)
         {
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
+
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
             if (apiUrl == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
                 createIntegrationSystemParameter.Key = "ApiUrl";
                 createIntegrationSystemParameter.Value = model.ApiUrl;
-
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
@@ -212,6 +241,15 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ErpParameterNetsis(NetsisErpSettingsViewModel model)
         {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
             if (apiUrl == null)
             {
@@ -280,8 +318,16 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ErpParameterOpak(NetsisErpSettingsViewModel model)
+        public async Task<IActionResult> ErpParameterOpak(OpakErpSettingsViewModel model)
         {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
             if (apiUrl == null)
             {
