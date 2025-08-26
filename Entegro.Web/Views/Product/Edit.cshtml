@@ -44,10 +44,25 @@
     <script src="/assets/vendor/libs/quill/quill.js"></script>
     <script src="/assets/vendor/libs/jquery-repeater/jquery-repeater.js"></script>
 
-    <!-- Page JS -->
-    <script data-origin="FileUploader">
-        $(function () {
-            // Init dropzone
+
+
+    <script>
+        $(document).ready(function() {
+            $('button[data-bs-target="#form-tabs-image"]').on('shown.bs.tab', function() {
+                var productId = '@Model.Id';
+                if (productId > 0) {
+                    $("#imageTabContent").load("/Product/ProductImagesPartial?id=" + productId, function() {
+                        initProductImageUploader();
+                    });
+                } else {
+                    $("#imageTabContent").html('<div class="alert alert-danger">Bu ürüne resim yüklemek için önce ürünü kaydetmeniz gerekmektedir.</div>');
+                }
+            });
+
+        }); </script>
+
+    <script>
+        function initProductImageUploader() {
             $("#upload-1388498530").dropzoneWrapper({
                 onUploading: null,
                 onUploadCompleted: null,
@@ -66,18 +81,22 @@
                 downloadEnabled: false
             });
 
-            $(document).on("click", ".set-main-picture", function (e) {
+            $(document).on("click", ".set-main-picture", function(e) {
                 var el = $(this).closest('.dz-image-preview');
                 var previewContainer = $(this).closest(".preview-container");
 
-                // Insert choosen media file at beginning of the list.
                 el.insertBefore(previewContainer.find('.dz-image-preview').first());
-                previewContainer.trigger("sort", { item: el });
+                previewContainer.trigger("sort", {
+                    item: el
+                });
 
                 return false;
             });
-        });
+        }
     </script>
+
+
+    
     <script>
         function focusFieldAndShowTab(el) {
             if (!el) return;
@@ -691,8 +710,5 @@
             });
         }
     </script>
-
-
-
 
 }

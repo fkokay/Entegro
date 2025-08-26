@@ -202,6 +202,21 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
+        #region Partial
+        public async Task<IActionResult> ProductImagesPartial(int id)
+        {
+            ProductViewModel model = new ProductViewModel();
+
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            await PrepareProductModel(model, product);
+            return PartialView("_ProductImages", model);
+        }
+        #endregion
         #region Product Categories
         [HttpPost]
         public async Task<IActionResult> ProductCategoryList(int productId, CancellationToken ct)
