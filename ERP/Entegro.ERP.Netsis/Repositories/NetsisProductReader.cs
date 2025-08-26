@@ -23,11 +23,12 @@ namespace Entegro.ERP.Netsis.Repositories
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            var countSql = @"SELECT  COUNT(*) FROM ENTEGRO_PRODUCTS";
+            var countSql = @"SELECT  COUNT(*) FROM ENTEGRO_PRODUCTS WHERE Code='RLX1309'";
             var totalCount = await connection.ExecuteScalarAsync<int>(countSql);
 
             var sql = @"
-            SELECT * FROM ENTEGRO_PRODUCTS
+            SELECT * FROM ENTEGRO_PRODUCTS 
+            WHERE Code='RLX1309'
             ORDER BY Code
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 

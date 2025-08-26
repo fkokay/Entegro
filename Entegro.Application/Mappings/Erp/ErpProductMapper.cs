@@ -52,10 +52,61 @@ namespace Entegro.Application.Mappings.Erp
                 product.Brand.MetaDescription = "";
             }
 
+            if (!string.IsNullOrEmpty(erpProduct.Category1))
+            {
+                var categoryHierarchy = BuildCategoryHierarchy(
+                    erpProduct.Category1,
+                    erpProduct.Category2,
+                    erpProduct.Category3,
+                    erpProduct.Category4
+                );
 
-
+                product.ProductCategories.Add(new DTOs.ProductCategory.ProductCategoryDto
+                {
+                    Category = categoryHierarchy,
+                    DisplayOrder = 0,
+                    CategoryId = 0,
+                    ProductId = 0
+                });
+            }
 
             return product;
+        }
+
+        private static DTOs.Category.CategoryDto BuildCategoryHierarchy(params string[] categories)
+        {
+            DTOs.Category.CategoryDto root = null;
+            DTOs.Category.CategoryDto current = null;
+
+            foreach (var categoryName in categories.Where(c => !string.IsNullOrEmpty(c)))
+            {
+                var newCategory = new DTOs.Category.CategoryDto
+                {
+                    Name = categoryName,
+                    CreatedOn = DateTime.Now,
+                    UpdatedOn = DateTime.Now,
+                    Description = "",
+                    DisplayOrder = 0,
+                    MetaKeywords = "",
+                    MetaDescription = "",
+                    MetaTitle = "",
+                    TreePath = "",
+                    SubCategories = new List<DTOs.Category.CategoryDto>()
+                };
+
+                if (root == null)
+                {
+                    root = newCategory;
+                    current = root;
+                }
+                else
+                {
+                    current.SubCategories.Add(newCategory);
+                    current = newCategory;
+                }
+            }
+
+            return root;
         }
 
         public static IEnumerable<ProductDto> ToDtoList(IEnumerable<ErpProductDto> products)

@@ -17,18 +17,31 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Category category)
         {
-            category.CreatedOn = DateTime.UtcNow;
-            category.UpdatedOn = DateTime.UtcNow;
-            category.TreePath = $"/{category.Id}/";
+            try
+            {
+                category.CreatedOn = DateTime.UtcNow;
+                category.UpdatedOn = DateTime.UtcNow;
+                category.TreePath = $"/{category.Id}/";
 
-            await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
+                await _context.Categories.AddAsync(category);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         public async Task DeleteAsync(Category category)
         {
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _context.Categories.AnyAsync(o => o.Name == name);
         }
 
         public async Task<List<Category>> GetAllAsync()
@@ -66,6 +79,14 @@ namespace Entegro.Infrastructure.Repositories
              .Include(b => b.MediaFile)
              .ThenInclude(b => b.Folder)
              .FirstOrDefaultAsync(b => b.Id == id);
+        }
+
+        public async Task<Category?> GetByNameAsync(string name)
+        {
+            return await _context.Categories
+            .Include(b => b.MediaFile)
+            .ThenInclude(b => b.Folder)
+            .FirstOrDefaultAsync(b => b.Name == name);
         }
 
         public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)

@@ -11,9 +11,8 @@ namespace Entegro.Domain.Entities
         public void Configure(EntityTypeBuilder<ProductCategory> builder)
         {
             builder.HasKey(pc => pc.Id);
-
             builder.HasOne(c => c.Category)
-                .WithMany(c => c.ProductCategories)
+                .WithMany()
                 .HasForeignKey(c => c.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
 

@@ -5,7 +5,9 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
+        Task<bool> ExistsByNameAsync(string name);
         Task<Category?> GetByIdAsync(int id);
+        Task<Category?> GetByNameAsync(string name);
         Task<List<Category>> GetAllAsync();
         Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(Category category);

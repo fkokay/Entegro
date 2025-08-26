@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 namespace Entegro.Domain.Entities
 {
     public class CategoryMap : IEntityTypeConfiguration<Category>
@@ -10,14 +11,15 @@ namespace Entegro.Domain.Entities
         public void Configure(EntityTypeBuilder<Category> builder)
         {
             builder.HasOne(c => c.ParentCategory)
-                   .WithMany()
+                   .WithMany(c => c.Children)
                    .HasForeignKey(c => c.ParentCategoryId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(c => c.ProductCategories)
-                   .WithOne(pc => pc.Category)
-                   .HasForeignKey(pc => pc.CategoryId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(c => c.MediaFile)
+                    .WithMany()
+                    .HasForeignKey(c => c.MediaFileId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
         }
     }
 
@@ -25,6 +27,7 @@ namespace Entegro.Domain.Entities
     public class Category : BaseEntity, IDisplayOrder
     {
         public int? ParentCategoryId { get; set; }
+
         private Category? _parentCategory;
         public Category? ParentCategory
         {
@@ -49,11 +52,12 @@ namespace Entegro.Domain.Entities
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
-        private ICollection<ProductCategory> _productCategories;
-        public ICollection<ProductCategory> ProductCategories
+        private ICollection<Category> _children;
+        [IgnoreDataMember]
+        public ICollection<Category> Children
         {
-            get => LazyLoader?.Load(this, ref _productCategories) ?? (_productCategories ??= new HashSet<ProductCategory>());
-            set => _productCategories = value;
+            get => LazyLoader?.Load(this, ref _children) ?? (_children ??= new HashSet<Category>());
+            set => _children = value;
         }
     }
 

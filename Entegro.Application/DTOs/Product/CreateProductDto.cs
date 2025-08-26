@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 
@@ -29,6 +30,7 @@ namespace Entegro.Application.DTOs.Product
         public string? Gtin { get; set; }
         public bool Published { get; set; } = true;
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
+        public List<ProductCategoryDto> ProductCategories { get; set; } = new List<ProductCategoryDto>();
         //public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
     }
 }

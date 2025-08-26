@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250826072214_Category")]
+    partial class Category
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,6 +76,9 @@ namespace Entegro.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -109,6 +115,8 @@ namespace Entegro.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("MediaFileId");
 
@@ -933,15 +941,18 @@ namespace Entegro.Infrastructure.Migrations
 
             modelBuilder.Entity("Entegro.Domain.Entities.Category", b =>
                 {
+                    b.HasOne("Entegro.Domain.Entities.Category", null)
+                        .WithMany("Children")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("Entegro.Domain.Entities.MediaFile", "MediaFile")
                         .WithMany()
-                        .HasForeignKey("MediaFileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("MediaFileId");
 
                     b.HasOne("Entegro.Domain.Entities.Category", "ParentCategory")
-                        .WithMany("Children")
+                        .WithMany()
                         .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("MediaFile");
 
@@ -1069,7 +1080,7 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.ProductCategory", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Category", "Category")
-                        .WithMany()
+                        .WithMany("ProductCategories")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1176,6 +1187,8 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Children");
+
+                    b.Navigation("ProductCategories");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.City", b =>

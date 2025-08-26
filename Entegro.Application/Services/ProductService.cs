@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Repositories;
@@ -12,20 +13,27 @@ namespace Entegro.Application.Services
     {
         private readonly IProductRepository _productRepository;
         private readonly IBrandService _brandService;
+        private readonly ICategoryService _categoryService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeValueService _productAttributeValueService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, IBrandService brandService, IProductAttributeService productAttributeService, IMapper mapper)
+        public ProductService(
+            IProductRepository productRepository, 
+            IBrandService brandService, 
+            ICategoryService categoryService,
+            IProductAttributeService productAttributeService, 
+            IMapper mapper)
         {
             _productRepository = productRepository;
             _brandService = brandService;
+            _categoryService = categoryService;
             _mapper = mapper;
         }
         public async Task<int> CreateProductAsync(CreateProductDto createProduct)
         {
             #region Marka
-            if (createProduct.BrandId == null && createProduct.Brand != null)
+            if ((createProduct.BrandId == null || createProduct.BrandId == 0) && createProduct.Brand != null)
             {
                 if (await _brandService.ExistsByNameAsync(createProduct.Brand.Name))
                 {
@@ -44,10 +52,41 @@ namespace Entegro.Application.Services
             }
             #endregion
 
+            #region Kategori
+            foreach (var productCategory in createProduct.ProductCategories)
+            {
+                if (productCategory.Category != null)
+                {
+                    productCategory.CategoryId = await CreateCategoryWithChildrenAsync(productCategory.Category);
+                    productCategory.Category = null;
+                }
+            }
+            #endregion
+
             var product = _mapper.Map<Product>(createProduct);
             await _productRepository.AddAsync(product);
 
             return product.Id;
+        }
+
+        private async Task<int> CreateCategoryWithChildrenAsync(CategoryDto categoryDto)
+        {
+            if (await _categoryService.ExistsByNameAsync(categoryDto.Name))
+            {
+                var existing = await _categoryService.GetCategoryByNameAsync(categoryDto.Name);
+                return existing.Id;
+            }
+
+            var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
+            var categoryId = await _categoryService.CreateCategoryAsync(createCategory);
+
+            foreach (var subCategoryDto in categoryDto.SubCategories)
+            {
+                subCategoryDto.ParentCategoryId = categoryId; 
+                await CreateCategoryWithChildrenAsync(subCategoryDto);
+            }
+
+            return categoryId;
         }
 
 

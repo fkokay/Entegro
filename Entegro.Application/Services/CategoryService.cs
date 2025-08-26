@@ -69,7 +69,6 @@ namespace Entegro.Application.Services
             return true;
         }
 
-
         public async Task<bool> DeleteCategoryAndReassignChildrenAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
@@ -96,8 +95,6 @@ namespace Entegro.Application.Services
             return true;
         }
 
-
-
         public async Task<bool> DeleteCategoryAsync(int categoryId)
         {
             Category? category = await _categoryRepository.GetByIdAsync(categoryId);
@@ -118,6 +115,11 @@ namespace Entegro.Application.Services
                 category.MediaFileId = null;
                 await _categoryRepository.UpdateAsync(category);
             }
+        }
+
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _categoryRepository.ExistsByNameAsync(name);
         }
 
         public async Task<CategoryDto?> GetByIdWithMediaAsync(int id)
@@ -225,6 +227,18 @@ namespace Entegro.Application.Services
             if (category == null)
             {
                 throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
+            }
+
+            var categoryDto = _mapper.Map<CategoryDto>(category);
+            return categoryDto;
+        }
+
+        public async Task<CategoryDto> GetCategoryByNameAsync(string name)
+        {
+            var category = await _categoryRepository.GetByNameAsync(name);
+            if (category == null)
+            {
+                return null;
             }
 
             var categoryDto = _mapper.Map<CategoryDto>(category);

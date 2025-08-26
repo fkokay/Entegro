@@ -87,7 +87,15 @@ namespace Entegro.Application.Mappings
             CreateMap<Category, CategoryDto>().ReverseMap();
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
             CreateMap<Category, UpdateCategoryDto>().ReverseMap();
+
+            CreateMap<CategoryDto, CreateCategoryDto>().ReverseMap();
+            CreateMap<CategoryDto, UpdateCategoryDto>().ReverseMap();
+
+            CreateMap<CreateCategoryDto, CategoryDto>().ReverseMap();
+            CreateMap<UpdateCategoryDto, CategoryDto>().ReverseMap();
+
             CreateMap<PagedResult<Category>, PagedResult<CategoryDto>>().ReverseMap();
+            CreateMap<PagedResult<CategoryDto>, PagedResult<Category>>().ReverseMap();
             #endregion
 
             #region Order
@@ -251,12 +259,14 @@ namespace Entegro.Application.Mappings
             CreateMap<CreateDistrictDto, District>().ReverseMap();
             CreateMap<UpdateDistrictDto, District>().ReverseMap();
             #endregion
+
             #region Country    
             CreateMap<Country, CountryDto>().ReverseMap();
             CreateMap<Country, CreateCountryDto>().ReverseMap();
             CreateMap<Country, UpdateCountryDto>().ReverseMap();
             CreateMap<PagedResult<Country>, PagedResult<CountryDto>>().ReverseMap();
             #endregion
+
             #region ProductImage
             CreateMap<ProductMediaFile, ProductMediaFileDto>().ReverseMap();
             CreateMap<ProductMediaFile, CreateProductMediaFileDto>().ReverseMap();

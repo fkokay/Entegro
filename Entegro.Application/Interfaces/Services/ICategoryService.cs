@@ -5,7 +5,9 @@ namespace Entegro.Application.Interfaces.Services
 {
     public interface ICategoryService
     {
+        Task<bool> ExistsByNameAsync(string name);
         Task<CategoryDto> GetCategoryByIdAsync(int categoryId);
+        Task<CategoryDto> GetCategoryByNameAsync(string name);
         Task<IEnumerable<CategoryDto>> GetCategoriesAsync();
         Task<IEnumerable<CategoryTreePathDto>> GetCategoriesFormatTreePathAsync();
         Task<PagedResult<CategoryDto>> GetCategoriesAsync(int pageNumber, int pageSize);
