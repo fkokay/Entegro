@@ -160,7 +160,7 @@ namespace Entegro.Web.Controllers
 
                 foreach (var item in model.SelectedProductAttributeIds)
                 {
-                    var exist = await _productAttributeMappingService.GetByAttibuteIdAsync(model.Id,item);
+                    var exist = await _productAttributeMappingService.GetByAttibuteIdAsync(model.Id, item);
 
                     if (exist == null)
                     {
@@ -511,6 +511,7 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     ProductName = product.Name,
                     Active = true,
+                    IntegrationCode = product.Code,
                     ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url
                 });
             }
