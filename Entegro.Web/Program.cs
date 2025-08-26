@@ -82,8 +82,8 @@ builder.Services.AddScoped<IProductAttributeService, ProductAttributeService>();
 builder.Services.AddScoped<IProductAttributeValueRepository, ProductAttributeValueRepository>();
 builder.Services.AddScoped<IProductAttributeValueService, ProductAttributeValueService>();
 
-builder.Services.AddScoped<IProductAttributeMappingRepository, ProductAttributeMappingRepository>();
-builder.Services.AddScoped<IProductAttributeMappingService, ProductAttributeMappingService>();
+builder.Services.AddScoped<IProductVariantAttributeRepository, ProductVariantAttributeRepository>();
+builder.Services.AddScoped<IProductVariantAttributeService, ProductVariantAttributeService>();
 
 
 builder.Services.AddScoped<IProductImageMappingRepository, ProductImageMappingRepository>();

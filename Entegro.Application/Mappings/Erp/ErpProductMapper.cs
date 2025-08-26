@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,76 +49,7 @@ namespace Entegro.Application.Mappings.Erp
                 product.Brand.MediaFileId = null;
                 product.Brand.MetaKeywords = "";
                 product.Brand.MetaTitle = "";
-                product.Brand.MetaDescription = ""; 
-            }
-
-            
-            foreach (var item in erpProduct.ProductVariantAttributes.Select(m=>m.Variant1Name).Distinct().ToList())
-            {
-                if (!string.IsNullOrEmpty(item))
-                {
-                    var values = erpProduct.ProductVariantAttributes.Where(m => m.Variant1Name == item).Select(m => m.Variant1Value).Distinct().ToList();
-                    ProductVariantAttributeDto productVariantAttribute = new ProductVariantAttributeDto();
-                    productVariantAttribute.AttributeControlTypeId = 0;
-                    productVariantAttribute.DisplayOrder = 0;
-                    productVariantAttribute.ProductAttribute = new DTOs.ProductAttribute.ProductAttributeDto()
-                    {
-                        Id = 0,
-                        Name = item,
-                        Description = "",
-                        DisplayOrder = 0,
-                        ProductAttributeValues = values.Select(m => new ProductAttributeValueDto()
-                        {
-                            DisplayOrder = 0,
-                            Name = m,
-                            ProductAttributeId = 0,
-                            Id = 0
-                        }).ToList()
-                    };
-
-                    product.ProductVariantAttributes.Add(productVariantAttribute);
-                }
-            }
-
-            foreach (var item in erpProduct.ProductVariantAttributes.Select(m => m.Variant2Name).Distinct().ToList())
-            {
-                if (!string.IsNullOrEmpty(item))
-                {
-                    var values = erpProduct.ProductVariantAttributes.Where(m => m.Variant2Name == item).Select(m => m.Variant2Value).Distinct().ToList();
-                    ProductVariantAttributeDto productVariantAttribute = new ProductVariantAttributeDto();
-                    productVariantAttribute.AttributeControlTypeId = 0;
-                    productVariantAttribute.DisplayOrder = 0;
-                    productVariantAttribute.ProductAttribute = new DTOs.ProductAttribute.ProductAttributeDto()
-                    {
-                        Id = 0,
-                        Name = item,
-                        Description = "",
-                        DisplayOrder = 0,
-                        ProductAttributeValues = values.Select(m => new ProductAttributeValueDto()
-                        {
-                            DisplayOrder = 0,
-                            Name = m,
-                            ProductAttributeId = 0,
-                            Id = 0
-                        }).ToList()
-                    };
-
-                    product.ProductVariantAttributes.Add(productVariantAttribute);
-                }
-            }
-
-            foreach (var item in erpProduct.ProductVariantAttributes)
-            {
-                product.ProductVariantAttributeCombinations.Add(new ProductVariantAttributeCombinationDto()
-                {
-                    Id = 0,
-                    Gtin = "",
-                    ManufacturerPartNumber = "",
-                    Price = item.Price,
-                    ProductId = 0,
-                    StockQuantity = Convert.ToInt32(item.StockQuantity),
-                    StokCode = item.VariantCode
-                });
+                product.Brand.MetaDescription = "";
             }
 
 

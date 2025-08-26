@@ -3,7 +3,7 @@ using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    public interface IProductAttributeMappingRepository
+    public interface IProductVariantAttributeRepository
     {
         Task<ProductVariantAttribute?> GetByIdAsync(int id);
         Task<ProductVariantAttribute?> GetByAttributeIdAsync(int id);

@@ -3,7 +3,7 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    public interface IProductAttributeMappingService
+    public interface IProductVariantAttributeService
     {
         Task<ProductVariantAttributeDto?> GetByIdAsync(int id);
         Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int id);

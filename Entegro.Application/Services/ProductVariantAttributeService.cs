@@ -7,12 +7,12 @@ using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Services
 {
-    public class ProductAttributeMappingService : IProductAttributeMappingService
+    public class ProductVariantAttributeService : IProductVariantAttributeService
     {
-        private readonly IProductAttributeMappingRepository _productAttributeMappingRepository;
+        private readonly IProductVariantAttributeRepository _productAttributeMappingRepository;
         private readonly IMapper _mapper;
 
-        public ProductAttributeMappingService(IProductAttributeMappingRepository productAttributeMapping, IMapper mapper)
+        public ProductVariantAttributeService(IProductVariantAttributeRepository productAttributeMapping, IMapper mapper)
         {
             _productAttributeMappingRepository = productAttributeMapping ?? throw new ArgumentNullException(nameof(productAttributeMapping));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -75,8 +75,6 @@ namespace Entegro.Application.Services
             var productAttributeMappingDto = _mapper.Map<ProductVariantAttributeDto>(productAttributeMapping);
             return productAttributeMappingDto;
         }
-
-
 
         public async Task<bool> UpdateAsync(UpdateProductVariantAttributeDto productAttributeMapping)
         {

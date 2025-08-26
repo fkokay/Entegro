@@ -3,12 +3,18 @@ using Entegro.Application.DTOs.Erp;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.DTOs.ProductAttributeValue;
+using Entegro.Application.DTOs.ProductVariantAttribute;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Erp;
 using Entegro.Application.Mappings.Marketplace;
+using Entegro.Application.Services;
 using Entegro.Domain.Entities;
+using Entegro.Infrastructure.Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
@@ -29,6 +35,9 @@ namespace Entegro.Service.Jobs
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeValueService _productAttributeValueService;
+        private readonly IProductVariantAttributeService _productVariantAttributeService;
+        private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IMapper _mapper;
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
@@ -40,6 +49,9 @@ namespace Entegro.Service.Jobs
             ICustomerService customerService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
+            IProductAttributeValueService productAttributeValueService,
+            IProductVariantAttributeService productVariantAttributeService,
+            IProductVariantAttributeValueService productVariantAttributeValueService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
@@ -50,6 +62,9 @@ namespace Entegro.Service.Jobs
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
+            _productAttributeValueService = productAttributeValueService;
+            _productVariantAttributeService = productVariantAttributeService ?? throw new ArgumentNullException(nameof(productVariantAttributeService));
+            _productVariantAttributeValueService = productVariantAttributeValueService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService ?? throw new ArgumentNullException(nameof(productVariantAttributeCombinationService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -116,18 +131,186 @@ namespace Entegro.Service.Jobs
                         var createProduct = _mapper.Map<CreateProductDto>(product);
                         var productId = await _productService.CreateProductAsync(createProduct);
 
-                        var p = await _productService.GetProductByIdAsync(productId);
-                        foreach (var item in product.ProductVariantAttributeCombinations)
+
+                        var erpProduct = erpProducts.Where(m => m.Code == product.Code).FirstOrDefault();
+
+                        foreach (var item in erpProduct.ProductVariantAttributes)
                         {
-                            var values = p.ProductVariantAttributes.Select(m => m.ProductAttribute.ProductAttributeValues.Select(m => new { ProductAttributeId = m.ProductAttributeId, ProductAttributeValueId = m.Id }).ToList()).ToList();
-                            foreach (var value in values)
+                            List<ProductVariantAttributeModel> productVariantAttributes = new List<ProductVariantAttributeModel>();
+
+                            if (!string.IsNullOrEmpty(item.Variant1Name) && !string.IsNullOrEmpty(item.Variant1Value))
                             {
-                                item.AttributeXml = JsonConvert.SerializeObject(value[0]);
-                                item.ProductId = productId;
-                                await _productVariantAttributeCombinationService.AddAsync(item);
+                                #region ProductAttribute
+                                var productAttribute = await _productAttributeService.GetByNameAsync(item.Variant1Name);
+                                int productAttributeId = 0;
+                                if (productAttribute == null)
+                                {
+                                    CreateProductAttributeDto createProductAttribute = new CreateProductAttributeDto()
+                                    {
+                                        Name = item.Variant1Name,
+                                        Description = "",
+                                        DisplayOrder = 0,
+                                    };
+
+                                    productAttributeId = await _productAttributeService.AddAsync(createProductAttribute);
+                                }
+                                else
+                                {
+                                    productAttributeId = productAttribute.Id;
+                                }
+                                #endregion
+
+                                #region ProductAttributeValue
+                                var productAttributeValue = await _productAttributeValueService.GetByNameAsync(item.Variant1Value);
+                                int productAttributeValueId = 0;
+                                if (productAttributeValue == null)
+                                {
+                                    CreateProductAttributeValueDto createProductAttributeValue = new CreateProductAttributeValueDto();
+                                    createProductAttributeValue.Name = item.Variant1Value;
+                                    createProductAttributeValue.DisplayOrder = 0;
+                                    createProductAttributeValue.ProductAttributeId = productAttributeId;
+
+                                    productAttributeValueId = await _productAttributeValueService.AddAsync(createProductAttributeValue);
+                                }
+                                else
+                                {
+                                    productAttributeValueId = productAttributeValue.Id;
+                                }
+                                #endregion
+
+                                #region ProductVariantAttribute
+                                var productVariantAttributeExist = await _productVariantAttributeService.GetByAttibuteIdAsync(productAttributeId);
+                                int productVariantAttributeId = 0;
+                                if (productVariantAttributeExist == null)
+                                {
+                                    CreateProductVariantAttributeDto productVariantAttribute = new CreateProductVariantAttributeDto();
+                                    productVariantAttribute.AttributeControlTypeId = 0;
+                                    productVariantAttribute.DisplayOrder = 0;
+                                    productVariantAttribute.ProductId = productId;
+                                    productVariantAttribute.ProductAttributeId = productAttributeId;
+
+                                    productVariantAttributeId = await _productVariantAttributeService.AddAsync(productVariantAttribute);
+                                }
+                                else
+                                {
+                                    productVariantAttributeId = productVariantAttributeExist.Id;
+                                }
+                                #endregion
+
+                                #region ProductVariantAttributeValue
+                                var productVariantAttributeValue = await _productVariantAttributeValueService.GetByNameAsync(item.Variant1Value);
+                                int productVariantAttributeValueId = 0;
+                                if (productAttributeValue == null)
+                                {
+                                    ProductVariantAttributeValueDto createProductVariantAttributeValue = new ProductVariantAttributeValueDto();
+                                    createProductVariantAttributeValue.ProductVariantAttributeId = productVariantAttributeId;
+                                    createProductVariantAttributeValue.Name = item.Variant1Value;
+
+                                    productVariantAttributeValueId = await _productVariantAttributeValueService.AddAsync(createProductVariantAttributeValue);
+                                }
+                                else
+                                {
+                                    productAttributeValueId = productAttributeValue.Id;
+                                } 
+                                #endregion
+
+                                productVariantAttributes.Add(new ProductVariantAttributeModel() { ProductAttributeId = productVariantAttributeId, ProductAttributeValueId = productVariantAttributeValueId });
+
                             }
 
-                          
+                            if (!string.IsNullOrEmpty(item.Variant2Name) && !string.IsNullOrEmpty(item.Variant2Value))
+                            {
+                                #region ProductAttribute
+                                var productAttribute = await _productAttributeService.GetByNameAsync(item.Variant2Name);
+                                int productAttributeId = 0;
+                                if (productAttribute == null)
+                                {
+                                    CreateProductAttributeDto createProductAttribute = new CreateProductAttributeDto()
+                                    {
+                                        Name = item.Variant2Name,
+                                        Description = "",
+                                        DisplayOrder = 0,
+                                        ProductAttributeValues = new List<ProductAttributeValueDto>() { new ProductAttributeValueDto() { Name = item.Variant2Name, DisplayOrder = 0, ProductAttributeId = 0 } }
+                                    };
+
+                                    productAttributeId = await _productAttributeService.AddAsync(createProductAttribute);
+                                }
+                                else
+                                {
+                                    productAttributeId = productAttribute.Id;
+                                }
+                                #endregion
+
+                                #region ProductAttributeValue
+                                var productAttributeValue = await _productAttributeValueService.GetByNameAsync(item.Variant2Name);
+                                int productAttributeValueId = 0;
+                                if (productAttributeValue == null)
+                                {
+                                    CreateProductAttributeValueDto createProductAttributeValue = new CreateProductAttributeValueDto();
+                                    createProductAttributeValue.Name = item.Variant2Value;
+                                    createProductAttributeValue.DisplayOrder = 0;
+                                    createProductAttributeValue.ProductAttributeId = productAttributeId;
+
+                                    productAttributeValueId = await _productAttributeValueService.AddAsync(createProductAttributeValue);
+                                }
+                                else
+                                {
+                                    productAttributeValueId = productAttributeValue.Id;
+                                }
+                                #endregion
+
+                                #region ProductVariantAttribute
+                                var productVariantAttributeExist = _productVariantAttributeService.GetByAttibuteIdAsync(productAttributeId);
+                                int productVariantAttributeId = 0;
+                                if (productVariantAttributeExist == null)
+                                {
+                                    CreateProductVariantAttributeDto productVariantAttribute = new CreateProductVariantAttributeDto();
+                                    productVariantAttribute.AttributeControlTypeId = 0;
+                                    productVariantAttribute.DisplayOrder = 0;
+                                    productVariantAttribute.ProductId = productId;
+                                    productVariantAttribute.ProductAttributeId = productAttributeId;
+
+                                    productVariantAttributeId = await _productVariantAttributeService.AddAsync(productVariantAttribute);
+                                }
+                                else
+                                {
+                                    productVariantAttributeId = productVariantAttributeExist.Id;
+                                }
+                                #endregion
+
+                                #region ProductVariantAttributeValue
+                                var productVariantAttributeValue = await _productVariantAttributeValueService.GetByNameAsync(item.Variant2Value);
+                                int productVariantAttributeValueId = 0;
+                                if (productAttributeValue == null)
+                                {
+                                    ProductVariantAttributeValueDto createProductVariantAttributeValue = new ProductVariantAttributeValueDto();
+                                    createProductVariantAttributeValue.ProductVariantAttributeId = productVariantAttributeId;
+                                    createProductVariantAttributeValue.Name = item.Variant2Value;
+
+                                    productVariantAttributeValueId = await _productVariantAttributeValueService.AddAsync(productVariantAttributeValue);
+                                }
+                                else
+                                {
+                                    productAttributeValueId = productAttributeValue.Id;
+                                }
+                                #endregion
+
+                                productVariantAttributes.Add(new ProductVariantAttributeModel() { ProductAttributeId = productVariantAttributeId, ProductAttributeValueId = productVariantAttributeValueId });
+                            }
+
+                            ProductVariantAttributeCombinationDto productVariantAttributeCombination = new ProductVariantAttributeCombinationDto()
+                            {
+                                Id = 0,
+                                ProductId = productId,
+                                Gtin = "",
+                                ManufacturerPartNumber = "",
+                                Price = item.Price,
+                                StockQuantity = Convert.ToInt32(item.StockQuantity),
+                                StokCode = item.VariantCode,
+                                AttributeXml = JsonConvert.SerializeObject(productVariantAttributes)
+                            };
+
+                            await _productVariantAttributeCombinationService.AddAsync(productVariantAttributeCombination);
                         }
                         _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
                     });
@@ -140,5 +323,11 @@ namespace Entegro.Service.Jobs
 
             _logger.LogInformation("{erpType} ürün senkronizasyonu tamamlandı. Zaman: {Time}", erpType, DateTime.UtcNow);
         }
+    }
+
+    public class ProductVariantAttributeModel
+    {
+        public int ProductAttributeId { get; set; }
+        public int ProductAttributeValueId { get; set; }
     }
 }

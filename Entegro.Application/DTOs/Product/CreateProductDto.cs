@@ -29,6 +29,6 @@ namespace Entegro.Application.DTOs.Product
         public string? Gtin { get; set; }
         public bool Published { get; set; } = true;
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
-        public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
+        //public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
     }
 }

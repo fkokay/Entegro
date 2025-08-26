@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Repositories
 {
-    public class ProductAttributeMappingRepository : IProductAttributeMappingRepository
+    public class ProductVariantAttributeRepository : IProductVariantAttributeRepository
     {
         private readonly EntegroContext _context;
 
-        public ProductAttributeMappingRepository(EntegroContext context)
+        public ProductVariantAttributeRepository(EntegroContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

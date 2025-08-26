@@ -20,7 +20,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductCategoryMappingService _productCategoryMappingService;
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
-        private readonly IProductAttributeMappingService _productAttributeMappingService;
+        private readonly IProductVariantAttributeService _productAttributeMappingService;
         private readonly IProductImageMappingService _productImageMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
@@ -29,7 +29,7 @@ namespace Entegro.Web.Controllers
             IProductCategoryMappingService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
-            IProductAttributeMappingService productAttributeMappingService,
+            IProductVariantAttributeService productAttributeMappingService,
             IProductImageMappingService productImageMappingService,
             IIntegrationSystemService integrationSystemService,
             IProductIntegrationService productIntegrationService)

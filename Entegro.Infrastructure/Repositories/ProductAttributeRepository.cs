@@ -55,6 +55,11 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.ProductAttributes.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<ProductAttribute?> GetByNameAsync(string name)
+        {
+            return await _context.ProductAttributes.FirstOrDefaultAsync(o => o.Name == name);
+        }
+
         public async Task UpdateAsync(ProductAttribute productAttribute)
         {
             _context.ProductAttributes.Update(productAttribute);

@@ -6,6 +6,7 @@ namespace Entegro.Application.Interfaces.Services
     public interface IProductAttributeValueService
     {
         Task<ProductAttributeValueDto?> GetByIdAsync(int id);
+        Task<ProductAttributeValueDto?> GetByNameAsync(string name);
         Task<List<ProductAttributeValueDto>> GetAllAsync();
         Task<PagedResult<ProductAttributeValueDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<int> AddAsync(CreateProductAttributeValueDto productAttributeValue);

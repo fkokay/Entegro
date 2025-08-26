@@ -38,6 +38,11 @@ builder.Services.AddScoped<IProductAttributeValueService, ProductAttributeValueS
 builder.Services.AddScoped<IProductVariantAttributeCombinationRepository, ProductVariantAttributeCombinationRepository>();
 builder.Services.AddScoped<IProductVariantAttributeCombinationService, ProductVariantAttributeCombinationService>();
 
+builder.Services.AddScoped<IProductVariantAttributeRepository, ProductVariantAttributeRepository>();
+builder.Services.AddScoped<IProductVariantAttributeService, ProductVariantAttributeService>();
+
+builder.Services.AddScoped<IProductVariantAttributeValueRepository, ProductVariantAttributeValueRepository>();
+builder.Services.AddScoped<IProductVariantAttributeValueService, ProductVariantAttributeValueService>();
 
 
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
