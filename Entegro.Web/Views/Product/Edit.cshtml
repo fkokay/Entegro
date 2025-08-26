@@ -534,14 +534,14 @@
                   customClass: { confirmButton: 'btn btn-success' },
                   buttonsStyling: false
                 }).then(() => {
-                  // ✅ 1) Kategoriler tabını aç
+                 
                   activateTab('#form-tabs-categories');
 
-                  // ✅ 2) Tabloyu yenile
+               
                   const productId = $('#productId').val();
                   loadProductCategories(productId);
 
-                  // (Opsiyonel) Modal alanlarını temizle
+                
                   $('#CategoryId').val(null).trigger('change');
                   $('#DisplayOrder').val('');
                 });
