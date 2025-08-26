@@ -217,6 +217,7 @@ namespace Entegro.Web.Controllers
             return PartialView("_ProductImages", model);
         }
         #endregion
+
         #region Product Categories
         [HttpPost]
         public async Task<IActionResult> ProductCategoryList(int productId, CancellationToken ct)
