@@ -7,11 +7,14 @@ using Entegro.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Entegro.Application.Services.Commerce.Smartstore
 {
@@ -47,7 +50,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreProductDto>>(json, _jsonOptions);
+                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductDto>>(json, _jsonOptions);
 
                 return data?.Value?.FirstOrDefault() is SmartstoreProductDto dto ? SmartstoreProductMapper.ToDto(dto) : null;
             }
@@ -59,7 +62,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
         public async Task UpsertProductAsync(ProductDto product)
         {
-            // Öncelikle ürünün Smartstore’da var olup olmadığını kontrol et
             try
             {
                 if (product.Brand != null)
@@ -72,7 +74,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     }
                     else
                     {
-                        //await UpdateBrandAsync(product.Brand, manufacturer.Id);
                         product.BrandId = manufacturer.Id;
                     }
                 }
@@ -87,8 +88,25 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     }
                     else
                     {
-                        //await UpdateCategoryAsync(item.Category, category.Id);
                         item.CategoryId = category.Id;
+                    }
+                }
+
+                foreach (var item in product.ProductMediaFiles)
+                {
+                    var fileExists = await FileExists("catalog/" + item.MediaFile.Name);
+                    if (fileExists.Value)
+                    {
+                        var smartstoreFile = await GetFileByPath("catalog/" + item.MediaFile.Name);
+                        item.MediaFileId = smartstoreFile.Id;
+                    }
+                    else
+                    {
+                        SmartstoreFileDto smartstoreFile = new SmartstoreFileDto();
+                        smartstoreFile.File = await getFileAsync("https://localhost:7230" + item.MediaFile.Url);
+                        smartstoreFile.FileName = "catalog/" + item.MediaFile.Name;
+                        smartstoreFile.MimeType = item.MediaFile.MimeType;
+                        item.MediaFileId = await UpsertMediaFile(smartstoreFile) ?? 0;
                     }
                 }
 
@@ -96,7 +114,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                 if (existing == null)
                 {
-                    // Yoksa POST ile yeni ürün ekle
                     var payload = SmartstoreProductMapper.ToDto(product);
                     var json = JsonSerializer.Serialize(payload, _jsonOptions);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -122,6 +139,11 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                             category.ProductId = id;
                         }
 
+                        foreach(var mediaFile in payload.ProductMediaFiles)
+                        {
+                            mediaFile.ProductId = id;
+                        }
+
                         var json = JsonSerializer.Serialize(payload, _jsonOptions);
                         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -134,6 +156,19 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             catch (Exception)
             {
 
+            }
+        }
+
+        private async Task<byte[]> getFileAsync(string url)
+        {
+            using (var client = new HttpClient())
+            {
+                using (var response = await client.GetAsync(url))
+                {
+                    byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+
+                    return imageBytes;
+                }
             }
         }
 
@@ -185,7 +220,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             return created.Id;
         }
 
-        public async Task UpdateBrandAsync(BrandDto brand,int id)
+        public async Task UpdateBrandAsync(BrandDto brand, int id)
         {
             var payload = SmartstoreManufacturerMapper.ToDto(brand);
             payload.Id = id;
@@ -212,7 +247,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreManufacturerDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreManufacturerDto>>(json, _jsonOptions);
 
                 return data?.Value?.FirstOrDefault() is SmartstoreManufacturerDto dto ? SmartstoreManufacturerMapper.ToDto(dto) : null;
             }
@@ -265,9 +300,77 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreCategoryDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreCategoryDto>>(json, _jsonOptions);
 
                 return data?.Value?.FirstOrDefault() is SmartstoreCategoryDto dto ? SmartstoreCategoryMapper.ToDto(dto) : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        #endregion
+
+        #region Image
+        public async Task<int?> UpsertMediaFile(SmartstoreFileDto smartstoreFile)
+        {
+            MultipartFormDataContent multipartContent = new MultipartFormDataContent();
+
+            var fileContent = new ByteArrayContent(smartstoreFile.File);
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(smartstoreFile.MimeType);
+            multipartContent.Add(fileContent, "file", smartstoreFile.FileName);
+            multipartContent.Add(new StringContent(smartstoreFile.FileName, Encoding.UTF8), "path");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "mediafiles/savefile");
+            request.Content = multipartContent;
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<SmartstoreFileItemInfoDto>(json, _jsonOptions);
+
+            return data?.Id;
+        }
+        public async Task<ODataResponse<bool>?> FileExists(string filePath)
+        {
+            try
+            {
+                var jsonContent = new
+                {
+                    path = filePath
+                };
+
+                var request = new HttpRequestMessage(HttpMethod.Post, "mediafiles/fileexists");
+                request.Content = new StringContent(JsonSerializer.Serialize(jsonContent), Encoding.UTF8, "application/json");
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ODataResponse<bool>>(json, _jsonOptions);
+                return data;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<SmartstoreFileItemInfoDto?> GetFileByPath(string filePath)
+        {
+            try
+            {
+                var jsonContent = new
+                {
+                    path = filePath
+                };
+
+                var request = new HttpRequestMessage(HttpMethod.Post, "mediafiles/getfilebypath");
+                request.Content = new StringContent(JsonSerializer.Serialize(jsonContent), Encoding.UTF8, "application/json");
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<SmartstoreFileItemInfoDto>(json, _jsonOptions);
+                return data;
             }
             catch (Exception)
             {

@@ -37,7 +37,7 @@ namespace Entegro.Application.Services
             {
                 if (await _brandService.ExistsByNameAsync(createProduct.Brand.Name))
                 {
-                    var brand = await _brandService.GetBrandByNameAsync(createProduct.Brand.Name);
+                    var brand = await _brandService.GetByNameAsync(createProduct.Brand.Name);
                     createProduct.BrandId = brand.Id;
                     createProduct.Brand = null;
                 }
@@ -45,8 +45,8 @@ namespace Entegro.Application.Services
                 {
                     var createBrand = _mapper.Map<CreateBrandDto>(createProduct.Brand);
 
-                    var brandResult = await _brandService.CreateBrandAsync(createBrand);
-                    createProduct.BrandId = brandResult;
+                    var brandResult = await _brandService.CreateAsync(createBrand);
+                    createProduct.BrandId = brandResult.Id;
                     createProduct.Brand = null;
                 }
             }

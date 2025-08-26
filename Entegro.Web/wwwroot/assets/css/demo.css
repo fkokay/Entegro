@@ -540,3 +540,10 @@
         padding: 6px;
         font-size: 10px;
     }
+
+
+table .avatar img {
+    inline-size:auto;
+    display: block;
+    margin: 0px auto;
+}

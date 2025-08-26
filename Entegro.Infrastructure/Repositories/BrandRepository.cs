@@ -28,6 +28,11 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsByIdAsync(int id)
+        {
+            return await _context.Brands.AnyAsync(o => o.Id == id);
+        }
+
         public async Task<bool> ExistsByNameAsync(string name)
         {
             return await _context.Brands.AnyAsync(o => o.Name == name);

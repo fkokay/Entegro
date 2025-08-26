@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.Commerce.Smartstore
 {
-    public class ODataResponse<T>
+    public class ODataListResponse<T>
     {
         [JsonPropertyName("value")]
-        public T Value { get; set; }
+        public List<T> Value { get; set; }
         [JsonPropertyName("@odata.count")]
         public int Count { get; set; }
     }

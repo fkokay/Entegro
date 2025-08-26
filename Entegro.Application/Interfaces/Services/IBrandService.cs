@@ -5,17 +5,14 @@ namespace Entegro.Application.Interfaces.Services
 {
     public interface IBrandService
     {
-        Task<BrandDto> GetBrandByIdAsync(int brandId);
-        Task<BrandDto> GetBrandByNameAsync(string brandName);
-        Task<IEnumerable<BrandDto>> GetBrandsAsync();
-        Task<PagedResult<BrandDto>> GetBrandsAsync(int pageNumber, int pageSize);
-        Task<int> CreateBrandAsync(CreateBrandDto createBrand);
-        Task<bool> UpdateBrandAsync(UpdateBrandDto updateBrand);
-        Task<bool> DeleteBrandAsync(int brandId);
-
-        Task<bool> ExistsByNameAsync(string brandName);
-        Task UpdateBrandImageAsync(int brandId, int mediaFileId);
-        Task DeleteBrandImageAsync(int brandId);
-        Task<BrandDto?> GetByIdWithMediaAsync(int id);
+        Task<bool> ExistsByIdAsync(int id);
+        Task<bool> ExistsByNameAsync(string name);
+        Task<BrandDto?> GetByIdAsync(int id);
+        Task<BrandDto?> GetByNameAsync(string name);
+        Task<IEnumerable<BrandDto>> GetAllAsync();
+        Task<PagedResult<BrandDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<BrandDto> CreateAsync(CreateBrandDto model);
+        Task<BrandDto> UpdateAsync(UpdateBrandDto model);
+        Task DeleteAsync(int id);
     }
 }
