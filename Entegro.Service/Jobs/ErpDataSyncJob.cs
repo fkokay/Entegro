@@ -84,7 +84,7 @@ namespace Entegro.Service.Jobs
 
             try
             {
-                erpProducts = (await _erpService.GetProductsAsync(erpType,500)).ToList();
+                erpProducts = (await _erpService.GetProductsAsync(erpType, 500)).ToList();
             }
             catch (Exception ex)
             {
@@ -185,7 +185,7 @@ namespace Entegro.Service.Jobs
                                     #endregion
 
                                     #region ProductVariantAttribute
-                                    var productVariantAttributeExist = await _productVariantAttributeService.GetByAttibuteIdAsync(productAttributeId);
+                                    var productVariantAttributeExist = await _productVariantAttributeService.GetByAttibuteIdAsync(productId, productAttributeId);
                                     int productVariantAttributeId = 0;
                                     if (productVariantAttributeExist == null)
                                     {
@@ -266,7 +266,7 @@ namespace Entegro.Service.Jobs
                                     #endregion
 
                                     #region ProductVariantAttribute
-                                    var productVariantAttributeExist = _productVariantAttributeService.GetByAttibuteIdAsync(productAttributeId);
+                                    var productVariantAttributeExist = _productVariantAttributeService.GetByAttibuteIdAsync(productId, productAttributeId);
                                     int productVariantAttributeId = 0;
                                     if (productVariantAttributeExist == null)
                                     {

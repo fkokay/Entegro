@@ -160,7 +160,7 @@ namespace Entegro.Web.Controllers
 
                 foreach (var item in model.SelectedProductAttributeIds)
                 {
-                    var exist = await _productAttributeMappingService.GetByAttibuteIdAsync(item);
+                    var exist = await _productAttributeMappingService.GetByAttibuteIdAsync(model.Id,item);
 
                     if (exist == null)
                     {
