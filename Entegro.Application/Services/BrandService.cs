@@ -30,9 +30,7 @@ namespace Entegro.Application.Services
         public async Task<bool> ExistsByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentOutOfRangeException(nameof(name));
-            }
+                throw new ArgumentException("Brand name boş olamaz.", nameof(name));
 
             return await _brandRepository.ExistsByNameAsync(name);
         }
@@ -45,6 +43,10 @@ namespace Entegro.Application.Services
             }
 
             var brand = await _brandRepository.GetByIdAsync(id);
+            if (brand == null)
+            {
+                return null;
+            }
             var brandDto = _mapper.Map<BrandDto>(brand);
 
             return brandDto;
@@ -54,10 +56,15 @@ namespace Entegro.Application.Services
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentException("Brand adı boş olamaz.", nameof(name));
             }
 
             var brand = await _brandRepository.GetByNameAsync(name);
+            if (brand == null)
+            {
+                return null;
+            }
+
             var brandDto = _mapper.Map<BrandDto>(brand);
 
             return brandDto;
@@ -72,36 +79,58 @@ namespace Entegro.Application.Services
 
         public async Task<PagedResult<BrandDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
+            if (pageNumber <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber));
+            if (pageSize <= 0)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+
             var brands = await _brandRepository.GetAllAsync(pageNumber, pageSize);
-            var brandDtos = _mapper.Map<PagedResult<BrandDto>>(brands);
-            return brandDtos;
+            return new PagedResult<BrandDto>
+            {
+                Items = _mapper.Map<IEnumerable<BrandDto>>(brands.Items),
+                TotalCount = brands.TotalCount,
+                PageNumber = brands.PageNumber,
+                PageSize = brands.PageSize
+            };
         }
 
         public async Task<BrandDto> CreateAsync(CreateBrandDto model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
             var brand = _mapper.Map<Brand>(model);
             await _brandRepository.AddAsync(brand);
-            var brandDto = _mapper.Map<BrandDto>(brand);
 
-            return brandDto;
+            return _mapper.Map<BrandDto>(brand);
         }
 
         public async Task<BrandDto> UpdateAsync(UpdateBrandDto model)
         {
-            var brand = _mapper.Map<Brand>(model);
-            await _brandRepository.UpdateAsync(brand);
-            var brandDto = _mapper.Map<BrandDto>(brand);
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            return brandDto;
+            var existingBrand = await _brandRepository.GetByIdAsync(model.Id);
+            if (existingBrand == null)
+                throw new KeyNotFoundException($"ID {model.Id} ile Brand bulunamadı.");
+
+            _mapper.Map(model, existingBrand);
+            await _brandRepository.UpdateAsync(existingBrand);
+
+            return _mapper.Map<BrandDto>(existingBrand);
         }
 
         public async Task DeleteAsync(int id)
         {
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id));
+
             var brand = await _brandRepository.GetByIdAsync(id);
-            if (brand != null)
-            {
-                await _brandRepository.DeleteAsync(brand);
-            }
+            if (brand == null)
+                throw new KeyNotFoundException($"ID {id} ile Brand bulunamadı.");
+
+            await _brandRepository.DeleteAsync(brand);
         }
     }
 }
