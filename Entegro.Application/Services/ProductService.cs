@@ -82,8 +82,8 @@ namespace Entegro.Application.Services
 
             foreach (var subCategoryDto in categoryDto.SubCategories)
             {
-                subCategoryDto.ParentCategoryId = categoryId; 
-                await CreateCategoryWithChildrenAsync(subCategoryDto);
+                subCategoryDto.ParentCategoryId = categoryId;
+                categoryId = await CreateCategoryWithChildrenAsync(subCategoryDto);
             }
 
             return categoryId;

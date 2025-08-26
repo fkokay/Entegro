@@ -84,7 +84,7 @@ namespace Entegro.Service.Jobs
 
             try
             {
-                erpProducts = (await _erpService.GetProductsAsync(erpType)).ToList();
+                erpProducts = (await _erpService.GetProductsAsync(erpType,500)).ToList();
             }
             catch (Exception ex)
             {
@@ -113,6 +113,11 @@ namespace Entegro.Service.Jobs
 
             foreach (var product in products)
             {
+                if (string.IsNullOrEmpty(product.Name))
+                {
+                    _logger.LogWarning("Ürün adı boş veya null, '{Code}' kodlu ürün atlanıyor.", product.Code);
+                    continue;
+                }
                 if (string.IsNullOrEmpty(product.Code))
                 {
                     _logger.LogWarning("Ürün kodu boş veya null, '{Name}' adlı ürün atlanıyor.", product.Name);
