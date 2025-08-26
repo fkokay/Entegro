@@ -56,6 +56,10 @@ namespace Entegro.Web.Controllers
             ViewBag.Commerces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce).Select(
                 m => new { m.Id, m.Name }
                 ).ToList();
+
+            ViewBag.Marketplaces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Marketplace).Select(
+                m => new { m.Id, m.Name }
+                ).ToList();
             return View();
         }
 
@@ -499,7 +503,6 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> IntegrationDialog(DialogViewModel model)
         {
-
             var product = await _productService.GetProductByIdAsync(model.ProductId);
             if (model.ProductIntegrationId == 0)
             {
