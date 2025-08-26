@@ -52,9 +52,9 @@ namespace Entegro.Application.Services
             return productAttributeMappingDto;
         }
 
-        public async Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int id)
+        public async Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int productId, int attributeId)
         {
-            var productAttributeMapping = await _productAttributeMappingRepository.GetByAttributeIdAsync(id);
+            var productAttributeMapping = await _productAttributeMappingRepository.GetByAttributeIdAsync(productId,attributeId);
             if (productAttributeMapping == null)
             {
                 return null;

@@ -6,7 +6,7 @@ namespace Entegro.Application.Interfaces.Services
     public interface IProductVariantAttributeService
     {
         Task<ProductVariantAttributeDto?> GetByIdAsync(int id);
-        Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int id);
+        Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int productId,int attributeId);
         Task<List<ProductVariantAttributeDto>> GetAllAsync();
         Task<PagedResult<ProductVariantAttributeDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<int> AddAsync(CreateProductVariantAttributeDto productAttributeMapping);
