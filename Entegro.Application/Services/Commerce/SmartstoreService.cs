@@ -43,7 +43,7 @@ namespace Entegro.Application.Services.Commerce
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreProductDto>>(json, new JsonSerializerOptions
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductDto>>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
@@ -72,7 +72,7 @@ namespace Entegro.Application.Services.Commerce
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var categoryResponse = JsonSerializer.Deserialize<ODataResponse<SmartstoreCategoryDto>>(json, new JsonSerializerOptions
+            var categoryResponse = JsonSerializer.Deserialize<ODataListResponse<SmartstoreCategoryDto>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
@@ -86,7 +86,7 @@ namespace Entegro.Application.Services.Commerce
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var manufacturers = JsonSerializer.Deserialize<ODataResponse<SmartstoreManufacturerDto>>(json, new JsonSerializerOptions
+            var manufacturers = JsonSerializer.Deserialize<ODataListResponse<SmartstoreManufacturerDto>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
@@ -120,7 +120,7 @@ namespace Entegro.Application.Services.Commerce
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ODataResponse<SmartstoreOrderDto>>(json, new JsonSerializerOptions
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreOrderDto>>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });

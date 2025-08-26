@@ -207,6 +207,12 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                     DisplayOrder = 0,
                 }).ToList();
 
+                smartstoreProduct.ProductMediaFiles = product.ProductMediaFiles.Select(m => new SmartstoreProductMediaFileDto()
+                {
+                    MediaFileId = m.MediaFileId,
+                    DisplayOrder = m.DisplayOrder,
+                }).ToList();
+
                 return smartstoreProduct; 
             }
             catch (Exception ex)

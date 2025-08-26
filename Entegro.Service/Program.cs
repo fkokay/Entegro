@@ -89,29 +89,29 @@ builder.Services.AddQuartz(q =>
             .RepeatForever())
         );
 
-    var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+    //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
-    q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+    //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeyTrendyol)
-        .WithIdentity("TrendyolDataSyncJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-    );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyTrendyol)
+    //    .WithIdentity("TrendyolDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //);
 
-    var jobKeyErp = new JobKey("ErpDataSyncJob");
+    //var jobKeyErp = new JobKey("ErpDataSyncJob");
 
-    q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+    //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeyErp)
-        .WithIdentity("ErpDataSyncJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-    );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyErp)
+    //    .WithIdentity("ErpDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //);
 });
 
 // Quartz hosted service
