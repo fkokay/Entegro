@@ -6,13 +6,10 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<ProductCategoryDto> GetProductCategoryByIdAsync(int productCategoryId);
         Task<IEnumerable<ProductCategoryDto>> GetProductCategorysAsync();
-        Task<int> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategory);
-        Task<bool> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory);
-        Task<bool> DeleteProductCategoryAsync(int productCategoryId);
-
-        Task<IReadOnlyList<ProductCategoryParhDto>> GetCategoryPathsByProductAsync(int productId, CancellationToken ct = default);
-        Task<IReadOnlyDictionary<int, IReadOnlyList<ProductCategoryParhDto>>> GetCategoryPathsByProductsAsync(IEnumerable<int> productIds, CancellationToken ct = default);
-
-
+        Task<ProductCategoryDto> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategory);
+        Task<ProductCategoryDto> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory);
+        Task DeleteProductCategoryAsync(int productCategoryId);
+        Task<IReadOnlyList<ProductCategoryPathDto>> GetCategoryPathsByProductAsync(int productId);
+        Task<IReadOnlyDictionary<int, IReadOnlyList<ProductCategoryPathDto>>> GetCategoryPathsByProductsAsync(IEnumerable<int> productIds);
     }
 }

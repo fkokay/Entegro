@@ -28,12 +28,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<IntegrationSystemLog>> GetAllAsync()
         {
-            return await _context.IntegrationSystemLogs.ToListAsync();
+            return await _context.IntegrationSystemLogs.AsNoTracking().ToListAsync();
         }
 
         public async Task<PagedResult<IntegrationSystemLog>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.IntegrationSystemLogs.AsQueryable();
+            var query = _context.IntegrationSystemLogs.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query
@@ -52,7 +52,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<IntegrationSystemLog?> GetByIdAsync(int id)
         {
-            return await _context.IntegrationSystemLogs.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.IntegrationSystemLogs.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(IntegrationSystemLog integrationSystemLog)

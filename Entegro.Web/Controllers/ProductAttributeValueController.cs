@@ -83,7 +83,7 @@ namespace Entegro.Web.Controllers
             int pageSize = model.Length;
 
 
-            var result = await _productAttributeValueService.GetAllAsync(pageNumber, model.Length);
+            var result = await _productAttributeValueService.GetPagedAsync(pageNumber, model.Length);
 
             return Json(new
             {
@@ -97,12 +97,16 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var isSuccess = await _productAttributeValueService.DeleteAsync(id);
-            if (isSuccess)
+
+            try
             {
+                await _productAttributeValueService.DeleteAsync(id);
                 return Json(new { success = true });
             }
-            return Json(new { success = false, message = "Silinecek Varyant Değeri Bulunamadı" });
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Silinecek Varyant Değeri Bulunamadı" });
+            }
         }
 
         [HttpGet]

@@ -18,15 +18,14 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> AddAsync(CreateProductVariantAttributeDto productAttributeMapping)
+        public async Task<ProductVariantAttributeDto> AddAsync(CreateProductVariantAttributeDto productAttributeMapping)
         {
             var model = _mapper.Map<ProductVariantAttribute>(productAttributeMapping);
             await _productAttributeMappingRepository.AddAsync(model);
-
-            return model.Id;
+            return _mapper.Map<ProductVariantAttributeDto>(model);
         }
 
-        public async Task<bool> DeleteAsync(int productAttributeMappingId)
+        public async Task DeleteAsync(int productAttributeMappingId)
         {
             var model = await _productAttributeMappingRepository.GetByIdAsync(productAttributeMappingId);
 
@@ -35,7 +34,6 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ProductAttribute with ID {productAttributeMappingId} not found.");
             }
             await _productAttributeMappingRepository.DeleteAsync(model);
-            return true;
         }
 
         public async Task<List<ProductVariantAttributeDto>> GetAllAsync()
@@ -45,7 +43,7 @@ namespace Entegro.Application.Services
             return ProductAttributeMappingDto.ToList();
         }
 
-        public async Task<PagedResult<ProductVariantAttributeDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductVariantAttributeDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             var productAttributeMappings = await _productAttributeMappingRepository.GetAllAsync(pageNumber, pageSize);
             var productAttributeMappingDto = _mapper.Map<PagedResult<ProductVariantAttributeDto>>(productAttributeMappings);
@@ -54,7 +52,7 @@ namespace Entegro.Application.Services
 
         public async Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int productId, int attributeId)
         {
-            var productAttributeMapping = await _productAttributeMappingRepository.GetByAttributeIdAsync(productId,attributeId);
+            var productAttributeMapping = await _productAttributeMappingRepository.GetByAttributeIdAsync(productId, attributeId);
             if (productAttributeMapping == null)
             {
                 return null;
@@ -76,10 +74,10 @@ namespace Entegro.Application.Services
             return productAttributeMappingDto;
         }
 
-        public async Task<bool> UpdateAsync(UpdateProductVariantAttributeDto productAttributeMapping)
+        public async Task<ProductVariantAttributeDto> UpdateAsync(UpdateProductVariantAttributeDto productAttributeMapping)
         {
             await _productAttributeMappingRepository.UpdateAsync(_mapper.Map<ProductVariantAttribute>(productAttributeMapping));
-            return true;
+            return _mapper.Map<ProductVariantAttributeDto>(productAttributeMapping);
         }
     }
 }

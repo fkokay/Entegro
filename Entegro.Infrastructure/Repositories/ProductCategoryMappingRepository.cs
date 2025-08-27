@@ -28,15 +28,15 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductCategory>> GetAllAsync()
         {
-            return await _context.ProductCategories.Include(m => m.Product).Include(m => m.Category).ToListAsync();
+            return await _context.ProductCategories.Include(m => m.Product).Include(m => m.Category).AsNoTracking().ToListAsync();
         }
 
         public async Task<ProductCategory?> GetByIdAsync(int id)
         {
-            return await _context.ProductCategories.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductCategories.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds, CancellationToken ct = default)
+        public async Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds)
         {
             var ids = productIds.Distinct().ToArray();
 
@@ -46,17 +46,17 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(m => m.Category)
                 .OrderBy(m => m.ProductId)
                 .ThenBy(m => m.DisplayOrder).ThenBy(m => m.CategoryId)
-                .ToListAsync(ct);
+                .ToListAsync();
         }
 
-        public async Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId, CancellationToken ct = default)
+        public async Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId)
         {
             return await _context.ProductCategories
              .AsNoTracking()
              .Where(m => m.ProductId == productId)
              .Include(m => m.Category)
              .OrderBy(m => m.DisplayOrder).ThenBy(m => m.CategoryId)
-             .ToListAsync(ct);
+             .ToListAsync();
         }
 
         public async Task UpdateAsync(ProductCategory productCategoryMapping)

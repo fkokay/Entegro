@@ -193,7 +193,8 @@ namespace Entegro.Web.Controllers
                     int mediaFileId = 0;
                     if (duplicateFileHandling == DuplicateFileHandling.Rename || duplicateFileHandling == DuplicateFileHandling.ThrowError)
                     {
-                        mediaFileId = await _mediaFileService.AddAsync(createMediaFile);
+                        var modelMediaFile = await _mediaFileService.AddAsync(createMediaFile);
+                        mediaFileId = modelMediaFile.Id;
                     }
                     else
                     {

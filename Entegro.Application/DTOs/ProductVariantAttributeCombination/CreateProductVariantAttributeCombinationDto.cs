@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Application.DTOs.ProductVariantAttributeCombination
 {
-    internal class CreateProductVariantAttributeCombinationDto
+    public class CreateProductVariantAttributeCombinationDto
     {
 
         public int ProductId { get; set; }

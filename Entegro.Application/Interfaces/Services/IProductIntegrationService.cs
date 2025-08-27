@@ -6,13 +6,13 @@ namespace Entegro.Application.Interfaces.Services
     public interface IProductIntegrationService
     {
         Task<ProductIntegrationDto?> GetByIdAsync(int productIntegrationId);
-        Task<ProductIntegrationDto?> GetByIntegrationSystemIdandIntegrationCodeAsync(int integrationSystemId, string integrationCode);
+        Task<ProductIntegrationDto?> GetByIntegrationSystemAndCodeAsync(int integrationSystemId, string integrationCode);
+        Task<ProductIntegrationDto?> GetByProductAndIntegrationSystemAsync(int productId, int integrationSystemId);
         Task<ProductIntegrationDto?> GetByIntegrationCodeAsync(string productIntegrationCode);
         Task<IEnumerable<ProductIntegrationDto>> GetProductIntegrationAsync();
-        Task<PagedResult<ProductIntegrationDto>> GetProductIntegrationAsync(int pageNumber, int pageSize);
-        Task<ProductIntegrationDto?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId);
-        Task<int> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration);
-        Task<bool> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration);
-        Task<bool> DeleteProductIntegrationAsync(int productIntegrationId);
+        Task<PagedResult<ProductIntegrationDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<ProductIntegrationDto> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration);
+        Task<ProductIntegrationDto> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration);
+        Task DeleteProductIntegrationAsync(int productIntegrationId);
     }
 }

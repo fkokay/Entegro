@@ -1,15 +1,8 @@
 ﻿using AutoMapper;
-using Entegro.Application.DTOs.ProductAttribute;
-using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services
 {
@@ -24,12 +17,11 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> AddAsync(ProductVariantAttributeValueDto data)
+        public async Task<ProductVariantAttributeValueDto> AddAsync(CreateProductVariantAttributeValueDto data)
         {
             var model = _mapper.Map<ProductVariantAttributeValue>(data);
             await _productVariantAttributeValueRepository.AddAsync(model);
-
-            return model.Id;
+            return _mapper.Map<ProductVariantAttributeValueDto>(model);
         }
 
         public async Task<ProductVariantAttributeValueDto?> GetByNameAsync(string name)

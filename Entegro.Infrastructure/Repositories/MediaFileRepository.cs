@@ -14,11 +14,10 @@ namespace Entegro.Infrastructure.Repositories
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task<int> AddAsync(MediaFile mediaFile)
+        public async Task AddAsync(MediaFile mediaFile)
         {
             await _context.MediaFiles.AddAsync(mediaFile);
             await _context.SaveChangesAsync();
-            return mediaFile.Id;
         }
 
         public async Task DeleteAsync(MediaFile mediaFile)
@@ -29,12 +28,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<MediaFile>> GetAllAsync()
         {
-            return await _context.MediaFiles.ToListAsync();
+            return await _context.MediaFiles.AsNoTracking().ToListAsync();
         }
 
         public async Task<PagedResult<MediaFile>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.MediaFiles.AsQueryable();
+            var query = _context.MediaFiles.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query
@@ -53,12 +52,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<MediaFile?> GetByIdAsync(int id)
         {
-            return await _context.MediaFiles.Include(m => m.Folder).FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.MediaFiles.Include(m => m.Folder).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<MediaFile?> GetByNameAndFolderAsync(string name, int? folderId)
         {
-            return await _context.MediaFiles.Include(m => m.Folder)
+            return await _context.MediaFiles.Include(m => m.Folder).AsNoTracking()
                     .FirstOrDefaultAsync(x => x.Name == name && x.FolderId == folderId);
         }
 

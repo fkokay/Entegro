@@ -29,7 +29,7 @@ namespace Entegro.Web.Controllers
             int pageSize = model.Length;
 
 
-            var result = await _orderService.GetOrdersAsync(pageNumber, model.Length);
+            var result = await _orderService.GetPagedAsync(pageNumber, model.Length);
 
             return Json(new
             {

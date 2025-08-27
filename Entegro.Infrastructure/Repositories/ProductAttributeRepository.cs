@@ -28,12 +28,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductAttribute>> GetAllAsync()
         {
-            return await _context.ProductAttributes.ToListAsync();
+            return await _context.ProductAttributes.AsNoTracking().ToListAsync();
         }
 
         public async Task<PagedResult<ProductAttribute>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductAttributes.AsQueryable();
+            var query = _context.ProductAttributes.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query
@@ -52,12 +52,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductAttribute?> GetByIdAsync(int id)
         {
-            return await _context.ProductAttributes.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductAttributes.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<ProductAttribute?> GetByNameAsync(string name)
         {
-            return await _context.ProductAttributes.FirstOrDefaultAsync(o => o.Name == name);
+            return await _context.ProductAttributes.AsNoTracking().FirstOrDefaultAsync(o => o.Name == name);
         }
 
         public async Task UpdateAsync(ProductAttribute productAttribute)

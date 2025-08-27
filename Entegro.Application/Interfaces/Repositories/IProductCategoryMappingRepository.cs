@@ -9,9 +9,8 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(ProductCategory productCategoryMapping);
         Task UpdateAsync(ProductCategory productCategoryMapping);
         Task DeleteAsync(ProductCategory productCategoryMapping);
-
-        Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId, CancellationToken ct = default);
-        Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds, CancellationToken ct = default);
+        Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId);
+        Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds);
 
     }
 }

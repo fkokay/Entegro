@@ -145,8 +145,8 @@ namespace Entegro.Service.Jobs
                                             Description = "",
                                             DisplayOrder = 0,
                                         };
-
-                                        productAttributeId = await _productAttributeService.AddAsync(createProductAttribute);
+                                        var model = await _productAttributeService.AddAsync(createProductAttribute);
+                                        productAttributeId = model.Id;
                                     }
                                     else
                                     {
@@ -164,7 +164,8 @@ namespace Entegro.Service.Jobs
                                         createProductAttributeValue.DisplayOrder = 0;
                                         createProductAttributeValue.ProductAttributeId = productAttributeId;
 
-                                        productAttributeValueId = await _productAttributeValueService.AddAsync(createProductAttributeValue);
+                                        var createProductAtrributeModel = await _productAttributeValueService.AddAsync(createProductAttributeValue);
+                                        productAttributeValueId = createProductAtrributeModel.Id;
                                     }
                                     else
                                     {
@@ -183,7 +184,8 @@ namespace Entegro.Service.Jobs
                                         productVariantAttribute.ProductId = productDTO.Id;
                                         productVariantAttribute.ProductAttributeId = productAttributeId;
 
-                                        productVariantAttributeId = await _productVariantAttributeService.AddAsync(productVariantAttribute);
+                                        var createProductVariantAttributeModel = await _productVariantAttributeService.AddAsync(productVariantAttribute);
+                                        productVariantAttributeId = createProductVariantAttributeModel.Id;
                                     }
                                     else
                                     {
@@ -200,7 +202,11 @@ namespace Entegro.Service.Jobs
                                         createProductVariantAttributeValue.ProductVariantAttributeId = productVariantAttributeId;
                                         createProductVariantAttributeValue.Name = item.Variant1Value;
 
-                                        productVariantAttributeValueId = await _productVariantAttributeValueService.AddAsync(createProductVariantAttributeValue);
+                                        var createProductVariantAttributeValueDto = await _productVariantAttributeValueService.AddAsync(new CreateProductVariantAttributeValueDto
+                                        {
+                                            Name = createProductVariantAttributeValue.Name,
+                                        });
+                                        productVariantAttributeValueId = createProductVariantAttributeValueDto.ProductVariantAttributeId;
                                     }
                                     else
                                     {
@@ -226,8 +232,8 @@ namespace Entegro.Service.Jobs
                                             DisplayOrder = 0,
                                             ProductAttributeValues = new List<ProductAttributeValueDto>() { new ProductAttributeValueDto() { Name = item.Variant2Name, DisplayOrder = 0, ProductAttributeId = 0 } }
                                         };
-
-                                        productAttributeId = await _productAttributeService.AddAsync(createProductAttribute);
+                                        var model = await _productAttributeService.AddAsync(createProductAttribute);
+                                        productAttributeId = model.Id;
                                     }
                                     else
                                     {
@@ -245,7 +251,8 @@ namespace Entegro.Service.Jobs
                                         createProductAttributeValue.DisplayOrder = 0;
                                         createProductAttributeValue.ProductAttributeId = productAttributeId;
 
-                                        productAttributeValueId = await _productAttributeValueService.AddAsync(createProductAttributeValue);
+                                        var createProductAttributeValueModel = await _productAttributeValueService.AddAsync(createProductAttributeValue);
+                                        productAttributeValueId = createProductAttributeValueModel.Id;
                                     }
                                     else
                                     {
@@ -263,8 +270,8 @@ namespace Entegro.Service.Jobs
                                         productVariantAttribute.DisplayOrder = 0;
                                         productVariantAttribute.ProductId = productDTO.Id;
                                         productVariantAttribute.ProductAttributeId = productAttributeId;
-
-                                        productVariantAttributeId = await _productVariantAttributeService.AddAsync(productVariantAttribute);
+                                        var createProductVariantAttributeDto = await _productVariantAttributeService.AddAsync(productVariantAttribute);
+                                        productVariantAttributeId = createProductVariantAttributeDto.Id;
                                     }
                                     else
                                     {
@@ -281,7 +288,11 @@ namespace Entegro.Service.Jobs
                                         createProductVariantAttributeValue.ProductVariantAttributeId = productVariantAttributeId;
                                         createProductVariantAttributeValue.Name = item.Variant2Value;
 
-                                        productVariantAttributeValueId = await _productVariantAttributeValueService.AddAsync(productVariantAttributeValue);
+                                        var createProductVariantAttributeValueDto = await _productVariantAttributeValueService.AddAsync(new CreateProductVariantAttributeValueDto
+                                        {
+                                            Name = createProductVariantAttributeValue.Name,
+                                        });
+                                        productVariantAttributeValueId = createProductVariantAttributeValueDto.ProductVariantAttributeId;
                                     }
                                     else
                                     {
@@ -303,8 +314,17 @@ namespace Entegro.Service.Jobs
                                     StokCode = item.VariantCode,
                                     AttributeXml = JsonConvert.SerializeObject(productVariantAttributes)
                                 };
-
-                                await _productVariantAttributeCombinationService.AddAsync(productVariantAttributeCombination);
+                                var createdCombination = new CreateProductVariantAttributeCombinationDto
+                                {
+                                    ProductId = productVariantAttributeCombination.ProductId,
+                                    Gtin = productVariantAttributeCombination.Gtin,
+                                    AttributeXml = productVariantAttributeCombination.AttributeXml,
+                                    ManufacturerPartNumber = productVariantAttributeCombination.ManufacturerPartNumber,
+                                    Price = productVariantAttributeCombination.Price,
+                                    StockQuantity = productVariantAttributeCombination.StockQuantity,
+                                    StokCode = productVariantAttributeCombination.StokCode
+                                };
+                                await _productVariantAttributeCombinationService.AddAsync(createdCombination);
                             }
                             _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
                         }

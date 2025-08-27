@@ -10,7 +10,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(ProductMediaFile productImage);
         Task UpdateAsync(ProductMediaFile productImage);
         Task DeleteAsync(ProductMediaFile productImage);
-        Task<PagedResult<ProductMediaFile>> GetAllAsync(int pageNumber, int pageSize);
+        Task<PagedResult<ProductMediaFile>> GetAllAsync(int pageNumber = 1, int pageSize = 7);
         Task<ProductMediaFile> GetByPictureIdProductIdAsync(int pictureId, int productId);
     }
 }

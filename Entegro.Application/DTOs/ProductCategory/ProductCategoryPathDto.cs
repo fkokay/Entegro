@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Application.DTOs.ProductCategory
 {
-    public class ProductCategoryParhDto
+    public class ProductCategoryPathDto
     {
         public int Id { get; set; }
         public int ProductId { get; init; }

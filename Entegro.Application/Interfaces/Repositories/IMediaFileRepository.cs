@@ -8,7 +8,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<MediaFile?> GetByIdAsync(int id);
         Task<List<MediaFile>> GetAllAsync();
         Task<PagedResult<MediaFile>> GetAllAsync(int pageNumber, int pageSize);
-        Task<int> AddAsync(MediaFile mediaFile);
+        Task AddAsync(MediaFile mediaFile);
         Task UpdateAsync(MediaFile mediaFile);
         Task DeleteAsync(MediaFile mediaFile);
         Task<MediaFile?> GetByNameAndFolderAsync(string name, int? folderId);

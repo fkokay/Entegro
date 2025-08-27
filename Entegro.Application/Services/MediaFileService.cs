@@ -21,12 +21,12 @@ namespace Entegro.Application.Services
             _mediaFolderRepository = mediaFolderRepository ?? throw new ArgumentNullException(nameof(mediaFolderRepository));
         }
 
-        public async Task<int> AddAsync(CreateMediaFileDto mediaFile)
+        public async Task<MediaFileDto> AddAsync(CreateMediaFileDto mediaFile)
         {
             var model = _mapper.Map<MediaFile>(mediaFile);
             await _mediaFileRepository.AddAsync(model);
 
-            return model.Id;
+            return _mapper.Map<MediaFileDto>(model);
         }
 
         public async Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, string fileName, int? folderId)
@@ -69,7 +69,7 @@ namespace Entegro.Application.Services
             };
         }
 
-        public async Task<bool> DeleteAsync(int mediaFileId)
+        public async Task DeleteAsync(int mediaFileId)
         {
             var mediaFile = await _mediaFileRepository.GetByIdAsync(mediaFileId);
             if (mediaFile == null)
@@ -95,7 +95,6 @@ namespace Entegro.Application.Services
                 mediaFolder.FilesCount--;
                 await _mediaFolderRepository.UpdateAsync(mediaFolder);
             }
-            return true;
         }
 
         public async Task<List<MediaFileDto>> GetAllAsync()
@@ -105,7 +104,7 @@ namespace Entegro.Application.Services
             return mediaFileDtos.ToList();
         }
 
-        public async Task<PagedResult<MediaFileDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<MediaFileDto>> GetPagedAsync(int pageNumber, int pageSize)
         {
             var mediaFiles = await _mediaFileRepository.GetAllAsync(pageNumber, pageSize);
             var mediaFileDtos = _mapper.Map<PagedResult<MediaFileDto>>(mediaFiles);
@@ -151,10 +150,11 @@ namespace Entegro.Application.Services
             return true;
         }
 
-        public async Task<bool> UpdateAsync(UpdateMediaFileDto mediaFile)
+        public async Task<MediaFileDto> UpdateAsync(UpdateMediaFileDto mediaFile)
         {
-            await _mediaFileRepository.UpdateAsync(_mapper.Map<MediaFile>(mediaFile));
-            return true;
+            var mediaFileDto = _mapper.Map<MediaFile>(mediaFile);
+            await _mediaFileRepository.UpdateAsync(mediaFileDto);
+            return _mapper.Map<MediaFileDto>(mediaFileDto);
         }
     }
 }

@@ -8,12 +8,12 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<MediaFileDto?> GetByIdAsync(int id);
         Task<List<MediaFileDto>> GetAllAsync();
-        Task<PagedResult<MediaFileDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task<int> AddAsync(CreateMediaFileDto mediaFile);
-        Task<bool> UpdateAsync(UpdateMediaFileDto mediaFile);
-        Task<bool> DeleteAsync(int mediaFileId);
-        Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file,string fileName, int? folderId);
+        Task<PagedResult<MediaFileDto>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<MediaFileDto> AddAsync(CreateMediaFileDto mediaFile);
+        Task<MediaFileDto> UpdateAsync(UpdateMediaFileDto mediaFile);
+        Task DeleteAsync(int mediaFileId);
         Task<MediaFileDto?> GetByNameAndFolderAsync(string name, int? folderId);
+        Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, string fileName, int? folderId);
         Task<bool> OverwriteByNameAsync(string name, int? folderId, CreateMediaFileDto builtDto);
     }
 }

@@ -18,15 +18,15 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> AddAsync(ProductVariantAttributeCombinationDto productAttributeMapping)
+        public async Task<ProductVariantAttributeCombinationDto> AddAsync(CreateProductVariantAttributeCombinationDto productAttributeMapping)
         {
             var model = _mapper.Map<ProductVariantAttributeCombination>(productAttributeMapping);
             await _productVariantAttributeCombinationRepository.AddAsync(model);
 
-            return model.Id;
+            return _mapper.Map<ProductVariantAttributeCombinationDto>(model);
         }
 
-        public async Task<bool> DeleteAsync(int productAttributeMappingId)
+        public async Task DeleteAsync(int productAttributeMappingId)
         {
             var model = await _productVariantAttributeCombinationRepository.GetByIdAsync(productAttributeMappingId);
 
@@ -35,7 +35,6 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ProductAttribute with ID {productAttributeMappingId} not found.");
             }
             await _productVariantAttributeCombinationRepository.DeleteAsync(model);
-            return true;
         }
 
         public async Task<List<ProductVariantAttributeCombinationDto>> GetAllAsync()
@@ -45,7 +44,7 @@ namespace Entegro.Application.Services
             return ProductVariantAttributeCombinationDto.ToList();
         }
 
-        public async Task<PagedResult<ProductVariantAttributeCombinationDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductVariantAttributeCombinationDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             var productVariantAttributeCombination = await _productVariantAttributeCombinationRepository.GetAllAsync(pageNumber, pageSize);
             var productVariantAttributeCombinationDto = _mapper.Map<PagedResult<ProductVariantAttributeCombinationDto>>(productVariantAttributeCombination);
@@ -64,10 +63,10 @@ namespace Entegro.Application.Services
             return productVariantAttributeCombinationDto;
         }
 
-        public async Task<bool> UpdateAsync(ProductVariantAttributeCombinationDto productVariantAttributeCombination)
+        public async Task<ProductVariantAttributeCombinationDto> UpdateAsync(UpdateProductVariantAttributeCombinationDto productVariantAttributeCombination)
         {
             await _productVariantAttributeCombinationRepository.UpdateAsync(_mapper.Map<ProductVariantAttributeCombination>(productVariantAttributeCombination));
-            return true;
+            return _mapper.Map<ProductVariantAttributeCombinationDto>(productVariantAttributeCombination);
         }
     }
 }

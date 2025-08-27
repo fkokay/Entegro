@@ -6,11 +6,11 @@ namespace Entegro.Application.Interfaces.Services
     public interface IProductVariantAttributeService
     {
         Task<ProductVariantAttributeDto?> GetByIdAsync(int id);
-        Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int productId,int attributeId);
+        Task<ProductVariantAttributeDto?> GetByAttibuteIdAsync(int productId, int attributeId);
         Task<List<ProductVariantAttributeDto>> GetAllAsync();
-        Task<PagedResult<ProductVariantAttributeDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task<int> AddAsync(CreateProductVariantAttributeDto productAttributeMapping);
-        Task<bool> UpdateAsync(UpdateProductVariantAttributeDto productAttributeMapping);
-        Task<bool> DeleteAsync(int productAttributeMappingId);
+        Task<PagedResult<ProductVariantAttributeDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<ProductVariantAttributeDto> AddAsync(CreateProductVariantAttributeDto productAttributeMapping);
+        Task<ProductVariantAttributeDto> UpdateAsync(UpdateProductVariantAttributeDto productAttributeMapping);
+        Task DeleteAsync(int productAttributeMappingId);
     }
 }

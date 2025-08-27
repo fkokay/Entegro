@@ -17,7 +17,8 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> CreateCategoryAsync(CreateCategoryDto createCategory)
+        // Yeni kategori oluşturma
+        public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategory)
         {
 
             var category = _mapper.Map<Category>(createCategory);
@@ -43,13 +44,12 @@ namespace Entegro.Application.Services
                 }
             }
 
-
             await _categoryRepository.UpdateAsync(category); // TreePath güncelleniyor
-
-            return category.Id;
+            return _mapper.Map<CategoryDto>(category);
         }
 
-        public async Task<bool> DeleteCategoryAndChildrenAsync(int categoryId)
+        // Kategori ve alt kategorilerini silme
+        public async Task DeleteCategoryAndChildrenAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
             if (category == null)
@@ -66,10 +66,10 @@ namespace Entegro.Application.Services
 
             // Kategoriyi sil
             await _categoryRepository.DeleteAsync(category);
-            return true;
         }
 
-        public async Task<bool> DeleteCategoryAndReassignChildrenAsync(int categoryId)
+        // Kategori ve alt kategorilerini silme, alt kategorileri başka bir kategoriye atama
+        public async Task DeleteCategoryAndReassignChildrenAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
             if (category == null)
@@ -92,10 +92,10 @@ namespace Entegro.Application.Services
 
             // Parent kategoriyi sil
             await _categoryRepository.DeleteAsync(category);
-            return true;
         }
 
-        public async Task<bool> DeleteCategoryAsync(int categoryId)
+        // Sadece kategori silme
+        public async Task DeleteCategoryAsync(int categoryId)
         {
             Category? category = await _categoryRepository.GetByIdAsync(categoryId);
 
@@ -104,9 +104,10 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
             }
             await _categoryRepository.DeleteAsync(category);
-            return true;
         }
 
+
+        // Kategori resmi silme
         public async Task DeleteCategoryImageAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
@@ -117,11 +118,12 @@ namespace Entegro.Application.Services
             }
         }
 
-        public async Task<bool> ExistsByNameAsync(string name)
-        {
-            return await _categoryRepository.ExistsByNameAsync(name);
-        }
 
+        // İsim ile kategori var mı kontrolü
+        public async Task<bool> ExistsByNameAsync(string name) => await _categoryRepository.ExistsByNameAsync(name);
+
+
+        // ID ile kategori ve medya dosyasını alma
         public async Task<CategoryDto?> GetByIdWithMediaAsync(int id)
         {
             var category = await _categoryRepository.GetByIdWithMediaAsync(id);
@@ -133,6 +135,8 @@ namespace Entegro.Application.Services
             return categoryDto;
         }
 
+
+        // Tüm kategorileri alma
         public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
         {
             var categories = await _categoryRepository.GetAllAsync();
@@ -140,13 +144,17 @@ namespace Entegro.Application.Services
             return categoryDtos;
         }
 
-        public async Task<PagedResult<CategoryDto>> GetCategoriesAsync(int pageNumber, int pageSize)
+
+        // Sayfalı kategori listeleme
+        public async Task<PagedResult<CategoryDto>> GetPagedAsync(int pageNumber, int pageSize)
         {
             var categories = await _categoryRepository.GetAllAsync(pageNumber, pageSize);
             var categoryDtos = _mapper.Map<PagedResult<CategoryDto>>(categories);
             return categoryDtos;
         }
 
+
+        // Kategorileri TreePath formatında alma
         public async Task<IEnumerable<CategoryTreePathDto>> GetCategoriesFormatTreePathAsync()
         {
             var categories = await GetCategoriesAsync();
@@ -181,9 +189,11 @@ namespace Entegro.Application.Services
             return result;
         }
 
-        public async Task<Select2Response> GetCategoriesForSelect2Async(string? term, int page, int pageSize, CancellationToken ct = default)
+
+        // Select2 için kategori listeleme
+        public async Task<Select2ResponseDto> GetCategoriesForSelect2Async(string? term, int page, int pageSize)
         {
-            var paged = await _categoryRepository.SearchPagedAsync(term, page, pageSize, ct);
+            var paged = await _categoryRepository.SearchPagedAsync(term, page, pageSize);
 
             // Sayfadaki kayıtların tüm ata ID’leri
             var ancestorIds = paged.Items
@@ -193,7 +203,7 @@ namespace Entegro.Application.Services
                 .Distinct()
                 .ToList();
 
-            var names = await _categoryRepository.GetNamesByIdsAsync(ancestorIds, ct);
+            var names = await _categoryRepository.GetNamesByIdsAsync(ancestorIds);
 
             static string FormatTreePath(string? treePath, IReadOnlyDictionary<int, string> map, string fallback)
             {
@@ -208,19 +218,21 @@ namespace Entegro.Application.Services
                 return chain.Count > 0 ? string.Join(" - ", chain) : fallback;
             }
 
-            var result = new Select2Response
+            var result = new Select2ResponseDto
             {
-                results = paged.Items.Select(r => new Select2Option
+                results = paged.Items.Select(r => new Select2OptionDto
                 {
                     id = r.Id,
                     text = FormatTreePath(r.TreePath, names, r.Name)
                 }).ToList(),
-                pagination = new Select2Response.Pagination { more = paged.HasMore }
+                pagination = new Select2ResponseDto.Pagination { more = paged.HasMore }
             };
 
             return result;
         }
 
+
+        // ID ile kategori alma
         public async Task<CategoryDto> GetCategoryByIdAsync(int categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
@@ -233,6 +245,8 @@ namespace Entegro.Application.Services
             return categoryDto;
         }
 
+
+        // İsim ile kategori alma
         public async Task<CategoryDto> GetCategoryByNameAsync(string name)
         {
             var category = await _categoryRepository.GetByNameAsync(name);
@@ -245,7 +259,9 @@ namespace Entegro.Application.Services
             return categoryDto;
         }
 
-        public async Task<bool> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
+
+        // Kategori güncelleme
+        public async Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
         {
             var category = _mapper.Map<Category>(updateCategory);
 
@@ -265,12 +281,12 @@ namespace Entegro.Application.Services
                     category.TreePath = $"/{category.Id}/"; // Ebeveyn bulunamazsa kök gibi
                 }
             }
-
             await _categoryRepository.UpdateAsync(category);
-
-            return true;
+            return _mapper.Map<CategoryDto>(category);
         }
 
+
+        // Kategori resmi güncelleme
         public async Task UpdateCategoryImageAsync(int categoryId, int mediaFileId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
@@ -281,6 +297,9 @@ namespace Entegro.Application.Services
             }
         }
 
+
+
+        #region yardımcı metotlar
         private string FormatTreePath(string treePath, List<CategoryDto> allCategories)
         {
             // TreePath'i id'ler üzerinden çözümleyelim
@@ -316,6 +335,8 @@ namespace Entegro.Application.Services
                 await UpdateChildTreePathsRecursivelyAsync(child);
             }
         }
+        #endregion
+
 
     }
 }

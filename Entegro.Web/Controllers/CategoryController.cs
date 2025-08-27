@@ -1,6 +1,5 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -145,20 +144,24 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id, int chooseType)
         {
-            if (chooseType == 1)
+
+            try
             {
-                var isSuccess = await _categoryService.DeleteCategoryAndChildrenAsync(id);
-                if (isSuccess)
+                if (chooseType == 1)
                 {
+                    await _categoryService.DeleteCategoryAndChildrenAsync(id);
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    await _categoryService.DeleteCategoryAndReassignChildrenAsync(id);
                     return Json(new { success = true });
                 }
             }
-            var isSuccess2 = await _categoryService.DeleteCategoryAndReassignChildrenAsync(id);
-            if (isSuccess2)
+            catch (Exception ex)
             {
-                return Json(new { success = true });
+                return Json(new { success = false, message = "Silinecek Kategori Bulunamadı" });
             }
-            return Json(new { success = false, message = "Silinecek Kategori Bulunamadı" });
         }
 
 
@@ -169,7 +172,7 @@ namespace Entegro.Web.Controllers
             int pageSize = model.Length;
 
 
-            var result = await _categoryService.GetCategoriesAsync(pageNumber, model.Length);
+            var result = await _categoryService.GetPagedAsync(pageNumber, model.Length);
 
             return Json(new
             {
@@ -181,10 +184,10 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AllCategory([FromForm] int page = 1, [FromForm] string? term = null, CancellationToken ct = default)
+        public async Task<IActionResult> AllCategory([FromForm] int page = 1, [FromForm] string? term = null)
         {
             const int pageSize = 20;
-            var data = await _categoryService.GetCategoriesForSelect2Async(term, page, pageSize, ct);
+            var data = await _categoryService.GetCategoriesForSelect2Async(term, page, pageSize);
             return Json(data);
         }
 

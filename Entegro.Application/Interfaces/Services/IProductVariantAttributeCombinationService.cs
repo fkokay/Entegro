@@ -7,9 +7,9 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<ProductVariantAttributeCombinationDto?> GetByIdAsync(int id);
         Task<List<ProductVariantAttributeCombinationDto>> GetAllAsync();
-        Task<PagedResult<ProductVariantAttributeCombinationDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task<int> AddAsync(ProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
-        Task<bool> UpdateAsync(ProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
-        Task<bool> DeleteAsync(int productVariantAttributeCombinationId);
+        Task<PagedResult<ProductVariantAttributeCombinationDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<ProductVariantAttributeCombinationDto> AddAsync(CreateProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
+        Task<ProductVariantAttributeCombinationDto> UpdateAsync(UpdateProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
+        Task DeleteAsync(int productVariantAttributeCombinationId);
     }
 }

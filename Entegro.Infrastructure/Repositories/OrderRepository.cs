@@ -27,20 +27,15 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> ExistsByOrderNoAsync(string orderNo)
-        {
-            return await _context.Orders.AnyAsync(p => p.OrderNo == orderNo);
-        }
+        public async Task<bool> ExistsByCustomerIdAsync(int customerId) => await _context.Orders.AnyAsync(o => o.CustomerId == customerId);
 
-        public async Task<List<Order>> GetAllAsync()
-        {
-            return await _context.Orders.ToListAsync();
-        }
+        public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _context.Orders.AnyAsync(p => p.OrderNo == orderNo);
+
+        public async Task<List<Order>> GetAllAsync() => await _context.Orders.AsNoTracking().ToListAsync();
 
         public async Task<PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize)
         {
-            //var query = _context.Orders.Include(m => m.Customer).Include(m => m.OrderItems).AsQueryable();
-            var query = _context.Orders.AsQueryable();
+            var query = _context.Orders.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
 
@@ -79,6 +74,79 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+        public async Task<Order?> GetByCustomerIdAsync(int customerId)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.CustomerId == customerId);
+            var orderItems = await _context.OrderItems.Where(oi => oi.OrderId == order.Id).ToListAsync();
+            var products = await _productRepository.GetAllAsync(orderItems.Select(oi => oi.ProductId).Distinct().ToList());
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == order.CustomerId);
+
+
+            if (order is null)
+                return new Order();
+
+            var orders = new Order
+            {
+                Id = order.Id,
+                CustomerId = order.CustomerId,
+                Deleted = order.Deleted,
+                IsTransient = order.Deleted,
+                OrderNo = order.OrderNo,
+                Customer = new Customer
+                {
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    Email = customer.Email,
+                    PhoneNumber = customer.PhoneNumber
+                },
+                OrderDate = order.OrderDate,
+                OrderSource = order.OrderSource,
+                OrderSourceId = order.OrderSourceId,
+                TotalAmount = order.TotalAmount,
+                OrderItems = orderItems.Select(x => new OrderItem
+                {
+                    Id = x.Id,
+                    DiscountAmount = x.DiscountAmount,
+                    OrderId = x.OrderId,
+                    Price = x.Price,
+                    ProductId = x.ProductId,
+                    Quantity = x.Quantity,
+                    TaxRate = x.TaxRate,
+                    UnitPrice = x.UnitPrice,
+                    Product = products.Where(p => p.Id == x.ProductId).Select(p => new Product
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        MainPictureId = p.MainPictureId,
+                        MainPicture = p.MainPicture == null ? null : new MediaFile()
+                        {
+                            Alt = p.MainPicture.Alt,
+                            CreatedOn = p.MainPicture.CreatedOn,
+                            Deleted = p.MainPicture.Deleted,
+                            Extension = p.MainPicture.Extension,
+                            Folder = p.MainPicture.Folder,
+                            FolderId = p.MainPicture.FolderId,
+                            Height = p.MainPicture.Height,
+                            Hidden = p.MainPicture.Hidden,
+                            Id = p.MainPicture.Id,
+                            IsTransient = p.MainPicture.IsTransient,
+                            MediaType = p.MainPicture.MediaType,
+                            Metadata = p.MainPicture.Metadata,
+                            MimeType = p.MainPicture.MimeType,
+                            Name = p.MainPicture.Name,
+                            PixelSize = p.MainPicture.PixelSize,
+                            Size = p.MainPicture.Size,
+                            Title = p.MainPicture.Title,
+                            UpdatedOn = p.MainPicture.UpdatedOn,
+                            Version = p.MainPicture.Version,
+                            Width = p.MainPicture.Width
+                        },
+                    }).FirstOrDefault()
+                }).ToList()
+            };
+            return orders;
         }
 
         public async Task<Order?> GetByIdAsync(int id)

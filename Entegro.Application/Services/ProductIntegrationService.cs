@@ -16,14 +16,14 @@ namespace Entegro.Application.Services
             _productIntegrationRepository = productIntegrationRepository ?? throw new ArgumentNullException(nameof(productIntegrationRepository)); ;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        public async Task<int> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration)
+        public async Task<ProductIntegrationDto> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration)
         {
             var productIntegration = _mapper.Map<ProductIntegration>(createProductIntegration);
             await _productIntegrationRepository.AddAsync(productIntegration);
-            return productIntegration.Id;
+            return _mapper.Map<ProductIntegrationDto>(productIntegration);
         }
 
-        public async Task<bool> DeleteProductIntegrationAsync(int productIntegrationId)
+        public async Task DeleteProductIntegrationAsync(int productIntegrationId)
         {
             ProductIntegration? productIntegration = await _productIntegrationRepository.GetByIdAsync(productIntegrationId);
 
@@ -32,7 +32,6 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ProductIntegration with ID {productIntegrationId} not found.");
             }
             await _productIntegrationRepository.DeleteAsync(productIntegration);
-            return true;
         }
 
         public async Task<ProductIntegrationDto?> GetByIdAsync(int productIntegrationId)
@@ -59,7 +58,7 @@ namespace Entegro.Application.Services
             return productIntegrationDto;
         }
 
-        public async Task<ProductIntegrationDto?> GetByIntegrationSystemIdandIntegrationCodeAsync(int integrationSystemId, string integrationCode)
+        public async Task<ProductIntegrationDto?> GetByIntegrationSystemAndCodeAsync(int integrationSystemId, string integrationCode)
         {
             var productIntegration = await _productIntegrationRepository.GetByIntegrationSystemIdandIntegrationCodeAsync(integrationSystemId, integrationCode);
             if (productIntegration == null)
@@ -70,7 +69,7 @@ namespace Entegro.Application.Services
             return productIntegrationDto;
         }
 
-        public async Task<ProductIntegrationDto?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId)
+        public async Task<ProductIntegrationDto?> GetByProductAndIntegrationSystemAsync(int productId, int integrationSystemId)
         {
             var productIntegration = await _productIntegrationRepository.GetByProductIdandIntegrationSystemIdAsync(productId, integrationSystemId);
             if (productIntegration == null)
@@ -87,15 +86,15 @@ namespace Entegro.Application.Services
             return _mapper.Map<IEnumerable<ProductIntegrationDto>>(await _productIntegrationRepository.GetAllAsync());
         }
 
-        public async Task<PagedResult<ProductIntegrationDto>> GetProductIntegrationAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductIntegrationDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             return _mapper.Map<PagedResult<ProductIntegrationDto>>(await _productIntegrationRepository.GetAllAsync(pageNumber, pageSize));
         }
 
-        public async Task<bool> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration)
+        public async Task<ProductIntegrationDto> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration)
         {
             await _productIntegrationRepository.UpdateAsync(_mapper.Map<ProductIntegration>(updateProductIntegration));
-            return true;
+            return _mapper.Map<ProductIntegrationDto>(updateProductIntegration);
         }
     }
 }

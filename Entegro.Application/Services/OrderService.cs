@@ -23,7 +23,7 @@ namespace Entegro.Application.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<int> CreateOrderAsync(CreateOrderDto createOrder)
+        public async Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrder)
         {
             int customerId = 0;
             if (await _customerService.ExistsByEmailAsync(createOrder.Customer.Email))
@@ -53,10 +53,10 @@ namespace Entegro.Application.Services
 
             await _orderRepository.AddAsync(order);
 
-            return order.Id;
+            return _mapper.Map<OrderDto>(order);
         }
 
-        public async Task<bool> DeleteOrderAsync(int orderId)
+        public async Task DeleteOrderAsync(int orderId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
 
@@ -65,13 +65,14 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"Order with ID {orderId} not found.");
             }
             await _orderRepository.DeleteAsync(order);
-            return true;
+
         }
 
-        public async Task<bool> ExistsByOrderNoAsync(string orderNo)
-        {
-            return await _orderRepository.ExistsByOrderNoAsync(orderNo);
-        }
+        public async Task<bool> ExistsByCustomerIdAsync(int customerId) => await _orderRepository.ExistsByCustomerIdAsync(customerId);
+
+        public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _orderRepository.ExistsByOrderNoAsync(orderNo);
+
+        public async Task<OrderDto?> GetByCustomerIdAsync(int customerId) => await _orderRepository.GetByCustomerIdAsync(customerId) is Order order ? _mapper.Map<OrderDto>(order) : null;
 
         public async Task<OrderDto> GetOrderByIdAsync(int orderId)
         {
@@ -92,17 +93,17 @@ namespace Entegro.Application.Services
             return orderDtos;
         }
 
-        public async Task<PagedResult<OrderDto>> GetOrdersAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<OrderDto>> GetPagedAsync(int pageNumber, int pageSize)
         {
             var orders = await _orderRepository.GetAllAsync(pageNumber, pageSize);
             var orderDtos = _mapper.Map<PagedResult<OrderDto>>(orders);
             return orderDtos;
         }
 
-        public async Task<bool> UpdateOrderAsync(UpdateOrderDto updateOrder)
+        public async Task<OrderDto> UpdateOrderAsync(UpdateOrderDto updateOrder)
         {
             await _orderRepository.UpdateAsync(_mapper.Map<Order>(updateOrder));
-            return true;
+            return _mapper.Map<OrderDto>(updateOrder);
         }
     }
 }

@@ -17,14 +17,14 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         }
-        public async Task<int> AddAsync(CreateProductMediaFileDto productImage)
+        public async Task<ProductMediaFileDto> AddAsync(CreateProductMediaFileDto productImage)
         {
             var createProductImage = _mapper.Map<ProductMediaFile>(productImage);
             await _productImageMappingRepository.AddAsync(createProductImage);
-            return createProductImage.Id;
+            return _mapper.Map<ProductMediaFileDto>(createProductImage);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var productImage = await _productImageMappingRepository.GetByIdAsync(id);
 
@@ -33,7 +33,7 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ProductImage with ID {id} not found.");
             }
             await _productImageMappingRepository.DeleteAsync(productImage);
-            return true;
+
         }
 
         public async Task<List<ProductMediaFileDto>> GetAllAsync()
@@ -43,7 +43,7 @@ namespace Entegro.Application.Services
             return productImageDtos.ToList();
         }
 
-        public async Task<PagedResult<ProductMediaFileDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductMediaFileDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             var productImages = await _productImageMappingRepository.GetAllAsync(pageNumber, pageSize);
             var productImageMappingDtos = _mapper.Map<PagedResult<ProductMediaFileDto>>(productImages);
@@ -68,10 +68,10 @@ namespace Entegro.Application.Services
             return productImageMappingDtos;
         }
 
-        public async Task<bool> UpdateAsync(UpdateProductMediaFileeDto productImage)
+        public async Task<ProductMediaFileDto> UpdateAsync(UpdateProductMediaFileeDto productImage)
         {
             await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(productImage));
-            return true;
+            return _mapper.Map<ProductMediaFileDto>(productImage);
         }
     }
 }

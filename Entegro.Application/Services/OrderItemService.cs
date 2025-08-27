@@ -17,10 +17,11 @@ namespace Entegro.Application.Services
             _orderItemRepository = orderItemRepository ?? throw new ArgumentNullException(nameof(orderItemRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        public async Task AddAsync(OrderItemDto orderItem)
+        public async Task<OrderItemDto> AddAsync(CreateOrderItemDto orderItem)
         {
             var orderItemDto = _mapper.Map<OrderItem>(orderItem);
             await _orderItemRepository.AddAsync(orderItemDto);
+            return _mapper.Map<OrderItemDto>(orderItemDto);
 
         }
 
@@ -37,7 +38,7 @@ namespace Entegro.Application.Services
             return orderItemDtos.ToList();
         }
 
-        public async Task<PagedResult<OrderItemDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<OrderItemDto>> GetPagedAsync(int pageNumber, int pageSize)
         {
             var orderItems = await _orderItemRepository.GetAllAsync(pageNumber, pageSize);
             var orderItemDtos = _mapper.Map<PagedResult<OrderItemDto>>(orderItems);
@@ -56,10 +57,11 @@ namespace Entegro.Application.Services
             return orderItemDtos;
         }
 
-        public async Task UpdateAsync(OrderItemDto orderItem)
+        public async Task<OrderItemDto> UpdateAsync(UpdateOrderItemDto orderItem)
         {
             var orderItemDto = _mapper.Map<OrderItem>(orderItem);
             await _orderItemRepository.UpdateAsync(orderItemDto);
+            return _mapper.Map<OrderItemDto>(orderItemDto);
         }
     }
 }

@@ -18,12 +18,11 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> AddAsync(CreateMediaFolderDto mediaFolder)
+        public async Task<MediaFolderDto> AddAsync(CreateMediaFolderDto mediaFolder)
         {
             var model = _mapper.Map<MediaFolder>(mediaFolder);
             await _mediaFolderRepository.AddAsync(model);
-
-            return model.Id;
+            return _mapper.Map<MediaFolderDto>(model);
         }
 
         public async Task<MediaFolderDto> CreateFolderAsync(string folderName, int? parentId = null)
@@ -58,7 +57,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<MediaFolderDto>(folder);
         }
 
-        public async Task<bool> DeleteAsync(int mediaFolderId)
+        public async Task DeleteAsync(int mediaFolderId)
         {
             var mediaFolder = await _mediaFolderRepository.GetByIdAsync(mediaFolderId);
 
@@ -67,7 +66,6 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"MediaFolder with ID {mediaFolderId} not found.");
             }
             await _mediaFolderRepository.DeleteAsync(mediaFolder);
-            return true;
         }
 
         public async Task<List<MediaFolderDto>> GetAllAsync()
@@ -107,10 +105,11 @@ namespace Entegro.Application.Services
             return folderDto;
         }
 
-        public async Task<bool> UpdateAsync(UpdateMediaFolderDto mediaFolder)
+        public async Task<MediaFolderDto> UpdateAsync(UpdateMediaFolderDto mediaFolder)
         {
-            await _mediaFolderRepository.UpdateAsync(_mapper.Map<MediaFolder>(mediaFolder));
-            return true; ;
+            var mediaFolderDto = _mapper.Map<MediaFolder>(mediaFolder);
+            await _mediaFolderRepository.UpdateAsync(mediaFolderDto);
+            return _mapper.Map<MediaFolderDto>(mediaFolderDto);
         }
 
         public async Task UpdateFilesCountAsync(int folderId, int filesCount)

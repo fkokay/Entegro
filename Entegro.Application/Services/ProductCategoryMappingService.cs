@@ -17,15 +17,14 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _catRepo = catRepo;
         }
-        public async Task<int> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategoryDto)
+        public async Task<ProductCategoryDto> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategoryDto)
         {
             var createProductCategory = _mapper.Map<ProductCategory>(createProductCategoryDto);
             await _productCategoryMappingRepository.AddAsync(createProductCategory);
-
-            return createProductCategory.Id;
+            return _mapper.Map<ProductCategoryDto>(createProductCategory);
         }
 
-        public async Task<bool> DeleteProductCategoryAsync(int productCategoryId)
+        public async Task DeleteProductCategoryAsync(int productCategoryId)
         {
             var productCategory = await _productCategoryMappingRepository.GetByIdAsync(productCategoryId);
 
@@ -34,22 +33,18 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ProductCategory with ID {productCategoryId} not found.");
             }
             await _productCategoryMappingRepository.DeleteAsync(productCategory);
-            return true;
         }
 
-        public async Task<IReadOnlyList<ProductCategoryParhDto>> GetCategoryPathsByProductAsync(int productId, CancellationToken ct = default)
+        public async Task<IReadOnlyList<ProductCategoryPathDto>> GetCategoryPathsByProductAsync(int productId)
         {
-            var mappings = await _productCategoryMappingRepository.GetByProductWithCategoryAsync(productId, ct);
+            var mappings = await _productCategoryMappingRepository.GetByProductWithCategoryAsync(productId);
 
-            var allPathIds = mappings
-                .SelectMany(m => SplitTreePathIds(m.Category?.TreePath))
-                .Distinct()
-                .ToArray();
+            var allPathIds = mappings.SelectMany(m => SplitTreePathIds(m.Category?.TreePath)).Distinct().ToArray();
 
-            var nameDict = await _catRepo.GetNamesByIdsAsync(allPathIds, ct);
+            var nameDict = await _catRepo.GetNamesByIdsAsync(allPathIds);
 
             return mappings
-                .Select(m => new ProductCategoryParhDto
+                .Select(m => new ProductCategoryPathDto
                 {
                     Id = m.Id,
                     ProductId = m.ProductId,
@@ -62,18 +57,15 @@ namespace Entegro.Application.Services
                 .ToList();
         }
 
-        public async Task<IReadOnlyDictionary<int, IReadOnlyList<ProductCategoryParhDto>>> GetCategoryPathsByProductsAsync(IEnumerable<int> productIds, CancellationToken ct = default)
+        public async Task<IReadOnlyDictionary<int, IReadOnlyList<ProductCategoryPathDto>>> GetCategoryPathsByProductsAsync(IEnumerable<int> productIds)
         {
-            var mappings = await _productCategoryMappingRepository.GetByProductsWithCategoryAsync(productIds, ct);
+            var mappings = await _productCategoryMappingRepository.GetByProductsWithCategoryAsync(productIds);
 
-            var allPathIds = mappings
-                .SelectMany(m => SplitTreePathIds(m.Category?.TreePath))
-                .Distinct()
-                .ToArray();
+            var allPathIds = mappings.SelectMany(m => SplitTreePathIds(m.Category?.TreePath)).Distinct().ToArray();
 
-            var nameDict = await _catRepo.GetNamesByIdsAsync(allPathIds, ct);
+            var nameDict = await _catRepo.GetNamesByIdsAsync(allPathIds);
 
-            var dtos = mappings.Select(m => new ProductCategoryParhDto
+            var dtos = mappings.Select(m => new ProductCategoryPathDto
             {
                 Id = m.Id,
                 ProductId = m.ProductId,
@@ -86,10 +78,10 @@ namespace Entegro.Application.Services
                 .GroupBy(d => d.ProductId)
                 .ToDictionary(
                     g => g.Key,
-                    g => (IReadOnlyList<ProductCategoryParhDto>)g
-                            .OrderBy(x => x.DisplayOrder)
-                            .ThenBy(x => x.CategoryPath)
-                            .ToList()
+                    g => (IReadOnlyList<ProductCategoryPathDto>)g
+                        .OrderBy(x => x.DisplayOrder)
+                        .ThenBy(x => x.CategoryPath)
+                        .ToList()
                 );
         }
 
@@ -112,10 +104,10 @@ namespace Entegro.Application.Services
             return productCategoryDtos;
         }
 
-        public async Task<bool> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory)
+        public async Task<ProductCategoryDto> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory)
         {
             await _productCategoryMappingRepository.UpdateAsync(_mapper.Map<ProductCategory>(updateProductCategory));
-            return true;
+            return _mapper.Map<ProductCategoryDto>(updateProductCategory);
         }
         private static IReadOnlyList<int> SplitTreePathIds(string? treePath)
         {

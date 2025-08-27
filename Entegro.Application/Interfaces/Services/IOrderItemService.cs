@@ -8,9 +8,9 @@ namespace Entegro.Application.Interfaces.Services
         Task<List<OrderItemDto>> GetByOrderIdAsync(int orderId);
         Task<OrderItemDto?> GetByIdAsync(int id);
         Task<List<OrderItemDto>> GetAllAsync();
-        Task<PagedResult<OrderItemDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task AddAsync(OrderItemDto orderItem);
-        Task UpdateAsync(OrderItemDto orderItem);
+        Task<PagedResult<OrderItemDto>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<OrderItemDto> AddAsync(CreateOrderItemDto orderItem);
+        Task<OrderItemDto> UpdateAsync(UpdateOrderItemDto orderItem);
         Task DeleteAsync(int id);
     }
 }

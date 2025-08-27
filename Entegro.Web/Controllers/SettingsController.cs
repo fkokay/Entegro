@@ -1001,7 +1001,8 @@ namespace Entegro.Web.Controllers
                     Id = m.Id,
                     Description = m.Description,
                     IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                    Name = m.Name
+                    Name = m.Name,
+                    IntegrationSystemParameter = m.IntegrationSystemParameters.FirstOrDefault(p => p.Key == "MarketplaceType")
                 });
 
 

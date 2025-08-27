@@ -8,9 +8,9 @@ namespace Entegro.Application.Interfaces.Services
         Task<ProductAttributeValueDto?> GetByIdAsync(int id);
         Task<ProductAttributeValueDto?> GetByNameAsync(string name);
         Task<List<ProductAttributeValueDto>> GetAllAsync();
-        Task<PagedResult<ProductAttributeValueDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task<int> AddAsync(CreateProductAttributeValueDto productAttributeValue);
-        Task<bool> UpdateAsync(UpdateProductAttributeValueDto productAttributeValue);
-        Task<bool> DeleteAsync(int productAttributeId);
+        Task<PagedResult<ProductAttributeValueDto>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<ProductAttributeValueDto> AddAsync(CreateProductAttributeValueDto productAttributeValue);
+        Task<ProductAttributeValueDto> UpdateAsync(UpdateProductAttributeValueDto productAttributeValue);
+        Task DeleteAsync(int productAttributeId);
     }
 }

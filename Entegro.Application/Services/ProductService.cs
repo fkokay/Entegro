@@ -82,15 +82,16 @@ namespace Entegro.Application.Services
             }
 
             var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
-            var categoryId = await _categoryService.CreateCategoryAsync(createCategory);
+            var createCategoryModel = await _categoryService.CreateCategoryAsync(createCategory);
+            //var categoryId = await _categoryService.CreateCategoryAsync(createCategory);
 
             foreach (var subCategoryDto in categoryDto.SubCategories)
             {
-                subCategoryDto.ParentCategoryId = categoryId;
-                categoryId = await CreateCategoryWithChildrenAsync(subCategoryDto);
+                subCategoryDto.ParentCategoryId = createCategoryModel.Id;
+                createCategoryModel.Id = await CreateCategoryWithChildrenAsync(subCategoryDto);
             }
 
-            return categoryId;
+            return createCategoryModel.Id;
         }
 
 

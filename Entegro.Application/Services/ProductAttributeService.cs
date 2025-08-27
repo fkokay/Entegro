@@ -18,15 +18,14 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> AddAsync(CreateProductAttributeDto productAttribute)
+        public async Task<ProductAttributeDto> AddAsync(CreateProductAttributeDto productAttribute)
         {
             var model = _mapper.Map<ProductAttribute>(productAttribute);
             await _productAttributeRepository.AddAsync(model);
-
-            return model.Id;
+            return _mapper.Map<ProductAttributeDto>(model);
         }
 
-        public async Task<bool> DeleteAsync(int productAttributeId)
+        public async Task DeleteAsync(int productAttributeId)
         {
             var productAttribute = await _productAttributeRepository.GetByIdAsync(productAttributeId);
 
@@ -35,7 +34,7 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ProductAttribute with ID {productAttributeId} not found.");
             }
             await _productAttributeRepository.DeleteAsync(productAttribute);
-            return true;
+
         }
 
         public async Task<List<ProductAttributeDto>> GetAllAsync()
@@ -45,7 +44,7 @@ namespace Entegro.Application.Services
             return productAttributeDtos.ToList();
         }
 
-        public async Task<PagedResult<ProductAttributeDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductAttributeDto>> GetPagedAsync(int pageNumber, int pageSize)
         {
             var productAttributes = await _productAttributeRepository.GetAllAsync(pageNumber, pageSize);
             var productAttributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(productAttributes);
@@ -76,10 +75,10 @@ namespace Entegro.Application.Services
             return productAttributeDto;
         }
 
-        public async Task<bool> UpdateAsync(UpdateProductAttributeDto productAttribute)
+        public async Task<ProductAttributeDto> UpdateAsync(UpdateProductAttributeDto productAttribute)
         {
             await _productAttributeRepository.UpdateAsync(_mapper.Map<ProductAttribute>(productAttribute));
-            return true;
+            return _mapper.Map<ProductAttributeDto>(productAttribute);
         }
     }
 }

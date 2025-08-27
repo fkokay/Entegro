@@ -58,7 +58,7 @@ namespace Entegro.Web.Controllers
                 ).ToList();
 
             ViewBag.Marketplaces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Marketplace).Select(
-                m => new { m.Id, m.Name }
+                m => new { m.Id, m.Name, Value = m.IntegrationSystemParameters.Select(x => x.Value).FirstOrDefault() }
                 ).ToList();
             return View();
         }
@@ -237,9 +237,9 @@ namespace Entegro.Web.Controllers
 
         #region Product Categories
         [HttpPost]
-        public async Task<IActionResult> ProductCategoryList(int productId, CancellationToken ct)
+        public async Task<IActionResult> ProductCategoryList(int productId)
         {
-            var data = await _productCategoryMappingService.GetCategoryPathsByProductAsync(productId, ct);
+            var data = await _productCategoryMappingService.GetCategoryPathsByProductAsync(productId);
             var results = data.Select(d => new { id = d.Id, text = d.CategoryPath, displayOrder = d.DisplayOrder });
             return Json(new { results });
         }
@@ -249,7 +249,8 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                int id = await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategoryDto);
+                var createProductCategoryMappingModel = await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategoryDto);
+                int id = createProductCategoryMappingModel.Id;
                 return Json(new { success = true, id });
             }
             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
@@ -258,8 +259,16 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ProductCategoryDelete(int id)
         {
-            bool isSuccess = await _productCategoryMappingService.DeleteProductCategoryAsync(id);
-            return Json(new { success = isSuccess });
+            try
+            {
+                await _productCategoryMappingService.DeleteProductCategoryAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Silinecek Kategori Bağlantısı Bulunamadı" });
+            }
+
         }
 
         #endregion
@@ -334,12 +343,15 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ProductPictureDelete(int id)
         {
-            var isSuccess = await _productImageMappingService.DeleteAsync(id);
-            if (!isSuccess)
+            try
+            {
+                await _productImageMappingService.DeleteAsync(id);
+                return StatusCode((int)HttpStatusCode.OK);
+            }
+            catch (Exception ex)
             {
                 return Json(new { success = false, message = "Resim silinirken bir hata oluştu." });
             }
-            return StatusCode((int)HttpStatusCode.OK);
         }
 
         [HttpPost]
@@ -416,7 +428,7 @@ namespace Entegro.Web.Controllers
             var allProduct = await _productService.GetProductsAsync();
             foreach (var product in allProduct)
             {
-                var productIntegration = await _productIntegrationService.GetByProductIdandIntegrationSystemIdAsync(product.Id, integrationSystemId);
+                var productIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.Id, integrationSystemId);
                 if (productIntegration != null)
                 {
                     await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
@@ -453,7 +465,7 @@ namespace Entegro.Web.Controllers
 
             try
             {
-                var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemIdandIntegrationCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
+                var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
                 if (existingProductIntegration != null)
                 {
                     if (existingProductIntegration.ProductId != model.ProductId)
@@ -504,6 +516,14 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> IntegrationDialog(DialogViewModel model)
         {
             var product = await _productService.GetProductByIdAsync(model.ProductId);
+
+            if (!string.IsNullOrEmpty(model.IntegrationValue))
+            {
+                return PartialView($"_IntegrationDialog.{model.IntegrationValue}", model.IntegrationValue);
+
+            }
+
+
             if (model.ProductIntegrationId == 0)
             {
                 return PartialView("_IntegrationDialog", new CreateProductIntegrationViewModel()
@@ -519,7 +539,6 @@ namespace Entegro.Web.Controllers
                 });
             }
 
-
             var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
             var createModel = new CreateProductIntegrationViewModel
             {
@@ -533,6 +552,8 @@ namespace Entegro.Web.Controllers
                 Active = existingProductIntegration.Active,
                 ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url
             };
+
+
 
             return PartialView("_IntegrationDialog", createModel);
         }
