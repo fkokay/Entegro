@@ -188,6 +188,20 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> Delete(int productId)
+        {
+            try
+            {
+                await _productService.DeleteProductAsync(productId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { success = false, message = $"{ex.Message}" });
+            }
+        }
+        [HttpPost]
         public async Task<IActionResult> ProductList([FromBody] GridCommand model)
         {
             int pageNumber = model.Start / model.Length;
