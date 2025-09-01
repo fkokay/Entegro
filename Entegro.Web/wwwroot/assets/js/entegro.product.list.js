@@ -101,7 +101,7 @@ Entegro.product.list = (function ($) {
         });
     }
     function editIntegration() {
-        $(document).on('click', '.product-integration', function (e) {
+        $(document).on('click', '.product-integration, .open-integration', function (e) {
             e.preventDefault();
 
             const $el = $(this).find('.integration-name');

@@ -163,6 +163,11 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                             else
                             {
                                 item.Id = 0;
+
+                                foreach (var value in item.ProductVariantAttributeValues)
+                                {
+                                    value.Id = 0;
+                                }
                             }
                         }
                         else
@@ -232,7 +237,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
 
                     var ex = await GetProductVariantAttributeCombination(data.Id, item.HashCode);
-                    if (ex != null)
+                    if (ex == null)
                     {
                         await CreateProductVariantAttributeCombination(item);
                     }

@@ -188,59 +188,65 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.Id = product.Id;
 
 
-                smartstoreProduct.ProductManufacturers = new List<SmartstoreProductManufacturerDto>();
-                if (product.BrandId.HasValue && product.BrandId > 0)
+                if (product.Id > 0)
                 {
-                    var productManufacturer = new SmartstoreProductManufacturerDto
+                    smartstoreProduct.ProductManufacturers = new List<SmartstoreProductManufacturerDto>();
+                    if (product.BrandId.HasValue && product.BrandId > 0)
                     {
-                        ManufacturerId = product.BrandId.Value,
+                        var productManufacturer = new SmartstoreProductManufacturerDto
+                        {
+                            ManufacturerId = product.BrandId.Value,
+                            ProductId = product.Id,
+                            DisplayOrder = 0
+                        };
+                        smartstoreProduct.ProductManufacturers.Add(productManufacturer);
+                    }
+
+                    smartstoreProduct.ProductCategories = product.ProductCategories.Select(m => new SmartstoreProductCategoryDto
+                    {
                         ProductId = product.Id,
-                        DisplayOrder = 0
-                    };
-                    smartstoreProduct.ProductManufacturers.Add(productManufacturer);
-                }
-
-                smartstoreProduct.ProductCategories = product.ProductCategories.Select(m => new SmartstoreProductCategoryDto
-                {
-                    CategoryId = m.CategoryId,
-                    IsFeaturedProduct = false,
-                    IsSystemMapping = false,
-                    DisplayOrder = 0,
-                }).ToList();
-
-                smartstoreProduct.ProductMediaFiles = product.ProductMediaFiles.Select(m => new SmartstoreProductMediaFileDto()
-                {
-                    MediaFileId = m.MediaFileId,
-                    DisplayOrder = m.DisplayOrder,
-                }).ToList();
-
-                smartstoreProduct.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new SmartstoreProductVariantAttributeDto()
-                {
-                    AttributeControlTypeId = 3,
-                    CustomData = "",
-                    DisplayOrder = m.DisplayOrder,
-                    IsRequired = true,
-                    ProductAttributeId = m.ProductAttributeId,
-                    TextPrompt = "",
-                    Id = m.Id,
-                    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new SmartstoreProductVariantAttributeValueDto()
-                    {
-                        Name = x.Name,
-                        Color = "",
+                        CategoryId = m.CategoryId,
+                        IsFeaturedProduct = false,
+                        IsSystemMapping = false,
                         DisplayOrder = 0,
-                        IsPreSelected = false,
-                        MediaFileId = 0,
-                        LinkedProductId = 0,
-                        PriceAdjustment = 0,
-                        ProductVariantAttributeId = 0,
-                        Quantity = 0,
-                        ValueTypeId = 0,
-                        WeightAdjustment = 0,
-                        Alias = "",
-                        Attribute = "",
-                        Id = x.Id
-                    }).ToList()
-                }).ToList();
+                    }).ToList();
+
+                    smartstoreProduct.ProductMediaFiles = product.ProductMediaFiles.Select(m => new SmartstoreProductMediaFileDto()
+                    {
+                        ProductId = product.Id,
+                        MediaFileId = m.MediaFileId,
+                        DisplayOrder = m.DisplayOrder,
+                    }).ToList();
+
+                    smartstoreProduct.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new SmartstoreProductVariantAttributeDto()
+                    {
+                        ProductId = product.Id,
+                        AttributeControlTypeId = 3,
+                        CustomData = "",
+                        DisplayOrder = m.DisplayOrder,
+                        IsRequired = true,
+                        ProductAttributeId = m.ProductAttributeId,
+                        TextPrompt = "",
+                        Id = m.Id,
+                        ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new SmartstoreProductVariantAttributeValueDto()
+                        {
+                            Name = x.Name,
+                            Color = "",
+                            DisplayOrder = 0,
+                            IsPreSelected = false,
+                            MediaFileId = 0,
+                            LinkedProductId = 0,
+                            PriceAdjustment = 0,
+                            ProductVariantAttributeId = m.Id,
+                            Quantity = 0,
+                            ValueTypeId = 0,
+                            WeightAdjustment = 0,
+                            Alias = "",
+                            Attribute = "",
+                            Id = x.Id
+                        }).ToList()
+                    }).ToList();
+                }
 
 
                 return smartstoreProduct;

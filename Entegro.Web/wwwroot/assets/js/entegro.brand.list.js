@@ -253,7 +253,6 @@ Entegro.brand.list = (function ($) {
         });
     }
 
-    // Dışa açık fonksiyonlar
     return {
         init: initList
     };
