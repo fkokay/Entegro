@@ -40,7 +40,14 @@
 </form>
 
 @section scripts {
-    <script data-origin="FileUploader">
+    <script src="/assets/js/entegro.category.js"></script>
+    <script>
+        $(function () {
+            Entegro.category.init('edit', '/category/edit');
+        });
+    </script>
+
+    @* <script data-origin="FileUploader">
         $(function () {
             // Init dropzone
             $("#MediaUpload").dropzoneWrapper({
@@ -298,6 +305,6 @@
             escapeMarkup: function (m) { return m; } // templateResult HTML kullanacaksan kalsın
           });
         });
-    </script>
+    </script> *@
 
 }

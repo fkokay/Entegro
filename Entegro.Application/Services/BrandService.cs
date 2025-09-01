@@ -4,7 +4,6 @@ using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
-using System.Xml.Linq;
 
 namespace Entegro.Application.Services
 {
