@@ -547,3 +547,16 @@ table .avatar img {
     display: block;
     margin: 0px auto;
 }
+
+
+.product-integration {
+    cursor: pointer;
+    background-color: #fff;
+    transition: background-color 0.2s ease;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+    .product-integration:hover {
+        background-color: #f1f5ff;
+    }
