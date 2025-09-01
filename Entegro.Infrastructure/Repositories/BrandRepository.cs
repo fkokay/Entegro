@@ -83,7 +83,6 @@ namespace Entegro.Infrastructure.Repositories
         public async Task UpdateAsync(Brand brand)
         {
             brand.UpdatedOn = DateTime.Now;
-
             _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
         }

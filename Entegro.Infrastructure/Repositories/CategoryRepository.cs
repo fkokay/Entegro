@@ -69,7 +69,7 @@ namespace Entegro.Infrastructure.Repositories
 
 
         // ID ile kategori getir
-        public async Task<Category?> GetByIdAsync(int id) => await _context.Categories.FirstOrDefaultAsync(o => o.Id == id);
+        public async Task<Category?> GetByIdAsync(int id) => await _context.Categories.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
 
 
         // ID ile kategori ve ilişkili medya dosyasını getir

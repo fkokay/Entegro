@@ -4,7 +4,6 @@ using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
-using System.Xml.Linq;
 
 namespace Entegro.Application.Services
 {
@@ -79,7 +78,7 @@ namespace Entegro.Application.Services
 
         public async Task<PagedResult<BrandDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
-            if (pageNumber <= 0)
+            if (pageNumber < 0)
                 throw new ArgumentOutOfRangeException(nameof(pageNumber));
             if (pageSize <= 0)
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
