@@ -57,7 +57,7 @@
                     <!-- DisplayOrder -->
                     <div class="col-12 mb-3">
                         <label class="form-label" for="DisplayOrder">Gösterim Sırası <span class="text-danger">*</span></label>
-                        <input type="number" id="DisplayOrder" name="DisplayOrder" class="form-control" placeholder="0"/>
+                        <input type="number" id="DisplayOrder" name="DisplayOrder" class="form-control" placeholder="0" />
                     </div>
 
                     <div class="col-12 text-center">
@@ -100,7 +100,7 @@
                     <!-- DisplayOrder -->
                     <div class="col-12 mb-3">
                         <label class="form-label" for="Edit_DisplayOrder">Gösterim Sırası <span class="text-danger">*</span></label>
-                        <input type="number" id="Edit_DisplayOrder" name="DisplayOrder" class="form-control" placeholder="0" value="0"/>
+                        <input type="number" id="Edit_DisplayOrder" name="DisplayOrder" class="form-control" placeholder="0" value="0" />
                     </div>
 
                     <div class="col-12 text-center">
@@ -115,5 +115,13 @@
 </div>
 
 @section Scripts {
-    <script src="~/assets/js/customjs/product-attribute-value/attributevalue.js"></script>
+    @* <script src="~/assets/js/customjs/product-attribute-value/attributevalue.js"></script> *@
+    <script src="/assets/js/entegro.attributevalue.js"></script>
+    <script>
+             $(function () {
+            Entegro.AttributeValue.List.init();
+        });
+    </script>
+
+
 }
