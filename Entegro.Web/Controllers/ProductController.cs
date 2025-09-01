@@ -534,7 +534,6 @@ namespace Entegro.Web.Controllers
             if (!string.IsNullOrEmpty(model.IntegrationValue))
             {
                 return PartialView($"_IntegrationDialog.{model.IntegrationValue}", model.IntegrationValue);
-
             }
 
 
