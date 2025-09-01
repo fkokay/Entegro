@@ -31,5 +31,12 @@ namespace Entegro.Domain.Entities
         public int AttributeControlTypeId { get; set; }
         public int DisplayOrder {get;set; }
 
+        private ICollection<ProductVariantAttributeValue> _productVariantAttributeValues;
+        public ICollection<ProductVariantAttributeValue> ProductVariantAttributeValues
+        {
+            get => LazyLoader?.Load(this, ref _productVariantAttributeValues) ?? (_productVariantAttributeValues ??= new HashSet<ProductVariantAttributeValue>());
+            set => _productVariantAttributeValues = value;
+        }
+
     }
 }

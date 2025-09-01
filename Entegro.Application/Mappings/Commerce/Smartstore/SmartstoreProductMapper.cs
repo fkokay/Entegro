@@ -43,7 +43,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
 
                 if (smartstoreProduct.ProductManufacturers.Any())
                 {
-                    var productManufacturer = smartstoreProduct.ProductManufacturers.First(); 
+                    var productManufacturer = smartstoreProduct.ProductManufacturers.First();
                     var brand = SmartstoreManufacturerMapper.ToDto(productManufacturer.Manufacturer);
                     productDto.Brand = brand;
                 }
@@ -84,7 +84,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.ShowOnHomePage = false;
                 smartstoreProduct.HomePageDisplayOrder = 0;
                 smartstoreProduct.MetaTitle = "";
-                smartstoreProduct.MetaDescription= "";
+                smartstoreProduct.MetaDescription = "";
                 smartstoreProduct.MetaKeywords = "";
                 smartstoreProduct.AllowCustomerReviews = true;
                 smartstoreProduct.Sku = product.Code;
@@ -185,7 +185,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.MainPictureId = null;
                 smartstoreProduct.HasPreviewPicture = false;
                 smartstoreProduct.HasDiscountsApplied = false;
-                smartstoreProduct.Id = 0;
+                smartstoreProduct.Id = product.Id;
 
 
                 smartstoreProduct.ProductManufacturers = new List<SmartstoreProductManufacturerDto>();
@@ -194,6 +194,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                     var productManufacturer = new SmartstoreProductManufacturerDto
                     {
                         ManufacturerId = product.BrandId.Value,
+                        ProductId = product.Id,
                         DisplayOrder = 0
                     };
                     smartstoreProduct.ProductManufacturers.Add(productManufacturer);
@@ -213,7 +214,36 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                     DisplayOrder = m.DisplayOrder,
                 }).ToList();
 
-                return smartstoreProduct; 
+                smartstoreProduct.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new SmartstoreProductVariantAttributeDto()
+                {
+                    AttributeControlTypeId = 3,
+                    CustomData = "",
+                    DisplayOrder = m.DisplayOrder,
+                    IsRequired = true,
+                    ProductAttributeId = m.ProductAttributeId,
+                    TextPrompt = "",
+                    Id = m.Id,
+                    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new SmartstoreProductVariantAttributeValueDto()
+                    {
+                        Name = x.Name,
+                        Color = "",
+                        DisplayOrder = 0,
+                        IsPreSelected = false,
+                        MediaFileId = 0,
+                        LinkedProductId = 0,
+                        PriceAdjustment = 0,
+                        ProductVariantAttributeId = 0,
+                        Quantity = 0,
+                        ValueTypeId = 0,
+                        WeightAdjustment = 0,
+                        Alias = "",
+                        Attribute = "",
+                        Id = x.Id
+                    }).ToList()
+                }).ToList();
+
+
+                return smartstoreProduct;
             }
             catch (Exception ex)
             {

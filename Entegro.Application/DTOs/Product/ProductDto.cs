@@ -42,7 +42,6 @@ namespace Entegro.Application.DTOs.Product
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
         public List<ProductCategoryDto> ProductCategories { get; set; } = new List<ProductCategoryDto>();
         public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
-        public List<ProductVariantAttributeValueDto> ProductVariantAttributeValues { get; set; } = new List<ProductVariantAttributeValueDto>();
         public List<ProductVariantAttributeCombinationDto> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationDto>();
         public List<ProductIntegrationDto> ProductIntegrations { get; set; } = new List<ProductIntegrationDto>();
     }

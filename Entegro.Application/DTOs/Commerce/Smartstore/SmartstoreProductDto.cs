@@ -122,5 +122,7 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public List<SmartstoreProductManufacturerDto> ProductManufacturers { get; set; } = new();
         public List<SmartstoreProductCategoryDto> ProductCategories { get; set; } = new();
         public List<SmartstoreProductMediaFileDto> ProductMediaFiles { get; set; } = new();
+        public List<SmartstoreProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new();
+        public List<SmartstoreProductVariantAttributeCombinationDto> ProductVariantAttributeCombinations { get; set; } = new();
     }
 }
