@@ -17,7 +17,7 @@ Entegro.mail = (function ($) {
             e.preventDefault();
 
             $.ajax({
-                url: '/settings/Mail', // JS dosyasında @Url.Action yerine direkt path
+                url: '/settings/Mail', 
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function (res) {
