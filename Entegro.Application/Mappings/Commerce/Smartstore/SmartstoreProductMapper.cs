@@ -221,7 +221,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                     smartstoreProduct.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new SmartstoreProductVariantAttributeDto()
                     {
                         ProductId = product.Id,
-                        AttributeControlTypeId = 3,
+                        AttributeControlTypeId = 1,
                         CustomData = "",
                         DisplayOrder = m.DisplayOrder,
                         IsRequired = true,

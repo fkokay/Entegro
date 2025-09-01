@@ -38,7 +38,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 categoryDto.MetaDescription = smartstoreCategory.MetaDescription;
                 categoryDto.CreatedOn = smartstoreCategory.CreatedOnUtc;
                 categoryDto.UpdatedOn = smartstoreCategory.UpdatedOnUtc;
-                
+
                 return categoryDto; ;
             }
             catch (Exception ex)
@@ -74,7 +74,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreCategory.SubjectToAcl = false;
                 smartstoreCategory.ShowOnHomePage = false;
                 smartstoreCategory.Published = true;
-                smartstoreCategory.ParentId = null;
+                smartstoreCategory.ParentId = category.ParentCategoryId > 0 ? category.ParentCategoryId : null;
                 smartstoreCategory.PageSizeOptions = "10,20,50";
                 smartstoreCategory.PageSize = 20;
                 smartstoreCategory.Name = category.Name;

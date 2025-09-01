@@ -85,9 +85,23 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                 foreach (var item in product.ProductCategories)
                 {
+                    int parenCategoryId = 0;
+                    if (item.Category.ParentCategory != null)
+                    {
+                        var parenCategory = await CategoryExistsAsync(item.Category.ParentCategory.Name);
+                        if (parenCategory == null)
+                        {
+                            parenCategoryId = await CreateCategoryAsync(item.Category.ParentCategory);
+                        }
+                        else
+                        {
+                            parenCategoryId = parenCategory.Id;
+                        }
+                    }
                     var category = await CategoryExistsAsync(item.Category.Name);
                     if (category == null)
                     {
+                        item.Category.ParentCategoryId = parenCategoryId;
                         int categoryId = await CreateCategoryAsync(item.Category);
                         item.CategoryId = categoryId;
                         item.ProductId = existing == null ? 0 : existing.Id;
