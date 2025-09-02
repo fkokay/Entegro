@@ -50,5 +50,7 @@ namespace Entegro.Infrastructure.Data
         public DbSet<IntegrationSystemLog> IntegrationSystemLogs { get; set; }
         public DbSet<MediaFolder> MediaFolders { get; set; }
         public DbSet<MediaFile> MediaFiles { get; set; }
+        public DbSet<SpecificationAttribute> SpecificationAttributes { get; set; }
+        public DbSet<SpecificationAttributeOption> SpecificationAttributeOptions { get; set; }
     }
 }
