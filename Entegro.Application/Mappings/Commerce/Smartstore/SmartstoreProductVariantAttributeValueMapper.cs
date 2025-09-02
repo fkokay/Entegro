@@ -52,7 +52,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProductVariantAttributeValue.ProductVariantAttributeId = productVariantAttributeValue.ProductVariantAttributeId;
                 smartstoreProductVariantAttributeValue.Name = productVariantAttributeValue.Name;
                 smartstoreProductVariantAttributeValue.Alias = productVariantAttributeValue.Name;
-                smartstoreProductVariantAttributeValue.MediaFileId = null;
+                smartstoreProductVariantAttributeValue.MediaFileId = 0;
                 smartstoreProductVariantAttributeValue.Color = "";
                 smartstoreProductVariantAttributeValue.PriceAdjustment = 0;
                 smartstoreProductVariantAttributeValue.WeightAdjustment = 0;

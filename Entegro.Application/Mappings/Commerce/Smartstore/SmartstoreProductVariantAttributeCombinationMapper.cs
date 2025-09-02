@@ -28,6 +28,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 }
 
                 ProductVariantAttributeCombinationDto productVariantAttributeCombination = new ProductVariantAttributeCombinationDto();
+                productVariantAttributeCombination.Id = smartstoreProductVariantAttributeCombination.Id;
                 productVariantAttributeCombination.ManufacturerPartNumber = smartstoreProductVariantAttributeCombination.ManufacturerPartNumber;
                 productVariantAttributeCombination.ProductId = smartstoreProductVariantAttributeCombination.ProductId;
                 productVariantAttributeCombination.RawAttribute = smartstoreProductVariantAttributeCombination.RawAttributes;
@@ -53,6 +54,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 }
 
                 SmartstoreProductVariantAttributeCombinationDto smartstoreProductVariantAttributeCombination = new SmartstoreProductVariantAttributeCombinationDto();
+                smartstoreProductVariantAttributeCombination.Id = productVariantAttributeCombination.Id;
                 smartstoreProductVariantAttributeCombination.ProductId = productVariantAttributeCombination.ProductId;
                 smartstoreProductVariantAttributeCombination.ManufacturerPartNumber = productVariantAttributeCombination.ManufacturerPartNumber;
                 smartstoreProductVariantAttributeCombination.Sku = productVariantAttributeCombination.StokCode;

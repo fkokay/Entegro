@@ -15,7 +15,7 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public int ProductVariantAttributeId { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
-        public int? MediaFileId { get; set; }
+        public int MediaFileId { get; set; }
         public string? Color { get; set; }
         public decimal PriceAdjustment { get; set; }
         public decimal WeightAdjustment { get; set; }
