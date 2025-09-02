@@ -12,7 +12,7 @@ namespace Entegro.Domain.Entities
         public string? ManufacturerPartNumber { get; set; }
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
-        public string AttributeXml { get; set; }
+        public string RawAttribute { get; set; }
 
 
         private Product _product;
