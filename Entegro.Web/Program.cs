@@ -121,6 +121,14 @@ builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepo
 builder.Services.AddScoped<IProductIntegrationService, ProductIntegrationService>();
 
 
+builder.Services.AddScoped<ISpecificationAttributeOptionRepository, SpecificationAttributeOptionRepository>();
+builder.Services.AddScoped<ISpecificationAttributeOptionService, SpecificationAttributeOptionService>();
+
+
+builder.Services.AddScoped<ISpecificationAttributeRepository, SpecificationAttributeRepository>();
+builder.Services.AddScoped<ISpecificationAttributeService, SpecificationAttributeService>();
+
+
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 builder.Services.AddHttpClient();
 
