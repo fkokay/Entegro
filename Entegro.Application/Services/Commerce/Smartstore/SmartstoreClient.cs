@@ -4,11 +4,13 @@ using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
+using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,18 +30,24 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 {
     public class SmartstoreClient
     {
+        private readonly string EntegroUrl = "https://localhost:7230";
+
+        private readonly ILogger<SmartstoreClient> _logger;
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
         };
 
-        public SmartstoreClient(HttpClient httpClient)
+        public SmartstoreClient(ILogger<SmartstoreClient> logger, HttpClient httpClient)
         {
+            _logger = logger;
+
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri("https://eticaret.ozgurteknolojiyazilim.com/odata/v1/");
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
             var authToken = Encoding.ASCII.GetBytes("c9a68396a00e4e58ccdda2fd2b653b51:6569aa8eb0afb17f37d0f63fdd98bf3a");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
         }
@@ -54,214 +62,76 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreProductDto dto ? SmartstoreProductMapper.ToDto(dto) : null;
+                return data?.Value?.FirstOrDefault() is SmartstoreProductDto dto
+                    ? SmartstoreProductMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                _logger.LogError(ex, "Error while fetching product by SKU: {Sku}", sku);
+                throw; // sessiz geçmek yerine fırlatalım
             }
         }
+
         public async Task UpsertProductAsync(ProductDto product)
         {
-            try
+            // 1. Marka
+            await HandleBrandAsync(product);
+
+            // 2. Kategoriler
+            await HandleCategoriesAsync(product);
+
+            // 3. Ürün var mı kontrolü
+            var existingProduct = await GetProductBySkuAsync(product.Code);
+            int productId;
+            if (existingProduct != null)
             {
-                var existing = await GetProductBySkuAsync(product.Code);
-
-                if (product.Brand != null)
-                {
-                    var manufacturer = await BrandExistsAsync(product.Brand.Name);
-                    if (manufacturer == null)
-                    {
-                        int brandId = await CreateBrandAsync(product.Brand);
-                        product.BrandId = brandId;
-                    }
-                    else
-                    {
-                        product.BrandId = manufacturer.Id;
-                    }
-                }
-
-                foreach (var item in product.ProductCategories)
-                {
-                    int parenCategoryId = 0;
-                    if (item.Category.ParentCategory != null)
-                    {
-                        var parenCategory = await CategoryExistsAsync(item.Category.ParentCategory.Name);
-                        if (parenCategory == null)
-                        {
-                            parenCategoryId = await CreateCategoryAsync(item.Category.ParentCategory);
-                        }
-                        else
-                        {
-                            parenCategoryId = parenCategory.Id;
-                        }
-                    }
-                    var category = await CategoryExistsAsync(item.Category.Name);
-                    if (category == null)
-                    {
-                        item.Category.ParentCategoryId = parenCategoryId;
-                        int categoryId = await CreateCategoryAsync(item.Category);
-                        item.CategoryId = categoryId;
-                        item.ProductId = existing == null ? 0 : existing.Id;
-                    }
-                    else
-                    {
-                        item.CategoryId = category.Id;
-                        item.ProductId = existing == null ? 0 : existing.Id;
-                    }
-                }
-
-                foreach (var item in product.ProductMediaFiles)
-                {
-                    var fileExists = await FileExists("catalog/" + item.MediaFile.Name);
-                    if (fileExists.Value)
-                    {
-                        var smartstoreFile = await GetFileByPath("catalog/" + item.MediaFile.Name);
-                        item.MediaFileId = smartstoreFile.Id;
-                        item.ProductId = existing == null ? 0 : existing.Id;
-                    }
-                    else
-                    {
-                        SmartstoreFileDto smartstoreFile = new SmartstoreFileDto();
-                        smartstoreFile.File = await getFileAsync("https://localhost:7230" + item.MediaFile.Url);
-                        smartstoreFile.FileName = "catalog/" + item.MediaFile.Name;
-                        smartstoreFile.MimeType = item.MediaFile.MimeType;
-
-                        item.MediaFileId = await UpsertMediaFile(smartstoreFile) ?? 0;
-                        item.ProductId = existing == null ? 0 : existing.Id;
-                    }
-                }
-
-                foreach (var item in product.ProductVariantAttributes)
-                {
-
-                    var attribute = await ProductAttributeExistsAsync(item.ProductAttribute.Name);
-                    if (attribute == null)
-                    {
-                        int attributeId = await CreateProductAttributeAsync(item.ProductAttribute);
-                        item.ProductAttributeId = attributeId;
-                        item.ProductId = existing == null ? 0 : existing.Id;
-                    }
-                    else
-                    {
-                        item.ProductAttributeId = attribute.Id;
-                        item.ProductId = existing == null ? 0 : existing.Id;
-
-                        if (existing != null)
-                        {
-                            var productVariantAttribute = await ProductVariantAttributeExistsAsync(existing.Id, attribute.Id);
-                            if (productVariantAttribute != null)
-                            {
-                                item.EntityId = item.Id;
-                                item.Id = productVariantAttribute.Id;
-
-                                foreach (var value in item.ProductVariantAttributeValues)
-                                {
-                                    var attributeValue = await ProductVariantAttributeValueExistsAsync(productVariantAttribute.Id, value.Name);
-                                    if (attributeValue != null)
-                                    {
-                                        value.ProductVariantAttributeId = productVariantAttribute.Id;
-                                        value.EntityId = value.Id;
-                                        value.Id = attributeValue.Id;
-
-                                    }
-                                    else
-                                    {
-                                        value.ProductVariantAttributeId = productVariantAttribute.Id;
-                                        value.Id = 0;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                item.Id = 0;
-
-                                foreach (var value in item.ProductVariantAttributeValues)
-                                {
-                                    value.Id = 0;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            item.Id = 0;
-                        }
-                    }
-
-
-                }
-
-                foreach (var item in product.ProductVariantAttributeCombinations)
-                {
-                    item.ProductId = existing == null ? 0 : existing.Id;
-                }
-
-
-
-                if (existing == null)
-                {
-                    product.Id = 0;
-                    var payload = SmartstoreProductMapper.ToDto(product);
-                    var json = JsonSerializer.Serialize(payload, _jsonOptions);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    var response = await _httpClient.PostAsync("products", content);
-                    var result = await response.Content.ReadAsStringAsync();
-                    response.EnsureSuccessStatusCode();
-                }
-                else
-                {
-                    product.Id = existing.Id;
-                    var payload = SmartstoreProductMapper.ToDto(product);
-                    if (payload != null)
-                    {
-                        var json = JsonSerializer.Serialize(payload, _jsonOptions);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var response = await _httpClient.PatchAsync($"products({product.Id})", content);
-                        var result = await response.Content.ReadAsStringAsync();
-                        response.EnsureSuccessStatusCode();
-                    }
-                }
-
-                var data = await GetProductBySkuAsync(product.Code);
-                var productVariantAttributes = await ProductVariantAttributeExistsAsync(data.Id);
-
-                foreach (var item in product.ProductVariantAttributeCombinations)
-                {
-                    List<KeyValuePair<int, ICollection<object>>> attributes = new List<KeyValuePair<int, ICollection<object>>>();
-
-                    var attr = JsonSerializer.Deserialize<List<ProductVariantAttributeModel>>(item.AttributeXml);
-
-                    foreach (var at in attr)
-                    {
-                        var productVariantAttribute = product.ProductVariantAttributes.Where(m => m.EntityId == at.ProductAttributeId).First();
-                        var productVariantAttributeValue = productVariantAttribute.ProductVariantAttributeValues.Where(m => m.EntityId == at.ProductAttributeValueId).ToList();
-
-                        attributes.Add(new KeyValuePair<int, ICollection<object>>(productVariantAttribute.Id, productVariantAttributeValue.Select(m => m.Id as object).ToList()));
-                    }
-
-                    RawAttribute rawAttribute = new RawAttribute();
-                    rawAttribute.Attributes = attributes;
-
-                    item.AttributeXml = JsonSerializer.Serialize(rawAttribute);
-                    item.HashCode = GetHashCode(rawAttribute);
-
-
-                    var ex = await GetProductVariantAttributeCombination(data.Id, item.HashCode);
-                    if (ex == null)
-                    {
-                        await CreateProductVariantAttributeCombination(item);
-                    }
-                }
-               
+                product.Id = existingProduct.Id;
+                productId = await UpdateProductAsync(product, existingProduct.Id) ?? 0;
             }
-            catch (Exception)
+            else
             {
-
+                productId = await CreateProductAsync(product) ?? 0;
             }
+
+            // 4. Resimler
+            await HandleMediaFilesAsync(productId, product);
+
+            // 5. Özellikler (Attributes)
+            await HandleAttributesAsync(productId, product);
+
+            // 6. Variant Combinations
+            await HandleVariantCombinationsAsync(productId, product);
+        }
+        public async Task<int?> CreateProductAsync(ProductDto product)
+        {
+            var payload = SmartstoreProductMapper.ToDto(product);
+            var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("products", content);
+            response.EnsureSuccessStatusCode();
+
+            var created = await response.Content.ReadFromJsonAsync<SmartstoreProductDto>();
+            return created?.Id ?? 0;
+        }
+        public async Task<int?> UpdateProductAsync(ProductDto product, int id)
+        {
+            var payload = SmartstoreProductMapper.ToDto(product);
+            if (payload == null)
+                throw new Exception("SmartstoreProductMapper returned null");
+
+            payload.Id = id;
+            var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PutAsync($"products({id})", content);
+            response.EnsureSuccessStatusCode();
+
+            var updated = await response.Content.ReadFromJsonAsync<SmartstoreProductDto>();
+            return updated?.Id ?? 0;
         }
         public async Task UpsertProductsAsync(IEnumerable<ProductDto> products)
         {
@@ -292,6 +162,118 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 await DeleteProductAsync(sku);
             }
         }
+
+        private async Task HandleBrandAsync(ProductDto product)
+        {
+            if (string.IsNullOrEmpty(product.Brand?.Name))
+                return;
+
+            _logger.LogInformation("Checking brand: {Brand}", product.Brand.Name);
+
+            var existingBrand = await BrandExistsAsync(product.Brand.Name);
+            if (existingBrand != null)
+            {
+                product.BrandId = existingBrand.Id;
+                _logger.LogInformation("Brand exists. Using BrandId={BrandId}", product.BrandId);
+            }
+            else
+            {
+                product.BrandId = await CreateBrandAsync(product.Brand);
+                _logger.LogInformation("Brand created. BrandId={BrandId}", product.BrandId);
+            }
+        }
+        private async Task HandleCategoriesAsync(ProductDto product)
+        {
+            if (product.ProductCategories == null || !product.ProductCategories.Any())
+                return;
+
+            foreach (var productCategory in product.ProductCategories)
+            {
+                var existing = await CategoryExistsAsync(productCategory.Category.Name);
+                productCategory.Category.Id = existing != null
+                    ? existing.Id
+                    : await CreateCategoryAsync(productCategory.Category);
+            }
+        }
+        private async Task HandleMediaFilesAsync(int productId, ProductDto product)
+        {
+            if (product.ProductMediaFiles == null || !product.ProductMediaFiles.Any())
+                return;
+
+            foreach (var productMediaFile in product.ProductMediaFiles)
+            {
+                var fileExists = await FileExists($"catalog/{productMediaFile.MediaFile.Name}");
+                if (fileExists != null && fileExists.Value)
+                {
+                    var smartstoreFile = await GetFileByPath($"catalog/{productMediaFile.MediaFile.Name}");
+                    productMediaFile.MediaFileId = smartstoreFile.Id;
+                    productMediaFile.ProductId = productId;
+                }
+                else
+                {
+                    SmartstoreFileDto smartstoreFile = new SmartstoreFileDto();
+                    smartstoreFile.File = await getFileAsync($"{EntegroUrl}{productMediaFile.MediaFile.Name}");
+                    smartstoreFile.FileName = string.Format($"catalog/{productMediaFile.MediaFile.Name}");
+                    smartstoreFile.MimeType = productMediaFile.MediaFile.MimeType;
+
+                    productMediaFile.MediaFile.Id = await CreateMediaFileAsync(smartstoreFile) ?? 0;
+                }
+            }
+        }
+        private async Task HandleAttributesAsync(int productId, ProductDto product)
+        {
+            if (product.ProductVariantAttributes == null || !product.ProductVariantAttributes.Any())
+                return;
+
+            foreach (var productVariantAttribute in product.ProductVariantAttributes)
+            {
+                // ProductAttribute kontrol / ekle
+                var existingAttr = await ProductAttributeExistsAsync(productVariantAttribute.ProductAttribute.Name);
+                productVariantAttribute.Id = existingAttr != null
+                    ? existingAttr.Id
+                    : await CreateProductAttributeAsync(productVariantAttribute.ProductAttribute);
+
+                // ProductVariantAttribute kontrol / ekle
+                var existingVariantAttr = await ProductVariantAttributeExistsAsync(productId, productVariantAttribute.Id);
+                int variantAttrId = existingVariantAttr?.Id ?? await CreateProductVariantAttributeAsync(new ProductVariantAttributeDto
+                {
+                    ProductId = productId,
+                    ProductAttributeId = productVariantAttribute.Id
+                });
+
+                // AttributeValue kontrol / ekle
+                foreach (var productVariantAttributeValue in productVariantAttribute.ProductVariantAttributeValues)
+                {
+                    productVariantAttributeValue.ProductVariantAttributeId = variantAttrId;
+
+                    var existingValue = await ProductVariantAttributeValueExistsAsync(variantAttrId, productVariantAttributeValue.Name);
+                    productVariantAttributeValue.Id = existingValue != null
+                        ? existingValue.Id
+                        : await CreateProductVariantAttributeValueAsync(productVariantAttributeValue);
+                }
+            }
+        }
+        private async Task HandleVariantCombinationsAsync(int productId, ProductDto product)
+        {
+            if (product.ProductVariantAttributeCombinations == null || !product.ProductVariantAttributeCombinations.Any())
+                return;
+
+            foreach (var combination in product.ProductVariantAttributeCombinations)
+            {
+                combination.ProductId = productId;
+                var existingCombination = await GetProductVariantAttributeCombination(productId, combination.HashCode);
+
+                if (existingCombination != null)
+                {
+                    combination.Id = existingCombination.Id;
+                    await UpdateProductVariantAttributeCombination(combination);
+                }
+                else
+                {
+                    await CreateProductVariantAttributeCombination(combination);
+                }
+            }
+        }
         #endregion
 
         #region Brand
@@ -302,21 +284,22 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("manufacturers", content);
-            var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
-            var created = await response.Content.ReadFromJsonAsync<SmartstoreProductDto>();
-            return created.Id;
+            var created = await response.Content.ReadFromJsonAsync<SmartstoreManufacturerDto>();
+            return created?.Id ?? 0;
         }
         public async Task UpdateBrandAsync(BrandDto brand, int id)
         {
             var payload = SmartstoreManufacturerMapper.ToDto(brand);
+            if (payload == null)
+                throw new Exception("SmartstoreManufacturerMapper returned null");
+
             payload.Id = id;
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsJsonAsync("manufacturers", content);
-            var result = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.PutAsync($"manufacturers({id})", content);
             response.EnsureSuccessStatusCode();
         }
         public async Task DeleteBrandAsync(int brandId)
@@ -328,17 +311,20 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         {
             try
             {
-                var url = $"manufacturers?$filter=name eq '{brandName}'";
+                var url = $"manufacturers?$filter=Name eq '{brandName}'";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
                 var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreManufacturerDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreManufacturerDto dto ? SmartstoreManufacturerMapper.ToDto(dto) : null;
+                return data?.Value?.FirstOrDefault() is SmartstoreManufacturerDto dto
+                    ? SmartstoreManufacturerMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "BrandExistsAsync");
                 return null;
             }
         }
@@ -352,50 +338,57 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("categories", content);
-            var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
-            var created = await response.Content.ReadFromJsonAsync<SmartstoreProductDto>();
-            return created == null ? 0 : created.Id;
+            var created = await response.Content.ReadFromJsonAsync<SmartstoreCategoryDto>();
+            return created?.Id ?? 0;
         }
+
         public async Task UpdateCategoryAsync(CategoryDto category, int id)
         {
             var payload = SmartstoreCategoryMapper.ToDto(category);
+            if (payload == null)
+                throw new Exception("SmartstoreCategoryMapper returned null");
+
             payload.Id = id;
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsJsonAsync("categories", content);
-            var result = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.PutAsync($"categories({id})", content);
             response.EnsureSuccessStatusCode();
         }
+
         public async Task DeleteCategoryAsync(int categoryId)
         {
             var response = await _httpClient.DeleteAsync($"categories({categoryId})");
             response.EnsureSuccessStatusCode();
         }
+
         public async Task<CategoryDto?> CategoryExistsAsync(string categoryName)
         {
             try
             {
-                var url = $"categories?$filter=name eq '{categoryName}'";
+                var url = $"categories?$filter=Name eq '{categoryName}'";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
                 var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreCategoryDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreCategoryDto dto ? SmartstoreCategoryMapper.ToDto(dto) : null;
+                return data?.Value?.FirstOrDefault() is SmartstoreCategoryDto dto
+                    ? SmartstoreCategoryMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "CategoryExistsAsync");
                 return null;
             }
         }
         #endregion
 
         #region Media File
-        public async Task<int?> UpsertMediaFile(SmartstoreFileDto smartstoreFile)
+        public async Task<int?> CreateMediaFileAsync(SmartstoreFileDto smartstoreFile)
         {
             MultipartFormDataContent multipartContent = new MultipartFormDataContent();
 
@@ -464,7 +457,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         #region Product Atribute
         public async Task<ProductAttributeDto?> ProductAttributeExistsAsync(string name)
         {
-
             try
             {
                 var url = $"productattributes?$filter=Name eq '{name}'";
@@ -472,12 +464,15 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductAttributeDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductAttributeDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreProductAttributeDto dto ? SmartstoreProductAttributeMapper.ToDto(dto) : null;
+                return data?.Value?.FirstOrDefault() is SmartstoreProductAttributeDto dto
+                    ? SmartstoreProductAttributeMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "");
                 return null;
             }
         }
@@ -488,20 +483,21 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("productattributes", content);
-            var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
             var created = await response.Content.ReadFromJsonAsync<SmartstoreProductAttributeDto>();
-            return created == null ? 0 : created.Id;
+            return created?.Id ?? 0;
         }
         public async Task DeleteProductAttributeAsync(int productAttributeId)
         {
             var response = await _httpClient.DeleteAsync($"productattributes({productAttributeId})");
             response.EnsureSuccessStatusCode();
         }
+        #endregion
+
+        #region Product Variant Attribute
         public async Task<List<ProductVariantAttributeDto>?> ProductVariantAttributeExistsAsync(int productId)
         {
-
             try
             {
                 var url = $"productvariantattributes?$expand=ProductVariantAttributeValues,ProductAttribute&$filter=ProductId eq {productId}";
@@ -509,53 +505,69 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeDto>>(json, _jsonOptions);
 
-                return SmartstoreProductVariantAttributeMapper.ToDtoList(data.Value).ToList();
+                return data?.Value != null ? SmartstoreProductVariantAttributeMapper.ToDtoList(data.Value).ToList() : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "");
                 return null;
             }
         }
-        public async Task<ProductAttributeDto?> ProductVariantAttributeExistsAsync(int productId, int productAttributeId)
+        public async Task<ProductVariantAttributeDto?> ProductVariantAttributeExistsAsync(int productId, int productAttributeId)
         {
-
             try
             {
-                var url = $"productvariantattributes?$filter=ProductId eq {productId} and ProductAttributeId eq {productAttributeId}";
+                var url = $"productvariantattributes?$expand=ProductAttribute&$filter=ProductId eq {productId} and ProductAttributeId eq {productAttributeId}";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductAttributeDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreProductAttributeDto dto ? SmartstoreProductAttributeMapper.ToDto(dto) : null;
+                return data?.Value?.FirstOrDefault() is SmartstoreProductVariantAttributeDto dto
+                    ? SmartstoreProductVariantAttributeMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "");
                 return null;
             }
         }
         public async Task<ProductVariantAttributeValueDto?> ProductVariantAttributeValueExistsAsync(int productVariantAttributeId, string name)
         {
-
             try
             {
-                var url = $"productvariantattributevalues?$filter= ProductVariantAttributeId eq {productVariantAttributeId} and Name eq '{name}'";
+                var url = $"productvariantattributevalues?$filter=ProductVariantAttributeId eq {productVariantAttributeId} and Name eq '{name}'";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeValueDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeValueDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreProductVariantAttributeValueDto dto ? SmartstoreProductVariantAttributeValueMapper.ToDto(dto) : null;
-
+                return data?.Value?.FirstOrDefault() is SmartstoreProductVariantAttributeValueDto dto
+                    ? SmartstoreProductVariantAttributeValueMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "");
                 return null;
             }
+        }
+        public async Task<int> CreateProductVariantAttributeAsync(ProductVariantAttributeDto productVariantAttribute)
+        {
+            var payload = SmartstoreProductVariantAttributeMapper.ToDto(productVariantAttribute);
+            var json = JsonSerializer.Serialize(payload, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("productvariantattributes", content);
+            response.EnsureSuccessStatusCode();
+
+            var created = await response.Content.ReadFromJsonAsync<SmartstoreProductVariantAttributeDto>();
+            return created?.Id ?? 0;
         }
         public async Task<int> CreateProductVariantAttributeValueAsync(ProductVariantAttributeValueDto productVariantAttributeValue)
         {
@@ -564,44 +576,46 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("productvariantattributevalues", content);
-            var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
             var created = await response.Content.ReadFromJsonAsync<SmartstoreProductVariantAttributeValueDto>();
-            return created == null ? 0 : created.Id;
+            return created?.Id ?? 0;
         }
+        #endregion
+
+        #region Product Variant Attribute Combination
         public async Task<ProductVariantAttributeCombinationDto?> GetProductVariantAttributeCombination(int productId, int hashCode)
         {
             try
             {
-
                 var url = $"productvariantattributecombinations?$filter=ProductId eq {productId} and HashCode eq {hashCode}";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeCombinationDto>>(json, _jsonOptions);
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductVariantAttributeCombinationDto>>(json, _jsonOptions);
 
-                return data?.Value?.FirstOrDefault() is SmartstoreProductVariantAttributeCombinationDto dto ? SmartstoreProductVariantAttributeCombinationMapper.ToDto(dto) : null;
+                return data?.Value?.FirstOrDefault() is SmartstoreProductVariantAttributeCombinationDto dto
+                    ? SmartstoreProductVariantAttributeCombinationMapper.ToDto(dto)
+                    : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "");
                 return null;
             }
         }
         public async Task<int?> CreateProductVariantAttributeCombination(ProductVariantAttributeCombinationDto productVariantAttributeCombination)
         {
-
             var payload = SmartstoreProductVariantAttributeCombinationMapper.ToDto(productVariantAttributeCombination);
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("productvariantattributecombinations", content);
-            var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
             var created = await response.Content.ReadFromJsonAsync<SmartstoreProductVariantAttributeCombinationDto>();
-            return created == null ? 0 : created.Id;
+            return created?.Id ?? 0;
         }
         public async Task<int?> UpdateProductVariantAttributeCombination(ProductVariantAttributeCombinationDto productVariantAttributeCombination)
         {
@@ -609,12 +623,11 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PatchAsync("productvariantattributecombinations", content);
-            var result = await response.Content.ReadAsStringAsync();
+            var response = await _httpClient.PatchAsync($"productvariantattributecombinations({productVariantAttributeCombination.Id})", content);
             response.EnsureSuccessStatusCode();
 
-            var created = await response.Content.ReadFromJsonAsync<SmartstoreProductVariantAttributeCombinationDto>();
-            return created == null ? 0 : created.Id;
+            var updated = await response.Content.ReadFromJsonAsync<SmartstoreProductVariantAttributeCombinationDto>();
+            return updated?.Id ?? 0;
         }
         #endregion
 

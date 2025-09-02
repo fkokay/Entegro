@@ -150,7 +150,7 @@ namespace Entegro.Web.Controllers
                 updateDto.Published = model.Published;
                 updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
                 {
-                    AttributeXml = JsonConvert.SerializeObject(m.Attributes),
+                    RawAttribute = JsonConvert.SerializeObject(m.Attributes),
                     Gtin = m.Gtin,
                     Id = m.Id,
                     ManufacturerPartNumber = m.ManufacturerPartNumber,
@@ -655,7 +655,7 @@ namespace Entegro.Web.Controllers
                 }).ToList();
                 model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductViewModel.ProductVariantAttributeCombinationViewModel()
                 {
-                    Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeViewModel>>(m.AttributeXml) ?? new List<ProductVariantAttributeViewModel>(),
+                    Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeViewModel>>(m.RawAttribute) ?? new List<ProductVariantAttributeViewModel>(),
                     Gtin = m.Gtin,
                     Id = m.Id,
                     ManufacturerPartNumber = m.ManufacturerPartNumber,

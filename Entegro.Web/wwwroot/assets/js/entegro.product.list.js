@@ -354,7 +354,10 @@ Entegro.product.list = (function ($) {
                         ]
                     }]
                 },
-                bottomStart: { features: ["info"] },
+                bottomStart: {
+                    rowClass: "row mx-3 justify-content-between",
+                    features: ["info"]
+                },
                 bottomEnd: "paging"
             },
             initComplete: function () {

@@ -23,11 +23,12 @@ namespace Entegro.Application.DTOs.Order
                 return OrderSource switch
                 {
                     OrderSource.Smartstore => "Smartstore",
-                    OrderSource.Trendyol => "Trendyol"
+                    OrderSource.Trendyol => "Trendyol",
+                    _ => throw new NotImplementedException()
                 };
             }
         }
-        public string OrderNo { get; set; }
+        public string OrderNo { get; set; } = "";
         public int CustomerId { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }

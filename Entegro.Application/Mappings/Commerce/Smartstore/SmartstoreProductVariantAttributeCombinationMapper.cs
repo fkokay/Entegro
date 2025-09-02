@@ -30,7 +30,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 ProductVariantAttributeCombinationDto productVariantAttributeCombination = new ProductVariantAttributeCombinationDto();
                 productVariantAttributeCombination.ManufacturerPartNumber = smartstoreProductVariantAttributeCombination.ManufacturerPartNumber;
                 productVariantAttributeCombination.ProductId = smartstoreProductVariantAttributeCombination.ProductId;
-                productVariantAttributeCombination.AttributeXml = smartstoreProductVariantAttributeCombination.RawAttributes;
+                productVariantAttributeCombination.RawAttribute = smartstoreProductVariantAttributeCombination.RawAttributes;
                 productVariantAttributeCombination.Price = smartstoreProductVariantAttributeCombination.Price ?? 0;
                 productVariantAttributeCombination.StokCode = smartstoreProductVariantAttributeCombination.Sku;
                 productVariantAttributeCombination.Gtin = smartstoreProductVariantAttributeCombination.Gtin;
@@ -62,7 +62,6 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProductVariantAttributeCombination.HashCode = productVariantAttributeCombination.HashCode;
                 smartstoreProductVariantAttributeCombination.AllowOutOfStockOrders = false;
                 smartstoreProductVariantAttributeCombination.StockQuantity = productVariantAttributeCombination.StockQuantity;
-                smartstoreProductVariantAttributeCombination.RawAttributes = "";
                 smartstoreProductVariantAttributeCombination.QuantityUnitId = null;
                 smartstoreProductVariantAttributeCombination.DeliveryTimeId = null;
                 smartstoreProductVariantAttributeCombination.IsActive = true;
@@ -73,7 +72,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProductVariantAttributeCombination.Weight = 0;
                 smartstoreProductVariantAttributeCombination.Price = productVariantAttributeCombination.Price;
                 smartstoreProductVariantAttributeCombination.Gtin = productVariantAttributeCombination.Gtin;
-                smartstoreProductVariantAttributeCombination.RawAttributes = productVariantAttributeCombination.AttributeXml;
+                smartstoreProductVariantAttributeCombination.RawAttributes = productVariantAttributeCombination.RawAttribute;
 
 
                 return smartstoreProductVariantAttributeCombination;

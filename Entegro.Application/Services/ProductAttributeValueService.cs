@@ -80,5 +80,17 @@ namespace Entegro.Application.Services
             await _productAttributeValueRepository.UpdateAsync(_mapper.Map<ProductAttributeValue>(productAttributeValue));
             return _mapper.Map<ProductAttributeValueDto>(productAttributeValue);
         }
+
+        public async Task<ProductAttributeValueDto?> GetByNameOrAttributeIdAsync(string name, int attributeId)
+        {
+            var productAttributeValue = await _productAttributeValueRepository.GetByNameOrAttributeIdAsync(name,attributeId);
+            if (productAttributeValue == null)
+            {
+                return null;
+            }
+
+            var productAttributeValueDto = _mapper.Map<ProductAttributeValueDto>(productAttributeValue);
+            return productAttributeValueDto;
+        }
     }
 }

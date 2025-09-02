@@ -23,7 +23,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<List<CityDto>>(cities);
         }
 
-        public async Task<CityDto> GetByIdAsync(int id)
+        public async Task<CityDto?> GetByIdAsync(int id)
         {
             var city = await _cityRepository.GetByIdAsync(id);
             return _mapper.Map<CityDto>(city);
