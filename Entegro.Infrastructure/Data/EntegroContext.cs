@@ -52,5 +52,6 @@ namespace Entegro.Infrastructure.Data
         public DbSet<MediaFile> MediaFiles { get; set; }
         public DbSet<SpecificationAttribute> SpecificationAttributes { get; set; }
         public DbSet<SpecificationAttributeOption> SpecificationAttributeOptions { get; set; }
+        public DbSet<Address> Addresses { get; set; }
     }
 }

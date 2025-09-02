@@ -62,7 +62,7 @@ namespace Entegro.Service.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             //await ProductSync();
-            //await OrderSync();
+            await OrderSync();
             await ProductWriter();
         }
 
@@ -121,6 +121,11 @@ namespace Entegro.Service.Jobs
                 }
 
                 order.OrderSource = OrderSource.Smartstore;
+                foreach (var item in order.OrderItems)
+                {
+                    item.Product = await _productService.GetProductByCodeAsync(item.Product.Code);
+                    item.ProductId = item.Product.Id;
+                }
 
                 try
                 {
