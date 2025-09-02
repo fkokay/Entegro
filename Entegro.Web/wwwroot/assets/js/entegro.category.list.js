@@ -31,6 +31,15 @@ Entegro.Category.List = (function () {
                 },
                 { data: 'Id', visible: false },
                 { data: 'Name' },
+                {
+                    data: 'ParentCategory.Name',
+                    render: function (data, type, row) {
+                        if (!data) {
+                            return  ' - ';
+                        }
+                        return data;
+                    }
+                },
                 { data: 'DisplayOrder' },
                 {
                     data: 'CreatedOn',

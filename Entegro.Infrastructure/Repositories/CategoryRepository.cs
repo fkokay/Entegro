@@ -53,7 +53,7 @@ namespace Entegro.Infrastructure.Repositories
         // Sayfalı kategori listeleme
         public async Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Categories.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().AsQueryable();
+            var query = _context.Categories.Include(c => c.ParentCategory).Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var categories = await query.Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();

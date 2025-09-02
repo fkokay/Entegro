@@ -22,6 +22,8 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
+using Entegro.Application.DTOs.SpecificationAttribute;
+using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.DTOs.Town;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
@@ -295,8 +297,24 @@ namespace Entegro.Application.Mappings
             CreateMap<ProductVariantAttributeValue, ProductVariantAttributeValueDto>().ReverseMap();
             CreateMap<PagedResult<Product>, PagedResult<ProductVariantAttributeValueDto>>().ReverseMap();
             CreateMap<PagedResult<ProductVariantAttributeValueDto>, PagedResult<Product>>().ReverseMap();
-            
 
+            #region SpecificationAttribute
+            CreateMap<SpecificationAttribute, SpecificationAttributeDto>().ReverseMap();
+            CreateMap<SpecificationAttribute, CreateSpecificationAttributeDto>().ReverseMap();
+            CreateMap<SpecificationAttribute, UpdateSpecificationAttributeDto>().ReverseMap();
+
+            CreateMap<PagedResult<SpecificationAttribute>, PagedResult<SpecificationAttributeDto>>().ReverseMap();
+
+            #endregion
+
+            #region SpecificationAttributeOption
+            CreateMap<SpecificationAttributeOption, SpecificationAttributeOptionDto>().ReverseMap();
+            CreateMap<SpecificationAttributeOption, CreateSpecificationAttributeOptionDto>().ReverseMap();
+            CreateMap<SpecificationAttributeOption, UpdateSpecificationAttributeOptionDto>().ReverseMap();
+
+            CreateMap<PagedResult<SpecificationAttributeOption>, PagedResult<SpecificationAttributeOptionDto>>().ReverseMap();
+
+            #endregion
         }
     }
 }
