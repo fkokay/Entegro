@@ -1,9 +1,12 @@
-﻿namespace Entegro.Application.DTOs.Category
+﻿using Entegro.Application.DTOs.MediaFile;
+
+namespace Entegro.Application.DTOs.Category
 {
     public class UpdateCategoryDto
     {
         public int Id { get; set; }
         public int? ParentCategoryId { get; set; }
+        public CreateCategoryDto? ParentCategory { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public int? MediaFileId { get; set; }
@@ -11,5 +14,9 @@
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
+        public bool Published { get; set; }
+
+        public List<CategoryDto> SubCategories { get; set; } = new List<CategoryDto>();
+        public virtual MediaFileDto? MediaFile { get; set; }
     }
 }
