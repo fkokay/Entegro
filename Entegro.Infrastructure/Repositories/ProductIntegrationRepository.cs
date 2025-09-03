@@ -67,9 +67,14 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductIntegration?> GetByIdAsync(int id)
         {
-            return await _context.ProductIntegrations
-                .Include(c => c.Product).AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.ProductIntegrations.AsNoTracking()
+                .Include(m => m.IntegrationSystem).ThenInclude(m => m.IntegrationSystemParameters)
+                .Include(m => m.Product).ThenInclude(m => m.Brand)
+                .Include(m => m.Product.ProductCategories).ThenInclude(m => m.Category).ThenInclude(m => m.ParentCategory)
+                .Include(m => m.Product.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+                .Include(m => m.Product.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute)
+                .Include(m => m.Product.ProductVariantAttributes).ThenInclude(m => m.ProductVariantAttributeValues)
+                .Include(m => m.Product.ProductVariantAttributeCombinations).FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<ProductIntegration?> GetByIntegrationCodeAsync(string integrationCode)

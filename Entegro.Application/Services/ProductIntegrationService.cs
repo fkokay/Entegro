@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductIntegration;
+using Entegro.Application.Events;
+using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using System.ComponentModel.Design;
 
 namespace Entegro.Application.Services
 {
@@ -11,15 +14,24 @@ namespace Entegro.Application.Services
     {
         private readonly IProductIntegrationRepository _productIntegrationRepository;
         private readonly IMapper _mapper;
-        public ProductIntegrationService(IProductIntegrationRepository productIntegrationRepository, IMapper mapper)
+        private readonly IEventPublisher _eventPublisher;
+        public ProductIntegrationService(
+            IProductIntegrationRepository productIntegrationRepository,
+            IMapper mapper,
+            IEventPublisher eventPublisher)
         {
             _productIntegrationRepository = productIntegrationRepository ?? throw new ArgumentNullException(nameof(productIntegrationRepository)); ;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
         }
         public async Task<ProductIntegrationDto> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration)
         {
             var productIntegration = _mapper.Map<ProductIntegration>(createProductIntegration);
             await _productIntegrationRepository.AddAsync(productIntegration);
+
+
+            var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
+            _eventPublisher.Publish(recordUpdatedEvent);
             return _mapper.Map<ProductIntegrationDto>(productIntegration);
         }
 
@@ -94,6 +106,10 @@ namespace Entegro.Application.Services
         public async Task<ProductIntegrationDto> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration)
         {
             await _productIntegrationRepository.UpdateAsync(_mapper.Map<ProductIntegration>(updateProductIntegration));
+
+            var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(updateProductIntegration.Id);
+            _eventPublisher.Publish(recordUpdatedEvent);
+
             return _mapper.Map<ProductIntegrationDto>(updateProductIntegration);
         }
     }

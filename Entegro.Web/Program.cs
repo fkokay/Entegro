@@ -1,10 +1,14 @@
+using Entegro.Application.Events;
+using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
+using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Infrastructure.Data;
+using Entegro.Infrastructure.EventBus;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
@@ -130,6 +134,13 @@ builder.Services.AddScoped<ISpecificationAttributeService, SpecificationAttribut
 
 
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
+
+
+builder.Services.AddScoped<IEventPublisher, EventBus>();
+builder.Services.AddScoped<SmartstoreClient>();
+builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
+builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, SmartstoreProductWriter>();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
