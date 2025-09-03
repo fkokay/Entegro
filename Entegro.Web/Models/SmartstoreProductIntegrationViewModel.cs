@@ -8,6 +8,8 @@
         public string? ProductCode { get; set; }
         public string? ProductMainPicture { get; set; }
         public int IntegrationSystemId { get; set; }
+        public string IntegrationSystemName { get; set; }
+        public string CommerceType { get; set; }
         public string IntegrationCode { get; set; }
         public decimal Price { get; set; }
         public DateTime? LastSyncDate { get; set; }

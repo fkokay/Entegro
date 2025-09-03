@@ -12,6 +12,17 @@
             <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
         </div>
     </div>
+    <div class="col-12 col-md-12">
+        <hr />
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
+        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly" })
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="CommerceType">E-Ticaret</label>
+        @Html.TextBoxFor(m => m.CommerceType, new { @class = "form-control", @readonly = "readonly" })
+    </div>
 </div>
 
 <form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationSmartstore" asp-controller="Product" class="row g-3 mt-3">

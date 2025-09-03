@@ -12,6 +12,23 @@
             <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
         </div>
     </div>
+    <div class="col-12 col-md-12">
+        <hr />
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
+        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly" })
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="CommerceType">Pazaryeri</label>
+        <label class="form-label" for="CommerceType">E-Ticaret</label>
+        <div class="d-flex justify-content-between align-items-center">
+            @Html.TextBoxFor(m => m.MarketplaceType, new { @class = "form-control", @readonly = "readonly" })
+            <a href="@Model.MarketplaceLink" target="_blank" class="fw-medium btn btn-icon btn-label-primary ms-4 waves-effect">
+                <i class="icon-base ti ti-link icon-md"></i>
+            </a>
+        </div>
+    </div>
 </div>
 
 <form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationTrendyol" asp-controller="Product" class="row g-3 mt-3">
