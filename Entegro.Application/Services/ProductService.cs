@@ -14,15 +14,11 @@ namespace Entegro.Application.Services
         private readonly IProductRepository _productRepository;
         private readonly IBrandService _brandService;
         private readonly ICategoryService _categoryService;
-        private readonly IProductAttributeService _productAttributeService;
-        private readonly IProductAttributeValueService _productAttributeValueService;
-        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IMapper _mapper;
         public ProductService(
             IProductRepository productRepository,
             IBrandService brandService,
             ICategoryService categoryService,
-            IProductAttributeService productAttributeService,
             IMapper mapper)
         {
             _productRepository = productRepository;
