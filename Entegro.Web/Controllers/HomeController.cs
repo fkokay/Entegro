@@ -1,6 +1,7 @@
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System.Diagnostics;
 
 namespace Entegro.Web.Controllers
@@ -17,6 +18,8 @@ namespace Entegro.Web.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogError("Home page visited at {Time}", DateTime.UtcNow);
+            Log.Error("Home page visited at {Time}", DateTime.UtcNow);
             return View();
         }
 
