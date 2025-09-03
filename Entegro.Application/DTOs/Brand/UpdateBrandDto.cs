@@ -12,6 +12,7 @@ namespace Entegro.Application.DTOs.Brand
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
+        public bool Published { get; set; }
 
         public MediaFileDto? MediaFile { get; set; }
     }

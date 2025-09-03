@@ -36,6 +36,7 @@ Entegro.brand.list = (function ($) {
                         return moment(data).format("DD.MM.yyyy HH:mm");
                     }
                 },
+                { data: 'Published' },
                 { data: 'Id' }
             ],
             columnDefs: [
@@ -63,6 +64,18 @@ Entegro.brand.list = (function ($) {
                                     <div class="d-flex flex-column">
                                         <h6 class="text-nowrap mb-0">${row.Name}</h6>
                                     </div>
+                                </div>`;
+                    }
+                },
+                {
+                    targets: -2,
+                    className: "text-center",
+                    render: data => {
+                        const checked = data ? "checked" : "";
+                        const titleText = data ? "Yayında" : "Yayında Değil";
+                        return `
+                                <div class="form-check d-inline-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
                                 </div>`;
                     }
                 },
