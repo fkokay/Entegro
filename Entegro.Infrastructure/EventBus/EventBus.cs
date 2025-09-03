@@ -26,8 +26,10 @@ namespace Entegro.Infrastructure.EventBus
                     var serviceProvider = scope.ServiceProvider;
                     var handlers = serviceProvider.GetServices<IEventHandler<TEvent>>();
 
-                    var handlerTasks = handlers.Select(h => h.HandleAsync(@event)).ToList();
-                    await Task.WhenAll(handlerTasks);
+                    foreach (var handler in handlers)
+                    {
+                        await handler.HandleAsync(@event);
+                    }
                 }
             });
         }

@@ -1,10 +1,17 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.CategoryAttribute;
+using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
+using Entegro.Application.Events;
+using Entegro.Application.Interfaces;
+using Entegro.Application.Interfaces.Repositories;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Entegro.Application.Services.Commerce.Smartstore;
+using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -16,13 +23,14 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Services.Marketplace
 {
-    public class TrendyolService : ITrendyolService
+    public class TrendyolService : ITrendyolService, IEventHandler<ProductIntegrationRecordUpdatedEvent>
     {
-        private readonly HttpClient _httpClient;
         private readonly string sellerId = "474352";
-        private readonly ILogger<TrendyolService> _logger;
 
-        public TrendyolService(HttpClient httpClient, ILogger<TrendyolService> logger)
+        private readonly HttpClient _httpClient;
+        private readonly IProductIntegrationService _productIntegrationService;
+        private readonly ILogger<TrendyolService> _logger;
+        public TrendyolService(HttpClient httpClient, IProductIntegrationService productIntegrationService, ILogger<TrendyolService> logger)
         {
 
 
@@ -38,8 +46,48 @@ namespace Entegro.Application.Services.Marketplace
             var password = "09WZjNvN6ZJU4Tg2z53r";
             var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            _productIntegrationService = productIntegrationService;
             _logger = logger;
         }
+        public async Task HandleAsync(ProductIntegrationRecordUpdatedEvent recordUpdatedEvent)
+        {
+            var productIntegration = await _productIntegrationService.GetByIdAsync(recordUpdatedEvent.ProductIntegrationId);
+            if (productIntegration == null)
+            {
+                return;
+            }
+
+            if (productIntegration.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Marketplace)
+            {
+                string marketplaceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
+
+                if (marketplaceType == "Trendyol")
+                {
+                    object customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonSerializer.Deserialize<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
+
+                    productIntegration.Product.Code = productIntegration.IntegrationCode;
+                    productIntegration.Product.Price = productIntegration.Price;
+
+                    var request = new TrendyolPriceAndStockUpdateRequest
+                    {
+                        Items = new List<TrendyolPriceAndStockUpdateDto>
+                        {
+                            new TrendyolPriceAndStockUpdateDto
+                            {
+                                Barcode = productIntegration.IntegrationCode,
+                                ListPrice = productIntegration.Price,
+                                SalePrice = productIntegration.Price,
+                                Quantity = productIntegration.Product.StockQuantity
+                            }
+                        }
+                    };
+
+                    await UpdatePriceAndStockAsync(request);
+                }
+            }
+        }
+
+
 
         public async Task<IEnumerable<BrandDto>> GetBrandsAsync()
         {
@@ -234,6 +282,26 @@ namespace Entegro.Application.Services.Marketplace
             return allProducts;
         }
 
+        public async Task<TrendyolProductDto?> GetProductWithBarcodeAsync(string barcode)
+        {
+            var url = $"product/sellers/{sellerId}/products?barcode={barcode}";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<TrendyolResponse<TrendyolProductDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.content.FirstOrDefault();
+        }
+
         public async Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50)
         {
             var allShipmentPackages = new List<TrendyolShipmentPackageDto>();
@@ -268,6 +336,24 @@ namespace Entegro.Application.Services.Marketplace
             }
 
             return allShipmentPackages;
+        }
+
+        public async Task UpdatePriceAndStockAsync(TrendyolPriceAndStockUpdateRequest request)
+        {
+            var url = $"inventory/sellers/{sellerId}/products/price-and-inventory";
+            var json = JsonSerializer.Serialize(request, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+
+            var result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+
+
         }
     }
 }

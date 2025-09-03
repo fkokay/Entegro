@@ -3,10 +3,12 @@ using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
+using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Application.Services.Commerce.Smartstore;
+using Entegro.Application.Services.Marketplace;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.EventBus;
 using Entegro.Infrastructure.Repositories;
@@ -140,6 +142,9 @@ builder.Services.AddScoped<IEventPublisher, EventBus>();
 builder.Services.AddScoped<SmartstoreClient>();
 builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
 builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, SmartstoreProductWriter>();
+
+builder.Services.AddScoped<ITrendyolService, TrendyolService>();
+builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, TrendyolService>();
 
 builder.Services.AddHttpClient();
 

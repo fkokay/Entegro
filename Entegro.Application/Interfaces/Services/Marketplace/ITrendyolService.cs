@@ -11,6 +11,8 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
     public interface ITrendyolService : IMarketplaceCategoryReader,IMarketplaceBrandReader,IMarketplaceCategoryAttributeReader,IMarketplaceCargoCompanyReader
     {
         Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(int pageSize = 50);
+        Task<TrendyolProductDto?> GetProductWithBarcodeAsync(string barcode);
         Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50);
+        Task UpdatePriceAndStockAsync(TrendyolPriceAndStockUpdateRequest request);
     }
 }

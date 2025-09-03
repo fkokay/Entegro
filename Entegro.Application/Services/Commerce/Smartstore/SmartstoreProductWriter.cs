@@ -5,6 +5,7 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
+using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -30,28 +31,32 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
         public async Task HandleAsync(ProductIntegrationRecordUpdatedEvent recordUpdatedEvent)
         {
-            var productIntegrations = await _productIntegrationService.GetByIdAsync(recordUpdatedEvent.ProductIntegrationId);
-
-            object customData = null;
-            if (productIntegrations.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Commerce)
+            var productIntegration = await _productIntegrationService.GetByIdAsync(recordUpdatedEvent.ProductIntegrationId);
+            if (productIntegration == null)
             {
-                string commerceType = productIntegrations.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
-                if (commerceType == "Smartstore")
-                {
-                    customData = string.IsNullOrEmpty(productIntegrations.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(productIntegrations.Custom);
-                }
+                return;
             }
 
-            productIntegrations.Product.Code = productIntegrations.IntegrationCode;
-            productIntegrations.Product.Price = productIntegrations.Price;
-
-            var request = new UpsertProductRequest
+            if (productIntegration.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Commerce)
             {
-                Product = productIntegrations.Product,
-                CustomData = customData
-            };
+                string commerceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
+               
+                if (commerceType == "Smartstore")
+                {
+                    object customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
 
-            await _smartstoreClient.UpsertProductAsync(request);
+                    productIntegration.Product.Code = productIntegration.IntegrationCode;
+                    productIntegration.Product.Price = productIntegration.Price;
+
+                    var request = new UpsertProductRequest
+                    {
+                        Product = productIntegration.Product,
+                        CustomData = customData
+                    };
+
+                    await _smartstoreClient.UpsertProductAsync(request);
+                }
+            }
         }
 
         public async Task DeleteProductAsync(string sku)
