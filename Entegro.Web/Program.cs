@@ -157,11 +157,15 @@ builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 
 builder.Services.AddScoped<IEventPublisher, EventBus>();
 builder.Services.AddScoped<SmartstoreClient>();
+""
 builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
 builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, SmartstoreProductWriter>();
 
 builder.Services.AddScoped<ITrendyolService, TrendyolService>();
 builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, TrendyolService>();
+
+builder.Services.AddScoped<IN11Service, N11Service>();
+builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, N11Service>();
 
 builder.Services.AddHttpClient();
 
