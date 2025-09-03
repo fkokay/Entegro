@@ -10,7 +10,9 @@ namespace Entegro.Application.DTOs.ProductIntegration
         public int IntegrationSystemId { get; set; }
         public string IntegrationCode { get; set; }
         public decimal Price { get; set; }
+        public string Custom { get; set; }
         public DateTime? LastSyncDate { get; set; }
+        public bool IsSync { get; set; }
         public bool Active { get; set; }
         public ProductDto Product { get; set; }
         public IntegrationSystemDto IntegrationSystem { get; set; }

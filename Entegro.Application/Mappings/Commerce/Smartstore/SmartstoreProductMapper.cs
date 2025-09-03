@@ -61,7 +61,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 return null;
             }
         }
-        public static SmartstoreProductDto? ToDto(ProductDto product)
+        public static SmartstoreProductDto? ToDto(ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
         {
             try
             {
@@ -73,6 +73,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 SmartstoreManufacturerMapper.ConfigureLogger(_logger);
 
                 SmartstoreProductDto smartstoreProduct = new SmartstoreProductDto();
+                smartstoreProduct.Id = product.Id;
                 smartstoreProduct.ProductTypeId = 5; // Varsayılan olarak basit ürün tipi
                 smartstoreProduct.ParentGroupedProductId = 0;
                 smartstoreProduct.Visibility = "Full";
@@ -126,7 +127,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.IsTaxExempt = false;
                 smartstoreProduct.IsEsd = false;
                 smartstoreProduct.TaxCategoryId = 1;
-                smartstoreProduct.ManageInventoryMethodId = 0;
+                smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
                 smartstoreProduct.StockQuantity = 10000;
                 smartstoreProduct.DisplayStockAvailability = false;
                 smartstoreProduct.DisplayStockQuantity = false;
@@ -185,10 +186,9 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.MainPictureId = null;
                 smartstoreProduct.HasPreviewPicture = false;
                 smartstoreProduct.HasDiscountsApplied = false;
-                smartstoreProduct.Id = product.Id;
 
 
-               
+
 
                 if (product.Id > 0)
                 {

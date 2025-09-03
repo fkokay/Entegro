@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings.Commerce.Smartstore;
@@ -9,6 +11,7 @@ using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Polly;
 using Polly.Retry;
 using Quartz;
@@ -16,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Entegro.Service.Jobs
 {
@@ -72,11 +76,36 @@ namespace Entegro.Service.Jobs
             var productIntegrations = await _productIntegrationService.GetProductIntegrationAsync();
             foreach (var item in productIntegrations)
             {
+                var customData = getCustomData(item);
+
+                item.Product.Code = item.IntegrationCode;
                 item.Product.Price = item.Price;
-                await _commerceProductWriter.UpsertProductAsync(item.Product);
+
+                var request = new UpsertProductRequest
+                {
+                    Product = item.Product,
+                    CustomData = customData
+                };
+                await _commerceProductWriter.UpsertProductAsync(request);
             }
 
             _logger.LogInformation("Smartstore ürün yazma işlemi tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+        }
+
+        private SmartstoreProductIntegrationCustomDto? getCustomData(ProductIntegrationDto item)
+        {
+            if (item.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Commerce)
+            {
+                string commerceType = item.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
+                if (commerceType == "Smartstore")
+                {
+                    var data = string.IsNullOrEmpty(item.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(item.Custom);
+
+                    return data;
+                }
+            }
+
+            return null;
         }
 
         private async Task OrderSync()

@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Product;
+﻿using Entegro.Application.DTOs.Commerce;
+using Entegro.Application.DTOs.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,12 @@ namespace Entegro.Application.Interfaces.Services.Commerce
 {
     public interface ICommerceProductWriter
     {
-        Task UpsertProductAsync(ProductDto product);
+        Task UpsertProductAsync(UpsertProductRequest request);
 
         /// <summary>
         /// Birden fazla ürünü toplu olarak ekler veya günceller.
         /// </summary>
-        Task UpsertProductsAsync(IEnumerable<ProductDto> products);
+        Task UpsertProductsAsync(IEnumerable<UpsertProductRequest> requests);
 
         /// <summary>
         /// Belirtilen SKU'ya sahip ürünü siler.

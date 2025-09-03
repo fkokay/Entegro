@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Product;
+﻿using Entegro.Application.DTOs.Commerce;
+using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Microsoft.Extensions.Logging;
 using System;
@@ -29,14 +30,14 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             await _smartstoreClient.DeleteProductsAsync(skus);
         }
 
-        public async Task UpsertProductAsync(ProductDto product)
+        public async Task UpsertProductAsync(UpsertProductRequest request)
         {
-            await _smartstoreClient.UpsertProductAsync(product);
+            await _smartstoreClient.UpsertProductAsync(request);
         }
 
-        public async Task UpsertProductsAsync(IEnumerable<ProductDto> products)
+        public async Task UpsertProductsAsync(IEnumerable<UpsertProductRequest> requests)
         {
-            await _smartstoreClient.UpsertProductsAsync(products);
+            await _smartstoreClient.UpsertProductsAsync(requests);
         }
     }
 }

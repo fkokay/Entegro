@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
@@ -77,41 +78,53 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             }
         }
 
-        public async Task UpsertProductAsync(ProductDto product)
+        public async Task UpsertProductAsync(UpsertProductRequest request)
         {
             // 1. Ürün var mı kontrolü
-            var existingProduct = await GetProductBySkuAsync(product.Code);
+            var existingProduct = await GetProductBySkuAsync(request.Product.Code);
             int productId;
             if (existingProduct != null)
             {
-                product.Id = existingProduct.Id;
+                request.Product.Id = existingProduct.Id;
                 productId = existingProduct.Id;
-                await UpdateProductAsync(product, existingProduct.Id);
+                await UpdateProductAsync(request.Product, request.CustomData as SmartstoreProductIntegrationCustomDto);
             }
             else
             {
-                product.Id = 0;
-                productId = await CreateProductAsync(product) ?? 0;
+                request.Product.Id = 0;
+                productId = await CreateProductAsync(request.Product,request.CustomData as SmartstoreProductIntegrationCustomDto) ?? 0;
             }
 
             // 2. Kategoriler
-            await HandleCategoriesAsync(productId,product);
+            await HandleCategoriesAsync(productId, request.Product);
 
             // 3. Marka
-            await HandleBrandAsync(productId,product);
+            await HandleBrandAsync(productId, request.Product);
 
             // 4. Resimler
-            await HandleMediaFilesAsync(productId, product);
+            await HandleMediaFilesAsync(productId, request.Product);
 
             // 5. Özellikler (Attributes)
-            await HandleAttributesAsync(productId, product);
+            await HandleAttributesAsync(productId, request.Product);
 
             // 6. Variant Combinations
-            await HandleVariantCombinationsAsync(productId, product);
+            await HandleVariantCombinationsAsync(productId, request.Product);
         }
-        public async Task<int?> CreateProductAsync(ProductDto product)
+        public async Task UpsertProductsAsync(IEnumerable<UpsertProductRequest> requests)
         {
-            var payload = SmartstoreProductMapper.ToDto(product);
+            foreach (var request in requests)
+            {
+                if (request == null)
+                {
+                    throw new ArgumentNullException(nameof(request), "Request cannot be null.");
+                }
+
+                await UpsertProductAsync(request);
+            }
+        }
+        public async Task<int?> CreateProductAsync(ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
+        {
+            var payload = SmartstoreProductMapper.ToDto(product, customData);
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -121,30 +134,17 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var created = await response.Content.ReadFromJsonAsync<SmartstoreProductDto>();
             return created?.Id ?? 0;
         }
-        public async Task UpdateProductAsync(ProductDto product, int id)
+        public async Task UpdateProductAsync(ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
         {
-            var payload = SmartstoreProductMapper.ToDto(product);
+            var payload = SmartstoreProductMapper.ToDto(product, customData);
             if (payload == null)
                 throw new Exception("SmartstoreProductMapper returned null");
 
-            payload.Id = id;
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync($"products({id})", content);
+            var response = await _httpClient.PutAsync($"products({product.Id})", content);
             response.EnsureSuccessStatusCode();
-        }
-        public async Task UpsertProductsAsync(IEnumerable<ProductDto> products)
-        {
-            foreach (var product in products)
-            {
-                if (product == null)
-                {
-                    throw new ArgumentNullException(nameof(product), "Product cannot be null.");
-                }
-
-                await UpsertProductAsync(product);
-            }
         }
         public async Task DeleteProductAsync(string sku)
         {
