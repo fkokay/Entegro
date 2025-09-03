@@ -10,7 +10,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<bool> ExistsByBarcodeAsync(string productBarcode);
         Task<ProductDto?> GetProductByIdAsync(int productId);
         Task<ProductDto?> GetProductByCodeAsync(string productCode);
-        Task<ProductDto?> GetByBarcodeAsync(string productBarcode);
+        Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode);
         Task<IEnumerable<ProductDto>> GetProductsAsync();
         Task<List<int>> GetAllProductIdAsync();
         Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);

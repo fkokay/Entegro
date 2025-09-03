@@ -127,7 +127,7 @@ namespace Entegro.Application.Services
             return allProducts.Select(x => x.Id).ToList();
         }
 
-        public async Task<ProductDto> GetProductByCodeAsync(string productCode)
+        public async Task<ProductDto?> GetProductByCodeAsync(string productCode)
         {
             var product = await _productRepository.GetByCodeAsync(productCode);
             if (product == null)
@@ -139,7 +139,7 @@ namespace Entegro.Application.Services
             return productDto;
         }
 
-        public async Task<ProductDto> GetProductByIdAsync(int productId)
+        public async Task<ProductDto?> GetProductByIdAsync(int productId)
         {
             var product = await _productRepository.GetByIdAsync(productId);
             if (product == null)
@@ -186,17 +186,17 @@ namespace Entegro.Application.Services
             return await _productRepository.ExistsByBarcodeAsync(productBarcode);
         }
 
-        public async Task<ProductDto?> GetByBarcodeAsync(string productBarcode)
-        {
-            var productDto = await _productRepository.GetByBarcodeAsync(productBarcode);
-            return _mapper.Map<ProductDto>(productDto);
-        }
-
         public async Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             var products = await _productRepository.GetAllAsync(pageNumber, pageSize);
             var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
             return productDtos;
+        }
+
+        public async Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode)
+        {
+            var productDto = await _productRepository.GetByBarcodeAsync(productBarcode);
+            return _mapper.Map<ProductDto>(productDto);
         }
     }
 }
