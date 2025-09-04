@@ -32,7 +32,7 @@ namespace Entegro.Web.Controllers
             };
             await _cityService.AddAsync(createDto);
 
-            return Json(new { success = true });
+            return RedirectToAction("List", "Countries");
         }
     }
 }
