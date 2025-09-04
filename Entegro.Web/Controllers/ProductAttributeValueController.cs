@@ -97,7 +97,6 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-
             try
             {
                 await _productAttributeValueService.DeleteAsync(id);
@@ -105,7 +104,7 @@ namespace Entegro.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Silinecek Varyant Değeri Bulunamadı" });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 

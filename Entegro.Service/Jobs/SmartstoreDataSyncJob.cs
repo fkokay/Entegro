@@ -96,7 +96,7 @@ namespace Entegro.Service.Jobs
         {
             if (item.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Commerce)
             {
-                string commerceType = item.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
+                string? commerceType = item.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
                 if (commerceType == "Smartstore")
                 {
                     var data = string.IsNullOrEmpty(item.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(item.Custom);
@@ -152,8 +152,18 @@ namespace Entegro.Service.Jobs
                 order.OrderSource = OrderSource.Smartstore;
                 foreach (var item in order.OrderItems)
                 {
-                    item.Product = await _productService.GetProductByCodeAsync(item.Product.Code);
-                    item.ProductId = item.Product.Id;
+                    if (item.Product != null)
+                    {
+                        var product = await _productService.GetProductByCodeAsync(item.Product.Code);
+
+                        if (product == null)
+                        {
+                            throw new Exception($"{item.Product.Code} kodlu ürün {order.OrderNo} ' +nolu siparişte bulunamadı");
+                        }
+
+                        item.Product = product;
+                        item.ProductId = product.Id;
+                    }
                 }
 
                 try
