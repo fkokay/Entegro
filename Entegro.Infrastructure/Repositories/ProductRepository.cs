@@ -237,6 +237,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByBarcodeAsync(string productBarcode)
         {
+
             return await _context.Products.AsNoTracking()
      .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
      .Include(m => m.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
@@ -253,9 +254,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            var query = _context.Products.AsNoTracking().AsQueryable();
-
-            var product = await query.Select(m => new Product()
+            var product = await _context.Products.Select(m => new Product()
             {
                 Id = m.Id,
                 Barcode = m.Barcode,
