@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.EmailAccount;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -95,6 +96,11 @@ namespace Entegro.Application.Services
             await _emailAccountRepository.UpdateAsync(existingEmailAccount);
 
             return _mapper.Map<EmailAccountDto>(existingEmailAccount);
+        }
+
+        Task<PagedResult<EmailAccountDto>> IEmailAccountService.GetPagedAsync(int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
         }
     }
 }
