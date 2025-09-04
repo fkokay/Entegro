@@ -7,6 +7,7 @@ using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Country;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.District;
+using Entegro.Application.DTOs.EmailAccount;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemLog;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
@@ -326,6 +327,15 @@ namespace Entegro.Application.Mappings
             CreateMap<Address, UpdateAddressDto>().ReverseMap();
 
             CreateMap<PagedResult<Address>, PagedResult<AddressDto>>().ReverseMap();
+            #endregion
+
+
+            #region EmailAccount
+            CreateMap<EmailAccount, EmailAccountDto>().ReverseMap();
+            CreateMap<EmailAccount, CreateEmailAccountDto>().ReverseMap();
+            CreateMap<EmailAccount, UpdateEmailAccountDto>().ReverseMap();
+
+            CreateMap<PagedResult<EmailAccount>, PagedResult<EmailAccountDto>>().ReverseMap();
             #endregion
 
         }

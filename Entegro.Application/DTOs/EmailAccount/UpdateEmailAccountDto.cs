@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entegro.Application.DTOs.EmailAccount
+﻿namespace Entegro.Application.DTOs.EmailAccount
 {
-    internal class UpdateEmailAccountDto
+    public class UpdateEmailAccountDto
     {
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string DisplayName { get; set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public bool EnableSsl { get; set; }
+        public int SecureOption { get; set; }
+        public bool UserDefaultCredentials { get; set; }
     }
 }
