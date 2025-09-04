@@ -14,7 +14,7 @@ namespace Entegro.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<City> GetByIdAsync(int id)
+        public async Task<City?> GetByIdAsync(int id)
         {
             return await _context.Cities
                 .Include(c => c.Towns)

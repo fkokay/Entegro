@@ -81,7 +81,8 @@ namespace Entegro.Infrastructure.Repositories
 
                 },
                 Order = o.Order
-            }).Skip(pageNumber * pageSize)
+            })  .OrderBy(o => o.Id)
+                .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 

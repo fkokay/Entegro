@@ -14,43 +14,23 @@ namespace Entegro.Infrastructure.Repositories
         {
             _context = context;
         }
-
-
-        //Yeni Kategori Eklerken TreePath değeri için category.Id kullanılıyor ancak category.Id henüz veritabanına eklenmediği için 0 olabilir.
         public async Task AddAsync(Category category)
         {
-            try
-            {
-                category.CreatedOn = DateTime.UtcNow;
-                category.UpdatedOn = DateTime.UtcNow;
-                category.TreePath = $"/{category.Id}/";
+            category.CreatedOn = DateTime.UtcNow;
+            category.UpdatedOn = DateTime.UtcNow;
+            category.TreePath = $"/{category.Id}/";
 
-                await _context.Categories.AddAsync(category);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
         }
 
-
-        // Silme işlemi
         public async Task DeleteAsync(Category category)
         {
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
-
-
-        // İsim ile varlık kontrolü
         public async Task<bool> ExistsByNameAsync(string name) => await _context.Categories.AnyAsync(o => o.Name == name);
-        // Tüm kategorileri getir
         public async Task<List<Category>> GetAllAsync() => await _context.Categories.AsNoTracking().ToListAsync();
-
-
-        // Sayfalı kategori listeleme
         public async Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.Categories.Include(c => c.ParentCategory).Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().AsQueryable();
@@ -66,13 +46,7 @@ namespace Entegro.Infrastructure.Repositories
                 PageSize = pageSize
             };
         }
-
-
-        // ID ile kategori getir
         public async Task<Category?> GetByIdAsync(int id) => await _context.Categories.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
-
-
-        // ID ile kategori ve ilişkili medya dosyasını getir
         public async Task<Category?> GetByIdWithMediaAsync(int id)
         {
             return await _context.Categories
@@ -80,9 +54,6 @@ namespace Entegro.Infrastructure.Repositories
              .ThenInclude(b => b.Folder)
              .FirstOrDefaultAsync(b => b.Id == id);
         }
-
-
-        // İsim ile kategori getir
         public async Task<Category?> GetByNameAsync(string name)
         {
             return await _context.Categories
@@ -90,14 +61,10 @@ namespace Entegro.Infrastructure.Repositories
             .ThenInclude(b => b.Folder)
             .FirstOrDefaultAsync(b => b.Name == name);
         }
-
-        // Belirli bir üst kategori ID'sine sahip kategorileri getir
         public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)
         {
             return await _context.Categories.Where(c => c.ParentCategoryId == parentCategoryId).ToListAsync();
         }
-
-        // ID'lere göre kategori isimlerini getir
         public async Task<Dictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
         {
 
@@ -108,8 +75,6 @@ namespace Entegro.Infrastructure.Repositories
                 .Select(c => new { c.Id, c.Name })
                 .ToDictionaryAsync(k => k.Id, v => v.Name);
         }
-
-        // Kategori arama ve sayfalama
         public async Task<PagedResult2<CategorySlim>> SearchPagedAsync(string? term, int page, int pageSize)
         {
 
@@ -120,19 +85,15 @@ namespace Entegro.Infrastructure.Repositories
 
             var q = _context.Categories.AsNoTracking();
 
-
-            // Arama terimi boş değilse filtre uygula
             if (!string.IsNullOrWhiteSpace(term))
             {
                 term = term.Trim();
-                // Türkçe karakter duyarsız arama için collation kullan
                 q = q.Where(c => EF.Functions.Collate(c.Name, "Turkish_CI_AI").Contains(term));
                 if (int.TryParse(term, out var idVal))
                 {
                     q = q.Union(_context.Categories.AsNoTracking().Where(c => c.Id == idVal));
                 }
             }
-            // Sıralama: Önce DisplayOrder, sonra Name, sonra Id
             q = q.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name).ThenBy(c => c.Id);
 
             var skip = (page - 1) * pageSize;
@@ -151,7 +112,6 @@ namespace Entegro.Infrastructure.Repositories
                 HasMore = hasMore
             };
         }
-        // Kategori güncelleme
         public async Task UpdateAsync(Category category)
         {
             category.UpdatedOn = DateTime.UtcNow;
