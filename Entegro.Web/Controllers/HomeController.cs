@@ -18,8 +18,6 @@ namespace Entegro.Web.Controllers
 
         public IActionResult Index()
         {
-            _logger.LogError("Home page visited at {Time}", DateTime.UtcNow);
-            Log.Error("Home page visited at {Time}", DateTime.UtcNow);
             return View();
         }
 

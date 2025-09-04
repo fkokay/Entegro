@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
@@ -6,6 +6,7 @@ using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using MapsterMapper;
 
 namespace Entegro.Application.Services
 {
@@ -90,7 +91,6 @@ namespace Entegro.Application.Services
             return createCategoryModel.Id;
         }
 
-
         public async Task DeleteProductAsync(int productId)
         {
 
@@ -115,12 +115,6 @@ namespace Entegro.Application.Services
         public async Task<bool> ExistsByNameAsync(string productName)
         {
             return await _productRepository.ExistsByNameAsync(productName);
-        }
-
-        public async Task<List<int>> GetAllProductIdAsync()
-        {
-            var allProducts = await _productRepository.GetAllAsync();
-            return allProducts.Select(x => x.Id).ToList();
         }
 
         public async Task<ProductDto?> GetProductByCodeAsync(string productCode)
@@ -153,7 +147,6 @@ namespace Entegro.Application.Services
             var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
             return productDtos;
         }
-
 
         public async Task<ProductDto> UpdateProductAsync(UpdateProductDto updateProduct)
         {
@@ -191,8 +184,9 @@ namespace Entegro.Application.Services
 
         public async Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode)
         {
-            var productDto = await _productRepository.GetByBarcodeAsync(productBarcode);
-            return _mapper.Map<ProductDto>(productDto);
+            var product = await _productRepository.GetByBarcodeAsync(productBarcode);
+            var productDto = product == null ? null : _mapper.Map<ProductDto>(product);
+            return productDto;
         }
     }
 }

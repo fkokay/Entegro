@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Entegro.Application.DTOs.Erp;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
@@ -9,6 +9,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Mappings.Erp;
+using MapsterMapper;
 using Newtonsoft.Json;
 using Polly;
 using Quartz;

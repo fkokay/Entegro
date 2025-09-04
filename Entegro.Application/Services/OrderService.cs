@@ -1,10 +1,11 @@
-﻿using AutoMapper;
+﻿
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 
 namespace Entegro.Application.Services

@@ -12,6 +12,8 @@ using Entegro.Application.Services.Marketplace;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.EventBus;
 using Entegro.Infrastructure.Repositories;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +74,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddDbContext<EntegroContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
@@ -179,7 +180,12 @@ builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, 
 
 builder.Services.AddHttpClient();
 
+MapsterConfig.RegisterMappings();
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
 var app = builder.Build();
+
 
 var supportedCultures = new[] { new CultureInfo("en-US") };
 

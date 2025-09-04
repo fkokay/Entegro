@@ -1,9 +1,10 @@
-﻿using AutoMapper;
+﻿
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 
 namespace Entegro.Application.Services

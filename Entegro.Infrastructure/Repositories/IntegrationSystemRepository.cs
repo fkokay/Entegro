@@ -28,7 +28,15 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<IntegrationSystem>> GetAllAsync()
         {
-            return await _context.IntegrationSystems.Include(p => p.IntegrationSystemParameters).ToListAsync();
+            return await _context.IntegrationSystems.AsNoTracking().Include(p => p.IntegrationSystemParameters).Select(m=> new IntegrationSystem()
+            {
+                Id = m.Id,
+                Description = m.Description,
+                IntegrationSystemParameters = m.IntegrationSystemParameters,
+                Name = m.Name,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType
+            }).ToListAsync();
         }
 
         public async Task<PagedResult<IntegrationSystem>> GetAllAsync(int pageNumber, int pageSize)
@@ -53,12 +61,28 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<IntegrationSystem?> GetByIdAsync(int id)
         {
-            return await _context.IntegrationSystems.Include(m => m.IntegrationSystemParameters).FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.IntegrationSystems.AsNoTracking().Include(m => m.IntegrationSystemParameters).Select(m => new IntegrationSystem()
+            {
+                Id = m.Id,
+                Description = m.Description,
+                IntegrationSystemParameters = m.IntegrationSystemParameters,
+                Name = m.Name,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType
+            }).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<IntegrationSystem?> GetByTypeIdAsync(int typeId)
         {
-            return await _context.IntegrationSystems.Include(m => m.IntegrationSystemParameters).FirstOrDefaultAsync(o => o.IntegrationSystemTypeId == typeId);
+            return await _context.IntegrationSystems.AsNoTracking().Include(m => m.IntegrationSystemParameters).Select(m => new IntegrationSystem()
+            {
+                Id = m.Id,
+                Description = m.Description,
+                IntegrationSystemParameters = m.IntegrationSystemParameters,
+                Name = m.Name,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType,
+            }).FirstOrDefaultAsync(o => o.IntegrationSystemTypeId == typeId);
         }
 
         public async Task UpdateAsync(IntegrationSystem integrationSystem)

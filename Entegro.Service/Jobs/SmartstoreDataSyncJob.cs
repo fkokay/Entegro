@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Order;
@@ -10,6 +10,7 @@ using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Polly;

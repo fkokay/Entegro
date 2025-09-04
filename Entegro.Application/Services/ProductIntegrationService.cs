@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.Events;
@@ -6,6 +6,7 @@ using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using MapsterMapper;
 using System.ComponentModel.Design;
 
 namespace Entegro.Application.Services

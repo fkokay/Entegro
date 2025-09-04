@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using Entegro.Application.DTOs.District;
+﻿using Entegro.Application.DTOs.District;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
+using MapsterMapper;
 
 namespace Entegro.Application.Services
 {
