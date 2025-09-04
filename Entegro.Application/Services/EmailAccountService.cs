@@ -97,10 +97,5 @@ namespace Entegro.Application.Services
 
             return _mapper.Map<EmailAccountDto>(existingEmailAccount);
         }
-
-        Task<PagedResult<EmailAccountDto>> IEmailAccountService.GetPagedAsync(int pageNumber, int pageSize)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -338,10 +338,98 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            return await _context.Products.AsNoTracking()
-                .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
-                .Include(m => m.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
-                .Include(m => m.ProductVariantAttributeCombinations).FirstOrDefaultAsync(o => o.Id == id);
+            var query = _context.Products.AsNoTracking().AsQueryable();
+
+            var product = await query.Select(m => new Product()
+            {
+                Id = m.Id,
+                Barcode = m.Barcode,
+                Name = m.Name,
+                Gtin = m.Gtin,
+                Price = m.Price,
+                Brand = m.Brand,
+                BrandId = m.BrandId,
+                Code = m.Code,
+                CreatedOn = m.CreatedOn,
+                Currency = m.Currency,
+                Deleted = m.Deleted,
+                Description = m.Description,
+                Height = m.Height,
+                Length = m.Length,
+                ManufacturerPartNumber = m.ManufacturerPartNumber,
+                MetaDescription = m.MetaDescription,
+                MetaKeywords = m.MetaKeywords,
+                MetaTitle = m.MetaTitle,
+                OldPrice = m.OldPrice,
+                ProductVariantAttributes = m.ProductVariantAttributes,
+                ProductMediaFiles = m.ProductMediaFiles,
+                ProductCategories = m.ProductCategories,
+                ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
+                {
+                    Active = x.Active,
+                    Id = x.Id,
+                    IntegrationSystem = new IntegrationSystem()
+                    {
+                        Id = x.IntegrationSystem.Id,
+                        Description = x.IntegrationSystem.Description,
+                        Name = x.IntegrationSystem.Name,
+                        IntegrationSystemParameters = x.IntegrationSystem.IntegrationSystemParameters.Select(a => new IntegrationSystemParameter()
+                        {
+                            Id = a.Id,
+                            IntegrationSystemId = a.IntegrationSystemId,
+                            Key = a.Key,
+                            Value = a.Value,
+                        }).ToList()
+                    },
+                    IntegrationSystemId = x.IntegrationSystemId,
+                    LastSyncDate = x.LastSyncDate,
+                    IntegrationCode = x.IntegrationCode,
+                    ProductId = x.ProductId,
+                    Price = x.Price,
+                }).ToList(),
+                Published = m.Published,
+                SpecialPrice = m.SpecialPrice,
+                StockQuantity = m.StockQuantity,
+                Unit = m.Unit,
+                UpdatedOn = m.UpdatedOn,
+                VatInc = m.VatInc,
+                VatRate = m.VatRate,
+                Weight = m.Weight,
+                Width = m.Width,
+                MainPictureId = m.MainPictureId,
+                MainPicture = m.MainPicture == null ? null : new MediaFile()
+                {
+                    Alt = m.MainPicture.Alt,
+                    CreatedOn = m.MainPicture.CreatedOn,
+                    Deleted = m.MainPicture.Deleted,
+                    Extension = m.MainPicture.Extension,
+                    Folder = m.MainPicture.Folder,
+                    FolderId = m.MainPicture.FolderId,
+                    Height = m.MainPicture.Height,
+                    Hidden = m.MainPicture.Hidden,
+                    Id = m.MainPicture.Id,
+                    IsTransient = m.MainPicture.IsTransient,
+                    MediaType = m.MainPicture.MediaType,
+                    Metadata = m.MainPicture.Metadata,
+                    MimeType = m.MainPicture.MimeType,
+                    Name = m.MainPicture.Name,
+                    PixelSize = m.MainPicture.PixelSize,
+                    Size = m.MainPicture.Size,
+                    Title = m.MainPicture.Title,
+                    UpdatedOn = m.MainPicture.UpdatedOn,
+                    Version = m.MainPicture.Version,
+                    Width = m.MainPicture.Width
+                },
+
+            }).OrderBy(m => m.Id).FirstOrDefaultAsync(o => o.Id == id);
+
+
+            return product;
+
+            //return await _context.Products.AsNoTracking()
+            //    .Include(m => m.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+            //    .Include(m => m.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute).ThenInclude(m => m.ProductAttributeValues)
+            //    .Include(m => m.ProductVariantAttributeCombinations).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task UpdateAsync(Product product)
