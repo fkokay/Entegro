@@ -112,6 +112,7 @@ namespace Entegro.Infrastructure.Repositories
                     {
                         Id = x.Product.Id,
                         Name = x.Product.Name,
+                        Code = x.Product.Code,
                         MainPictureId = x.Product.MainPictureId,
                         MainPicture = x.Product.MainPicture == null ? null : new MediaFile()
                         {
