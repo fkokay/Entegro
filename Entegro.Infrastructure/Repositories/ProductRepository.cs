@@ -220,6 +220,7 @@ namespace Entegro.Infrastructure.Repositories
                 },
 
             })
+                .OrderBy(m => m.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
