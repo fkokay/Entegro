@@ -176,11 +176,11 @@ Entegro.product = (function ($) {
                     }
                 });
             }
-            clearCategoryValidationUI();
+            //clearCategoryValidationUI();
         });
 
         $(document).on('click', '#btnSaveProductCategory', function () {
-            if (!validateProductCategoryModal().valid) return;
+            //if (!validateProductCategoryModal().valid) return;
 
             const payload = {
                 productId: Number($('#productId').val()) || 0,

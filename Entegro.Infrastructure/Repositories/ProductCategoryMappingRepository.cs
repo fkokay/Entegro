@@ -16,7 +16,13 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(ProductCategory productCategoryMapping)
         {
-            await _context.ProductCategories.AddAsync(productCategoryMapping);
+            var mapping = new ProductCategory
+            {
+                ProductId = productCategoryMapping.ProductId,
+                CategoryId = productCategoryMapping.CategoryId,
+                DisplayOrder = productCategoryMapping.DisplayOrder
+            };
+            await _context.ProductCategories.AddAsync(mapping);
             await _context.SaveChangesAsync();
         }
 

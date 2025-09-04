@@ -156,7 +156,7 @@ namespace Entegro.Web.Controllers
                 updateDto.ManufacturerPartNumber = model.ManufacturerPartNumber;
                 updateDto.Gtin = model.Gtin;
                 updateDto.Published = model.Published;
-                updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
+                updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations == null ? null : model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
                 {
                     RawAttribute = JsonConvert.SerializeObject(m.Attributes),
                     Gtin = m.Gtin,
