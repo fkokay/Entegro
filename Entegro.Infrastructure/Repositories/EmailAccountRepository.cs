@@ -31,7 +31,10 @@ namespace Entegro.Infrastructure.Repositories
             }
         }
 
-        public async Task<List<EmailAccount>> GetAllAsync() => await _context.EmailAccounts.ToListAsync();
+        public async Task<List<EmailAccount>> GetAllAsync()
+        {
+            return await _context.EmailAccounts.ToListAsync();
+        }
 
         public async Task<PagedResult<EmailAccount>> GetAllAsync(int pageNumber, int pageSize)
         {
@@ -52,7 +55,10 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<EmailAccount> GetByIdAsync(int id) => await _context.EmailAccounts.FirstOrDefaultAsync(o => o.Id == id);
+        public async Task<EmailAccount?> GetByIdAsync(int id)
+        {
+            return await _context.EmailAccounts.FirstOrDefaultAsync(o => o.Id == id);
+        }
 
         public async Task UpdateAsync(EmailAccount email)
         {
