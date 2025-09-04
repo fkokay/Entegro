@@ -27,9 +27,17 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task DeleteAsync(Brand brand)
         {
-            var entity = new Brand { Id = brand.Id };
-            _context.Brands.Attach(entity);
-            _context.Brands.Remove(entity);
+            var tracked = _context.Brands.Local.FirstOrDefault(b => b.Id == brand.Id);
+            if (tracked != null)
+            {
+                _context.Brands.Remove(tracked);
+            }
+            else
+            {
+                _context.Brands.Attach(brand);
+                _context.Brands.Remove(brand);
+            }
+
             await _context.SaveChangesAsync();
         }
 
