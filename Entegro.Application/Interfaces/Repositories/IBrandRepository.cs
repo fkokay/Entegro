@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
@@ -11,6 +12,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<Brand?> GetByNameAsync(string name);
         Task<List<Brand>> GetAllAsync();
         Task<PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize);
+        Task<PagedResult<Brand>> GetPagedAsync(GridCommand gridCommand);
         Task AddAsync(Brand brand);
         Task UpdateAsync(Brand brand);
         Task DeleteAsync(Brand brand);

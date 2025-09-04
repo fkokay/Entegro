@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;

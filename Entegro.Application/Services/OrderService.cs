@@ -7,6 +7,7 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
+using Order = Entegro.Domain.Entities.Order;
 
 namespace Entegro.Application.Services
 {

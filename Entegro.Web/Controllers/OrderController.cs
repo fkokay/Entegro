@@ -1,4 +1,5 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

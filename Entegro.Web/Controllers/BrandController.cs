@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -140,18 +141,13 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BrandList([FromBody] GridCommand model)
+        public async Task<IActionResult> BrandList([FromBody] GridCommand gridCommand)
         {
-
-            int pageNumber = model.Start / model.Length;
-            int pageSize = model.Length;
-
-
-            var result = await _brandService.GetPagedAsync(pageNumber, model.Length);
+            var result = await _brandService.GetPagedAsync(gridCommand);
 
             return Json(new
             {
-                draw = model.Draw,
+                draw = gridCommand.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

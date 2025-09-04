@@ -14,15 +14,6 @@ namespace Entegro.Domain.Common
 {
     public abstract partial class BaseEntity : INamedEntity
     {
-        private ILazyLoader _lazyLoader;
-
-        [IgnoreDataMember, NotMapped]
-        protected internal virtual ILazyLoader LazyLoader
-        {
-            get => _lazyLoader ?? NullLazyLoader.Instance;
-            set => _lazyLoader = value;
-        }
-
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 

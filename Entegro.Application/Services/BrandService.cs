@@ -131,5 +131,17 @@ namespace Entegro.Application.Services
 
             await _brandRepository.DeleteAsync(brand);
         }
+
+        public async Task<PagedResult<BrandDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var brands = await _brandRepository.GetPagedAsync(gridCommand);
+            return new PagedResult<BrandDto>
+            {
+                Items = _mapper.Map<IEnumerable<BrandDto>>(brands.Items),
+                TotalCount = brands.TotalCount,
+                PageNumber = brands.PageNumber,
+                PageSize = brands.PageSize
+            };
+        }
     }
 }

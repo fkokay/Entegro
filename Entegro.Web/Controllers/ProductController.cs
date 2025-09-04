@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Product;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;

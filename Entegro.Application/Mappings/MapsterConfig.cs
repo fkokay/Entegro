@@ -28,6 +28,7 @@ using Entegro.Application.DTOs.Town;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities;
 using Mapster;
+using Order = Entegro.Domain.Entities.Order;
 
 namespace Entegro.Application.Mappings
 {
