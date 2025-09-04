@@ -19,14 +19,11 @@ namespace Entegro.Application.Services.Commerce
         public SmartstoreService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri("https://www.hunerisonline.com/odata/v1/");
-
-            // Header ayarları
+            _httpClient.BaseAddress = new Uri("https://eticaret.ozgurteknolojiyazilim.com/odata/v1/");
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // Basic Authentication header'ını ayarlıyoruz
-            var authToken = Encoding.ASCII.GetBytes("bf0c273c90bcb045a7502daf2d9adaf1:193af61a4f6f74ef3ea77e1af9e0f099");
+            var authToken = Encoding.ASCII.GetBytes("c9a68396a00e4e58ccdda2fd2b653b51:6569aa8eb0afb17f37d0f63fdd98bf3a");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
         }
 
@@ -115,7 +112,7 @@ namespace Entegro.Application.Services.Commerce
 
             while (moreData)
             {
-                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer,OrderItems";
+                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer,OrderItems($expand=Product)";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 

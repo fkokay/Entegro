@@ -1,19 +1,42 @@
+using Entegro.Application.Events;
+using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
+using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
+using Entegro.Application.Services.Commerce.Smartstore;
+using Entegro.Application.Services.Marketplace;
 using Entegro.Infrastructure.Data;
+using Entegro.Infrastructure.EventBus;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Warning()
+    .WriteTo.Console()
+    .WriteTo.Graylog(new GraylogSinkOptions
+    {
+        HostnameOrAddress = "127.0.0.1",
+        Port = 12201,
+        Facility = "EntegroWebApp",
+        TransportType = TransportType.Udp
+    })
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddCors(options =>
 {
@@ -133,6 +156,20 @@ builder.Services.AddScoped<ISpecificationAttributeService, SpecificationAttribut
 
 
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
+
+
+builder.Services.AddScoped<IEventPublisher, EventBus>();
+builder.Services.AddScoped<SmartstoreClient>();
+""
+builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
+builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, SmartstoreProductWriter>();
+
+builder.Services.AddScoped<ITrendyolService, TrendyolService>();
+builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, TrendyolService>();
+
+builder.Services.AddScoped<IN11Service, N11Service>();
+builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, N11Service>();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -159,12 +196,11 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.UseStaticFiles();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.Run();

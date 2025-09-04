@@ -10,6 +10,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
 {
     public interface IMarketplaceCargoCompanyReader
     {
-        Task<IEnumerable<TrendyolCargoCompanyDto>> GetCargoCompaniesAsync();
+       
     }
 }

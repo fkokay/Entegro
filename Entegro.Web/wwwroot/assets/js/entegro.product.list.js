@@ -116,7 +116,7 @@ Entegro.product.list = (function ($) {
 
 
             $.ajax({
-                url: '/Product/integrationDialog',
+                url: '/Product/ProductIntegrationDialog',
                 type: 'GET',
                 dataType: 'html',
                 data: {

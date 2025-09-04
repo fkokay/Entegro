@@ -8,6 +8,8 @@
         public string IntegrationCode { get; set; }
         public decimal Price { get; set; }
         public DateTime? LastSyncDate { get; set; }
+        public bool IsSync { get; set; }
+        public string? Custom { get; set; }
         public bool Active { get; set; }
       
     }

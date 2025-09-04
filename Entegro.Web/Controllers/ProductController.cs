@@ -5,10 +5,14 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
+using System;
 using System.Net;
 using static Entegro.Web.Models.ProductViewModel;
 
@@ -24,6 +28,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductImageMappingService _productImageMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly ITrendyolService _trenyolService;
         public ProductController(
             IProductService productService,
             IProductCategoryMappingService productCategoryMappingService,
@@ -32,7 +37,8 @@ namespace Entegro.Web.Controllers
             IProductVariantAttributeService productAttributeMappingService,
             IProductImageMappingService productImageMappingService,
             IIntegrationSystemService integrationSystemService,
-            IProductIntegrationService productIntegrationService)
+            IProductIntegrationService productIntegrationService,
+            ITrendyolService trendyolService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -42,6 +48,7 @@ namespace Entegro.Web.Controllers
             _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
             _integrationSystemService = integrationSystemService ?? throw new ArgumentNullException(nameof(integrationSystemService));
             _productIntegrationService = productIntegrationService;
+            _trenyolService = trendyolService;
         }
 
         #region Product list / create / edit / delete
@@ -201,6 +208,7 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = $"{ex.Message}" });
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> ProductList([FromBody] GridCommand model)
         {
@@ -443,20 +451,7 @@ namespace Entegro.Web.Controllers
             foreach (var product in allProduct)
             {
                 var productIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.Id, integrationSystemId);
-                if (productIntegration != null)
-                {
-                    await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
-                    {
-                        Id = productIntegration.Id,
-                        Active = productIntegration.Active,
-                        IntegrationSystemId = integrationSystemId,
-                        IntegrationCode = product.Code,
-                        Price = product.Price,
-                        ProductId = productIntegration.ProductId,
-                        LastSyncDate = productIntegration.LastSyncDate
-                    });
-                }
-                else
+                if (productIntegration == null)
                 {
                     await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
                     {
@@ -473,8 +468,125 @@ namespace Entegro.Web.Controllers
             return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ProductIntegrationDialog(ProductIntegrationDialogViewModel model)
+        {
+            var product = await _productService.GetProductByIdAsync(model.ProductId);
+            var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
+            if (integrationSystem == null)
+            {
+                return NotFound();
+            }
+
+
+            if (integrationSystem.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce)
+            {
+                var commerceType = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
+
+
+                if (model.ProductIntegrationId == 0)
+                {
+                    var createModel = new SmartstoreProductIntegrationViewModel()
+                    {
+                        Id = 0,
+                        ProductId = product.Id,
+                        IntegrationSystemId = model.IntegrationSystemId,
+                        IntegrationSystemName = integrationSystem.Name,
+                        ProductName = product.Name,
+                        ProductCode = product.Code,
+                        CommerceType = commerceType,
+                        ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
+                        Price = product.Price,
+                        IntegrationCode = product.Code,
+                        Active = true,
+                    };
+
+                    return PartialView($"_IntegrationDialog.Commerce.{commerceType}", createModel);
+                }
+                else
+                {
+                    var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                    var createModel = new SmartstoreProductIntegrationViewModel
+                    {
+                        Id = existingProductIntegration.Id,
+                        ProductId = existingProductIntegration.ProductId,
+                        IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                        IntegrationSystemName = integrationSystem.Name,
+                        CommerceType = commerceType,
+                        IntegrationCode = existingProductIntegration?.IntegrationCode,
+                        Price = existingProductIntegration?.Price ?? 0m,
+                        ProductName = product.Name,
+                        ProductCode = product.Code,
+                        Active = existingProductIntegration.Active,
+                        ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url
+                    };
+
+                    if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                    {
+                        createModel.Custom = JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomViewModel>(existingProductIntegration.Custom) ?? new SmartstoreProductIntegrationCustomViewModel();
+                    }
+
+                    return PartialView($"_IntegrationDialog.Commerce.{commerceType}", createModel);
+                }
+            }
+
+            if (integrationSystem.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Marketplace)
+            {
+                var marketplaceType = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
+                if (model.ProductIntegrationId == 0)
+                {
+                    var createModel = new TrendyolProductIntegrationViewModel()
+                    {
+                        Id = 0,
+                        ProductId = product.Id,
+                        IntegrationSystemId = model.IntegrationSystemId,
+                        IntegrationSystemName = integrationSystem.Name,
+                        MarketplaceType = marketplaceType,
+                        ProductName = product.Name,
+                        ProductCode = product.Code,
+                        ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
+                        Price = product.Price,
+                        IntegrationCode = product.Code,
+                        Active = true,
+                    };
+
+                    return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+                }
+                else
+                {
+                    var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                    var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(existingProductIntegration.IntegrationCode);
+
+                    var createModel = new TrendyolProductIntegrationViewModel
+                    {
+                        Id = existingProductIntegration.Id,
+                        ProductId = existingProductIntegration.ProductId,
+                        IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                        IntegrationSystemName = integrationSystem.Name,
+                        MarketplaceType = marketplaceType,
+                        IntegrationCode = existingProductIntegration?.IntegrationCode,
+                        Price = existingProductIntegration?.Price ?? 0m,
+                        ProductName = product.Name,
+                        ProductCode = product.Code,
+                        Active = existingProductIntegration.Active,
+                        ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
+                        MarketplaceLink = existingTrendyolProduct == null ? "#":existingTrendyolProduct.productUrl,
+                    };
+
+                    if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                    {
+                        createModel.Custom = JsonConvert.DeserializeObject<TrednyolProductIntegrationCustomViewModel>(existingProductIntegration.Custom) ?? new TrednyolProductIntegrationCustomViewModel();
+                    }
+
+                    return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+                }
+            }
+
+            return NotFound();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegration(CreateProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationSmartstore(SmartstoreProductIntegrationViewModel model)
         {
 
             try
@@ -488,32 +600,35 @@ namespace Entegro.Web.Controllers
                     }
 
                 }
+
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
                 if (productIntegration == null || model.Id == 0)
                 {
-
-                    await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
-                    {
-                        IntegrationCode = model.IntegrationCode,
-                        Price = model.Price,
-                        ProductId = model.ProductId,
-                        IntegrationSystemId = model.IntegrationSystemId,
-                        Active = true,
-                        LastSyncDate = null
-                    });
+                    var createProductIntegration = new CreateProductIntegrationDto();
+                    createProductIntegration.IntegrationCode = model.IntegrationCode;
+                    createProductIntegration.Price = model.Price;
+                    createProductIntegration.ProductId = model.ProductId;
+                    createProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
+                    createProductIntegration.Active = model.Active;
+                    createProductIntegration.LastSyncDate = null;
+                    createProductIntegration.IsSync = false;
+                    createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
                 }
                 else
                 {
-                    await _productIntegrationService.UpdateProductIntegrationAsync(new UpdateProductIntegrationDto
-                    {
-                        Id = productIntegration.Id,
-                        Active = model.Active,
-                        IntegrationSystemId = productIntegration.IntegrationSystemId,
-                        IntegrationCode = model.IntegrationCode,
-                        Price = model.Price,
-                        ProductId = productIntegration.ProductId,
-                        LastSyncDate = productIntegration.LastSyncDate
-                    });
+                    var updateProductIntegration = new UpdateProductIntegrationDto();
+                    updateProductIntegration.Id = productIntegration.Id;
+                    updateProductIntegration.IntegrationCode = model.IntegrationCode;
+                    updateProductIntegration.Price = model.Price;
+                    updateProductIntegration.ProductId = model.ProductId;
+                    updateProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
+                    updateProductIntegration.Active = model.Active;
+                    updateProductIntegration.LastSyncDate = null;
+                    updateProductIntegration.IsSync = false;
+                    updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+
+                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -525,50 +640,65 @@ namespace Entegro.Web.Controllers
 
 
         }
-
-        [HttpGet]
-        public async Task<IActionResult> IntegrationDialog(DialogViewModel model)
+        [HttpPost]
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationTrendyol(TrendyolProductIntegrationViewModel model)
         {
-            var product = await _productService.GetProductByIdAsync(model.ProductId);
 
-            if (!string.IsNullOrEmpty(model.IntegrationValue))
+            try
             {
-                return PartialView($"_IntegrationDialog.{model.IntegrationValue}", model.IntegrationValue);
-            }
-
-
-            if (model.ProductIntegrationId == 0)
-            {
-                return PartialView("_IntegrationDialog", new CreateProductIntegrationViewModel()
+                var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
+                if (existingProductIntegration != null)
                 {
-                    ProductId = model.ProductId,
-                    IntegrationSystemId = model.IntegrationSystemId,
-                    Price = product.Price,
-                    ProductCode = product.Code,
-                    ProductName = product.Name,
-                    Active = true,
-                    IntegrationCode = product.Code,
-                    ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url
-                });
+                    if (existingProductIntegration.ProductId != model.ProductId)
+                    {
+                        return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {existingProductIntegration.Product.Name}" });
+                    }
+
+                }
+                var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(model.IntegrationCode);
+                if (existingTrendyolProduct == null)
+                {
+                    return Json(new { success = false, message = $"Trendyol üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
+                }
+
+                var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
+                if (productIntegration == null || model.Id == 0)
+                {
+                    var createProductIntegration = new CreateProductIntegrationDto();
+                    createProductIntegration.IntegrationCode = model.IntegrationCode;
+                    createProductIntegration.Price = model.Price;
+                    createProductIntegration.ProductId = model.ProductId;
+                    createProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
+                    createProductIntegration.Active = model.Active;
+                    createProductIntegration.LastSyncDate = null;
+                    createProductIntegration.IsSync = false;
+                    createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                }
+                else
+                {
+                    var updateProductIntegration = new UpdateProductIntegrationDto();
+                    updateProductIntegration.Id = productIntegration.Id;
+                    updateProductIntegration.IntegrationCode = model.IntegrationCode;
+                    updateProductIntegration.Price = model.Price;
+                    updateProductIntegration.ProductId = model.ProductId;
+                    updateProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
+                    updateProductIntegration.Active = model.Active;
+                    updateProductIntegration.LastSyncDate = null;
+                    updateProductIntegration.IsSync = false;
+                    updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+
+                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Bir hata oluştu: " + ex.Message });
             }
 
-            var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-            var createModel = new CreateProductIntegrationViewModel
-            {
-                Id = existingProductIntegration.Id,
-                ProductId = existingProductIntegration.ProductId,
-                IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
-                IntegrationCode = existingProductIntegration?.IntegrationCode,
-                Price = existingProductIntegration?.Price ?? 0m,
-                ProductName = product.Name,
-                ProductCode = product.Code,
-                Active = existingProductIntegration.Active,
-                ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url
-            };
 
-
-
-            return PartialView("_IntegrationDialog", createModel);
         }
 
         #endregion

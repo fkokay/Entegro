@@ -36,7 +36,20 @@
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Published">Yayınlandı</label>
+                            <div class="col-sm-9">
+                                <label class="switch switch-lg">
+                                    @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
+                                    <span class="switch-toggle-slider">
+                                        <span class="switch-on"></span>
+                                        <span class="switch-off"></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-12">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Görüntüleme sırası</label>

@@ -43,6 +43,7 @@ namespace Entegro.Web.Controllers
                 MetaTitle = model.MetaTitle,
                 DisplayOrder = model.DisplayOrder,
                 MetaKeywords = model.MetaKeywords,
+                Published = model.Published,
             };
             await _categoryService.CreateCategoryAsync(createDto);
 
@@ -85,6 +86,7 @@ namespace Entegro.Web.Controllers
                 ParentCategoryId = category.ParentCategoryId,
                 TreePath = category.TreePath,
                 ParentCategoryFormattedName = formattedParentName,
+                Published = category.Published,
                 MediaFileId = category.MediaFileId,
                 MediaFile = category.MediaFile == null ? null : new MediaFileViewModel()
                 {
@@ -134,6 +136,7 @@ namespace Entegro.Web.Controllers
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
                     MetaKeywords = model.MetaKeywords,
+                    Published = model.Published,
                 };
                 await _categoryService.UpdateCategoryAsync(updateDto);
                 return Json(new { success = true });

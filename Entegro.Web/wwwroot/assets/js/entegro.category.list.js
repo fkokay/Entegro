@@ -31,15 +31,6 @@ Entegro.Category.List = (function () {
                 },
                 { data: 'Id', visible: false },
                 { data: 'Name' },
-                {
-                    data: 'ParentCategory.Name',
-                    render: function (data, type, row) {
-                        if (!data) {
-                            return  ' - ';
-                        }
-                        return data;
-                    }
-                },
                 { data: 'DisplayOrder' },
                 {
                     data: 'CreatedOn',
@@ -48,6 +39,7 @@ Entegro.Category.List = (function () {
                         return moment(data).format("DD.MM.yyyy HH:mm");
                     }
                 },
+                { data: 'Published' },
                 { data: 'Id' }
             ],
             columnDefs: [
@@ -83,9 +75,21 @@ Entegro.Category.List = (function () {
                              </div>
                              <div class="d-flex flex-column">
                                  <h6 class="text-nowrap mb-0">${row.Name}</h6>
-                                 ${row.ParentCategory ? `<small class="text-muted d-none d-sm-block">Üst: ${row.ParentCategory.Name}</small>` : ""}
+                                 ${row.ParentCategory ? `<small class="text-muted d-none d-sm-block">${row.ParentCategory.Name} » ${row.Name} </small>` : ""}
                              </div>
                          </div>`;
+                    }
+                },
+                {
+                    targets: -2,
+                    className: "text-center",
+                    render: data => {
+                        const checked = data ? "checked" : "";
+                        const titleText = data ? "Yayında" : "Yayında Değil";
+                        return `
+                                <div class="form-check d-inline-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
+                                </div>`;
                     }
                 },
                 {

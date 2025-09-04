@@ -43,7 +43,8 @@ namespace Entegro.Web.Controllers
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
                     MetaKeywords = model.MetaKeywords,
-                    MediaFileId = model.MediaFileId
+                    MediaFileId = model.MediaFileId,
+                    Published = model.Published,
                 };
 
                 await _brandService.CreateAsync(createDto);
@@ -68,6 +69,7 @@ namespace Entegro.Web.Controllers
                 MetaDescription = brand.MetaDescription,
                 MetaTitle = brand.MetaTitle,
                 DisplayOrder = brand.DisplayOrder,
+                Published = brand.Published,
                 MetaKeywords = brand.MetaKeywords,
                 MediaFileId = brand.MediaFileId,
                 MediaFile = brand.MediaFile == null ? null : new MediaFileViewModel()
@@ -114,6 +116,7 @@ namespace Entegro.Web.Controllers
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
                     MetaKeywords = model.MetaKeywords,
+                    Published = model.Published,
                 };
                 await _brandService.UpdateAsync(updateDto);
                 return Json(new { success = true });

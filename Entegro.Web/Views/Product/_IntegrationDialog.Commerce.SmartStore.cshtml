@@ -1,0 +1,62 @@
+﻿@model SmartstoreProductIntegrationViewModel
+
+<div class="row">
+    <div class="d-flex justify-content-start align-items-center product-name">
+        <div class="avatar-wrapper">
+            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                <img src="@Model.ProductMainPicture" alt="" />
+            </div>
+        </div>
+        <div class="d-flex flex-column">
+            <h6 class="text-nowrap mb-0">@Model.ProductName</h6>
+            <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
+        </div>
+    </div>
+    <div class="col-12 col-md-12">
+        <hr />
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
+        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly" })
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="CommerceType">E-Ticaret</label>
+        @Html.TextBoxFor(m => m.CommerceType, new { @class = "form-control", @readonly = "readonly" })
+    </div>
+</div>
+
+<form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationSmartstore" asp-controller="Product" class="row g-3 mt-3">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ProductId" />
+    <input type="hidden" asp-for="IntegrationSystemId" />
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+        <input type="text" asp-for="IntegrationCode" class="form-control" required />
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="price">Fiyat</label>
+        <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
+    </div>
+    <div class="col-12 col-md-12">
+        <div class="form-check form-switch mb-2 mt-2">
+            <input class="form-check-input" type="checkbox" asp-for="Active" />
+            <label class="form-check-label" for="Active">Aktif</label>
+        </div>
+    </div>
+    <div class="col-12 col-md-12">
+        <hr />
+    </div>
+    <div class="col-md-12">
+        <label class="form-label" for="Custom.ManageInventoryMethod">Stok Yönetimi</label>
+        <select asp-for="Custom.ManageInventoryMethod" class="form-select">
+            <option value="0">Stok Kontrolü Yok</option>
+            <option value="1">Stok Takibi Var</option>
+            <option value="2">Özelliklerle Birlikte Stok Takibi Var</option>
+        </select>
+    </div>
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+    </div>
+</form>
