@@ -88,7 +88,15 @@
                                                     <td>@city.Id</td>
                                                     <td>@city.Name</td>
                                                     <td>@city.Published</td>
-                                                    <td></td>
+                                                    <td>
+                                                        <button type="button"
+                                                                class="btn btn-primary open-town-modal"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#createTown"
+                                                                data-city-id="@city.Id">
+                                                            İlçe Ekle
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             }
                                             

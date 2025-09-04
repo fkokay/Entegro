@@ -289,11 +289,15 @@ Entegro.product = (function ($) {
     function initVariantsRepeater(data) {
         const $repeater = $('#ProductVariantAttributeCombinationRepeater');
         if (!$repeater.length) return;
-
+ 
         $repeater.repeater({
             initEmpty: false,
             show: function () { $(this).slideDown(); },
-            hide: function (deleteElement) { if (confirm('Varyant silinecek emin misiniz?')) $(this).slideUp(deleteElement); },
+            hide: function (deleteElement) {
+                if (confirm('Varyant silinecek emin misiniz?')) {
+                    console.log($(this)); // Bu, silinecek olan elemanı temsil eder
+                    $(this).slideUp(deleteElement);
+                }; },
             repeaters: [{
                 selector: '.AttributesRepeater',
                 initEmpty: false,

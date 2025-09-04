@@ -116,6 +116,9 @@ builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<ICityService, CityService>();
 
+builder.Services.AddScoped<ITownRepository, TownRepository>();
+builder.Services.AddScoped<ITownService, TownService>();
+
 
 builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();
 builder.Services.AddScoped<IProductIntegrationService, ProductIntegrationService>();

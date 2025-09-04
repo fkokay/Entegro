@@ -17,4 +17,12 @@ namespace Entegro.Web.Models
         public int DisplayOrder { get; set; }
         public bool Published { get; set; }
     }
+
+    public class ModalTownViewModel
+    {
+        public int CityId { get; set; }
+        public string TownName { get; set; }
+        public int TownDisplayOrder { get; set; }
+        public bool Published { get; set; }
+    }
 }
