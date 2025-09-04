@@ -69,28 +69,28 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<ProductIntegration?> GetByIdAsync(int id)
         {
             var entity = await _context.ProductIntegrations
-     .Include(pi => pi.IntegrationSystem)
-         .ThenInclude(isys => isys.IntegrationSystemParameters)
-     .Include(pi => pi.IntegrationSystem)
-         .ThenInclude(isys => isys.IntegrationSystemLogs)
-     .Include(pi => pi.Product)
-         .ThenInclude(p => p.Brand)
-     .Include(pi => pi.Product)
-         .ThenInclude(p => p.ProductCategories)
-             .ThenInclude(pc => pc.Category)
-                 .ThenInclude(c => c.ParentCategory)
-     .Include(pi => pi.Product)
-         .ThenInclude(p => p.ProductMediaFiles)
-             .ThenInclude(pm => pm.MediaFile)
-     .ThenInclude(mf => mf.MediaFolder) // sadece Folder ekledik
-     .Include(pi => pi.Product)
-         .ThenInclude(p => p.ProductVariantAttributes)
-             .ThenInclude(pv => pv.ProductAttribute)
-                 .ThenInclude(pa => pa.ProductAttributeValues)
-     .Include(pi => pi.Product)
-         .ThenInclude(p => p.ProductVariantAttributeCombinations)
-     .AsNoTracking()
-     .FirstOrDefaultAsync(pi => pi.Id == id);
+             .Include(pi => pi.IntegrationSystem)
+                 .ThenInclude(isys => isys.IntegrationSystemParameters)
+             .Include(pi => pi.IntegrationSystem)
+                 .ThenInclude(isys => isys.IntegrationSystemLogs)
+             .Include(pi => pi.Product)
+                 .ThenInclude(p => p.Brand)
+             .Include(pi => pi.Product)
+                 .ThenInclude(p => p.ProductCategories)
+                     .ThenInclude(pc => pc.Category)
+                         .ThenInclude(c => c.ParentCategory)
+             .Include(pi => pi.Product)
+                 .ThenInclude(p => p.ProductMediaFiles)
+                     .ThenInclude(pm => pm.MediaFile)
+             .ThenInclude(mf => mf.MediaFolder) // sadece Folder ekledik
+             .Include(pi => pi.Product)
+                 .ThenInclude(p => p.ProductVariantAttributes)
+                     .ThenInclude(pv => pv.ProductAttribute)
+                         .ThenInclude(pa => pa.ProductAttributeValues)
+             .Include(pi => pi.Product)
+                 .ThenInclude(p => p.ProductVariantAttributeCombinations)
+             .AsNoTracking()
+             .FirstOrDefaultAsync(pi => pi.Id == id);
 
             return entity;
         }
