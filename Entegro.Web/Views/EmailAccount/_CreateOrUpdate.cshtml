@@ -1,0 +1,102 @@
+﻿@model EmailAccountViewModel
+
+<div class="col-lg-9 col-12 mb-lg-0 mb-4">
+    <div class="card mb-3">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="account-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" type="button" role="tab">Hesaplar</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
+                <div class="row g-3 p-3">
+                    <input type="hidden" value="@Model.Id" asp-for="Id" />
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Email">Email</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "Email", @type = "email" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="DisplayName">Görünen Ad</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.DisplayName, new { @class = "form-control", @id = "DisplayName" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Host">Sunucu (Host)</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Host, new { @class = "form-control", @id = "Host" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Port">Port</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Port, new { @class = "form-control", @type = "number", @id = "Port" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Username">Kullanıcı Adı</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @id = "Username" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="Password">Şifre</label>
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @id = "Password" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="SecureOption">Şifreleme</label>
+                            <div class="col-sm-9">
+                                @Html.DropDownListFor(m => m.SecureOption, new SelectList(new[]
+                                {
+                                    new { Value = "0", Text = "Şifreleme yok" },
+                                                                new { Value = "1", Text = "Otomatik (varsa SSL veya TLS, aksi takdirde şifreleme yapmayın)" },
+                                                                new { Value = "2", Text = "Immediately (SSL veya TLS ile bağlantıyı hemen şifreleyin)" }
+                                                                }, "Value", "Text"), new { @class = "form-control", id = "encryption" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="form-label" for="encryption"></label>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row align-items-center">
+                            <label class="col-sm-3 col-form-label text-sm-start" for="UserDefaultCredentials">Varsayılan Kimlik Bilgilerini Kullan</label>
+                            <div class="col-sm-9">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(m => m.UserDefaultCredentials, new { @class = "form-check-input", @id = "UserDefaultCredentials" })
+                                    <label class="form-check-label" for="UserDefaultCredentials"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

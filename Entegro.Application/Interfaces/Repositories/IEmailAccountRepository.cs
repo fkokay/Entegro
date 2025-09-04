@@ -1,4 +1,5 @@
-﻿using Entegro.Domain.Entities;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
@@ -7,6 +8,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<EmailAccount> GetByIdAsync(int id);
         Task<List<EmailAccount>> GetAllAsync();
         Task AddAsync(EmailAccount email);
+        Task<PagedResult<EmailAccount>> GetAllAsync(int pageNumber, int pageSize);
         Task UpdateAsync(EmailAccount email);
         Task DeleteAsync(EmailAccount email);
     }
