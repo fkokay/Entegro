@@ -16,15 +16,17 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(Brand brand)
         {
-            brand.CreatedOn = DateTime.Now;
-            brand.UpdatedOn = DateTime.Now;
+            brand.CreatedOn = DateTime.UtcNow;
+            brand.UpdatedOn = DateTime.UtcNow;
             await _context.Brands.AddAsync(brand);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Brand brand)
         {
-            _context.Brands.Remove(brand);
+            var entity = new Brand { Id = brand.Id };
+            _context.Brands.Attach(entity);
+            _context.Brands.Remove(entity);
             await _context.SaveChangesAsync();
         }
 
@@ -40,16 +42,15 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Brand>> GetAllAsync()
         {
-            return await _context.Brands.ToListAsync();
+            return await _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking().OrderBy(b => b.Id).ToListAsync();
         }
 
         public async Task<PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsQueryable();
+            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking().OrderBy(b => b.Id);
 
             var totalCount = await query.CountAsync();
             var brands = await query
-                .OrderBy(b => b.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -83,7 +84,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Brand brand)
         {
-            brand.UpdatedOn = DateTime.Now;
+            brand.UpdatedOn = DateTime.UtcNow;
             _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
         }

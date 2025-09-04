@@ -17,43 +17,67 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Category category)
         {
-            category.CreatedOn = DateTime.UtcNow;
-            category.UpdatedOn = DateTime.UtcNow;
-            category.TreePath = $"/{category.Id}/";
-
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
+
+            category.TreePath = $"/{category.Id}/";
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
         }
+
         public async Task DeleteAsync(Category category)
         {
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
-        public async Task<bool> ExistsByNameAsync(string name) => await _context.Categories.AnyAsync(o => o.Name == name);
-        public async Task<List<Category>> GetAllAsync() => await _context.Categories.AsNoTracking().ToListAsync();
+
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _context.Categories.AnyAsync(o => o.Name == name);
+        }
+
+        public async Task<List<Category>> GetAllAsync()
+        {
+            return await _context.Categories
+                .Include(c => c.ParentCategory)
+                .Include(m => m.MediaFile)
+                .ThenInclude(m => m.MediaFolder).AsNoTracking().ToListAsync();
+        }
+
         public async Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Categories.Include(c => c.ParentCategory).Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking().AsQueryable();
+            var query = _context.Categories
+                .Include(c => c.ParentCategory)
+                .Include(m => m.MediaFile)
+                .ThenInclude(m => m.MediaFolder)
+                .OrderBy(b => b.Id)
+                .AsNoTracking();
+                
 
             var totalCount = await query.CountAsync();
-            var categories = await query.OrderBy(m=>m.Id).Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
+            var items = await query
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             return new PagedResult<Category>
             {
-                Items = categories,
+                Items = items,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
         }
-        public async Task<Category?> GetByIdAsync(int id) => await _context.Categories.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
-        public async Task<Category?> GetByIdWithMediaAsync(int id)
+
+        public async Task<Category?> GetByIdAsync(int id)
         {
             return await _context.Categories
              .Include(b => b.MediaFile)
              .ThenInclude(b => b.MediaFolder)
+             .AsNoTracking()
              .FirstOrDefaultAsync(b => b.Id == id);
         }
+
         public async Task<Category?> GetByNameAsync(string name)
         {
             return await _context.Categories
@@ -61,24 +85,28 @@ namespace Entegro.Infrastructure.Repositories
             .ThenInclude(b => b.MediaFolder)
             .FirstOrDefaultAsync(b => b.Name == name);
         }
+
         public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)
         {
             return await _context.Categories.Where(c => c.ParentCategoryId == parentCategoryId).ToListAsync();
         }
+
         public async Task<Dictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
         {
+
+            if (ids == null || !ids.Any())
+                return new Dictionary<int, string>();
 
             var set = ids.Distinct().ToArray();
             return await _context.Categories
                 .AsNoTracking()
                 .Where(c => set.Contains(c.Id))
                 .Select(c => new { c.Id, c.Name })
-                .ToDictionaryAsync(k => k.Id, v => v.Name);
+                .ToDictionaryAsync(k => k.Id, v => v.Name ?? "");
         }
+
         public async Task<PagedResult2<CategorySlim>> SearchPagedAsync(string? term, int page, int pageSize)
         {
-
-
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 20;
             if (pageSize > 100) pageSize = 100;
@@ -112,6 +140,7 @@ namespace Entegro.Infrastructure.Repositories
                 HasMore = hasMore
             };
         }
+
         public async Task UpdateAsync(Category category)
         {
             category.UpdatedOn = DateTime.UtcNow;

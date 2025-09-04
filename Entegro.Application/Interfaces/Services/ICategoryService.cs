@@ -14,9 +14,6 @@ namespace Entegro.Application.Interfaces.Services
         Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategory);
         Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory);
         Task DeleteCategoryAsync(int categoryId);
-        Task<CategoryDto?> GetByIdWithMediaAsync(int id);
-        Task UpdateCategoryImageAsync(int categoryId, int mediaFileId);
-        Task DeleteCategoryImageAsync(int categoryId);
         Task<Select2ResponseDto> GetCategoriesForSelect2Async(string? term, int page, int pageSize);
         Task DeleteCategoryAndChildrenAsync(int categoryId);
         Task DeleteCategoryAndReassignChildrenAsync(int categoryId);

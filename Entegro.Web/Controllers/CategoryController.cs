@@ -55,8 +55,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            //var category = await _categoryService.GetCategoryByIdAsync(id);
-            var category = await _categoryService.GetByIdWithMediaAsync(id);
+            var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 return NotFound();

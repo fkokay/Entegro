@@ -17,52 +17,52 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Address address)
         {
-            address.CreatedOn = DateTime.Now;
-            address.UpdatedOn = DateTime.Now;
+            address.CreatedOn = DateTime.UtcNow;
+            address.UpdatedOn = DateTime.UtcNow;
             await _context.Addresses.AddAsync(address);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Address address)
         {
-            var modal = await _context.Addresses.FindAsync(address.Id);
-            if (modal != null)
-            {
-                _context.Addresses.Remove(modal);
-                await _context.SaveChangesAsync();
-            }
+            var entity = new Address { Id = address.Id };
+            _context.Addresses.Attach(entity);
+            _context.Addresses.Remove(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<Address>> GetAllAsync()
         {
-            return await _context.Addresses.ToListAsync();
+            return await _context.Addresses.AsNoTracking().OrderBy(a => a.Id).ToListAsync();
         }
 
         public async Task<PagedResult<Address>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Addresses.AsQueryable();
+            var query = _context.Addresses.AsNoTracking().OrderBy(a => a.Id);
 
             var totalCount = await query.CountAsync();
-            var brands = await query
-                .OrderBy(b => b.Id)
+            var items = await query
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             return new PagedResult<Address>
             {
-                Items = brands,
+                Items = items,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
         }
 
-        public async Task<Address?> GetByIdAsync(int id) => await _context.Addresses.FirstOrDefaultAsync(o => o.Id == id);
+        public async Task<Address?> GetByIdAsync(int id)
+        {
+            return await _context.Addresses.FirstOrDefaultAsync(o => o.Id == id);
+        }
 
         public async Task UpdateAsync(Address address)
         {
-            address.UpdatedOn = DateTime.Now;
+            address.UpdatedOn = DateTime.UtcNow;
             _context.Addresses.Update(address);
             await _context.SaveChangesAsync();
         }
