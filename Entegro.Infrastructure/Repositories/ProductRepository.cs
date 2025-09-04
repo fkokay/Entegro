@@ -254,7 +254,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            var product = await _context.Products.Select(m => new Product()
+            var product = await _context.Products.AsNoTracking().Select(m => new Product()
             {
                 Id = m.Id,
                 Barcode = m.Barcode,
