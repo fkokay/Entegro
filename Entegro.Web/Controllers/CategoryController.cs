@@ -165,7 +165,7 @@ namespace Entegro.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Silinecek Kategori Bulunamadı" });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
