@@ -1,8 +1,17 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities
 {
+    public class IntegrationSystemLogMap : IEntityTypeConfiguration<IntegrationSystemLog>
+    {
+        public void Configure(EntityTypeBuilder<IntegrationSystemLog> builder)
+        {
+
+        }
+    }
     [Table("IntegrationSystemLog")]
     public class IntegrationSystemLog : BaseEntity
     {

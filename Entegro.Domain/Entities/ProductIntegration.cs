@@ -1,8 +1,19 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Emit;
 namespace Entegro.Domain.Entities
 {
+    public class ProductIntegrationMap : IEntityTypeConfiguration<ProductIntegration>
+    {
+        public void Configure(EntityTypeBuilder<ProductIntegration> builder)
+        {
+            builder.HasIndex(p => new { p.IntegrationSystemId, p.IntegrationCode }).IsUnique();
+            builder.Property(p => p.Price).HasPrecision(18, 4);
+        }
+    }
     [Table("ProductIntegration")]
     public class ProductIntegration : BaseEntity
     {

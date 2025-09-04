@@ -1,10 +1,20 @@
 ﻿using Entegro.Domain.Common;
 using Entegro.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Domain.Entities
 {
+    public class OrderMap : IEntityTypeConfiguration<Order>
+    {
+        public void Configure(EntityTypeBuilder<Order> builder)
+        {
+            builder.Property(p => p.TotalAmount).HasPrecision(18, 4);
+        }
+    }
+
     [Table("Order")]
     public class Order : BaseEntity, ISoftDeletable, ITransient
     {

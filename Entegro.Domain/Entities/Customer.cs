@@ -1,4 +1,6 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
+    public class CustomerMap : IEntityTypeConfiguration<Customer>
+    {
+        public void Configure(EntityTypeBuilder<Customer> builder)
+        {
+
+        }
+    }
     [Table("Customer")]
     public class Customer : BaseEntity,IAuditable
     {

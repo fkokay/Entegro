@@ -1,8 +1,17 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities
 {
+    public class MediaFileMap : IEntityTypeConfiguration<MediaFile>
+    {
+        public void Configure(EntityTypeBuilder<MediaFile> builder)
+        {
+
+        }
+    }
     [Table("MediaFile")]
     public class MediaFile : BaseEntity, ITransient
     {

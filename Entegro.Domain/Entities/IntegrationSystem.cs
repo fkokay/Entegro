@@ -1,9 +1,18 @@
 ﻿using Entegro.Domain.Common;
 using Entegro.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities
 {
+    public class IntegrationSystemMap : IEntityTypeConfiguration<IntegrationSystem>
+    {
+        public void Configure(EntityTypeBuilder<IntegrationSystem> builder)
+        {
+
+        }
+    }
     [Table("IntegrationSystem")]
     public class IntegrationSystem : BaseEntity
     {

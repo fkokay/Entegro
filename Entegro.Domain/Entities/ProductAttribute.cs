@@ -1,8 +1,17 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities
 {
+    public class ProductAttributeMap : IEntityTypeConfiguration<ProductAttribute>
+    {
+        public void Configure(EntityTypeBuilder<ProductAttribute> builder)
+        {
+
+        }
+    }
     [Table("ProductAttribute")]
     public class ProductAttribute : BaseEntity, IDisplayOrder
     {

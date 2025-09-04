@@ -1,9 +1,18 @@
 ﻿using Entegro.Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Domain.Entities
 {
+    public class MediaFolderMap : IEntityTypeConfiguration<MediaFolder>
+    {
+        public void Configure(EntityTypeBuilder<MediaFolder> builder)
+        {
+
+        }
+    }
     [Table("MediaFolder")]
     public class MediaFolder : BaseEntity
     {

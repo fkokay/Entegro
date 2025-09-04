@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Emit;
 
 namespace Entegro.Domain.Entities
 {
@@ -14,6 +15,15 @@ namespace Entegro.Domain.Entities
                    .WithOne(pc => pc.Product)
                    .HasForeignKey(pc => pc.ProductId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(p => p.Price).HasPrecision(18, 4);
+            builder.Property(p => p.OldPrice).HasPrecision(18, 4);
+            builder.Property(p => p.SpecialPrice).HasPrecision(18, 4);
+            builder.Property(p => p.VatRate).HasPrecision(18, 4);
+            builder.Property(p => p.Weight).HasPrecision(18, 4);
+            builder.Property(p => p.Length).HasPrecision(18, 4);
+            builder.Property(p => p.Width).HasPrecision(18, 4);
+            builder.Property(p => p.Height).HasPrecision(18, 4);
         }
     }
 

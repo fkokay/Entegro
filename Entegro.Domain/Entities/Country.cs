@@ -1,9 +1,18 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Domain.Entities
 {
+    public class CountryMap : IEntityTypeConfiguration<Country>
+    {
+        public void Configure(EntityTypeBuilder<Country> builder)
+        {
+
+        }
+    }
     [Table("Country")]
     public class Country : BaseEntity
     {
