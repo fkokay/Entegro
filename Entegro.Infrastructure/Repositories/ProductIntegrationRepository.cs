@@ -133,7 +133,7 @@ namespace Entegro.Infrastructure.Repositories
                     MetaTitle = pi.Product.MetaTitle,
                     MetaDescription = pi.Product.MetaDescription,
                     ManufacturerPartNumber = pi.Product.ManufacturerPartNumber,
-                    Brand = new Brand
+                    Brand = pi.Product.Brand == null ? null :new Brand
                     {
                         Id = pi.Product.Brand.Id,
                         Name = pi.Product.Brand.Name
@@ -148,8 +148,8 @@ namespace Entegro.Infrastructure.Repositories
                             Name = pc.Category.Name,
                             ParentCategory = pc.Category.ParentCategory == null ? null : new Category()
                             {
-                                Id = pc.Category.ParentCategoryId.Value,
-                                Name = pc.Category.Name,
+                                Id = pc.Category.ParentCategory.Id,
+                                Name = pc.Category.ParentCategory.Name
                             }
                         },
                         ProductId = pc.ProductId,
@@ -182,9 +182,9 @@ namespace Entegro.Infrastructure.Repositories
                             Metadata = mf.MediaFile.Metadata,
                             UpdatedOn = mf.MediaFile.UpdatedOn,
                             MediaType = mf.MediaFile.MimeType,
-                            Folder = mf.MediaFile == null ? null : new MediaFolder
+                            Folder = mf.MediaFile.Folder == null ? null : new MediaFolder
                             {
-                                Id = mf.MediaFile.FolderId.Value,
+                                Id = mf.MediaFile.Folder.Id,
                                 Metadata = mf.MediaFile.Folder.Metadata,
                                 Discriminator = mf.MediaFile.Folder.Discriminator,
                                 CanDetectTracks = mf.MediaFile.Folder.CanDetectTracks,
