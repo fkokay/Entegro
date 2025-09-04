@@ -20,7 +20,7 @@
         columns: [
             { data: 'Id' },
             { data: 'Id', orderable: false, render: DataTable.render.select() },
-            { data: 'ProductAttribute.Name' },
+            { data: 'ProductAttributeName' },
             { data: 'Name' },
             { data: 'DisplayOrder' },
             { data: 'Id' },

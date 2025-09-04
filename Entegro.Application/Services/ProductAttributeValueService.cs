@@ -49,6 +49,11 @@ namespace Entegro.Application.Services
         {
             var productAttributeValues = await _productAttributeValueRepository.GetAllAsync(pageNumber, pageSize);
             var productAttributeValueDtos = _mapper.Map<PagedResult<ProductAttributeValueDto>>(productAttributeValues);
+
+            foreach (var item in productAttributeValueDtos.Items)
+            {
+                item.ProductAttributeName = productAttributeValues.Items.Where(m => m.Id == item.Id).Select(m => m.ProductAttribute?.Name).FirstOrDefault() ?? "";
+            }
             return productAttributeValueDtos;
         }
 
@@ -84,7 +89,7 @@ namespace Entegro.Application.Services
 
         public async Task<ProductAttributeValueDto?> GetByNameOrAttributeIdAsync(string name, int attributeId)
         {
-            var productAttributeValue = await _productAttributeValueRepository.GetByNameOrAttributeIdAsync(name,attributeId);
+            var productAttributeValue = await _productAttributeValueRepository.GetByNameOrAttributeIdAsync(name, attributeId);
             if (productAttributeValue == null)
             {
                 return null;

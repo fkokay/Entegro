@@ -109,12 +109,12 @@ namespace Entegro.Application.Services
 
         public async Task<bool> ExistsByCodeAsync(string productCode)
         {
-            return await _productRepository.ExistsByCodeAsync(productCode);
+            return await _productRepository.ExistsAsync(m=>m.Code == productCode);
         }
 
         public async Task<bool> ExistsByNameAsync(string productName)
         {
-            return await _productRepository.ExistsByNameAsync(productName);
+            return await _productRepository.ExistsAsync(m=>m.Name == productName);
         }
 
         public async Task<ProductDto?> GetProductByCodeAsync(string productCode)
@@ -172,7 +172,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> ExistsByBarcodeAsync(string productBarcode)
         {
-            return await _productRepository.ExistsByBarcodeAsync(productBarcode);
+            return await _productRepository.ExistsAsync(m=>m.Barcode == productBarcode);
         }
 
         public async Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)

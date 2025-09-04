@@ -26,33 +26,24 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(ProductAttributeValue productAttributeValue)
+        {
+            _context.ProductAttributeValues.Update(productAttributeValue);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<ProductAttributeValue>> GetAllAsync()
         {
-            return await _context.ProductAttributeValues.ToListAsync();
+            return await IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking()).OrderBy(p => p.Id).ToListAsync();
         }
 
         public async Task<PagedResult<ProductAttributeValue>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.ProductAttributeValues
-          .AsNoTracking()
-          .Select(x => new ProductAttributeValue
-          {
-              Id = x.Id,
-              ProductAttributeId = x.ProductAttributeId,
-              Name = x.Name,
-              DisplayOrder = x.DisplayOrder,
-              ProductAttribute = new ProductAttribute
-              {
-                  Id = x.ProductAttribute.Id,
-                  Name = x.ProductAttribute.Name,
-                  Description = x.ProductAttribute.Description,
-                  DisplayOrder = x.ProductAttribute.DisplayOrder
-              }
-          });
+            var query = IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking()).OrderBy(p => p.Id);
+
 
             var totalCount = await query.CountAsync();
             var productAttributeValues = await query
-                .OrderBy(b => b.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -68,23 +59,25 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductAttributeValue?> GetByIdAsync(int id)
         {
-            return await _context.ProductAttributeValues.FirstOrDefaultAsync(o => o.Id == id);
+            return await IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking())
+                    .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<ProductAttributeValue?> GetByNameAsync(string name)
         {
-            return await _context.ProductAttributeValues.FirstOrDefaultAsync(o => o.Name == name);
+            return await IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking())
+              .FirstOrDefaultAsync(p => p.Name == name);
         }
 
         public async Task<ProductAttributeValue?> GetByNameOrAttributeIdAsync(string name, int attributeId)
         {
-            return await _context.ProductAttributeValues.FirstOrDefaultAsync(o => o.Name == name && o.ProductAttributeId == attributeId);
+            return await IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking())
+              .FirstOrDefaultAsync(p => p.Name == name && p.ProductAttributeId == attributeId);
         }
 
-        public async Task UpdateAsync(ProductAttributeValue productAttributeValue)
+        private IQueryable<ProductAttributeValue> IncludeAllProperties(IQueryable<ProductAttributeValue> query)
         {
-            _context.ProductAttributeValues.Update(productAttributeValue);
-            await _context.SaveChangesAsync();
+            return query.Include(p => p.ProductAttribute).AsSplitQuery();
         }
     }
 }
