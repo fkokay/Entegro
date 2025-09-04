@@ -155,6 +155,13 @@ builder.Services.AddScoped<ISpecificationAttributeRepository, SpecificationAttri
 builder.Services.AddScoped<ISpecificationAttributeService, SpecificationAttributeService>();
 
 
+builder.Services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
+builder.Services.AddScoped<IEmailAccountService, EmailAccountService>();
+
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+
+
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 
 
