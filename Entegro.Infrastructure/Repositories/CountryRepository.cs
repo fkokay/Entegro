@@ -15,7 +15,7 @@ namespace Entegro.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Country> GetByIdAsync(int id)
+        public async Task<Country?> GetByIdAsync(int id)
         {
             return await _context.Countries
                 .Include(c => c.Cities)
@@ -59,6 +59,7 @@ namespace Entegro.Infrastructure.Repositories
 
             var totalCount = await query.CountAsync();
             var categories = await query
+                .OrderBy(b => b.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

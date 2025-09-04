@@ -41,6 +41,7 @@ namespace Entegro.Infrastructure.Repositories
 
             var totalCount = await query.CountAsync();
             var brands = await query
+                .OrderBy(b => b.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -54,7 +55,7 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<Address> GetByIdAsync(int id) => await _context.Addresses.FirstOrDefaultAsync(o => o.Id == id);
+        public async Task<Address?> GetByIdAsync(int id) => await _context.Addresses.FirstOrDefaultAsync(o => o.Id == id);
 
         public async Task UpdateAsync(Address address)
         {

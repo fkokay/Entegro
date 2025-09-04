@@ -4,7 +4,7 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface ITownRepository
     {
-        Task<Town> GetByIdAsync(int id);
+        Task<Town?> GetByIdAsync(int id);
         Task<List<Town>> GetAllAsync();
         Task<List<Town>> GetByCityIdAsync(int cityId);
         Task AddAsync(Town town);

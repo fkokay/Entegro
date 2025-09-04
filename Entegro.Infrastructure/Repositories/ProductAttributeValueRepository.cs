@@ -52,6 +52,7 @@ namespace Entegro.Infrastructure.Repositories
 
             var totalCount = await query.CountAsync();
             var productAttributeValues = await query
+                .OrderBy(b => b.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

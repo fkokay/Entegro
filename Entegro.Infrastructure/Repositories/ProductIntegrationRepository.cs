@@ -52,6 +52,7 @@ namespace Entegro.Infrastructure.Repositories
 
             var totalCount = await query.CountAsync();
             var orders = await query
+                .OrderBy(b => b.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

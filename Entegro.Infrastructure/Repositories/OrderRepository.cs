@@ -62,7 +62,8 @@ namespace Entegro.Infrastructure.Repositories
                     TaxRate = i.TaxRate,
                     UnitPrice = i.UnitPrice
                 }).ToList()
-            }).Skip(pageNumber * pageSize)
+            }).OrderBy(m => m.Id)
+                .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
