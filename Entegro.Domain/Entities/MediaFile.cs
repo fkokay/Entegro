@@ -15,13 +15,8 @@ namespace Entegro.Domain.Entities
     [Table("MediaFile")]
     public class MediaFile : BaseEntity, ITransient
     {
-        public int? FolderId { get; set; }
-        private MediaFolder? _folder;
-        public MediaFolder? Folder
-        {
-            get => _folder ?? LazyLoader?.Load(this, ref _folder);
-            set => _folder = value;
-        }
+        public int? MediaFolderId { get; set; }
+        public virtual MediaFolder? MediaFolder { get; set; }
         public string Name { get; set; }
         public string Alt { get; set; }
         public string Title { get; set; }
@@ -39,9 +34,5 @@ namespace Entegro.Domain.Entities
         public bool Deleted { get; set; }
         public bool Hidden { get; set; }
         public int Version { get; set; }
-
-
-
-
     }
 }

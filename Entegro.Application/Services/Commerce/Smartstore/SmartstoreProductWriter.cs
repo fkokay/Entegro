@@ -21,11 +21,17 @@ namespace Entegro.Application.Services.Commerce.Smartstore
     {
         private readonly SmartstoreClient _smartstoreClient;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly IProductService _productService;
         private readonly ILogger<SmartstoreProductWriter> _logger;
-        public SmartstoreProductWriter(SmartstoreClient smartstoreClient,IProductIntegrationService productIntegrationService, ILogger<SmartstoreProductWriter> logger)
+        public SmartstoreProductWriter(
+            SmartstoreClient smartstoreClient,
+            IProductIntegrationService productIntegrationService,
+            IProductService productService,
+            ILogger<SmartstoreProductWriter> logger)
         {
             _smartstoreClient = smartstoreClient;
             _productIntegrationService = productIntegrationService;
+            _productService = productService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -39,18 +45,25 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
             if (productIntegration.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Commerce)
             {
-                string commerceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
-               
+                string? commerceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
+
                 if (commerceType == "Smartstore")
                 {
-                    object customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
+                    object? customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
 
-                    productIntegration.Product.Code = productIntegration.IntegrationCode;
-                    productIntegration.Product.Price = productIntegration.Price;
+                    var product = await _productService.GetProductByIdAsync(productIntegration.ProductId);
+                    if (product == null)
+                    {
+                        _logger.LogWarning($"Product with ID {productIntegration.ProductId} not found.");
+                        return;
+                    }
+
+                    product.Code = productIntegration.IntegrationCode;
+                    product.Price = productIntegration.Price;
 
                     var request = new UpsertProductRequest
                     {
-                        Product = productIntegration.Product,
+                        Product = product,
                         CustomData = customData
                     };
 

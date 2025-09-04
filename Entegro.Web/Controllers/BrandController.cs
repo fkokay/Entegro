@@ -93,10 +93,10 @@ namespace Entegro.Web.Controllers
                     Title = brand.MediaFile.Title,
                     UpdatedOn = brand.MediaFile.UpdatedOn,
                     Width = brand.MediaFile.Width,
-                    Folder = brand.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    Folder = brand.MediaFile.MediaFolder == null ? null : new MediaFolderViewModel()
                     {
-                        Id = brand.MediaFile.Folder.Id,
-                        Name = brand.MediaFile.Folder.Name,
+                        Id = brand.MediaFile.MediaFolder.Id,
+                        Name = brand.MediaFile.MediaFolder.Name,
                     }
                 }
             };

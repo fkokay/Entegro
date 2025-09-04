@@ -20,31 +20,14 @@ namespace Entegro.Domain.Entities
     public class ProductVariantAttribute : BaseEntity, IDisplayOrder
     {
         public int ProductId { get; set; }
-
-        private Product _product;
-        public Product Product
-        {
-            get => _product ?? LazyLoader.Load(this, ref _product);
-            set => _product = value;
-        }
+        public virtual Product Product { get; set; }
         public int ProductAttributeId { get; set; }
-
-        private ProductAttribute _productAttribute;
-        public ProductAttribute ProductAttribute
-        {
-            get => _productAttribute ?? LazyLoader.Load(this, ref _productAttribute);
-            set => _productAttribute = value;
-        }
+        public virtual ProductAttribute ProductAttribute { get; set; }
         public bool IsRequried { get; set; }
         public int AttributeControlTypeId { get; set; }
         public int DisplayOrder {get;set; }
 
-        private ICollection<ProductVariantAttributeValue> _productVariantAttributeValues;
-        public ICollection<ProductVariantAttributeValue> ProductVariantAttributeValues
-        {
-            get => LazyLoader?.Load(this, ref _productVariantAttributeValues) ?? (_productVariantAttributeValues ??= new HashSet<ProductVariantAttributeValue>());
-            set => _productVariantAttributeValues = value;
-        }
+        public virtual ICollection<ProductVariantAttributeValue> ProductVariantAttributeValues{get;set;} = new HashSet<ProductVariantAttributeValue>();
 
     }
 }

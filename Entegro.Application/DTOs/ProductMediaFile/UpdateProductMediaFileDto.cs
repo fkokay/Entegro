@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Application.DTOs.ProductMediaFile
 {
-    public class UpdateProductMediaFileeDto
+    public class UpdateProductMediaFileDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }

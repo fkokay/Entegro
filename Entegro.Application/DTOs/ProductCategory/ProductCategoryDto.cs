@@ -11,6 +11,5 @@ namespace Entegro.Application.DTOs.ProductCategory
         public int DisplayOrder { get; set; }
 
         public CategoryDto Category { get; set; }
-        public ProductDto Product { get; set; }
     }
 }

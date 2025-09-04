@@ -19,21 +19,9 @@ namespace Entegro.Domain.Entities
     {
         public int ProductId { get; set; }
         public decimal Price { get; set; }
-
-        private Product _product;
-        public Product Product
-        {
-            get => _product ?? LazyLoader?.Load(this, ref _product);
-            set => _product = value;
-        }
+        public virtual Product Product { get; set; }
         public int IntegrationSystemId { get; set; }
-
-        private IntegrationSystem _integrationSystem;
-        public IntegrationSystem IntegrationSystem
-        {
-            get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
-            set => _integrationSystem = value;
-        }
+        public virtual IntegrationSystem IntegrationSystem { get; set; }
         public string IntegrationCode { get; set; }
         public string? Custom { get; set; }
         public DateTime? LastSyncDate { get; set; }

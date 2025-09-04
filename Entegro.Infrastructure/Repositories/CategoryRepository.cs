@@ -33,7 +33,7 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<List<Category>> GetAllAsync() => await _context.Categories.AsNoTracking().ToListAsync();
         public async Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Categories.Include(c => c.ParentCategory).Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().AsQueryable();
+            var query = _context.Categories.Include(c => c.ParentCategory).Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var categories = await query.OrderBy(m=>m.Id).Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
@@ -51,14 +51,14 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Categories
              .Include(b => b.MediaFile)
-             .ThenInclude(b => b.Folder)
+             .ThenInclude(b => b.MediaFolder)
              .FirstOrDefaultAsync(b => b.Id == id);
         }
         public async Task<Category?> GetByNameAsync(string name)
         {
             return await _context.Categories
             .Include(b => b.MediaFile)
-            .ThenInclude(b => b.Folder)
+            .ThenInclude(b => b.MediaFolder)
             .FirstOrDefaultAsync(b => b.Name == name);
         }
         public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)

@@ -9,9 +9,6 @@ namespace Entegro.Application.DTOs.ProductMediaFile
         public int ProductId { get; set; }
         public int MediaFileId { get; set; }
         public int DisplayOrder { get; set; }
-
-        public ProductDto Product { get; set; }
         public MediaFileDto MediaFile { get; set; }
-
     }
 }

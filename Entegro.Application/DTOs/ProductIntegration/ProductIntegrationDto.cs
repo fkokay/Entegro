@@ -14,7 +14,7 @@ namespace Entegro.Application.DTOs.ProductIntegration
         public DateTime? LastSyncDate { get; set; }
         public bool IsSync { get; set; }
         public bool Active { get; set; }
-        public ProductDto Product { get; set; }
+
         public IntegrationSystemDto IntegrationSystem { get; set; }
     }
 }

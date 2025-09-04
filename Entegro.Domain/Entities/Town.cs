@@ -16,14 +16,9 @@ namespace Entegro.Domain.Entities
     public class Town : BaseEntity
     {
         public int CityId { get; set; }
+        public virtual City City { get; set; }
         public string Name { get; set; }
         public bool Published { get; set; }
-
-        private ICollection<District> _districts;
-        public ICollection<District> Districts
-        {
-            get => LazyLoader?.Load(this, ref _districts) ?? (_districts ??= new HashSet<District>());
-            set => _districts = value;
-        }
+        public virtual ICollection<District> Districts { get; set; } = new HashSet<District>();
     }
 }

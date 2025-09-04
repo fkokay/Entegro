@@ -69,7 +69,7 @@ namespace Entegro.Application.Services
             return productImageMappingDtos;
         }
 
-        public async Task<ProductMediaFileDto> UpdateAsync(UpdateProductMediaFileeDto productImage)
+        public async Task<ProductMediaFileDto> UpdateAsync(UpdateProductMediaFileDto productImage)
         {
             await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(productImage));
             return _mapper.Map<ProductMediaFileDto>(productImage);

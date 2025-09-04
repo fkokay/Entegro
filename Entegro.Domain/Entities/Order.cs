@@ -32,27 +32,19 @@ namespace Entegro.Domain.Entities
             {
                 return OrderSource switch
                 {
-                    OrderSource.Smartstore => "Smartstore"
+                    OrderSource.Smartstore => "Smartstore",
+                    OrderSource.Trendyol => "Trendyol",
+                    _ => throw new NotImplementedException(),
                 };
             }
         }
         public string OrderNo { get; set; }
         public int CustomerId { get; set; }
+        public virtual Customer? Customer { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public bool Deleted { get; set; }
         public bool IsTransient { get; set; }
-        private Customer? _customer;
-        public Customer? Customer
-        {
-            get => _customer ?? LazyLoader?.Load(this, ref _customer);
-            set => _customer = value;
-        }
-        private ICollection<OrderItem> _orderItems;
-        public ICollection<OrderItem> OrderItems
-        {
-            get => LazyLoader?.Load(this, ref _orderItems) ?? (_orderItems ??= new HashSet<OrderItem>());
-            set => _orderItems = value;
-        }
+        public virtual ICollection<OrderItem> OrderItems { get; set; }
     }
 }

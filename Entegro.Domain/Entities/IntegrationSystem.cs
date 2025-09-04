@@ -43,21 +43,8 @@ namespace Entegro.Domain.Entities
         }
         public string Name { get; set; }
         public string? Description { get; set; }
-
-
-        private ICollection<IntegrationSystemParameter> _integrationSystemParameters;
-        public ICollection<IntegrationSystemParameter> IntegrationSystemParameters
-        {
-            get => LazyLoader?.Load(this, ref _integrationSystemParameters) ?? (_integrationSystemParameters ??= new HashSet<IntegrationSystemParameter>());
-            set => _integrationSystemParameters = value;
-        }
-
-        private ICollection<IntegrationSystemLog> _integrationSystemLogs;
-        public ICollection<IntegrationSystemLog> IntegrationSystemLogs
-        {
-            get => LazyLoader?.Load(this, ref _integrationSystemLogs) ?? (_integrationSystemLogs ??= new HashSet<IntegrationSystemLog>());
-            set => _integrationSystemLogs = value;
-        }
+        public virtual ICollection<IntegrationSystemParameter> IntegrationSystemParameters { get; set; } = new HashSet<IntegrationSystemParameter>();
+        public virtual ICollection<IntegrationSystemLog> IntegrationSystemLogs { get; set; } = new HashSet<IntegrationSystemLog>();
 
     }
 }

@@ -29,8 +29,13 @@ namespace Entegro.Application.Services.Marketplace
 
         private readonly HttpClient _httpClient;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly IProductService _productService;
         private readonly ILogger<TrendyolService> _logger;
-        public TrendyolService(HttpClient httpClient, IProductIntegrationService productIntegrationService, ILogger<TrendyolService> logger)
+        public TrendyolService(
+            HttpClient httpClient, 
+            IProductIntegrationService productIntegrationService, 
+            IProductService productService,
+            ILogger<TrendyolService> logger)
         {
 
 
@@ -47,6 +52,7 @@ namespace Entegro.Application.Services.Marketplace
             var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
             _productIntegrationService = productIntegrationService;
+            _productService = productService;
             _logger = logger;
         }
         public async Task HandleAsync(ProductIntegrationRecordUpdatedEvent recordUpdatedEvent)
@@ -59,14 +65,20 @@ namespace Entegro.Application.Services.Marketplace
 
             if (productIntegration.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Marketplace)
             {
-                string marketplaceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
+                string? marketplaceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
 
                 if (marketplaceType == "Trendyol")
                 {
-                    object customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonSerializer.Deserialize<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
+                    object? customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonSerializer.Deserialize<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
+                    var product = await _productService.GetProductByIdAsync(productIntegration.ProductId);
+                    if (product == null)
+                    {
+                        _logger.LogWarning($"Product with ID {productIntegration.ProductId} not found.");
+                        return;
+                    }
 
-                    productIntegration.Product.Code = productIntegration.IntegrationCode;
-                    productIntegration.Product.Price = productIntegration.Price;
+                    product.Code = productIntegration.IntegrationCode;
+                    product.Price = productIntegration.Price;
 
                     var request = new TrendyolPriceAndStockUpdateRequest
                     {
@@ -77,7 +89,7 @@ namespace Entegro.Application.Services.Marketplace
                                 Barcode = productIntegration.IntegrationCode,
                                 ListPrice = productIntegration.Price,
                                 SalePrice = productIntegration.Price,
-                                Quantity = productIntegration.Product.StockQuantity
+                                Quantity = product.StockQuantity
                             }
                         }
                     };

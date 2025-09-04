@@ -22,13 +22,7 @@ namespace Entegro.Domain.Entities
     public class ProductVariantAttributeValue : BaseEntity
     {
         public int ProductVariantAttributeId { get; set; }
-
-        private ProductVariantAttribute _productVariantAttribute;
-        public ProductVariantAttribute ProductVariantAttribute
-        {
-            get => _productVariantAttribute ?? LazyLoader.Load(this, ref _productVariantAttribute);
-            set => _productVariantAttribute = value;
-        }
+        public virtual ProductVariantAttribute ProductVariantAttribute { get; set; }
         public string Name { get; set; }
     }
 }

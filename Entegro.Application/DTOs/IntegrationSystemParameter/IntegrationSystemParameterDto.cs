@@ -13,7 +13,5 @@ namespace Entegro.Application.DTOs.IntegrationSystemParameter
         public int IntegrationSystemId { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
-
-        public virtual IntegrationSystemDto IntegrationSystem { get; set; }
     }
 }

@@ -78,13 +78,19 @@ namespace Entegro.Service.Jobs
             foreach (var item in productIntegrations)
             {
                 var customData = getCustomData(item);
+                var product = await _productService.GetProductByIdAsync(item.ProductId);
+                if (product == null)
+                {
+                    _logger.LogWarning($"Product with ID {item.ProductId} not found.");
+                    continue;
+                }
 
-                item.Product.Code = item.IntegrationCode;
-                item.Product.Price = item.Price;
+                product.Code = item.IntegrationCode;
+                product.Price = item.Price;
 
                 var request = new UpsertProductRequest
                 {
-                    Product = item.Product,
+                    Product = product,
                     CustomData = customData
                 };
                 await _commerceProductWriter.UpsertProductAsync(request);

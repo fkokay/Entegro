@@ -29,6 +29,7 @@ namespace Entegro.Application.DTOs.IntegrationSystem
                     IntegrationSystemType.Marketplace => "Pazaryeri Entegrasyonu",
                     IntegrationSystemType.Cargo => "Kargo Entegrasyonu",
                     IntegrationSystemType.EInvoice => "E-Fatura Entegrasyonu",
+                    _ => throw new NotImplementedException(),
                 };
             }
         }

@@ -17,12 +17,7 @@ namespace Entegro.Domain.Entities
     public class MediaFolder : BaseEntity
     {
         public int? ParentId { get; set; }
-        private MediaFolder? _parent;
-        public MediaFolder? Parent
-        {
-            get => _parent ?? LazyLoader?.Load(this, ref _parent);
-            set => _parent = value;
-        }
+        public virtual MediaFolder? Parent { get; set; }
         public string TreePath { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string Slug { get; set; } = null!;
@@ -33,12 +28,6 @@ namespace Entegro.Domain.Entities
         public string ResKey { get; set; } = null!;
         public bool IncludePath { get; set; }
         public int? Order { get; set; }
-
-        private ICollection<MediaFile> _mediaFiles;
-        public ICollection<MediaFile> MediaFiles
-        {
-            get => LazyLoader?.Load(this, ref _mediaFiles) ?? (_mediaFiles ??= new HashSet<MediaFile>());
-            set => _mediaFiles = value;
-        }
+        public virtual ICollection<MediaFile> MediaFiles { get; set; }
     }
 }

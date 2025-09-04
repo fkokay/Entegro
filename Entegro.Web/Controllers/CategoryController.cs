@@ -109,10 +109,10 @@ namespace Entegro.Web.Controllers
                     Title = category.MediaFile.Title,
                     UpdatedOn = category.MediaFile.UpdatedOn,
                     Width = category.MediaFile.Width,
-                    Folder = category.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    Folder = category.MediaFile.MediaFolder == null ? null : new MediaFolderViewModel()
                     {
-                        Id = category.MediaFile.Folder.Id,
-                        Name = category.MediaFile.Folder.Name,
+                        Id = category.MediaFile.MediaFolder.Id,
+                        Name = category.MediaFile.MediaFolder.Name,
                     }
                 }
 

@@ -43,15 +43,7 @@ namespace Entegro.Domain.Entities
         public decimal VatRate { get; set; }
         public bool VatInc { get; set; }
         public int? BrandId { get; set; }
-
-        private Brand? _brand;
-        public Brand? Brand
-        {
-            get => _brand ?? LazyLoader?.Load(this, ref _brand);
-            set => _brand = value;
-        }
-
-
+        public virtual Brand? Brand { get; set; }
         public int StockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }
@@ -62,51 +54,16 @@ namespace Entegro.Domain.Entities
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
         public int? MainPictureId { get; set; }
-        private MediaFile? _mainPicture;
-        public MediaFile? MainPicture
-        {
-            get => _mainPicture ?? LazyLoader?.Load(this, ref _mainPicture);
-            set => _mainPicture = value;
-        }
+        public virtual MediaFile? MainPicture { get; set; }
         public bool Published { get; set; } = true;
         public bool Deleted { get; set; } = false;
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-
-        private ICollection<ProductMediaFile> _productMediaFiles;
-        public ICollection<ProductMediaFile> ProductMediaFiles
-        {
-            get => LazyLoader?.Load(this, ref _productMediaFiles) ?? (_productMediaFiles ??= new HashSet<ProductMediaFile>());
-            set => _productMediaFiles = value;
-        }
-
-        private ICollection<ProductCategory> _productCategories;
-        public ICollection<ProductCategory> ProductCategories
-        {
-            get => LazyLoader?.Load(this, ref _productCategories) ?? (_productCategories ??= new HashSet<ProductCategory>());
-            set => _productCategories = value;
-        }
-
-        private ICollection<ProductVariantAttribute> _productVariantAttributes;
-        public ICollection<ProductVariantAttribute> ProductVariantAttributes
-        {
-            get => LazyLoader?.Load(this, ref _productVariantAttributes) ?? (_productVariantAttributes ??= new HashSet<ProductVariantAttribute>());
-            set => _productVariantAttributes = value;
-        }
-
-        private ICollection<ProductVariantAttributeCombination> _productVariantAttributeCombinations;
-        public ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations
-        {
-            get => LazyLoader?.Load(this, ref _productVariantAttributeCombinations) ?? (_productVariantAttributeCombinations ??= new HashSet<ProductVariantAttributeCombination>());
-            set => _productVariantAttributeCombinations = value;
-        }
-
-        private ICollection<ProductIntegration> _productIntegrations;
-        public ICollection<ProductIntegration> ProductIntegrations
-        {
-            get => LazyLoader?.Load(this, ref _productIntegrations) ?? (_productIntegrations ??= new HashSet<ProductIntegration>());
-            set => _productIntegrations = value;
-        }
+        public virtual ICollection<ProductMediaFile> ProductMediaFiles { get; set; } = new HashSet<ProductMediaFile>();
+        public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new HashSet<ProductCategory>();
+        public virtual ICollection<ProductVariantAttribute> ProductVariantAttributes { get; set; } = new HashSet<ProductVariantAttribute>();
+        public virtual ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; } = new HashSet<ProductVariantAttributeCombination>();
+        public virtual ICollection<ProductIntegration> ProductIntegrations { get; set; } = new HashSet<ProductIntegration>();
 
     }
 }

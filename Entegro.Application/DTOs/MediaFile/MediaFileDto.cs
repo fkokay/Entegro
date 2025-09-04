@@ -26,18 +26,18 @@ namespace Entegro.Application.DTOs.MediaFile
         {
             get
             {
-                if (this.Folder == null)
+                if (this.MediaFolder == null)
                 {
                     return $"/media/{Id}/{Name}";
                 }
                 else
                 {
-                    return $"/media/{Id}/{Folder.Name}/{Name}";
+                    return $"/media/{Id}/{MediaFolder.Name}/{Name}";
                 }
 
             }
         }
 
-        public MediaFolderDto? Folder { get; set; }
+        public MediaFolderDto? MediaFolder { get; set; }
     }
 }

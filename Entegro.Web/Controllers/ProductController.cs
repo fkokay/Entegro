@@ -6,6 +6,7 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -406,7 +407,7 @@ namespace Entegro.Web.Controllers
                                 EntityMediaId = productPicture.Id
                             });
 
-                            await _productImageMappingService.UpdateAsync(new UpdateProductMediaFileeDto
+                            await _productImageMappingService.UpdateAsync(new UpdateProductMediaFileDto
                             {
                                 Id = pictureId,
                                 DisplayOrder = i,
@@ -596,7 +597,13 @@ namespace Entegro.Web.Controllers
                 {
                     if (existingProductIntegration.ProductId != model.ProductId)
                     {
-                        return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {existingProductIntegration.Product.Name}" });
+                        var product = await _productService.GetProductByIdAsync(existingProductIntegration.ProductId);
+                        if (product == null)
+                        {
+                            return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: Bulunamadı" });
+                        }
+
+                        return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {product.Name}" });
                     }
 
                 }
@@ -651,7 +658,12 @@ namespace Entegro.Web.Controllers
                 {
                     if (existingProductIntegration.ProductId != model.ProductId)
                     {
-                        return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {existingProductIntegration.Product.Name}" });
+                        var product = await _productService.GetProductByIdAsync(existingProductIntegration.ProductId);
+                        if (product == null)
+                        {
+                            return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: Bulunamadı" });
+                        }
+                        return Json(new { success = false, message = $"Bu entegrasyon sistemi ve kod kombinasyonu zaten mevcut. Ürün Adı: {product.Name}" });
                     }
 
                 }
@@ -778,10 +790,10 @@ namespace Entegro.Web.Controllers
                         Title = m.MediaFile.Title,
                         UpdatedOn = m.MediaFile.UpdatedOn,
                         Width = m.MediaFile.Width,
-                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                        Folder = m.MediaFile.MediaFolder == null ? null : new MediaFolderViewModel()
                         {
-                            Id = m.MediaFile.Folder.Id,
-                            Name = m.MediaFile.Folder.Name,
+                            Id = m.MediaFile.MediaFolder.Id,
+                            Name = m.MediaFile.MediaFolder.Name,
                         }
                     }
                 }).ToList();

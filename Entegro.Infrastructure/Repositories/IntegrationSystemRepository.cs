@@ -28,20 +28,17 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<IntegrationSystem>> GetAllAsync()
         {
-            return await _context.IntegrationSystems.AsNoTracking().Include(p => p.IntegrationSystemParameters).Select(m=> new IntegrationSystem()
-            {
-                Id = m.Id,
-                Description = m.Description,
-                IntegrationSystemParameters = m.IntegrationSystemParameters,
-                Name = m.Name,
-                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                IntegrationSystemType = m.IntegrationSystemType
-            }).ToListAsync();
+            var integrationSystems = await _context.IntegrationSystems
+            .Include(x => x.IntegrationSystemParameters)
+            .AsNoTracking()
+            .ToListAsync();
+
+            return integrationSystems;
         }
 
         public async Task<PagedResult<IntegrationSystem>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.IntegrationSystems.AsQueryable();
+            var query = _context.IntegrationSystems.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query

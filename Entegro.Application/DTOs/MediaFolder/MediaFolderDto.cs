@@ -1,4 +1,7 @@
-﻿namespace Entegro.Application.DTOs.MediaFolder
+﻿using Entegro.Application.DTOs.MediaFile;
+using Entegro.Domain.Entities;
+
+namespace Entegro.Application.DTOs.MediaFolder
 {
     public class MediaFolderDto
     {

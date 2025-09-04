@@ -17,21 +17,12 @@ namespace Entegro.Domain.Entities
     public class ProductVariantAttributeCombination : BaseEntity
     {
         public int ProductId { get; set; }
+        public virtual Product Product { get; set; }
         public string? StokCode { get; set; }
         public string? Gtin { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string RawAttribute { get; set; }
-
-
-        private Product _product;
-
-        public Product Product
-        {
-            get => _product ?? LazyLoader.Load(this, ref _product);
-            set => _product = value;
-        }
-
     }
 }

@@ -33,7 +33,10 @@ namespace Entegro.Infrastructure.Repositories
             }
         }
 
-        public async Task<List<Address>> GetAllAsync() => await _context.Addresses.ToListAsync();
+        public async Task<List<Address>> GetAllAsync()
+        {
+            return await _context.Addresses.ToListAsync();
+        }
 
         public async Task<PagedResult<Address>> GetAllAsync(int pageNumber, int pageSize)
         {

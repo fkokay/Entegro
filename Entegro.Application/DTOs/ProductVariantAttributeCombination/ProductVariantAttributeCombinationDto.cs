@@ -13,7 +13,5 @@ namespace Entegro.Application.DTOs.ProductVariantAttributeCombination
         public int StockQuantity { get; set; }
         public string RawAttribute { get; set; }
         public int HashCode { get; set; }
-
-        public virtual ProductDto Product { get; set; }
     }
 }

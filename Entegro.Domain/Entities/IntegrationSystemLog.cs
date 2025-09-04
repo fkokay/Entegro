@@ -16,12 +16,7 @@ namespace Entegro.Domain.Entities
     public class IntegrationSystemLog : BaseEntity
     {
         public int IntegrationSystemId { get; set; }
-        private IntegrationSystem? _integrationSystem;
-        public IntegrationSystem? IntegrationSystem
-        {
-            get => _integrationSystem ?? LazyLoader?.Load(this, ref _integrationSystem);
-            set => _integrationSystem = value;
-        }
+        public virtual IntegrationSystem? IntegrationSystem { get; set; }
         public DateTime Timestamp { get; set; }
         public string Message { get; set; }
         public string LogLevel { get; set; } // e.g., "Info", "Warning", "Error"

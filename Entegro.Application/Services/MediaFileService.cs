@@ -78,10 +78,10 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"MediaFile with ID {mediaFileId} not found.");
             }
 
-            var mediaFolder = mediaFile.FolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value) : null;
+            var mediaFolder = mediaFile.MediaFolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.MediaFolderId.Value) : null;
 
 
-            string folderName = mediaFile.Folder?.Name ?? ""; // default Brand olabilir
+            string folderName = mediaFile.MediaFolder?.Name ?? ""; // default Brand olabilir
             string uploadsRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folderName);
             string filePath = Path.Combine(uploadsRoot, mediaFile.Name);
 

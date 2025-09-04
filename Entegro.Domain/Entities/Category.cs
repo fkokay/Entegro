@@ -27,24 +27,12 @@ namespace Entegro.Domain.Entities
     public class Category : BaseEntity, IDisplayOrder
     {
         public int? ParentCategoryId { get; set; }
-
-        private Category? _parentCategory;
-        public Category? ParentCategory
-        {
-            get => _parentCategory ?? LazyLoader?.Load(this, ref _parentCategory);
-            set => _parentCategory = value;
-        }
+        public virtual Category? ParentCategory { get; set; }
         public string TreePath { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public int? MediaFileId { get; set; }
-
-        private MediaFile? _mediaFile;
-        public MediaFile? MediaFile
-        {
-            get => _mediaFile ?? LazyLoader?.Load(this, ref _mediaFile);
-            set => _mediaFile = value;
-        }
+        public virtual MediaFile? MediaFile { get; set; }
         public string? MetaTitle { get; set; }
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
@@ -52,14 +40,7 @@ namespace Entegro.Domain.Entities
         public bool Published { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-
-        private ICollection<Category> _children;
-        [IgnoreDataMember]
-        public ICollection<Category> Children
-        {
-            get => LazyLoader?.Load(this, ref _children) ?? (_children ??= new HashSet<Category>());
-            set => _children = value;
-        }
+        public virtual ICollection<Category> Children { get; set; } = new HashSet<Category>();
     }
 
     public sealed class CategorySlim

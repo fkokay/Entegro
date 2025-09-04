@@ -16,20 +16,9 @@ namespace Entegro.Domain.Entities
     public class City : BaseEntity
     {
         public int CountryId { get; set; }
-        private Country? _country;
-        public Country? Country
-        {
-            get => _country ?? LazyLoader?.Load(this, ref _country);
-            set => _country = value;
-        }
+        public virtual Country? Country { get; set; }
         public string Name { get; set; }
         public bool Published { get; set; }
-
-        private ICollection<Town> _towns;
-        public ICollection<Town> Towns
-        {
-            get => LazyLoader?.Load(this, ref _towns) ?? (_towns ??= new HashSet<Town>());
-            set => _towns = value;
-        }
+        public virtual ICollection<Town> Towns { get; set; }
     }
 }

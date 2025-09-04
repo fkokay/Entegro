@@ -17,21 +17,9 @@ namespace Entegro.Domain.Entities
     public class ProductMediaFile : BaseEntity, IDisplayOrder
     {
         public int ProductId { get; set; }
-        private Product _product;
-        public Product Product
-        {
-            get => _product ?? LazyLoader.Load(this, ref _product);
-            set => _product = value;
-        }
-
+        public virtual Product Product { get; set; }
         public int MediaFileId { get; set; }
-
-        private MediaFile _mediaFile;
-        public MediaFile MediaFile
-        {
-            get => _mediaFile ?? LazyLoader.Load(this, ref _mediaFile);
-            set => _mediaFile = value;
-        }
+        public virtual MediaFile MediaFile { get; set; }
         public int DisplayOrder { get; set; }
     }
 }

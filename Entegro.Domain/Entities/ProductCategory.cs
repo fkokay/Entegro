@@ -28,22 +28,10 @@ namespace Entegro.Domain.Entities
     public class ProductCategory : BaseEntity, IDisplayOrder
     {
         public int CategoryId { get; set; }
-
-        private Category _category;
-        public Category Category
-        {
-            get => _category ?? LazyLoader.Load(this, ref _category);
-            set => _category = value;
-        }
+        public virtual Category Category { get; set; }
 
         public int ProductId { get; set; }
-
-        private Product _product;
-        public Product Product
-        {
-            get => _product ?? LazyLoader.Load(this, ref _product);
-            set => _product = value;
-        }
+        public virtual Product Product { get; set; }
         public int DisplayOrder { get; set; }
 
     }

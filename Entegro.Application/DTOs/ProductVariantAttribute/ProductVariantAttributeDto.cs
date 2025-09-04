@@ -15,9 +15,7 @@ namespace Entegro.Application.DTOs.ProductVariantAttribute
         public int AttributeControlTypeId { get; set; }
         public int DisplayOrder { get; set; }
 
-        public ProductDto Product { get; set; }
         public ProductAttributeDto ProductAttribute { get; set; }
-
         public List<ProductVariantAttributeValueDto> ProductVariantAttributeValues { get; set; } = new List<ProductVariantAttributeValueDto>();
     }
 }

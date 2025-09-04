@@ -8,7 +8,5 @@ namespace Entegro.Application.DTOs.ProductAttributeValue
         public int ProductAttributeId { get; set; }
         public string Name { get; set; } = null!;
         public int DisplayOrder { get; set; }
-
-        public virtual ProductAttributeDto ProductAttribute { get; set; }
     }
 }
