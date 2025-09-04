@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Entegro.Application.DTOs.Address;
 using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.City;
@@ -294,9 +295,12 @@ namespace Entegro.Application.Mappings
             #endregion
 
 
+            #region ProductVariant
             CreateMap<ProductVariantAttributeValue, ProductVariantAttributeValueDto>().ReverseMap();
             CreateMap<PagedResult<Product>, PagedResult<ProductVariantAttributeValueDto>>().ReverseMap();
             CreateMap<PagedResult<ProductVariantAttributeValueDto>, PagedResult<Product>>().ReverseMap();
+            #endregion
+
 
             #region SpecificationAttribute
             CreateMap<SpecificationAttribute, SpecificationAttributeDto>().ReverseMap();
@@ -315,6 +319,15 @@ namespace Entegro.Application.Mappings
             CreateMap<PagedResult<SpecificationAttributeOption>, PagedResult<SpecificationAttributeOptionDto>>().ReverseMap();
 
             #endregion
+
+            #region Address
+            CreateMap<Address, AddressDto>().ReverseMap();
+            CreateMap<Address, CreateAddressDto>().ReverseMap();
+            CreateMap<Address, UpdateAddressDto>().ReverseMap();
+
+            CreateMap<PagedResult<Address>, PagedResult<AddressDto>>().ReverseMap();
+            #endregion
+
         }
     }
 }

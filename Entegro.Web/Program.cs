@@ -160,7 +160,7 @@ builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 
 builder.Services.AddScoped<IEventPublisher, EventBus>();
 builder.Services.AddScoped<SmartstoreClient>();
-""
+
 builder.Services.AddScoped<ICommerceProductWriter, SmartstoreProductWriter>();
 builder.Services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, SmartstoreProductWriter>();
 
