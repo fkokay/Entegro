@@ -3,10 +3,12 @@ using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class SettingsController : Controller
     {
         private readonly IIntegrationSystemService _integrationSystemService;

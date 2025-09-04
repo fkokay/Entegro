@@ -1,6 +1,8 @@
 ﻿using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Entegro.Web.Controllers
 {
@@ -23,9 +25,27 @@ namespace Entegro.Web.Controllers
         {
             var user = await _userService.GetByEmailAndPasswordAsync(model.Email, model.Password);
             if (user is not null)
-                return RedirectToAction("List", "Brand");
+            {
+                var userClaims = new List<Claim>()
+                {
+                    new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.FirstName),
+                    new Claim(ClaimTypes.Surname, user.LastName),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? ""),
+                };
 
-            return View(model);
+                var grandmaIdentity = new ClaimsIdentity(userClaims, "User");
+
+                var userPrincipal = new ClaimsPrincipal(new[] { grandmaIdentity });
+                await HttpContext.SignInAsync(userPrincipal);
+
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Kullanıcı adı veya şifre hatalı" });
+            }
         }
 
         [HttpGet]

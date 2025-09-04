@@ -1,10 +1,12 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
