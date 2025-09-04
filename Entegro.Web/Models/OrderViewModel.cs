@@ -20,7 +20,8 @@ namespace Entegro.Web.Models
                 return OrderSource switch
                 {
                     OrderSource.Smartstore => "Smartstore",
-                    OrderSource.Trendyol => "Trendyol"
+                    OrderSource.Trendyol => "Trendyol",
+                    _ => throw new NotImplementedException()
                 };
             }
         }

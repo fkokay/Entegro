@@ -3,6 +3,7 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -94,6 +95,8 @@ namespace Entegro.Web.Controllers
                 updateDto.Port = model.Port;
                 updateDto.Email = model.Email;
                 updateDto.Host = model.Host;
+
+                await _emailAccountService.UpdateAsync(updateDto);
 
                 return Json(new { success = true });
             }

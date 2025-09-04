@@ -88,7 +88,7 @@ namespace Entegro.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Silinecek Varyant Bulunamadı" });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 

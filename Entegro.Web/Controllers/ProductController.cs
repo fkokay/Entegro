@@ -288,7 +288,7 @@ namespace Entegro.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Silinecek Kategori Bağlantısı Bulunamadı" });
+                return Json(new { success = false, message = ex.Message });
             }
 
         }
@@ -372,7 +372,7 @@ namespace Entegro.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Resim silinirken bir hata oluştu." });
+                return Json(new { success = false, message = ex.Message});
             }
         }
 
