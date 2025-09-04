@@ -6,14 +6,12 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Domain.Entities;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
-using System;
 using System.Net;
 using static Entegro.Web.Models.ProductViewModel;
 
@@ -572,7 +570,7 @@ namespace Entegro.Web.Controllers
                         ProductCode = product.Code,
                         Active = existingProductIntegration.Active,
                         ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                        MarketplaceLink = existingTrendyolProduct == null ? "#":existingTrendyolProduct.productUrl,
+                        MarketplaceLink = existingTrendyolProduct == null ? "#" : existingTrendyolProduct.productUrl,
                     };
 
                     if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
@@ -753,6 +751,8 @@ namespace Entegro.Web.Controllers
                         }).ToList()
                     }
                 }).ToList();
+
+
                 model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductImageViewModel()
                 {
                     Id = m.Id,

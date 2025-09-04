@@ -275,9 +275,92 @@ namespace Entegro.Infrastructure.Repositories
                 MetaKeywords = m.MetaKeywords,
                 MetaTitle = m.MetaTitle,
                 OldPrice = m.OldPrice,
-                ProductVariantAttributes = m.ProductVariantAttributes,
-                ProductMediaFiles = m.ProductMediaFiles,
-                ProductCategories = m.ProductCategories,
+                ProductVariantAttributes = m.ProductVariantAttributes.Select(v => new ProductVariantAttribute
+                {
+                    AttributeControlTypeId = v.AttributeControlTypeId,
+                    DisplayOrder = v.DisplayOrder,
+                    Id = v.Id,
+                    IsRequried = v.IsRequried,
+                    ProductAttributeId = v.ProductAttributeId,
+                    ProductId = v.ProductId,
+                    ProductAttribute = new ProductAttribute
+                    {
+                        Id = v.ProductAttributeId,
+                        Name = v.ProductAttribute.Name,
+                        Description = v.ProductAttribute.Description,
+                        DisplayOrder = v.ProductAttribute.DisplayOrder,
+                        ProductAttributeValues = v.ProductAttribute.ProductAttributeValues.Select(v => new ProductAttributeValue
+                        {
+                            Id = v.ProductAttributeId,
+                            Name = v.Name,
+                            ProductAttributeId = v.ProductAttributeId,
+                            DisplayOrder = v.DisplayOrder,
+                        }).ToList()
+                    },
+                }).ToList(),
+                ProductMediaFiles = m.ProductMediaFiles.Select(mf => new ProductMediaFile
+                {
+                    Id = mf.Id,
+                    DisplayOrder = mf.DisplayOrder,
+                    MediaFileId = mf.MediaFileId,
+                    ProductId = mf.ProductId,
+                    MediaFile = new MediaFile
+                    {
+                        Id = mf.MediaFile.Id,
+                        Alt = mf.MediaFile.Alt,
+                        CreatedOn = mf.MediaFile.CreatedOn,
+                        Deleted = mf.MediaFile.Deleted,
+                        Extension = mf.MediaFile.Extension,
+                        FolderId = mf.MediaFile.FolderId,
+                        Height = mf.MediaFile.Height,
+                        Width = mf.MediaFile.Width,
+                        Version = mf.MediaFile.Version,
+                        Hidden = mf.MediaFile.Hidden,
+                        IsTransient = mf.MediaFile.IsTransient,
+                        MimeType = mf.MediaFile.MimeType,
+                        Name = mf.MediaFile.Name,
+                        Title = mf.MediaFile.Title,
+                        PixelSize = mf.MediaFile.PixelSize,
+                        Size = mf.MediaFile.Size,
+                        Metadata = mf.MediaFile.Metadata,
+                        UpdatedOn = mf.MediaFile.UpdatedOn,
+                        MediaType = mf.MediaFile.MimeType,
+                        Folder = mf.MediaFile == null ? null : new MediaFolder
+                        {
+                            Id = mf.MediaFile.FolderId.Value,
+                            Metadata = mf.MediaFile.Folder.Metadata,
+                            Discriminator = mf.MediaFile.Folder.Discriminator,
+                            CanDetectTracks = mf.MediaFile.Folder.CanDetectTracks,
+                            TreePath = mf.MediaFile.Folder.TreePath,
+                            FilesCount = mf.MediaFile.Folder.FilesCount,
+                            IncludePath = mf.MediaFile.Folder.IncludePath,
+                            MediaFiles = mf.MediaFile.Folder.MediaFiles,
+                            Order = mf.MediaFile.Folder.Order,
+                            Name = mf.MediaFile.Folder.Name,
+                            Slug = mf.MediaFile.Folder.Slug,
+                            ParentId = mf.MediaFile.Folder.ParentId,
+                            Parent = mf.MediaFile.Folder.Parent,
+                            ResKey = mf.MediaFile.Folder.ResKey
+                        }
+                    }
+                }).ToList(),
+                ProductCategories = m.ProductCategories.Select(pc => new ProductCategory
+                {
+                    Id = pc.Id,
+                    CategoryId = pc.CategoryId,
+                    Category = new Category
+                    {
+                        Id = pc.CategoryId,
+                        Name = pc.Category.Name,
+                        ParentCategory = pc.Category.ParentCategory == null ? null : new Category()
+                        {
+                            Id = pc.Category.ParentCategoryId.Value,
+                            Name = pc.Category.Name,
+                        }
+                    },
+                    ProductId = pc.ProductId,
+                    DisplayOrder = pc.DisplayOrder,
+                }).ToList(),
                 ProductIntegrations = m.ProductIntegrations.Select(x => new ProductIntegration
                 {
                     Active = x.Active,
