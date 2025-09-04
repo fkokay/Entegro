@@ -12,7 +12,6 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<Product?> GetByCodeAsync(string productCode);
         Task<Product?> GetByBarcodeAsync(string productBarcode);
         Task<List<Product>> GetAllAsync();
-        Task<List<Product>> GetAllAsync(List<int> productIds);
         Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(Product product);
         Task UpdateAsync(Product product);

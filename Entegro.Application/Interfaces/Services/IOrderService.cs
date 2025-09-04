@@ -5,8 +5,6 @@ namespace Entegro.Application.Interfaces.Services
 {
     public interface IOrderService
     {
-        Task<bool> ExistsByCustomerIdAsync(int customerId);
-        Task<OrderDto?> GetByCustomerIdAsync(int customerId);
         Task<OrderDto> GetOrderByIdAsync(int orderId);
         Task<bool> ExistsByOrderNoAsync(string orderNo);
         Task<IEnumerable<OrderDto>> GetOrdersAsync();
