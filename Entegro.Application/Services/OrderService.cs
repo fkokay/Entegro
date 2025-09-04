@@ -69,11 +69,7 @@ namespace Entegro.Application.Services
 
         }
 
-        public async Task<bool> ExistsByCustomerIdAsync(int customerId) => await _orderRepository.ExistsByCustomerIdAsync(customerId);
-
         public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _orderRepository.ExistsByOrderNoAsync(orderNo);
-
-        public async Task<OrderDto?> GetByCustomerIdAsync(int customerId) => await _orderRepository.GetByCustomerIdAsync(customerId) is Order order ? _mapper.Map<OrderDto>(order) : null;
 
         public async Task<OrderDto> GetOrderByIdAsync(int orderId)
         {
