@@ -14,6 +14,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             _context = context;
         }
+
         public async Task AddAsync(Category category)
         {
             category.CreatedOn = DateTime.UtcNow;
@@ -23,7 +24,6 @@ namespace Entegro.Infrastructure.Repositories
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
         }
-
         public async Task DeleteAsync(Category category)
         {
             _context.Categories.Remove(category);
@@ -36,7 +36,7 @@ namespace Entegro.Infrastructure.Repositories
             var query = _context.Categories.Include(c => c.ParentCategory).Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
-            var categories = await query.Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
+            var categories = await query.OrderBy(m=>m.Id).Skip(pageNumber * pageSize).Take(pageSize).ToListAsync();
 
             return new PagedResult<Category>
             {
