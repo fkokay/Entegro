@@ -1,8 +1,17 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities
 {
+    public class TownMap : IEntityTypeConfiguration<Town>
+    {
+        public void Configure(EntityTypeBuilder<Town> builder)
+        {
+
+        }
+    }
     [Table("Town")]
     public class Town : BaseEntity
     {

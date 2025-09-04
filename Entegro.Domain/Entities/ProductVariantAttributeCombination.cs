@@ -1,8 +1,18 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities
 {
+    public class ProductVariantAttributeCombinationMap : IEntityTypeConfiguration<ProductVariantAttributeCombination>
+    {
+        public void Configure(EntityTypeBuilder<ProductVariantAttributeCombination> builder)
+        {
+            builder.Property(p => p.Price).HasPrecision(18, 4);
+        }
+    }
+
     [Table("ProductVariantAttributeCombination")]
     public class ProductVariantAttributeCombination : BaseEntity
     {

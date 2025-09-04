@@ -1,11 +1,19 @@
 ﻿using Entegro.Domain.Common;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
 namespace Entegro.Domain.Entities
 {
+    public class ProductVariantAttributeMap : IEntityTypeConfiguration<ProductVariantAttribute>
+    {
+        public void Configure(EntityTypeBuilder<ProductVariantAttribute> builder)
+        {
+
+        }
+    }
     [Table("Product_ProductAttribute_Mapping")]
     [Index(nameof(AttributeControlTypeId), Name = "IX_AttributeControlTypeId")]
     [Index(nameof(ProductId), nameof(DisplayOrder), Name = "IX_Product_ProductAttribute_Mapping_ProductId_DisplayOrder")]

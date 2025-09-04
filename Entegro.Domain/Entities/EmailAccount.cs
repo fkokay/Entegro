@@ -1,4 +1,6 @@
 ﻿using Entegro.Domain.Common;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities
 {
+    public class EmailAccountMap : IEntityTypeConfiguration<EmailAccount>
+    {
+        public void Configure(EntityTypeBuilder<EmailAccount> builder)
+        {
+
+        }
+    }
     [Table("EmailAccount")]
     public class EmailAccount : BaseEntity
     {

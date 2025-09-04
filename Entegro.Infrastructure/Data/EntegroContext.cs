@@ -17,13 +17,36 @@ namespace Entegro.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new ProductCategoryMap());
-            modelBuilder.ApplyConfiguration(new ProductMap());
+            modelBuilder.ApplyConfiguration(new AddressMap());
+            modelBuilder.ApplyConfiguration(new BrandMap());
             modelBuilder.ApplyConfiguration(new CategoryMap());
+            modelBuilder.ApplyConfiguration(new CityMap());
+            modelBuilder.ApplyConfiguration(new CountryMap());
+            modelBuilder.ApplyConfiguration(new CustomerMap());
+            modelBuilder.ApplyConfiguration(new DistrictMap());
+            modelBuilder.ApplyConfiguration(new EmailAccountMap());
+            modelBuilder.ApplyConfiguration(new IntegrationSystemMap());
+            modelBuilder.ApplyConfiguration(new IntegrationSystemLogMap());
+            modelBuilder.ApplyConfiguration(new IntegrationSystemParameterMap());
+            modelBuilder.ApplyConfiguration(new LogMap());
+            modelBuilder.ApplyConfiguration(new MediaFileMap());
+            modelBuilder.ApplyConfiguration(new MediaFolderMap());
+            modelBuilder.ApplyConfiguration(new OrderMap());
+            modelBuilder.ApplyConfiguration(new OrderItemMap());
+            modelBuilder.ApplyConfiguration(new ProductMap());
+            modelBuilder.ApplyConfiguration(new ProductAttributeMap());
+            modelBuilder.ApplyConfiguration(new ProductAttributeValueMap());
+            modelBuilder.ApplyConfiguration(new ProductCategoryMap());
+            modelBuilder.ApplyConfiguration(new ProductIntegrationMap());
+            modelBuilder.ApplyConfiguration(new ProductMediaFileMap());
+            modelBuilder.ApplyConfiguration(new ProductVariantAttributeMap());
+            modelBuilder.ApplyConfiguration(new ProductVariantAttributeCombinationMap());
+            modelBuilder.ApplyConfiguration(new ProductVariantAttributeValueMap());
+            modelBuilder.ApplyConfiguration(new SpecificationAttributeMap());
+            modelBuilder.ApplyConfiguration(new SpecificationAttributeOptionMap());
+            modelBuilder.ApplyConfiguration(new TownMap());
+            modelBuilder.ApplyConfiguration(new UserMap());
 
-            modelBuilder.Entity<ProductIntegration>()
-                .HasIndex(p => new { p.IntegrationSystemId, p.IntegrationCode })
-                .IsUnique();
         }
 
         public DbSet<User> Users { get; set; }
