@@ -75,7 +75,6 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddQuartz(q =>
 {
-    q.UseMicrosoftDependencyInjectionJobFactory();
 
     var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
