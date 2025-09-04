@@ -3,10 +3,12 @@ using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly IUserService _userService;

@@ -179,7 +179,7 @@
     <script src="~/assets/js/main.js"></script>
 
     <!-- Page JS -->
-    <script src="~/assets/js/pages-auth.js"></script>
+    <script src="~/assets/js/theme/pages-auth.js"></script>
 
 
     <script>
@@ -234,11 +234,15 @@
                         };
 
                         $.ajax({
-                            url: '/Account/Login', // Controller'ına göre burayı değiştir
+                            url: '/Identity/Login', // Controller'ına göre burayı değiştir
                             method: 'POST',
                             data: formData,
                             success: function (response) {
-                                window.location.href = '/Brand/List'; // Başarılı giriş sonrası yönlendirme
+                               if(response.success){
+                                    window.location.href = '/Home/Index';
+                               }else{
+                                    alert(response.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+                               }
                             },
                             error: function (xhr) {
                                 alert(xhr.responseText || 'Giriş yapılırken bir hata oluştu.');

@@ -1,10 +1,12 @@
 ﻿using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class ProductAttributeValueController : Controller
     {
         private readonly IProductAttributeValueService _productAttributeValueService;

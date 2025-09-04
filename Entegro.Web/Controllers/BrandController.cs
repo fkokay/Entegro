@@ -1,10 +1,12 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class BrandController : Controller
     {
         private readonly IBrandService _brandService;

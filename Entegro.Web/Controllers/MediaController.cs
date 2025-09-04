@@ -2,11 +2,13 @@
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Dynamic;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class MediaController : Controller
     {
         private readonly static IDictionary<string, string[]> _defaultExtensionsMap = new Dictionary<string, string[]>

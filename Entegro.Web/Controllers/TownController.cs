@@ -1,10 +1,12 @@
 ﻿using Entegro.Application.DTOs.Town;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
+    [Authorize]
     public class TownController : Controller
     {
         private readonly ITownService _townService;
