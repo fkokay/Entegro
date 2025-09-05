@@ -42,18 +42,4 @@ namespace Entegro.Domain.Entities
         public DateTime UpdatedOn { get; set; }
         public virtual ICollection<Category> Children { get; set; } = new HashSet<Category>();
     }
-
-    public sealed class CategorySlim
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public string? TreePath { get; set; }
-    }
-
-    public sealed class PagedResult2<T>
-    {
-        public List<T> Items { get; init; } = new();
-        public bool HasMore { get; init; }
-    }
-
 }
