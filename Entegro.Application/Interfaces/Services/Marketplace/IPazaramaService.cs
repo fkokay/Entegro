@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
-    public interface IPazaramaService : IMarketplaceCategoryReader, IMarketplaceBrandReader, IMarketplaceCategoryAttributeReader, IMarketplaceCargoCompanyReader
+    public interface IPazaramaService : IMarketplaceCategoryReader<PazaramaApiContext>, IMarketplaceBrandReader<PazaramaApiContext>, IMarketplaceCategoryAttributeReader<PazaramaApiContext>
     {
-        Task<PazaramaProductDto?> GetProductWithStockCodeAsync(string stockCode);
+        Task<PazaramaProductDto?> GetProductWithStockCodeAsync(PazaramaApiContext context,string stockCode);
     }
 }

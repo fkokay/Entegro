@@ -33,7 +33,7 @@ namespace Entegro.Application.Services.Marketplace
 
             if (productIntegration.IntegrationSystem.IntegrationSystemType == IntegrationSystemType.Marketplace)
             {
-                string marketplaceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
+                string? marketplaceType = productIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
 
                 if (marketplaceType == "Pazarama")
                 {
@@ -42,22 +42,22 @@ namespace Entegro.Application.Services.Marketplace
             }
         }
 
-        public Task<IEnumerable<BrandDto>> GetBrandsAsync()
+        public Task<IEnumerable<BrandDto>> GetBrandsAsync(PazaramaApiContext context)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+        public Task<IEnumerable<CategoryDto>> GetCategoriesAsync(PazaramaApiContext context)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CategoryAttributeDto> GetCategoryAttibutesAsync(int categoryId)
+        public Task<CategoryAttributeDto> GetCategoryAttibutesAsync(PazaramaApiContext context, int categoryId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PazaramaProductDto?> GetProductWithStockCodeAsync(string stockCode)
+        public Task<PazaramaProductDto?> GetProductWithStockCodeAsync(PazaramaApiContext context, string stockCode)
         {
             throw new NotImplementedException();
         }

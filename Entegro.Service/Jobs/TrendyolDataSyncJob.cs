@@ -55,28 +55,32 @@ namespace Entegro.Service.Jobs
 
         private async Task CategoryAttributeSync()
         {
-            var result = await _trendyolService.GetCategoryAttibutesAsync(411);
+            TrendyolApiContext context = new TrendyolApiContext();
+            var result = await _trendyolService.GetCategoryAttibutesAsync(context,411);
         }
 
         private async Task BrandSync()
         {
-            var result = await _trendyolService.GetBrandsAsync();
+            TrendyolApiContext context = new TrendyolApiContext();
+            var result = await _trendyolService.GetBrandsAsync(context);
         }
 
         private async Task CategorySync()
         {
-            var result = await _trendyolService.GetCategoriesAsync();
+            TrendyolApiContext context = new TrendyolApiContext();
+            var result = await _trendyolService.GetCategoriesAsync(context);
         }
 
         private async Task OrderSync()
         {
+            TrendyolApiContext context = new TrendyolApiContext();
             _logger.LogInformation("Trendyol sipariş senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
 
             IEnumerable<TrendyolShipmentPackageDto> trendyolShipmentPackages;
 
             try
             {
-                trendyolShipmentPackages = await _trendyolService.GetShipmentPackagesAsync();
+                trendyolShipmentPackages = await _trendyolService.GetShipmentPackagesAsync(context);
             }
             catch (Exception ex)
             {
@@ -155,11 +159,13 @@ namespace Entegro.Service.Jobs
         {
             _logger.LogInformation("Trendyol ürün senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
 
+            TrendyolApiContext context = new TrendyolApiContext();
+
             IEnumerable<TrendyolProductDto> trendyolProducts;
 
             try
             {
-                trendyolProducts = await _trendyolService.GetProductsAsync();
+                trendyolProducts = await _trendyolService.GetProductsAsync(context);
             }
             catch (Exception ex)
             {

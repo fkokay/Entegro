@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductIntegration;
@@ -549,8 +550,14 @@ namespace Entegro.Web.Controllers
                 }
                 else
                 {
+                    TrendyolApiContext context = new TrendyolApiContext
+                    {
+                        SellerId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SellerId").Select(m => m.Value).FirstOrDefault(),
+                        Username = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Username").Select(m => m.Value).FirstOrDefault(),
+                        Password = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Password").Select(m => m.Value).FirstOrDefault(),
+                    };
                     var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                    var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(existingProductIntegration.IntegrationCode);
+                    var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context,existingProductIntegration.IntegrationCode);
 
                     var createModel = new TrendyolProductIntegrationViewModel
                     {
@@ -661,7 +668,15 @@ namespace Entegro.Web.Controllers
                     }
 
                 }
-                var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(model.IntegrationCode);
+
+                TrendyolApiContext context = new TrendyolApiContext
+                {
+                    SellerId = existingProductIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SellerId").Select(m => m.Value).FirstOrDefault(),
+                    Username = existingProductIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Username").Select(m => m.Value).FirstOrDefault(),
+                    Password = existingProductIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Password").Select(m => m.Value).FirstOrDefault(),
+                };
+
+                var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, model.IntegrationCode);
                 if (existingTrendyolProduct == null)
                 {
                     return Json(new { success = false, message = $"Trendyol üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
