@@ -1,0 +1,36 @@
+﻿<div class="modal fade" id="productAttributeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-simple modal-edit-user">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="modal-title-text mb-2">Yeni Varyant Kaydı</h3>
+                </div>
+
+                <form id="productAttributeForm" class="row g-3" onsubmit="return false;">
+                    <input type="hidden" id="Attribute_Id" name="Id" />
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="Attribute_Name">Ad <span class="text-danger">*</span></label>
+                        <input type="text" id="Attribute_Name" name="Name" class="form-control" placeholder="Örn: Renk" />
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="Attribute_Description">Açıklama</label>
+                        <textarea id="Attribute_Description" name="Description" class="form-control" rows="3" placeholder="Varyant açıklaması (opsiyonel)"></textarea>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="Attribute_DisplayOrder">Gösterim Sırası <span class="text-danger">*</span></label>
+                        <input type="number" id="Attribute_DisplayOrder" name="DisplayOrder" class="form-control" value="0" />
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

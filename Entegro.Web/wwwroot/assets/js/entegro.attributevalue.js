@@ -97,6 +97,7 @@ Entegro.AttributeValue.List = (function ($) {
                                             <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
                                             <span class="d-none d-sm-inline-block">Yeni Kayıt</span>`,
                                         className: "add-new btn btn-primary",
+                                        attr: { "data-action": "create-attribute-value" },
                                         action: function () {
                                             const $form = $('#createAttributeValueForm');
                                             if ($form.length) $form[0].reset();
@@ -142,36 +143,34 @@ Entegro.AttributeValue.List = (function ($) {
                 });
             }, 100);
 
-            initPASelect('#ProductAttributeId', '#createAttributeValue');  
-            initPASelect('#Edit_ProductAttributeId', '#editAttributeValue');
-
             let _paCache = null;
+
             function fetchAllPA() {
                 if (_paCache) return $.Deferred().resolve(_paCache).promise();
                 return $.getJSON('/ProductAttributeValue/GetAllProductAttribute')
                     .then((data) => { _paCache = data?.results || []; return _paCache; });
             }
 
-            function initPASelect(selector, modalSelector) {
-                const $el = $(selector);
-                if (!$el.length) return;
-
-                $el.select2({
-                    dropdownParent: $(modalSelector),
-                    placeholder: 'Varyant adı seçin...',
-                    allowClear: true,
-                    ajax: {
-                        url: '/ProductAttributeValue/GetAllProductAttribute',
-                        type: 'GET',
-                        dataType: 'json',
-                        delay: 200,
-                        processResults: function (data) {
-                            return { results: data?.results || [] };
+            function initPASelectOnce() {
+                const $el = $('#ProductAttributeId');
+                if (!$el.data('select2')) {
+                    $el.select2({
+                        dropdownParent: $('#attributeValueModal'),
+                        placeholder: 'Varyant adı seçin...',
+                        allowClear: true,
+                        ajax: {
+                            url: '/ProductAttributeValue/GetAllProductAttribute',
+                            type: 'GET',
+                            dataType: 'json',
+                            delay: 200,
+                            processResults: function (data) {
+                                return { results: data?.results || [] };
+                            },
+                            cache: true
                         },
-                        cache: true
-                    },
-                    width: '100%'
-                });
+                        width: '100%'
+                    });
+                }
             }
 
             function setSelect2Selected(selector, id, text) {
@@ -197,102 +196,42 @@ Entegro.AttributeValue.List = (function ($) {
                 }
             }
 
-            (function () {
-                const formEl = document.getElementById('createAttributeValueForm');
-                if (!formEl) return;
+            /* ============ Modal aç/kapat ve formu doldur ============ */
+            function resetAttributeValueForm() {
+                const $form = $('#attributeValueForm')[0];
+                $form.reset();
+                $('#AttributeValueId').val('');
+                $('#ProductAttributeId').val(null).trigger('change'); // select2 temizle
+                $('#DisplayOrder').val('0');
+            }
 
-                window.createPAVValidation = FormValidation.formValidation(formEl, {
-                    locale: 'tr_TR',
-                    localization: FormValidation.locales.tr_TR,
-                    fields: {
-                        ProductAttributeId: { validators: { notEmpty: { message: 'Varyant adı seçilmelidir.' } } },
-                        Name: {
-                            validators: {
-                                notEmpty: { message: 'Değer adı boş bırakılamaz.' },
-                                stringLength: { min: 1, max: 100, message: 'Değer adı 1–100 karakter olmalıdır.' }
-                            }
-                        },
-                        DisplayOrder: {
-                            validators: {
-                                notEmpty: { message: 'Gösterim sırası boş bırakılamaz.' },
-                                integer: { message: 'Gösterim sırası tam sayı olmalıdır.' },
-                                greaterThan: { inclusive: true, min: 0, message: '0 veya daha büyük olmalıdır.' }
-                            }
-                        }
-                    },
-                    plugins: {
-                        trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap5: new FormValidation.plugins.Bootstrap5({ eleValidClass: '', rowSelector: '.mb-3' }),
-                        submitButton: new FormValidation.plugins.SubmitButton(),
-                        autoFocus: new FormValidation.plugins.AutoFocus()
-                    },
-                    init: (instance) => {
-                        instance.on('core.form.valid', function () {
-                            const $form = $('#createAttributeValueForm');
-                            $.ajax({
-                                url: '/ProductAttributeValue/Create',
-                                type: 'POST',
-                                data: $form.serialize(), // ProductAttributeId, Name, DisplayOrder
-                                success: function (res) {
-                                    if (res && res.success) {
-                                        Swal.fire({
-                                            title: 'Başarılı!',
-                                            text: 'Varyant değeri eklendi.',
-                                            icon: 'success',
-                                            confirmButtonText: 'Tamam',
-                                            customClass: { confirmButton: 'btn btn-success' },
-                                            buttonsStyling: false
-                                        }).then(() => {
-                                            $('#createAttributeValue').modal('hide');
-                                            dt.ajax.reload(null, false);
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Hata!',
-                                            text: (res && res.message) || 'Bir hata oluştu.',
-                                            icon: 'error',
-                                            confirmButtonText: 'Tamam',
-                                            customClass: { confirmButton: 'btn btn-danger' },
-                                            buttonsStyling: false
-                                        });
-                                    }
-                                },
-                                error: function (xhr) {
-                                    Swal.fire({
-                                        title: 'Hata!',
-                                        text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
-                                        icon: 'error',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: { confirmButton: 'btn btn-danger' },
-                                        buttonsStyling: false
-                                    });
-                                }
-                            });
-                        });
-                    }
-                });
-            })();
+            function openAttributeValueModal(mode = 'create', id = null) {
+                initPASelectOnce();
+                resetAttributeValueForm();
 
-            $(document).on('click', '.edit-attributeValue', function () {
-                const id = $(this).data('id');
+                const $title = $('#attributeValueModalTitle');
+                const $modal = $('#attributeValueModal');
+
+                if (mode === 'create') {
+                    $title.text('Yeni Varyant Değeri');
+                    $modal.modal('show');
+                    return;
+                }
+
+                // edit
+                $title.text('Varyant Değeri Güncelle');
                 if (!id) return;
 
-                const $editForm = $('#editAttributeValueForm');
-                if ($editForm.length) $editForm[0].reset();
-                if (window.editPAVValidation) window.editPAVValidation.resetForm(true);
-
+                // Veriyi çek ve doldur
                 $.getJSON('/ProductAttributeValue/Edit', { id: id })
                     .done(function (m) {
-                        // Beklenen JSON: { Id, Name, ProductAttributeId, DisplayOrder }
-                        $('#Edit_Id').val(m.Id);
-                        $('#Edit_Name').val(m.Name ?? '');
-                        $('#Edit_DisplayOrder').val(m.DisplayOrder ?? 0);
+                        // Beklenen JSON: { Id, Name, ProductAttributeId, DisplayOrder, [ProductAttributeName] }
+                        $('#AttributeValueId').val(m.Id);
+                        $('#Name').val(m.Name ?? '');
+                        $('#DisplayOrder').val(m.DisplayOrder ?? 0);
+                        setSelect2Selected('#ProductAttributeId', m.ProductAttributeId /*, m.ProductAttributeName*/);
 
-                        // ProductAttribute select2'yi seçili getir (text yoksa cache'ten bul)
-                        setSelect2Selected('#Edit_ProductAttributeId', m.ProductAttributeId /*, m.ProductAttributeName*/);
-
-                        $('#editAttributeValue').find('h3.mb-2').text('Varyant Değeri Güncelle');
-                        $('#editAttributeValue').modal('show');
+                        $modal.modal('show');
                     })
                     .fail(function (xhr) {
                         Swal.fire({
@@ -304,13 +243,18 @@ Entegro.AttributeValue.List = (function ($) {
                             buttonsStyling: false
                         });
                     });
-            });
+            }
 
-            (function () {
-                const editFormEl = document.getElementById('editAttributeValueForm');
-                if (!editFormEl) return;
+            /* ============ FormValidation (tek örnek) ============ */
+            let attributeValueFV = null;
 
-                window.editPAVValidation = FormValidation.formValidation(editFormEl, {
+            function ensureValidation() {
+                if (attributeValueFV) return attributeValueFV;
+
+                const formEl = document.getElementById('attributeValueForm');
+                if (!formEl) return null;
+
+                attributeValueFV = FormValidation.formValidation(formEl, {
                     locale: 'tr_TR',
                     localization: FormValidation.locales.tr_TR,
                     fields: {
@@ -337,28 +281,39 @@ Entegro.AttributeValue.List = (function ($) {
                     },
                     init: (instance) => {
                         instance.on('core.form.valid', function () {
-                            const $form = $('#editAttributeValueForm');
+                            const $form = $('#attributeValueForm');
+                            const id = $('#AttributeValueId').val();
+                            const isEdit = !!id;
+
+                            // Endpoint ve payload
+                            const url = isEdit ? '/ProductAttributeValue/Edit' : '/ProductAttributeValue/Create';
+
+                            // Çift tıklamayı engelle
+                            const $submitBtn = $form.find('button[type="submit"]');
+                            $submitBtn.prop('disabled', true);
+
                             $.ajax({
-                                url: '/ProductAttributeValue/Edit',
+                                url: url,
                                 type: 'POST',
-                                data: $form.serialize(), // Id, ProductAttributeId, Name, DisplayOrder
+                                data: $form.serialize(), // Id (varsa), ProductAttributeId, Name, DisplayOrder
                                 success: function (res) {
                                     if (res && res.success) {
                                         Swal.fire({
-                                            title: 'Güncellendi!',
-                                            text: 'Varyant değeri başarıyla güncellendi.',
+                                            title: isEdit ? 'Güncellendi!' : 'Başarılı!',
+                                            text: isEdit ? 'Varyant değeri başarıyla güncellendi.' : 'Varyant değeri eklendi.',
                                             icon: 'success',
                                             confirmButtonText: 'Tamam',
                                             customClass: { confirmButton: 'btn btn-success' },
                                             buttonsStyling: false
                                         }).then(() => {
-                                            $('#editAttributeValue').modal('hide');
-                                            dt.ajax.reload(null, false);
+                                            $('#attributeValueModal').modal('hide');
+                                            // DataTable varsa güncelle
+                                            window.location.reload();
                                         });
                                     } else {
                                         Swal.fire({
                                             title: 'Hata!',
-                                            text: (res && res.message) || 'Güncelleme sırasında bir hata oluştu.',
+                                            text: (res && res.message) || 'İşlem sırasında bir hata oluştu.',
                                             icon: 'error',
                                             confirmButtonText: 'Tamam',
                                             customClass: { confirmButton: 'btn btn-danger' },
@@ -375,12 +330,46 @@ Entegro.AttributeValue.List = (function ($) {
                                         customClass: { confirmButton: 'btn btn-danger' },
                                         buttonsStyling: false
                                     });
+                                },
+                                complete: function () {
+                                    $submitBtn.prop('disabled', false);
                                 }
                             });
                         });
                     }
                 });
-            })();
+
+                return attributeValueFV;
+            }
+
+            /* ============ Başlatma & Olay bağlama ============ */
+            $(function () {
+                // FormValidation’ı hazırla
+                ensureValidation();
+
+                // Modal her açıldığında select2 parent doğru olsun
+                $('#attributeValueModal').on('shown.bs.modal', function () {
+                    initPASelectOnce();
+                });
+
+                // "Yeni" butonu örneği: data-action="create-attribute-value"
+                $(document).on('click', '[data-action="create-attribute-value"]', function () {
+                    openAttributeValueModal('create');
+                });
+
+                // "Düzenle" butonu örneği: .edit-attributeValue (data-id ile)
+                $(document).on('click', '.edit-attributeValue', function () {
+                    const id = $(this).data('id');
+                    if (!id) return;
+                    openAttributeValueModal('edit', id);
+                });
+
+                // Reset’e basınca validasyon temizlensin
+                $('#attributeValueForm').on('reset', function () {
+                    if (attributeValueFV) attributeValueFV.resetForm(true);
+                    setTimeout(() => { $('#ProductAttributeId').val(null).trigger('change'); }, 0);
+                });
+            });
 
             $(document).on('click', '.delete-attributeValue', function () {
                 const id = $(this).data('id');
