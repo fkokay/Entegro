@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -25,36 +26,36 @@ namespace Entegro.Application.Services.Marketplace
 {
     public class TrendyolService : ITrendyolService, IEventHandler<ProductIntegrationRecordUpdatedEvent>
     {
-        private readonly string sellerId = "474352";
-
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductService _productService;
         private readonly ILogger<TrendyolService> _logger;
         public TrendyolService(
-            HttpClient httpClient, 
+            IHttpClientFactory httpClientFactory, 
             IProductIntegrationService productIntegrationService, 
             IProductService productService,
             ILogger<TrendyolService> logger)
         {
-
-
-            _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri($"https://apigw.trendyol.com/integration/");
-
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // Basic Auth
-            var username = "9tjWr2F7zHJKnMDMbcqb";
-            var password = "09WZjNvN6ZJU4Tg2z53r";
-            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
             _productService = productService;
             _logger = logger;
         }
+
+
+        private HttpClient CreateHttpClient(TrendyolApiContext context)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(context.BaseUrl);
+
+            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{context.Username}:{context.Password}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            return client;
+        }
+
         public async Task HandleAsync(ProductIntegrationRecordUpdatedEvent recordUpdatedEvent)
         {
             var productIntegration = await _productIntegrationService.GetByIdAsync(recordUpdatedEvent.ProductIntegrationId);
@@ -69,6 +70,13 @@ namespace Entegro.Application.Services.Marketplace
 
                 if (marketplaceType == "Trendyol")
                 {
+                    var apiContext = new TrendyolApiContext
+                    {
+                        SellerId = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "SellerId").Value,
+                        Username = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "Username").Value,
+                        Password = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "Password").Value
+                    };
+
                     object? customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonSerializer.Deserialize<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
                     var product = await _productService.GetProductByIdAsync(productIntegration.ProductId);
                     if (product == null)
@@ -94,15 +102,16 @@ namespace Entegro.Application.Services.Marketplace
                         }
                     };
 
-                    await UpdatePriceAndStockAsync(request);
+                    await UpdatePriceAndStockAsync(apiContext,request);
                 }
             }
         }
 
 
 
-        public async Task<IEnumerable<BrandDto>> GetBrandsAsync()
+        public async Task<IEnumerable<BrandDto>> GetBrandsAsync(TrendyolApiContext context)
         {
+            using var client = CreateHttpClient(context);
             var allBrands = new List<TrendyolBrandDto>();
             bool moreData = true;
             int page = 0;
@@ -110,7 +119,7 @@ namespace Entegro.Application.Services.Marketplace
             while (moreData)
             {
                 var url = $"product/brands?size=2000&page={page}";
-                var response = await _httpClient.GetAsync(url);
+                var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -217,12 +226,13 @@ namespace Entegro.Application.Services.Marketplace
             return Task.FromResult(trendyolCargoCompanies.AsEnumerable());
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+        public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync(TrendyolApiContext context)
         {
+            using var client = CreateHttpClient(context);
             var allCategories = new List<TrendyolCategoryDto>();
 
             var url = $"product/product-categories";
-            var response = await _httpClient.GetAsync(url);
+            var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -239,10 +249,11 @@ namespace Entegro.Application.Services.Marketplace
             return categories;
         }
 
-        public async Task<CategoryAttributeDto> GetCategoryAttibutesAsync(int categoryId)
+        public async Task<CategoryAttributeDto> GetCategoryAttibutesAsync(TrendyolApiContext context,int categoryId)
         {
+            using var client = CreateHttpClient(context);
             var url = $"product/product-categories/{categoryId}/attributes";
-            var response = await _httpClient.GetAsync(url);
+            var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -258,16 +269,17 @@ namespace Entegro.Application.Services.Marketplace
             return categoryAttribute;
         }
 
-        public async Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(int pageSize = 50)
+        public async Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(TrendyolApiContext context,int pageSize = 50)
         {
+            using var client = CreateHttpClient(context);
             var allProducts = new List<TrendyolProductDto>();
             bool moreData = true;
             int page = 0;
 
             while (moreData)
             {
-                var url = $"product/sellers/{sellerId}/products?size={pageSize}&page={page}";
-                var response = await _httpClient.GetAsync(url);
+                var url = $"product/sellers/{context.SellerId}/products?size={pageSize}&page={page}";
+                var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -294,10 +306,11 @@ namespace Entegro.Application.Services.Marketplace
             return allProducts;
         }
 
-        public async Task<TrendyolProductDto?> GetProductWithBarcodeAsync(string barcode)
+        public async Task<TrendyolProductDto?> GetProductWithBarcodeAsync(TrendyolApiContext context,string barcode)
         {
-            var url = $"product/sellers/{sellerId}/products?barcode={barcode}";
-            var response = await _httpClient.GetAsync(url);
+            using var client = CreateHttpClient(context);
+            var url = $"product/sellers/{context.SellerId}/products?barcode={barcode}";
+            var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -314,16 +327,19 @@ namespace Entegro.Application.Services.Marketplace
             return data.content.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50)
+        public async Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(TrendyolApiContext context,int pageSize = 50)
         {
+
+            using var client = CreateHttpClient(context);
+
             var allShipmentPackages = new List<TrendyolShipmentPackageDto>();
             bool moreData = true;
             int page = 0;
 
             while (moreData)
             {
-                var url = $"order/sellers/{sellerId}/orders?size={pageSize}&page={page}";
-                var response = await _httpClient.GetAsync(url);
+                var url = $"order/sellers/{context.SellerId}/orders?size={pageSize}&page={page}";
+                var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -350,16 +366,18 @@ namespace Entegro.Application.Services.Marketplace
             return allShipmentPackages;
         }
 
-        public async Task UpdatePriceAndStockAsync(TrendyolPriceAndStockUpdateRequest request)
+        public async Task UpdatePriceAndStockAsync(TrendyolApiContext context,TrendyolPriceAndStockUpdateRequest request)
         {
-            var url = $"inventory/sellers/{sellerId}/products/price-and-inventory";
+            using var client = CreateHttpClient(context);
+
+            var url = $"inventory/sellers/{context.SellerId}/products/price-and-inventory";
             var json = JsonSerializer.Serialize(request, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(url, content);
+            var response = await client.PostAsync(url, content);
 
             var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();

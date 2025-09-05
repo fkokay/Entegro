@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using System;
 using System.Collections.Generic;
@@ -8,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
-    public interface ITrendyolService : IMarketplaceCategoryReader,IMarketplaceBrandReader,IMarketplaceCategoryAttributeReader
+    public interface ITrendyolService : IMarketplaceCategoryReader<TrendyolApiContext>, IMarketplaceBrandReader<TrendyolApiContext>, IMarketplaceCategoryAttributeReader<TrendyolApiContext>
     {
         Task<IEnumerable<TrendyolCargoCompanyDto>> GetCargoCompaniesAsync();
-        Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(int pageSize = 50);
-        Task<TrendyolProductDto?> GetProductWithBarcodeAsync(string barcode);
-        Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50);
-        Task UpdatePriceAndStockAsync(TrendyolPriceAndStockUpdateRequest request);
+        Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(TrendyolApiContext context, int pageSize = 50);
+        Task<TrendyolProductDto?> GetProductWithBarcodeAsync(TrendyolApiContext context, string barcode);
+        Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(TrendyolApiContext context, int pageSize = 50);
+        Task UpdatePriceAndStockAsync(TrendyolApiContext context, TrendyolPriceAndStockUpdateRequest request);
     }
 }

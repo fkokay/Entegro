@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
-    public interface IMarketplaceCategoryAttributeReader
+    public interface IMarketplaceCategoryAttributeReader<TContext>
     {
-        Task<CategoryAttributeDto> GetCategoryAttibutesAsync(int categoryId);
+        Task<CategoryAttributeDto> GetCategoryAttibutesAsync(TContext context,int categoryId);
     }
 }

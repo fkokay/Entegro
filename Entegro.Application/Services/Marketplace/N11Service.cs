@@ -44,42 +44,42 @@ namespace Entegro.Application.Services.Marketplace
         }
 
 
-        public Task<IEnumerable<BrandDto>> GetBrandsAsync()
+        public Task<IEnumerable<BrandDto>> GetBrandsAsync(N11ApiContext context)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+        public Task<IEnumerable<CategoryDto>> GetCategoriesAsync(N11ApiContext context)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CategoryAttributeDto> GetCategoryAttibutesAsync(int categoryId)
+        public Task<CategoryAttributeDto> GetCategoryAttibutesAsync(N11ApiContext context,int categoryId)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdatePriceAndStockAsync(N11PriceAndStockUpdatePayload payload)
+        public Task UpdatePriceAndStockAsync(N11ApiContext context,N11PriceAndStockUpdatePayload payload)
         {
             throw new NotImplementedException();
         }
 
-        public Task<N11ProductDto?> GetProductWithN11CodeAsync(string n11Code)
+        public Task<N11ProductDto?> GetProductWithN11CodeAsync(N11ApiContext context,string n11Code)
         {
             throw new NotImplementedException();
         }
 
-        public Task<N11ProductDto?> GetProductWithStockCodeAsync(string stockCode)
+        public Task<N11ProductDto?> GetProductWithStockCodeAsync(N11ApiContext context,string stockCode)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<N11ProductDto>> GetProductsAsync(int pageSize = 50)
+        public Task<IEnumerable<N11ProductDto>> GetProductsAsync(N11ApiContext context,int pageSize = 50)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<N11ShipmentPackageDto>> GetShipmentPackagesAsync(int pageSize = 50)
+        public Task<IEnumerable<N11ShipmentPackageDto>> GetShipmentPackagesAsync(N11ApiContext context,int pageSize = 50)
         {
             throw new NotImplementedException();
         }

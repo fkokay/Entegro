@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
-    public interface IMarketplaceBrandReader
+    public interface IMarketplaceBrandReader<TContext>
     {
-        Task<IEnumerable<BrandDto>> GetBrandsAsync();
+        Task<IEnumerable<BrandDto>> GetBrandsAsync(TContext context);
     }
 }

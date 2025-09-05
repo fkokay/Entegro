@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
-    public interface IMarketplaceCategoryReader
+    public interface IMarketplaceCategoryReader<TContext>
     {
-        Task<IEnumerable<CategoryDto>> GetCategoriesAsync();
+        Task<IEnumerable<CategoryDto>> GetCategoriesAsync(TContext context);
     }
 }
