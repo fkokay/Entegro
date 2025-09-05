@@ -42,6 +42,14 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Products.AsNoTracking().AnyAsync(predicate);
         }
 
+        public async Task<Product?> GetByAsync(Expression<Func<Product, bool>> predicate)
+        {
+            var product = await IncludeAllProperties(_context.Products.AsNoTracking())
+            .FirstOrDefaultAsync(predicate);
+
+            return product;
+        }
+
         public async Task<List<Product>> GetAllAsync()
         {
             var query = IncludeAllProperties(_context.Products.AsNoTracking());
@@ -71,15 +79,6 @@ namespace Entegro.Infrastructure.Repositories
                 PageSize = pageSize
             };
         }
-
-        public async Task<Product?> GetByAsync(Expression<Func<Product, bool>> predicate)
-        {
-            var product = await IncludeAllProperties(_context.Products.AsNoTracking())
-            .FirstOrDefaultAsync(predicate);
-
-            return product;
-        }
-
 
         public async Task UpdateMainPictureIdAsync(int productId, int mainPictureId)
         {
