@@ -4,6 +4,7 @@ using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Linq.Dynamic.Core;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -59,27 +60,6 @@ namespace Entegro.Infrastructure.Repositories
             return products;
         }
 
-        public async Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize)
-        {
-            var query = IncludeAllProperties(_context.Products.AsNoTracking());
-
-            var totalCount = await query.CountAsync();
-
-            var products = await query
-                .OrderBy(p => p.Id)
-                .Skip(pageNumber * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new PagedResult<Product>
-            {
-                Items = products,
-                TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
-        }
-
         public async Task UpdateMainPictureIdAsync(int productId, int mainPictureId)
         {
             var product = new Product { Id = productId, MainPictureId = mainPictureId, UpdatedOnUtc = DateTime.UtcNow };
@@ -96,6 +76,47 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(x => x.ProductMediaFiles).ThenInclude(pm => pm.MediaFile)
                 .Include(x => x.ProductCategories).ThenInclude(pc => pc.Category)
                 .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters);
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<Product>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var query = IncludeAllProperties(_context.Products.AsNoTracking());
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var products = await query
+                .OrderBy(p => p.Id)
+                .Skip(gridCommand.Start)
+                .Take(gridCommand.Length)
+                .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<Product>
+            {
+                Items = products,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start / gridCommand.Length,
+                PageSize = gridCommand.Length
+            };
         }
     }
 }

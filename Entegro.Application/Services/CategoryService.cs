@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Brand;
+﻿using Entegro.Application.DTOs.Address;
+using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
@@ -80,20 +81,6 @@ namespace Entegro.Application.Services
             };
         }
 
-        public async Task<PagedResult<CategoryDto>> SearchPagedAsync(string? term, int page, int pageSize)
-        {
-            var categories = await _categoryRepository.GetAllAsync(term, page, pageSize);
-            var items = _mapper.Map<IEnumerable<CategoryDto>>(categories.Items);
-
-
-            return new PagedResult<CategoryDto>
-            {
-                Items = items,
-                TotalCount = categories.TotalCount,
-                PageNumber = categories.PageNumber,
-                PageSize = categories.PageSize
-            };
-        }
 
         public async Task<string> GetCategoryPathAsync(ICategoryNode categoryNode, string separator = " » ")
         {
@@ -181,7 +168,10 @@ namespace Entegro.Application.Services
             return root;
         }
 
-
+        public Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            throw new NotImplementedException();
+        }
 
 
         private static void AddChildTreeNodes(TreeNode<ICategoryNode> parentNode, int parentItemId, Multimap<int, CategoryNode> nodeMap)
@@ -202,5 +192,7 @@ namespace Entegro.Application.Services
                 AddChildTreeNodes(newNode, node.Id, nodeMap);
             }
         }
+
+
     }
 }

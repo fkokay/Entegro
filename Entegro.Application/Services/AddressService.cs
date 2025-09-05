@@ -72,6 +72,11 @@ namespace Entegro.Application.Services
             return addressDtos;
         }
 
+        public Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<AddressDto> UpdateAsync(UpdateAddressDto address)
         {
             if (address == null)
