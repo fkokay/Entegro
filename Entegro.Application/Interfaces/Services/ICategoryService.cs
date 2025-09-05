@@ -1,4 +1,6 @@
-﻿using Entegro.Application.DTOs.Category;
+﻿using Entegro.Application.DTOs.Address;
+using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Collections;
 using Entegro.Domain.Entities;
@@ -11,6 +13,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<CategoryDto?> GetCategoryByIdAsync(int categoryId);
         Task<CategoryDto?> GetCategoryByNameAsync(string name);
         Task<PagedResult<CategoryDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand);
         Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategory);
         Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory);
         Task DeleteCategoryAsync(int categoryId);
