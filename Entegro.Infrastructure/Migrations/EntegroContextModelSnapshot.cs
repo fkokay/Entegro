@@ -53,7 +53,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int?>("CountryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DistrictId")
@@ -89,7 +89,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int?>("TownId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ZipPostalCode")
@@ -108,7 +108,7 @@ namespace Entegro.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -136,7 +136,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<bool>("Published")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -154,8 +154,11 @@ namespace Entegro.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -179,8 +182,9 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("int");
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int")
+                        .HasColumnName("ParentCategoryId");
 
                     b.Property<bool>("Published")
                         .HasColumnType("bit");
@@ -189,14 +193,14 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MediaFileId");
 
-                    b.HasIndex("ParentCategoryId");
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Category");
                 });
@@ -263,7 +267,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CustomerType")
@@ -295,7 +299,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<string>("Town")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -711,7 +715,7 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Currency")
@@ -774,7 +778,7 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<string>("Unit")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("VatInc")
@@ -1155,14 +1159,14 @@ namespace Entegro.Infrastructure.Migrations
                         .HasForeignKey("MediaFileId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Entegro.Domain.Entities.Category", "ParentCategory")
+                    b.HasOne("Entegro.Domain.Entities.Category", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentCategoryId")
+                        .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("MediaFile");
 
-                    b.Navigation("ParentCategory");
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.City", b =>

@@ -18,8 +18,8 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Category category)
         {
-            category.CreatedOn = DateTime.UtcNow;
-            category.UpdatedOn = DateTime.UtcNow;
+            category.CreatedOnUtc = DateTime.UtcNow;
+            category.UpdatedOnUtc = DateTime.UtcNow;
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
 
@@ -30,7 +30,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Category category)
         {
-            category.UpdatedOn = DateTime.UtcNow;
+            category.UpdatedOnUtc = DateTime.UtcNow;
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
@@ -42,17 +42,25 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Category>> GetAllAsync()
+        public async Task<List<Category>> GetAllAsync(bool includeHidden = false)
         {
-            return await _context.Categories
-                .Include(c => c.ParentCategory)
+            var query = _context.Categories
+                .Include(c => c.Parent)
                 .Include(m => m.MediaFile)
-                .ThenInclude(m => m.MediaFolder).AsNoTracking().ToListAsync();
+                .ThenInclude(m => m.MediaFolder).AsNoTracking();
+
+            query = includeHidden ? query : query.Where(c => c.Published);
+            query = query.OrderBy(x => x.ParentId)
+                .ThenBy(x => x.DisplayOrder)
+                .ThenBy(x => x.Name);
+
+            return await query.ToListAsync();
         }
 
         public async Task<PagedResult<Category>> GetAllAsync(string term, int pageNumber, int pageSize)
         {
             var query = _context.Categories
+                .Include(c => c.Parent)
                 .Include(m => m.MediaFile)
                 .ThenInclude(m => m.MediaFolder)
                 .OrderBy(b => b.Id)
@@ -87,6 +95,7 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Category?> GetByAsync(Expression<Func<Category, bool>> predicate)
         {
             return await _context.Categories
+            .Include(b => b.Parent)
             .Include(b => b.MediaFile)
             .ThenInclude(b => b.MediaFolder)
             .FirstOrDefaultAsync(predicate);

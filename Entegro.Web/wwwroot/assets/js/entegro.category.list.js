@@ -75,7 +75,7 @@ Entegro.Category.List = (function () {
                              </div>
                              <div class="d-flex flex-column">
                                  <h6 class="text-nowrap mb-0">${row.Name}</h6>
-                                 ${row.ParentCategory ? `<small class="text-muted d-none d-sm-block">${row.ParentCategory.Name} » ${row.Name} </small>` : ""}
+                                 ${row.Parent ? `<small class="text-muted d-none d-sm-block">${row.Parent.Name} » ${row.Name} </small>` : ""}
                              </div>
                          </div>`;
                     }

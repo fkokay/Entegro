@@ -48,7 +48,7 @@ namespace Entegro.Application.Services.Marketplace
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(context.BaseUrl);
 
-            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{context.Username}:{context.Password}"));
+            var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{context.ApiUser}:{context.ApiPassword}"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -72,9 +72,9 @@ namespace Entegro.Application.Services.Marketplace
                 {
                     var apiContext = new TrendyolApiContext
                     {
-                        SellerId = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "SellerId").Value,
-                        Username = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "Username").Value,
-                        Password = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "Password").Value
+                        SupplierId = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "SupplierId").Value,
+                        ApiUser = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "ApiUser").Value,
+                        ApiPassword = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "ApiPassword").Value
                     };
 
                     object? customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonSerializer.Deserialize<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
@@ -278,7 +278,7 @@ namespace Entegro.Application.Services.Marketplace
 
             while (moreData)
             {
-                var url = $"product/sellers/{context.SellerId}/products?size={pageSize}&page={page}";
+                var url = $"product/sellers/{context.SupplierId}/products?size={pageSize}&page={page}";
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -309,7 +309,7 @@ namespace Entegro.Application.Services.Marketplace
         public async Task<TrendyolProductDto?> GetProductWithBarcodeAsync(TrendyolApiContext context,string barcode)
         {
             using var client = CreateHttpClient(context);
-            var url = $"product/sellers/{context.SellerId}/products?barcode={barcode}";
+            var url = $"product/sellers/{context.SupplierId}/products?barcode={barcode}";
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
@@ -338,7 +338,7 @@ namespace Entegro.Application.Services.Marketplace
 
             while (moreData)
             {
-                var url = $"order/sellers/{context.SellerId}/orders?size={pageSize}&page={page}";
+                var url = $"order/sellers/{context.SupplierId}/orders?size={pageSize}&page={page}";
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -370,7 +370,7 @@ namespace Entegro.Application.Services.Marketplace
         {
             using var client = CreateHttpClient(context);
 
-            var url = $"inventory/sellers/{context.SellerId}/products/price-and-inventory";
+            var url = $"inventory/sellers/{context.SupplierId}/products/price-and-inventory";
             var json = JsonSerializer.Serialize(request, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true

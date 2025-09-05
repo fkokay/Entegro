@@ -1,3 +1,6 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Entegro;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
@@ -9,22 +12,43 @@ using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Application.Services.Marketplace;
+using Entegro.Caching;
+using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.EventBus;
 using Entegro.Infrastructure.Repositories;
+using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Extensions.Logging;
+using Serilog.Filters;
 using Serilog.Sinks.Graylog;
 using Serilog.Sinks.Graylog.Core.Transport;
 using System.Globalization;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 
+var rgSystemSource = new Regex("^File|^System|^Microsoft|^Serilog|^Autofac|^Castle|^MiniProfiler|^Newtonsoft|^Pipelines|^Azure|^StackExchange|^Superpower|^Dasync", RegexOptions.Compiled);
+var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? Environments.Production;
+var isDevEnvironment = IsDevEnvironment();
+var baseDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = isDevEnvironment ? null : baseDirectory
+});
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 {
@@ -88,7 +112,41 @@ builder.Services.AddDbContext<EntegroContext>(options =>
     
     options.UseLazyLoadingProxies(); // Lazy loading proxy kullanacaksan
 });
+var configuration = (IConfiguration)builder.Configuration;
 
+
+builder.Host
+    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    .UseSerilog(dispose: true);
+
+
+var startupLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("File");
+var appContext = new SmartApplicationContext(builder.Environment, configuration, startupLogger);
+var engine = EngineFactory.Create(appContext.AppConfiguration);
+var engineStarter = engine.Start(appContext);
+
+// Configure RequestSizeLimit and RequestFormLimits
+if (appContext.AppConfiguration.MaxRequestBodySize != null)
+{
+    builder.WebHost.ConfigureKestrel(kestrel =>
+    {
+        kestrel.Limits.MaxRequestBodySize = appContext.AppConfiguration.MaxRequestBodySize;
+    });
+
+    builder.Services.Configure<FormOptions>(form =>
+    {
+        form.MultipartBodyLengthLimit = appContext.AppConfiguration.MaxRequestBodySize.Value;
+    });
+}
+
+// Add NativeLibraryDirectory to PATH environment variable
+AddPathToEnv(appContext.RuntimeInfo.NativeLibraryDirectory);
+
+// Add services to the container.
+engineStarter.ConfigureServices(builder.Services);
+
+// Add services to the Autofac container.
+builder.Host.ConfigureContainer<ContainerBuilder>(engineStarter.ConfigureContainer);
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -239,4 +297,34 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
 }
 
+engineStarter.ConfigureApplication(app);
+
 app.Run();
+
+
+bool IsDevEnvironment()
+{
+    if (environmentName == Environments.Development)
+        return true;
+
+    if (System.Diagnostics.Debugger.IsAttached)
+        return true;
+
+    // if there's a 'Smartstore.sln' in one of the parent folders,
+    // then we're likely in a dev environment
+    if (CommonHelper.FindSolutionRoot(Directory.GetCurrentDirectory()) != null)
+        return true;
+
+    return false;
+}
+void AddPathToEnv(string path)
+{
+    var name = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Path" : "PATH";
+    var value = Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
+
+    if (value.IsEmpty() || !value.Contains(path))
+    {
+        value = value.EmptyNull().Trim(';') + ';' + path;
+        Environment.SetEnvironmentVariable(name, value, EnvironmentVariableTarget.Process);
+    }
+}

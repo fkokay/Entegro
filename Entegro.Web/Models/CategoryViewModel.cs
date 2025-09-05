@@ -17,7 +17,7 @@ namespace Entegro.Web.Models
         public bool Published { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public string? ParentCategoryFormattedName { get; set; }
+        public CategoryViewModel? Parent { get; set; }
         public MediaFileViewModel? MediaFile { get; set; }
 
     }

@@ -19,8 +19,8 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(Brand brand)
         {
-            brand.CreatedOn = DateTime.UtcNow;
-            brand.UpdatedOn = DateTime.UtcNow;
+            brand.CreatedOnUtc = DateTime.UtcNow;
+            brand.UpdatedOnUtc = DateTime.UtcNow;
             await _context.Brands.AddAsync(brand);
             await _context.SaveChangesAsync();
         }
@@ -137,7 +137,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Brand brand)
         {
-            brand.UpdatedOn = DateTime.UtcNow;
+            brand.UpdatedOnUtc = DateTime.UtcNow;
             _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
         }

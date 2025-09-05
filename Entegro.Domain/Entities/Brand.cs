@@ -1,4 +1,4 @@
-﻿using Entegro.Domain.Common;
+﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -15,7 +15,7 @@ namespace Entegro.Domain.Entities
     }
 
     [Table("Brand")]
-    public class Brand : BaseEntity, IDisplayOrder
+    public class Brand : BaseEntity, IDisplayOrder, IAuditable
     {
         public string Name { get; set; }
         public string? Description { get; set; }
@@ -26,7 +26,7 @@ namespace Entegro.Domain.Entities
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
         public bool Published { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public DateTime CreatedOnUtc { get; set; }
+        public DateTime UpdatedOnUtc { get; set; }
     }
 }

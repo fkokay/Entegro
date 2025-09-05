@@ -17,8 +17,8 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Address address)
         {
-            address.CreatedOn = DateTime.UtcNow;
-            address.UpdatedOn = DateTime.UtcNow;
+            address.CreatedOnUtc = DateTime.UtcNow;
+            address.UpdatedOnUtc = DateTime.UtcNow;
             await _context.Addresses.AddAsync(address);
             await _context.SaveChangesAsync();
         }
@@ -62,7 +62,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Address address)
         {
-            address.UpdatedOn = DateTime.UtcNow;
+            address.UpdatedOnUtc = DateTime.UtcNow;
             _context.Addresses.Update(address);
             await _context.SaveChangesAsync();
         }
