@@ -80,7 +80,6 @@ namespace Entegro.Application.Services
 
             var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
             var createCategoryModel = await _categoryService.CreateCategoryAsync(createCategory);
-            //var categoryId = await _categoryService.CreateCategoryAsync(createCategory);
 
             foreach (var subCategoryDto in categoryDto.SubCategories)
             {
@@ -97,7 +96,7 @@ namespace Entegro.Application.Services
             if (productId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(productId));
 
-            var product = await _productRepository.GetByIdAsync(productId);
+            var product = await _productRepository.GetByAsync(m=>m.Id == productId);
 
             if (product == null)
             {
@@ -119,7 +118,7 @@ namespace Entegro.Application.Services
 
         public async Task<ProductDto?> GetProductByCodeAsync(string productCode)
         {
-            var product = await _productRepository.GetByCodeAsync(productCode);
+            var product = await _productRepository.GetByAsync(m=>m.Code == productCode);
             if (product == null)
             {
                 throw new KeyNotFoundException($"Product with ID {productCode} not found.");
@@ -131,7 +130,7 @@ namespace Entegro.Application.Services
 
         public async Task<ProductDto?> GetProductByIdAsync(int productId)
         {
-            var product = await _productRepository.GetByIdAsync(productId);
+            var product = await _productRepository.GetByAsync(m=>m.Id == productId);
             if (product == null)
             {
                 throw new KeyNotFoundException($"Product with ID {productId} not found.");
@@ -153,7 +152,7 @@ namespace Entegro.Application.Services
             if (updateProduct == null)
                 throw new ArgumentNullException(nameof(updateProduct));
 
-            var existingProduct = await _productRepository.GetByIdAsync(updateProduct.Id);
+            var existingProduct = await _productRepository.GetByAsync(m=>m.Id == updateProduct.Id);
             if (existingProduct == null)
                 throw new KeyNotFoundException($"ID {updateProduct.Id} ile Product bulunamadı.");
 
@@ -184,7 +183,7 @@ namespace Entegro.Application.Services
 
         public async Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode)
         {
-            var product = await _productRepository.GetByBarcodeAsync(productBarcode);
+            var product = await _productRepository.GetByAsync(m=>m.Barcode == productBarcode);
             var productDto = product == null ? null : _mapper.Map<ProductDto>(product);
             return productDto;
         }

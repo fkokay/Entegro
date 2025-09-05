@@ -30,6 +30,13 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(Product product)
+        {
+            product.UpdatedOn = DateTime.UtcNow;
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<bool> ExistsAsync(Expression<Func<Product, bool>> predicate)
         {
             return await _context.Products.AsNoTracking().AnyAsync(predicate);
@@ -40,7 +47,7 @@ namespace Entegro.Infrastructure.Repositories
             var query = IncludeAllProperties(_context.Products.AsNoTracking());
 
             var products = await query.ToListAsync();
-        
+
             return products;
         }
 
@@ -65,36 +72,14 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<Product?> GetByBarcodeAsync(string productBarcode)
+        public async Task<Product?> GetByAsync(Expression<Func<Product, bool>> predicate)
         {
             var product = await IncludeAllProperties(_context.Products.AsNoTracking())
-           .FirstOrDefaultAsync(o => o.Barcode == productBarcode);
+            .FirstOrDefaultAsync(predicate);
 
             return product;
         }
 
-        public async Task<Product?> GetByCodeAsync(string productCode)
-        {
-            var product = await IncludeAllProperties(_context.Products.AsNoTracking())
-            .FirstOrDefaultAsync(o => o.Code == productCode);
-
-            return product;
-        }
-
-        public async Task<Product?> GetByIdAsync(int id)
-        {
-            var product = await IncludeAllProperties(_context.Products.AsNoTracking())
-            .FirstOrDefaultAsync(o => o.Id == id);
-
-            return product;
-        }
-
-        public async Task UpdateAsync(Product product)
-        {
-            product.UpdatedOn = DateTime.UtcNow;
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
-        }
 
         public async Task UpdateMainPictureIdAsync(int productId, int mainPictureId)
         {
@@ -108,11 +93,10 @@ namespace Entegro.Infrastructure.Repositories
         private IQueryable<Product> IncludeAllProperties(IQueryable<Product> query)
         {
             return query
-                .Include(p => p.Brand)
-                .Include(p => p.ProductMediaFiles).ThenInclude(pm => pm.MediaFile)
-                .Include(p => p.ProductCategories).ThenInclude(pc => pc.Category)
-                .Include(p => p.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem)
-                    .ThenInclude(isys => isys.IntegrationSystemParameters);
+                .Include(x => x.Brand)
+                .Include(x => x.ProductMediaFiles).ThenInclude(pm => pm.MediaFile)
+                .Include(x => x.ProductCategories).ThenInclude(pc => pc.Category)
+                .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters);
         }
     }
 }

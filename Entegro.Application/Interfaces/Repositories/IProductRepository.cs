@@ -7,9 +7,7 @@ namespace Entegro.Application.Interfaces.Repositories
     public interface IProductRepository
     {
         Task<bool> ExistsAsync(Expression<Func<Product, bool>> predicate);
-        Task<Product?> GetByIdAsync(int id);
-        Task<Product?> GetByCodeAsync(string productCode);
-        Task<Product?> GetByBarcodeAsync(string productBarcode);
+        Task<Product?> GetByAsync(Expression<Func<Product, bool>> predicate);
         Task<List<Product>> GetAllAsync();
         Task<PagedResult<Product>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(Product product);
