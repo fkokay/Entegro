@@ -3,6 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -17,10 +18,20 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task AddAsync(Category category)
         {
+            category.CreatedOn = DateTime.UtcNow;
+            category.UpdatedOn = DateTime.UtcNow;
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
 
             category.TreePath = $"/{category.Id}/";
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Category category)
+        {
+            category.UpdatedOn = DateTime.UtcNow;
+
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
         }
@@ -31,11 +42,6 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> ExistsByNameAsync(string name)
-        {
-            return await _context.Categories.AnyAsync(o => o.Name == name);
-        }
-
         public async Task<List<Category>> GetAllAsync()
         {
             return await _context.Categories
@@ -44,7 +50,7 @@ namespace Entegro.Infrastructure.Repositories
                 .ThenInclude(m => m.MediaFolder).AsNoTracking().ToListAsync();
         }
 
-        public async Task<PagedResult<Category>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<Category>> GetAllAsync(string term,int pageNumber, int pageSize)
         {
             var query = _context.Categories
                 .Include(c => c.ParentCategory)
@@ -52,7 +58,12 @@ namespace Entegro.Infrastructure.Repositories
                 .ThenInclude(m => m.MediaFolder)
                 .OrderBy(b => b.Id)
                 .AsNoTracking();
-                
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                query = query.Where(m => m.Name.Contains(term));
+            }
+
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -69,84 +80,17 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<Category?> GetByIdAsync(int id)
+        public async Task<bool> ExistsAsync(Expression<Func<Category, bool>> predicate)
         {
-            return await _context.Categories
-             .Include(b => b.MediaFile)
-             .ThenInclude(b => b.MediaFolder)
-             .AsNoTracking()
-             .FirstOrDefaultAsync(b => b.Id == id);
+            return await _context.Categories.AnyAsync(predicate);
         }
 
-        public async Task<Category?> GetByNameAsync(string name)
+        public async Task<Category?> GetByAsync(Expression<Func<Category, bool>> predicate)
         {
             return await _context.Categories
             .Include(b => b.MediaFile)
             .ThenInclude(b => b.MediaFolder)
-            .FirstOrDefaultAsync(b => b.Name == name);
-        }
-
-        public async Task<List<Category>> GetByParentIdAsync(int parentCategoryId)
-        {
-            return await _context.Categories.Where(c => c.ParentCategoryId == parentCategoryId).ToListAsync();
-        }
-
-        public async Task<Dictionary<int, string>> GetNamesByIdsAsync(IEnumerable<int> ids)
-        {
-
-            if (ids == null || !ids.Any())
-                return new Dictionary<int, string>();
-
-            var set = ids.Distinct().ToArray();
-            return await _context.Categories
-                .AsNoTracking()
-                .Where(c => set.Contains(c.Id))
-                .Select(c => new { c.Id, c.Name })
-                .ToDictionaryAsync(k => k.Id, v => v.Name ?? "");
-        }
-
-        public async Task<PagedResult2<CategorySlim>> SearchPagedAsync(string? term, int page, int pageSize)
-        {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 20;
-            if (pageSize > 100) pageSize = 100;
-
-            var q = _context.Categories.AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(term))
-            {
-                term = term.Trim();
-                q = q.Where(c => EF.Functions.Collate(c.Name, "Turkish_CI_AI").Contains(term));
-                if (int.TryParse(term, out var idVal))
-                {
-                    q = q.Union(_context.Categories.AsNoTracking().Where(c => c.Id == idVal));
-                }
-            }
-            q = q.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name).ThenBy(c => c.Id);
-
-            var skip = (page - 1) * pageSize;
-
-            var rows = await q.Select(c => new CategorySlim { Id = c.Id, Name = c.Name, TreePath = c.TreePath })
-                              .Skip(skip)
-                              .Take(pageSize + 1) // +1 => hasMore
-                              .ToListAsync();
-
-            var hasMore = rows.Count > pageSize;
-            if (hasMore) rows.RemoveAt(pageSize);
-
-            return new PagedResult2<CategorySlim>
-            {
-                Items = rows,
-                HasMore = hasMore
-            };
-        }
-
-        public async Task UpdateAsync(Category category)
-        {
-            category.UpdatedOn = DateTime.UtcNow;
-
-            _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
+            .FirstOrDefaultAsync(predicate);
         }
     }
 }

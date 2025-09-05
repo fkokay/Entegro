@@ -92,7 +92,6 @@ Entegro.AttributeValue.List = (function ($) {
                                             { extend: "copy", className: "dropdown-item", text: `<i class="icon-base ti tabler-copy me-1"></i> Copy`, exportOptions: { columns: [2, 3, 4] } }
                                         ]
                                     },
-                                    // Yeni Kayıt: create modal aç
                                     {
                                         text: `
                                             <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
@@ -123,7 +122,6 @@ Entegro.AttributeValue.List = (function ($) {
                 }
             });
 
-            // ================== Görsel küçük ayarlar (opsiyonel) ==================
             setTimeout(() => {
                 const adjustments = [
                     { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -144,11 +142,9 @@ Entegro.AttributeValue.List = (function ($) {
                 });
             }, 100);
 
-            // ================== Select2 kaynakları ==================
-            initPASelect('#ProductAttributeId', '#createAttributeValue');     // Create modal
-            initPASelect('#Edit_ProductAttributeId', '#editAttributeValue');  // Edit modal
+            initPASelect('#ProductAttributeId', '#createAttributeValue');  
+            initPASelect('#Edit_ProductAttributeId', '#editAttributeValue');
 
-            // Tek seferlik cache: tüm attribute listesi (Edit text set etmek için)
             let _paCache = null;
             function fetchAllPA() {
                 if (_paCache) return $.Deferred().resolve(_paCache).promise();
@@ -178,7 +174,6 @@ Entegro.AttributeValue.List = (function ($) {
                 });
             }
 
-            // Seçili ProductAttributeId’yi Select2’ye yerleştir (ismi mümkünse doldur)
             function setSelect2Selected(selector, id, text) {
                 const $el = $(selector);
                 if (!id || !$el.length) return;
@@ -202,7 +197,6 @@ Entegro.AttributeValue.List = (function ($) {
                 }
             }
 
-            // ================== CREATE: FormValidation + POST ==================
             (function () {
                 const formEl = document.getElementById('createAttributeValueForm');
                 if (!formEl) return;
@@ -279,7 +273,6 @@ Entegro.AttributeValue.List = (function ($) {
                 });
             })();
 
-            // ================== EDIT: Aç (GET), doldur, POST ==================
             $(document).on('click', '.edit-attributeValue', function () {
                 const id = $(this).data('id');
                 if (!id) return;
@@ -389,7 +382,6 @@ Entegro.AttributeValue.List = (function ($) {
                 });
             })();
 
-            // ================== DELETE: SweetAlert2 onay + POST ==================
             $(document).on('click', '.delete-attributeValue', function () {
                 const id = $(this).data('id');
                 if (!id) return;

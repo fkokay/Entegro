@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Category;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -19,274 +20,68 @@ namespace Entegro.Application.Services
 
         public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategory)
         {
-
             var category = _mapper.Map<Category>(createCategory);
-
-
             await _categoryRepository.AddAsync(category);
 
-            // TreePath hesaplama
-            if (category.ParentCategoryId == null)
-            {
-                category.TreePath = $"/{category.Id}/";
-            }
-            else
-            {
-                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId.Value);
-                if (parentCategory != null)
-                {
-                    category.TreePath = $"{parentCategory.TreePath}{category.Id}/";
-                }
-                else
-                {
-                    category.TreePath = $"/{category.Id}/"; // Ebeveyn bulunamazsa yine kök gibi
-                }
-            }
-
-            await _categoryRepository.UpdateAsync(category); // TreePath güncelleniyor
             return _mapper.Map<CategoryDto>(category);
-        }
-
-        public async Task DeleteCategoryAndChildrenAsync(int categoryId)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category == null)
-                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
-
-            var children = await _categoryRepository.GetByParentIdAsync(categoryId);
-
-            foreach (var child in children)
-            {
-                await DeleteCategoryAndChildrenAsync(child.Id);
-            }
-
-            await _categoryRepository.DeleteAsync(category);
-        }
-
-        public async Task DeleteCategoryAndReassignChildrenAsync(int categoryId)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category == null)
-                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
-
-            var children = await _categoryRepository.GetByParentIdAsync(categoryId);
-
-            foreach (var child in children)
-            {
-                child.ParentCategoryId = null;
-
-                child.TreePath = $"/{child.Id}/";
-                await _categoryRepository.UpdateAsync(child);
-
-                await UpdateChildTreePathsRecursivelyAsync(child);
-            }
-
-            await _categoryRepository.DeleteAsync(category);
         }
 
         public async Task DeleteCategoryAsync(int categoryId)
         {
-            Category? category = await _categoryRepository.GetByIdAsync(categoryId);
-
+            var category = await _categoryRepository.GetByAsync(m => m.Id == categoryId);
             if (category == null)
-            {
                 throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
-            }
-            await _categoryRepository.DeleteAsync(category);
-        }
 
-        public async Task DeleteCategoryImageAsync(int categoryId)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category != null)
-            {
-                category.MediaFileId = null;
-                await _categoryRepository.UpdateAsync(category);
-            }
+            await _categoryRepository.DeleteAsync(category);
         }
 
         public async Task<bool> ExistsByNameAsync(string name)
         {
-            return await _categoryRepository.ExistsByNameAsync(name);
+            return await _categoryRepository.ExistsAsync(m => m.Name == name);
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+        public async Task<CategoryDto?> GetCategoryByIdAsync(int categoryId)
         {
-            var categories = await _categoryRepository.GetAllAsync();
-            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
-            return categoryDtos;
+            var category = await _categoryRepository.GetByAsync(m => m.Id == categoryId);
+            return category == null ? null : _mapper.Map<CategoryDto>(category);
         }
 
-        public async Task<PagedResult<CategoryDto>> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<CategoryDto?> GetCategoryByNameAsync(string name)
         {
-            var categories = await _categoryRepository.GetAllAsync(pageNumber, pageSize);
-            var categoryDtos = _mapper.Map<PagedResult<CategoryDto>>(categories);
-            return categoryDtos;
+            var category = await _categoryRepository.GetByAsync(m => m.Name == name);
+            return category == null ? null : _mapper.Map<CategoryDto>(category);
         }
 
-        public async Task<IEnumerable<CategoryTreePathDto>> GetCategoriesFormatTreePathAsync()
+        public async Task<PagedResult<CategoryDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
-            var categories = await GetCategoriesAsync();
-
-            var orderedCategories = categories.OrderBy(c => c.TreePath).ToList();
-
-            var categoryDtos = orderedCategories.Select(category => new CategoryDto
+            var categories = await _categoryRepository.GetAllAsync("", pageNumber, pageSize);
+            return new PagedResult<CategoryDto>
             {
-                Id = category.Id,
-                ParentCategoryId = category.ParentCategoryId,
-                TreePath = category.TreePath,
-                Name = category.Name,
-                Description = category.Description,
-                MetaTitle = category.MetaTitle,
-                MetaDescription = category.MetaDescription,
-                MetaKeywords = category.MetaKeywords,
-                DisplayOrder = category.DisplayOrder,
-                CreatedOn = category.CreatedOn,
-                UpdatedOn = category.UpdatedOn
-            }).ToList();
-
-            var result = categoryDtos.Select(c => new CategoryTreePathDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                FormattedName = FormatTreePath(c.TreePath, categoryDtos)
-            }).ToList();
-
-            return result;
-        }
-
-        public async Task<Select2ResponseDto> GetCategoriesForSelect2Async(string? term, int page, int pageSize)
-        {
-            var paged = await _categoryRepository.SearchPagedAsync(term, page, pageSize);
-
-            // Sayfadaki kayıtların tüm ata ID’leri
-            var ancestorIds = paged.Items
-                .SelectMany(r => (r.TreePath ?? "/").Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries))
-                .Select(s => int.TryParse(s, out var i) ? i : 0)
-                .Where(i => i > 0)
-                .Distinct()
-                .ToList();
-
-            var names = await _categoryRepository.GetNamesByIdsAsync(ancestorIds);
-
-            static string FormatTreePath(string? treePath, IReadOnlyDictionary<int, string> map, string fallback)
-            {
-                if (string.IsNullOrWhiteSpace(treePath)) return fallback;
-                var parts = treePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
-                var chain = new List<string>(parts.Length);
-                foreach (var p in parts)
-                {
-                    if (int.TryParse(p, out var id) && map.TryGetValue(id, out var nm))
-                        chain.Add(nm);
-                }
-                return chain.Count > 0 ? string.Join(" - ", chain) : fallback;
-            }
-
-            var result = new Select2ResponseDto
-            {
-                results = paged.Items.Select(r => new Select2OptionDto
-                {
-                    id = r.Id,
-                    text = FormatTreePath(r.TreePath, names, r.Name)
-                }).ToList(),
-                pagination = new Select2ResponseDto.Pagination { more = paged.HasMore }
+                Items = _mapper.Map<IEnumerable<CategoryDto>>(categories.Items),
+                TotalCount = categories.TotalCount,
+                PageNumber = categories.PageNumber,
+                PageSize = categories.PageSize
             };
-
-            return result;
         }
 
-        public async Task<CategoryDto> GetCategoryByIdAsync(int categoryId)
+        public async Task<PagedResult<CategoryDto>> SearchPagedAsync(string? term, int page, int pageSize)
         {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category == null)
+            var categories = await _categoryRepository.GetAllAsync(term, page, pageSize);
+            return new PagedResult<CategoryDto>
             {
-                throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
-            }
-
-            var categoryDto = _mapper.Map<CategoryDto>(category);
-            return categoryDto;
-        }
-
-        public async Task<CategoryDto> GetCategoryByNameAsync(string name)
-        {
-            var category = await _categoryRepository.GetByNameAsync(name);
-            if (category == null)
-            {
-                return null;
-            }
-
-            var categoryDto = _mapper.Map<CategoryDto>(category);
-            return categoryDto;
+                Items = _mapper.Map<IEnumerable<CategoryDto>>(categories.Items),
+                TotalCount = categories.TotalCount,
+                PageNumber = categories.PageNumber,
+                PageSize = categories.PageSize
+            };
         }
 
         public async Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
         {
             var category = _mapper.Map<Category>(updateCategory);
-
-            if (category.ParentCategoryId == null)
-            {
-                category.TreePath = $"/{category.Id}/";
-            }
-            else
-            {
-                var parentCategory = await _categoryRepository.GetByIdAsync(category.ParentCategoryId.Value);
-                if (parentCategory != null)
-                {
-                    category.TreePath = $"{parentCategory.TreePath}{category.Id}/";
-                }
-                else
-                {
-                    category.TreePath = $"/{category.Id}/"; // Ebeveyn bulunamazsa kök gibi
-                }
-            }
             await _categoryRepository.UpdateAsync(category);
+
             return _mapper.Map<CategoryDto>(category);
-        }
-
-        public async Task UpdateCategoryImageAsync(int categoryId, int mediaFileId)
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
-            if (category != null)
-            {
-                category.MediaFileId = mediaFileId;
-                await _categoryRepository.UpdateAsync(category);
-            }
-        }
-
-        private string FormatTreePath(string treePath, List<CategoryDto> allCategories)
-        {
-            // TreePath'i id'ler üzerinden çözümleyelim
-            var pathIds = treePath.Trim('/').Split('/');
-            var categoryNames = new List<string>();
-
-            foreach (var pathId in pathIds)
-            {
-                // ID'ye karşılık gelen kategori ismini buluyoruz
-                var category = allCategories.FirstOrDefault(c => c.Id.ToString() == pathId);
-                if (category != null)
-                {
-                    categoryNames.Add(category.Name);
-                }
-            }
-
-            // Kategori isimlerini " - " ile birleştiriyoruz
-            return string.Join(" - ", categoryNames);
-        }
-
-        private async Task UpdateChildTreePathsRecursivelyAsync(Category parentCategory)
-        {
-            var childCategories = await _categoryRepository.GetByParentIdAsync(parentCategory.Id);
-
-            foreach (var child in childCategories)
-            {
-                // Yeni TreePath: parent'ın TreePath'i + kendi ID'si
-                child.TreePath = $"{parentCategory.TreePath}{child.Id}/";
-
-                await _categoryRepository.UpdateAsync(child);
-
-                // Alt kategoriler için kendini tekrar çağır
-                await UpdateChildTreePathsRecursivelyAsync(child);
-            }
         }
     }
 }

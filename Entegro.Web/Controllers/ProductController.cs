@@ -260,13 +260,6 @@ namespace Entegro.Web.Controllers
         #endregion
 
         #region Product Categories
-        [HttpPost]
-        public async Task<IActionResult> ProductCategoryList(int productId)
-        {
-            var data = await _productCategoryMappingService.GetCategoryPathsByProductAsync(productId);
-            var results = data.Select(d => new { id = d.Id, text = d.CategoryPath, displayOrder = d.DisplayOrder });
-            return Json(new { results });
-        }
 
         [HttpPost]
         public async Task<IActionResult> ProductCategoryInsert([FromBody] CreateProductCategoryDto createProductCategoryDto)

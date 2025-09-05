@@ -62,7 +62,7 @@ namespace Entegro.Web.Controllers
                 return NotFound();
             }
             string formattedParentName = null;
-            var formattedCategories = await _categoryService.GetCategoriesFormatTreePathAsync();
+            var formattedCategories = await _categoryService.Get();
             if (category.ParentCategoryId != null)
             {
                 var parent = formattedCategories.FirstOrDefault(c => c.Id == category.ParentCategoryId);
@@ -154,12 +154,12 @@ namespace Entegro.Web.Controllers
             {
                 if (chooseType == 1)
                 {
-                    await _categoryService.DeleteCategoryAndChildrenAsync(id);
+                    await _categoryService.DeleteCategoryAsync(id);
                     return Json(new { success = true });
                 }
                 else
                 {
-                    await _categoryService.DeleteCategoryAndReassignChildrenAsync(id);
+                    await _categoryService.DeleteCategoryAsync(id);
                     return Json(new { success = true });
                 }
             }

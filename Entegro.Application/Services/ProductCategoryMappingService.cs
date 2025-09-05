@@ -36,56 +36,6 @@ namespace Entegro.Application.Services
             await _productCategoryMappingRepository.DeleteAsync(productCategory);
         }
 
-        public async Task<IReadOnlyList<ProductCategoryPathDto>> GetCategoryPathsByProductAsync(int productId)
-        {
-            var mappings = await _productCategoryMappingRepository.GetByProductWithCategoryAsync(productId);
-
-            var allPathIds = mappings.SelectMany(m => SplitTreePathIds(m.Category?.TreePath)).Distinct().ToArray();
-
-            var nameDict = await _catRepo.GetNamesByIdsAsync(allPathIds);
-
-            return mappings
-                .Select(m => new ProductCategoryPathDto
-                {
-                    Id = m.Id,
-                    ProductId = m.ProductId,
-                    CategoryId = m.CategoryId,
-                    DisplayOrder = m.DisplayOrder,
-                    CategoryPath = BuildPathString(m.Category?.TreePath, nameDict)
-                })
-                .OrderBy(d => d.DisplayOrder)
-                .ThenBy(d => d.CategoryPath)
-                .ToList();
-        }
-
-        public async Task<IReadOnlyDictionary<int, IReadOnlyList<ProductCategoryPathDto>>> GetCategoryPathsByProductsAsync(IEnumerable<int> productIds)
-        {
-            var mappings = await _productCategoryMappingRepository.GetByProductsWithCategoryAsync(productIds);
-
-            var allPathIds = mappings.SelectMany(m => SplitTreePathIds(m.Category?.TreePath)).Distinct().ToArray();
-
-            var nameDict = await _catRepo.GetNamesByIdsAsync(allPathIds);
-
-            var dtos = mappings.Select(m => new ProductCategoryPathDto
-            {
-                Id = m.Id,
-                ProductId = m.ProductId,
-                CategoryId = m.CategoryId,
-                DisplayOrder = m.DisplayOrder,
-                CategoryPath = BuildPathString(m.Category?.TreePath, nameDict)
-            });
-
-            return dtos
-                .GroupBy(d => d.ProductId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => (IReadOnlyList<ProductCategoryPathDto>)g
-                        .OrderBy(x => x.DisplayOrder)
-                        .ThenBy(x => x.CategoryPath)
-                        .ToList()
-                );
-        }
-
         public async Task<ProductCategoryDto> GetProductCategoryByIdAsync(int productCategoryId)
         {
             var productCategory = await _productCategoryMappingRepository.GetByIdAsync(productCategoryId);
