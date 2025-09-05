@@ -28,7 +28,7 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _context.Orders.AnyAsync(p => p.OrderNo == orderNo);
+        public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _context.Orders.AnyAsync(p => p.OrderNumber == orderNo);
 
         public async Task<List<Order>> GetAllAsync()
         {
@@ -44,10 +44,10 @@ namespace Entegro.Infrastructure.Repositories
             var orders = await query.Select(o => new Order
             {
                 Id = o.Id,
-                OrderNo = o.OrderNo,
+                OrderNumber = o.OrderNumber,
                 OrderDate = o.OrderDate,
                 CustomerId = o.CustomerId,
-                TotalAmount = o.TotalAmount,
+                OrderTotal = o.OrderTotal,
                 Deleted = o.Deleted,
                 IsTransient = o.IsTransient,
                 OrderSource = o.OrderSource,
@@ -87,7 +87,7 @@ namespace Entegro.Infrastructure.Repositories
                 CustomerId = o.CustomerId,
                 Deleted = o.Deleted,
                 IsTransient = o.Deleted,
-                OrderNo = o.OrderNo,
+                OrderNumber = o.OrderNumber,
                 Customer = new Customer
                 {
                     Id = o.Customer.Id,
@@ -98,7 +98,7 @@ namespace Entegro.Infrastructure.Repositories
                 OrderDate = o.OrderDate,
                 OrderSource = o.OrderSource,
                 OrderSourceId = o.OrderSourceId,
-                TotalAmount = o.TotalAmount,
+                OrderTotal = o.OrderTotal,
                 OrderItems = o.OrderItems.Select(x => new OrderItem
                 {
                     Id = x.Id,

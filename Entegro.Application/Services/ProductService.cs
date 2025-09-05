@@ -174,9 +174,9 @@ namespace Entegro.Application.Services
             return await _productRepository.ExistsAsync(m=>m.Barcode == productBarcode);
         }
 
-        public async Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
+        public async Task<PagedResult<ProductDto>> GetPagedAsync(GridCommand gridCommand)
         {
-            var products = await _productRepository.GetAllAsync(pageNumber, pageSize);
+            var products = await _productRepository.GetPagedAsync(gridCommand);
             var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
             return productDtos;
         }

@@ -86,7 +86,10 @@ namespace Entegro.Infrastructure.Repositories
             {
                 if (!string.IsNullOrEmpty(gridCommand.Search.Value))
                 {
-                    query = query.Where(b => b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                    query = query.Where(b => 
+                    b.Name.Contains(gridCommand.Search.Value) || 
+                    b.Code.Contains(gridCommand.Search.Value) ||
+                    b.Barcode.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
             }
 
@@ -105,7 +108,6 @@ namespace Entegro.Infrastructure.Repositories
             var totalCount = await query.CountAsync();
 
             var products = await query
-                .OrderBy(p => p.Id)
                 .Skip(gridCommand.Start)
                 .Take(gridCommand.Length)
                 .ToListAsync();

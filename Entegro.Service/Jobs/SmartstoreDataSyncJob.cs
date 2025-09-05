@@ -1,6 +1,7 @@
 ﻿
 using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
@@ -156,7 +157,31 @@ namespace Entegro.Service.Jobs
                     continue;
                 }
 
-                order.OrderSource = OrderSource.Smartstore;
+                var customer = await _customerService.GetCustomerByEmailAsync(order.Customer.Email);
+                if (customer == null)
+                {
+                    var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
+                    createCustomer.Address = order.Customer.Address;
+                    createCustomer.City = order.Customer.City;
+                    createCustomer.Town = order.Customer.Town;
+                    createCustomer.Street = order.Customer.Street;
+                    createCustomer.PhoneNumber = order.Customer.PhoneNumber;
+                    createCustomer.Name = order.Customer.Name;
+                    createCustomer.CustomerType = 1;
+                    createCustomer.Email = order.Customer.Email;
+                    createCustomer.CreatedOn = DateTime.Now;
+                    createCustomer.UpdatedOn = DateTime.Now;
+
+                    var customerId = await _customerService.CreateCustomerAsync(createCustomer);
+                    order.CustomerId = customerId;
+                    order.Customer = null;
+                }
+                else
+                {
+                    order.CustomerId = customer.Id;
+                    order.Customer = null;
+                }
+
                 foreach (var item in order.OrderItems)
                 {
                     if (item.Product != null)
