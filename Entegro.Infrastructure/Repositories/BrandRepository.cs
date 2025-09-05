@@ -58,7 +58,10 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking().OrderBy(b => b.Id);
+            var query = _context.Brands
+                .Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder)
+                .AsNoTracking()
+                .OrderBy(b => b.Id);
 
             var totalCount = await query.CountAsync();
             var brands = await query

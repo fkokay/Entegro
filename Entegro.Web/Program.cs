@@ -33,7 +33,7 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 });
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Warning()
+    .MinimumLevel.Information()
     .WriteTo.Console()
     .WriteTo.Graylog(new GraylogSinkOptions
     {
