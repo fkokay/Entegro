@@ -1,19 +1,17 @@
 ﻿using Entegro.Domain.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Serialization;
 namespace Entegro.Domain.Entities
 {
     public class CategoryMap : IEntityTypeConfiguration<Category>
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.HasOne(c => c.ParentCategory)
-                   .WithMany(c => c.Children)
-                   .HasForeignKey(c => c.ParentCategoryId)
-                   .OnDelete(DeleteBehavior.NoAction);
+            //builder.HasOne(c => c.ParentCategory)
+            //       .WithMany(c => c.Children)
+            //       .HasForeignKey(c => c.ParentCategoryId)
+            //       .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(c => c.MediaFile)
                     .WithMany()
@@ -40,6 +38,6 @@ namespace Entegro.Domain.Entities
         public bool Published { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public virtual ICollection<Category> Children { get; set; } = new HashSet<Category>();
+        //public virtual ICollection<Category> Children { get; set; } = new HashSet<Category>();
     }
 }
