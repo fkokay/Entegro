@@ -8,7 +8,7 @@ namespace Entegro.Application.Interfaces.Repositories
     {
         Task<bool> ExistsAsync(Expression<Func<Category, bool>> predicate);
         Task<Category?> GetByAsync(Expression<Func<Category, bool>> predicate);
-        Task<List<Category>> GetAllAsync();
+        Task<List<Category>> GetAllAsync(bool includeHidden = false);
         Task<PagedResult<Category>> GetAllAsync(string term, int pageNumber, int pageSize);
         Task AddAsync(Category category);
         Task UpdateAsync(Category category);

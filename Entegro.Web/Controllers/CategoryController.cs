@@ -4,6 +4,7 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Azure.Core.HttpHeader;
 
 namespace Entegro.Web.Controllers
 {
@@ -61,19 +62,6 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            //string formattedParentName = null;
-            //var formattedCategories = await _categoryService.Get();
-            //if (category.ParentCategoryId != null)
-            //{
-            //    var parent = formattedCategories.FirstOrDefault(c => c.Id == category.ParentCategoryId);
-            //    formattedParentName = parent?.FormattedName;
-            //}
-            //else
-            //{
-            //    var self = formattedCategories.FirstOrDefault(c => c.Id == category.Id);
-            //    formattedParentName = self?.FormattedName ?? category.Name;
-            //}
-            var size = category.MediaFile?.Size;
             var categoryModel = new CategoryViewModel
             {
                 Id = category.Id,
@@ -87,7 +75,21 @@ namespace Entegro.Web.Controllers
                 Name = category.Name,
                 ParentCategoryId = category.ParentCategoryId,
                 TreePath = category.TreePath,
-                ParentCategoryFormattedName = "formattedParentName",
+                Parent = category.Parent == null ? null : new CategoryViewModel()
+                {
+                    Id = category.Parent.Id,
+                    CreatedOn = category.Parent.CreatedOn,
+                    UpdatedOn = category.Parent.UpdatedOn,
+                    Description = category.Parent.Description,
+                    DisplayOrder = category.Parent.DisplayOrder,
+                    MetaDescription = category.Parent.MetaDescription,
+                    MetaKeywords = category.Parent.MetaKeywords,
+                    MetaTitle = category.Parent.MetaTitle,
+                    Name = category.Parent.Name,
+                    ParentCategoryId = category.Parent.ParentCategoryId,
+                    TreePath = category.Parent.TreePath,
+                    Published = category.Parent.Published,
+                },
                 Published = category.Published,
                 MediaFileId = category.MediaFileId,
                 MediaFile = category.MediaFile == null ? null : new MediaFileViewModel()
@@ -115,9 +117,7 @@ namespace Entegro.Web.Controllers
                         Name = category.MediaFile.MediaFolder.Name,
                     }
                 }
-
             };
-
 
             return View(categoryModel);
         }
@@ -191,9 +191,22 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AllCategory([FromForm] int page = 1, [FromForm] string? term = null)
         {
-            const int pageSize = 20;
-            var data = await _categoryService.SearchPagedAsync(term, page, pageSize);
-            return Json(data);
+            var categoryTree = await _categoryService.GetCategoryTreeAsync(includeHidden: true);
+            var categories = categoryTree.Flatten(false);
+
+            var query = categories.SelectAwait(async c => new
+            {
+                id = c.Id.ToString(),
+                text = await _categoryService.GetCategoryPathAsync(c),
+            });
+
+            var mainList = await query.AsyncToList();
+
+            return Json(new
+            {
+                results = mainList,
+                pagination = new { more = false }
+            });
         }
 
     }

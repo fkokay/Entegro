@@ -1,0 +1,13 @@
+﻿namespace Entegro.Engine.Modularity
+{
+    public interface IModuleConstraint
+    {
+        bool Matches(IModuleDescriptor descriptor, int? storeId);
+    }
+
+    internal sealed class NullModuleContraint : IModuleConstraint
+    {
+        public bool Matches(IModuleDescriptor descriptor, int? storeId)
+            => true;
+    }
+}

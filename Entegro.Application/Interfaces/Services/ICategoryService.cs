@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
+using Entegro.Collections;
 using Entegro.Domain.Entities;
 
 namespace Entegro.Application.Interfaces.Services
@@ -14,5 +15,8 @@ namespace Entegro.Application.Interfaces.Services
         Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory);
         Task DeleteCategoryAsync(int categoryId);
         Task<PagedResult<CategoryDto>> SearchPagedAsync(string? term, int page, int pageSize);
+        Task<string> GetCategoryPathAsync(ICategoryNode categoryNode, string separator = " » ");
+        string GetCategoryPath(TreeNode<ICategoryNode> treeNode, string separator = " » ");
+        Task<TreeNode<ICategoryNode>> GetCategoryTreeAsync(int rootCategoryId = 0, bool includeHidden = false);
     }
 }

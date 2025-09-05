@@ -29,9 +29,9 @@
                             <label class="col-sm-3 col-form-label text-sm-start" for="ParentCategoryId">Kategori</label>
                             <div class="col-sm-9">
                                 <select id="ParentCategoryId" name="ParentCategoryId" class="select2 form-select form-select-lg" asp-for="ParentCategoryId">
-                                    @if (Model.ParentCategoryId != null)
+                                    @if (Model.Parent != null)
                                     {
-                                        <option value="@Model.ParentCategoryId" selected>@Model.ParentCategoryFormattedName</option>
+                                        <option value="@Model.Parent.Id" selected>@Model.Parent.Name</option>
                                     }
                                 </select>
                             </div>

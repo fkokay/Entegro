@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entegro.ERP.Abstractions", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entegro.ERP.Application", "ERP\Entegro.ERP.Application\Entegro.ERP.Application.csproj", "{2FD91B69-D0E6-4C1D-A8F7-37C91B8C89FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entegro", "Entegro\Entegro.csproj", "{97282045-FC16-492D-B7DA-895C756072A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{2FD91B69-D0E6-4C1D-A8F7-37C91B8C89FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FD91B69-D0E6-4C1D-A8F7-37C91B8C89FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FD91B69-D0E6-4C1D-A8F7-37C91B8C89FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97282045-FC16-492D-B7DA-895C756072A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97282045-FC16-492D-B7DA-895C756072A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97282045-FC16-492D-B7DA-895C756072A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97282045-FC16-492D-B7DA-895C756072A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

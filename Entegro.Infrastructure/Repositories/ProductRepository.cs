@@ -17,8 +17,8 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task AddAsync(Product product)
         {
-            product.CreatedOn = DateTime.UtcNow;
-            product.UpdatedOn = DateTime.UtcNow;
+            product.CreatedOnUtc = DateTime.UtcNow;
+            product.UpdatedOnUtc = DateTime.UtcNow;
 
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
@@ -32,7 +32,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Product product)
         {
-            product.UpdatedOn = DateTime.UtcNow;
+            product.UpdatedOnUtc = DateTime.UtcNow;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }
@@ -82,10 +82,10 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateMainPictureIdAsync(int productId, int mainPictureId)
         {
-            var product = new Product { Id = productId, MainPictureId = mainPictureId, UpdatedOn = DateTime.UtcNow };
+            var product = new Product { Id = productId, MainPictureId = mainPictureId, UpdatedOnUtc = DateTime.UtcNow };
             _context.Products.Attach(product);
             _context.Entry(product).Property(p => p.MainPictureId).IsModified = true;
-            _context.Entry(product).Property(p => p.UpdatedOn).IsModified = true;
+            _context.Entry(product).Property(p => p.UpdatedOnUtc).IsModified = true;
             await _context.SaveChangesAsync();
         }
 

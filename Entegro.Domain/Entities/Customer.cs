@@ -1,4 +1,4 @@
-﻿using Entegro.Domain.Common;
+﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -18,7 +18,7 @@ namespace Entegro.Domain.Entities
         }
     }
     [Table("Customer")]
-    public class Customer : BaseEntity,IAuditable
+    public class Customer : BaseEntity, IAuditable
     {
         public string Name { get; set; }
         public string Email { get; set; }
@@ -31,7 +31,7 @@ namespace Entegro.Domain.Entities
         public int CustomerType { get; set; } // 0: Individual, 1: Corporate
         public string? TaxOffice { get; set; }
         public string? TaxNumber { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public DateTime CreatedOnUtc { get; set; }
+        public DateTime UpdatedOnUtc { get; set; }
     }
 }

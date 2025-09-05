@@ -56,7 +56,7 @@ namespace Entegro.Infrastructure.Repositories
                     Brand = o.Product.Brand,
                     BrandId = o.Product.BrandId,
                     Code = o.Product.Code,
-                    CreatedOn = o.Product.CreatedOn,
+                    CreatedOnUtc = o.Product.CreatedOnUtc,
                     Currency = o.Product.Currency,
                     Deleted = o.Product.Deleted,
                     Description = o.Product.Description,
@@ -76,7 +76,7 @@ namespace Entegro.Infrastructure.Repositories
                     Unit = o.Product.Unit,
                     VatInc = o.Product.VatInc,
                     VatRate = o.Product.VatRate,
-                    UpdatedOn = o.Product.UpdatedOn,
+                    UpdatedOnUtc = o.Product.UpdatedOnUtc,
                     Weight = o.Product.Weight
 
                 },

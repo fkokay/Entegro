@@ -6,11 +6,12 @@ namespace Entegro.Application.DTOs.Category
     {
         public int Id { get; set; }
         public int? ParentCategoryId { get; set; }
-        public CategoryDto ParentCategory { get; set; }
+        public CategoryDto? Parent { get; set; }
         public int? MediaFileId { get; set; }
-        public string TreePath { get; set; }
+        public string TreePath { get; set; } = string.Empty;
         public string Name { get; set; }
         public string? Description { get; set; }
+        public string Breadcrumb { get; set; }
         public string? MetaTitle { get; set; }
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
@@ -20,6 +21,6 @@ namespace Entegro.Application.DTOs.Category
         public DateTime UpdatedOn { get; set; }
 
         public List<CategoryDto> SubCategories { get; set; } = new List<CategoryDto>();
-        public virtual MediaFileDto? MediaFile { get; set; }
+        public MediaFileDto? MediaFile { get; set; }
     }
 }

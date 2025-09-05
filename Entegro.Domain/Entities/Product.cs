@@ -1,4 +1,4 @@
-﻿using Entegro.Domain.Common;
+﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -57,13 +57,12 @@ namespace Entegro.Domain.Entities
         public virtual MediaFile? MainPicture { get; set; }
         public bool Published { get; set; } = true;
         public bool Deleted { get; set; } = false;
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public DateTime CreatedOnUtc { get; set; }
+        public DateTime UpdatedOnUtc { get; set; }
         public virtual ICollection<ProductMediaFile> ProductMediaFiles { get; set; } = new HashSet<ProductMediaFile>();
         public virtual ICollection<ProductCategory> ProductCategories { get; set; } = new HashSet<ProductCategory>();
         public virtual ICollection<ProductVariantAttribute> ProductVariantAttributes { get; set; } = new HashSet<ProductVariantAttribute>();
         public virtual ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; } = new HashSet<ProductVariantAttributeCombination>();
         public virtual ICollection<ProductIntegration> ProductIntegrations { get; set; } = new HashSet<ProductIntegration>();
-
     }
 }

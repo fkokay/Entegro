@@ -1,4 +1,4 @@
-﻿using Entegro.Domain.Common;
+﻿
 using Entegro.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
