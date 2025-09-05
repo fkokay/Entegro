@@ -109,12 +109,12 @@ Entegro.Attribute.List = (function ($) {
                 }
             });
 
-            // CREATE form validation
+            // CREATE + EDIT tek form validation ve submit
             (function () {
-                const formEl = document.getElementById('createProductAttributeForm');
+                const formEl = document.getElementById('productAttributeForm');
                 if (!formEl) return;
 
-                window.createFormValidation = FormValidation.formValidation(formEl, {
+                window.productAttributeFormValidation = FormValidation.formValidation(formEl, {
                     locale: 'tr_TR',
                     localization: FormValidation.locales.tr_TR,
                     fields: {
@@ -124,7 +124,11 @@ Entegro.Attribute.List = (function ($) {
                                 stringLength: { min: 3, max: 100, message: 'Ad 3–100 karakter olmalıdır.' }
                             }
                         },
-                        Description: { validators: { stringLength: { max: 1000, message: 'Açıklama en fazla 1000 karakter olabilir.' } } },
+                        Description: {
+                            validators: {
+                                stringLength: { max: 1000, message: 'Açıklama en fazla 1000 karakter olabilir.' }
+                            }
+                        },
                         DisplayOrder: {
                             validators: {
                                 notEmpty: { message: 'Gösterim sırası boş bırakılamaz.' },
@@ -135,34 +139,41 @@ Entegro.Attribute.List = (function ($) {
                     },
                     plugins: {
                         trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap5: new FormValidation.plugins.Bootstrap5({ eleValidClass: '', rowSelector: '.mb-3' }),
+                        bootstrap5: new FormValidation.plugins.Bootstrap5({
+                            eleValidClass: '',
+                            rowSelector: '.mb-3'
+                        }),
                         submitButton: new FormValidation.plugins.SubmitButton(),
                         autoFocus: new FormValidation.plugins.AutoFocus()
                     },
                     init: (instance) => {
                         instance.on('core.form.valid', function () {
-                            const $form = $('#createProductAttributeForm');
+                            const $form = $('#productAttributeForm');
+                            const id = $('#Attribute_Id').val();
+                            const isEdit = !!id;
+                            const url = isEdit ? '/ProductAttribute/Edit' : '/ProductAttribute/Create';
+
                             $.ajax({
-                                url: '/ProductAttribute/Create',
+                                url: url,
                                 type: 'POST',
                                 data: $form.serialize(),
                                 success: function (res) {
                                     if (res && res.success) {
                                         Swal.fire({
-                                            title: 'Başarılı!',
-                                            text: 'Kayıt başarıyla eklendi.',
+                                            title: isEdit ? 'Güncellendi!' : 'Başarılı!',
+                                            text: isEdit ? 'Kayıt başarıyla güncellendi.' : 'Kayıt başarıyla eklendi.',
                                             icon: 'success',
                                             confirmButtonText: 'Tamam',
                                             customClass: { confirmButton: 'btn btn-success' },
                                             buttonsStyling: false
                                         }).then(() => {
-                                            $('#createProductAttribute').modal('hide');
+                                            $('#productAttributeModal').modal('hide');
                                             dt.ajax.reload(null, false);
                                         });
                                     } else {
                                         Swal.fire({
                                             title: 'Hata!',
-                                            text: (res && res.message) || 'Bir hata oluştu.',
+                                            text: (res && res.message) || 'İşlem sırasında bir hata oluştu.',
                                             icon: 'error',
                                             confirmButtonText: 'Tamam',
                                             customClass: { confirmButton: 'btn btn-danger' },
@@ -186,24 +197,40 @@ Entegro.Attribute.List = (function ($) {
                 });
             })();
 
-            // EDIT aç ve doldur
+            // FORMU AÇ: YENİ
+            $(document).on('click', '.add-new', function () {
+                const $form = $('#productAttributeForm');
+                if ($form.length) $form[0].reset();
+
+                $('#Attribute_Id').val('');
+                $('#Attribute_DisplayOrder').val(0);
+
+                if (window.productAttributeFormValidation)
+                    window.productAttributeFormValidation.resetForm(true);
+
+                $('#productAttributeModal').find('.modal-title-text').text('Yeni Varyant Kaydı');
+                $('#productAttributeModal').modal('show');
+            });
+
+            // FORMU AÇ: DÜZENLE
             $(document).on('click', '.edit-attribute', function () {
                 const id = $(this).data('id');
                 if (!id) return;
 
-                const $editForm = $('#editProductAttributeForm');
-                if ($editForm.length) $editForm[0].reset();
-                if (window.editFormValidation) window.editFormValidation.resetForm(true);
+                const $form = $('#productAttributeForm');
+                if ($form.length) $form[0].reset();
+                if (window.productAttributeFormValidation)
+                    window.productAttributeFormValidation.resetForm(true);
 
                 $.getJSON('/ProductAttribute/Edit', { id: id })
                     .done(function (m) {
-                        $('#Edit_Id').val(m.Id);
-                        $('#Edit_Name').val(m.Name ?? '');
-                        $('#Edit_Description').val(m.Description ?? '');
-                        $('#Edit_DisplayOrder').val(m.DisplayOrder ?? 0);
+                        $('#Attribute_Id').val(m.Id);
+                        $('#Attribute_Name').val(m.Name ?? '');
+                        $('#Attribute_Description').val(m.Description ?? '');
+                        $('#Attribute_DisplayOrder').val(m.DisplayOrder ?? 0);
 
-                        $('#editProductAttribute').find('h3.mb-2').text('Varyant Güncelle');
-                        $('#editProductAttribute').modal('show');
+                        $('#productAttributeModal').find('.modal-title-text').text('Varyant Güncelle');
+                        $('#productAttributeModal').modal('show');
                     })
                     .fail(function (xhr) {
                         Swal.fire({
@@ -216,83 +243,6 @@ Entegro.Attribute.List = (function ($) {
                         });
                     });
             });
-
-            // EDIT form validation
-            (function () {
-                const editFormEl = document.getElementById('editProductAttributeForm');
-                if (!editFormEl) return;
-
-                window.editFormValidation = FormValidation.formValidation(editFormEl, {
-                    locale: 'tr_TR',
-                    localization: FormValidation.locales.tr_TR,
-                    fields: {
-                        Name: {
-                            validators: {
-                                notEmpty: { message: 'Ad alanı boş bırakılamaz.' },
-                                stringLength: { min: 3, max: 100, message: 'Ad 3–100 karakter olmalıdır.' }
-                            }
-                        },
-                        Description: { validators: { stringLength: { max: 1000, message: 'Açıklama en fazla 1000 karakter olabilir.' } } },
-                        DisplayOrder: {
-                            validators: {
-                                notEmpty: { message: 'Gösterim sırası boş bırakılamaz.' },
-                                integer: { message: 'Gösterim sırası tam sayı olmalıdır.' },
-                                greaterThan: { inclusive: true, min: 0, message: '0 veya daha büyük olmalıdır.' }
-                            }
-                        }
-                    },
-                    plugins: {
-                        trigger: new FormValidation.plugins.Trigger(),
-                        bootstrap5: new FormValidation.plugins.Bootstrap5({ eleValidClass: '', rowSelector: '.mb-3' }),
-                        submitButton: new FormValidation.plugins.SubmitButton(),
-                        autoFocus: new FormValidation.plugins.AutoFocus()
-                    },
-                    init: (instance) => {
-                        instance.on('core.form.valid', function () {
-                            const $form = $('#editProductAttributeForm');
-                            $.ajax({
-                                url: '/ProductAttribute/Edit',
-                                type: 'POST',
-                                data: $form.serialize(),
-                                success: function (res) {
-                                    if (res && res.success) {
-                                        Swal.fire({
-                                            title: 'Güncellendi!',
-                                            text: 'Kayıt başarıyla güncellendi.',
-                                            icon: 'success',
-                                            confirmButtonText: 'Tamam',
-                                            customClass: { confirmButton: 'btn btn-success' },
-                                            buttonsStyling: false
-                                        }).then(() => {
-                                            $('#editProductAttribute').modal('hide');
-                                            dt.ajax.reload(null, false);
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Hata!',
-                                            text: (res && res.message) || 'Güncelleme sırasında bir hata oluştu.',
-                                            icon: 'error',
-                                            confirmButtonText: 'Tamam',
-                                            customClass: { confirmButton: 'btn btn-danger' },
-                                            buttonsStyling: false
-                                        });
-                                    }
-                                },
-                                error: function (xhr) {
-                                    Swal.fire({
-                                        title: 'Hata!',
-                                        text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
-                                        icon: 'error',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: { confirmButton: 'btn btn-danger' },
-                                        buttonsStyling: false
-                                    });
-                                }
-                            });
-                        });
-                    }
-                });
-            })();
 
             // DELETE
             $(document).on('click', '.delete-attribute', function () {
