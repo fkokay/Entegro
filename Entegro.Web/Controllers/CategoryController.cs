@@ -61,18 +61,18 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            string formattedParentName = null;
-            var formattedCategories = await _categoryService.Get();
-            if (category.ParentCategoryId != null)
-            {
-                var parent = formattedCategories.FirstOrDefault(c => c.Id == category.ParentCategoryId);
-                formattedParentName = parent?.FormattedName;
-            }
-            else
-            {
-                var self = formattedCategories.FirstOrDefault(c => c.Id == category.Id);
-                formattedParentName = self?.FormattedName ?? category.Name;
-            }
+            //string formattedParentName = null;
+            //var formattedCategories = await _categoryService.Get();
+            //if (category.ParentCategoryId != null)
+            //{
+            //    var parent = formattedCategories.FirstOrDefault(c => c.Id == category.ParentCategoryId);
+            //    formattedParentName = parent?.FormattedName;
+            //}
+            //else
+            //{
+            //    var self = formattedCategories.FirstOrDefault(c => c.Id == category.Id);
+            //    formattedParentName = self?.FormattedName ?? category.Name;
+            //}
             var size = category.MediaFile?.Size;
             var categoryModel = new CategoryViewModel
             {
@@ -87,7 +87,7 @@ namespace Entegro.Web.Controllers
                 Name = category.Name,
                 ParentCategoryId = category.ParentCategoryId,
                 TreePath = category.TreePath,
-                ParentCategoryFormattedName = formattedParentName,
+                ParentCategoryFormattedName = "formattedParentName",
                 Published = category.Published,
                 MediaFileId = category.MediaFileId,
                 MediaFile = category.MediaFile == null ? null : new MediaFileViewModel()
@@ -192,7 +192,7 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> AllCategory([FromForm] int page = 1, [FromForm] string? term = null)
         {
             const int pageSize = 20;
-            var data = await _categoryService.GetCategoriesForSelect2Async(term, page, pageSize);
+            var data = await _categoryService.SearchPagedAsync(term, page, pageSize);
             return Json(data);
         }
 

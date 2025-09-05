@@ -50,10 +50,9 @@ namespace Entegro.Infrastructure.Repositories
                 .ThenInclude(m => m.MediaFolder).AsNoTracking().ToListAsync();
         }
 
-        public async Task<PagedResult<Category>> GetAllAsync(string term,int pageNumber, int pageSize)
+        public async Task<PagedResult<Category>> GetAllAsync(string term, int pageNumber, int pageSize)
         {
             var query = _context.Categories
-                .Include(c => c.ParentCategory)
                 .Include(m => m.MediaFile)
                 .ThenInclude(m => m.MediaFolder)
                 .OrderBy(b => b.Id)
