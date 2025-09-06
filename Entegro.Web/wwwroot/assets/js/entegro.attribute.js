@@ -98,18 +98,28 @@ Entegro.Attribute.Form = (function ($) {
             $('#productAttributeModal').modal('show');
         });
 
-        // Güncelleme formu
         $(document).on('click', '.edit-attribute', function () {
             const id = $(this).data('id');
             if (!id) return;
 
-            $.getJSON('/ProductAttribute/Edit', { id: id })
+            $.getJSON('/ProductAttribute/Edit', { id })
                 .done(function (m) {
-                    $('#Attribute_Id').val(m.Id);
-                    $('#Attribute_Name').val(m.Name ?? '');
-                    $('#Attribute_Description').val(m.Description ?? '');
-                    $('#Attribute_DisplayOrder').val(m.DisplayOrder ?? 0);
-                    fv.resetForm(true);
+                    // Her iki ihtimali de karşıla
+                    const Id = m.id ?? m.Id;
+                    const Name = m.name ?? m.Name;
+                    const Description = m.description ?? m.Description;
+                    const DisplayOrder = m.displayOrder ?? m.DisplayOrder;
+
+                    // (Opsiyonel) fv varsa önce temizleyip sonra doldur
+                    if (window.fv?.resetForm) {
+                        fv.resetForm(true);
+                    }
+
+                    $('#Attribute_Id').val(Id ?? 0);
+                    $('#Attribute_Name').val(Name ?? '');
+                    $('#Attribute_Description').val(Description ?? '');
+                    $('#Attribute_DisplayOrder').val(DisplayOrder ?? 0);
+
                     $('#productAttributeModal .modal-title-text').text('Varyant Güncelle');
                     $('#productAttributeModal').modal('show');
                 })
@@ -124,6 +134,7 @@ Entegro.Attribute.Form = (function ($) {
                     });
                 });
         });
+
 
         // Silme
         $(document).on('click', '.delete-attribute', function () {
