@@ -1,5 +1,4 @@
-﻿@using Entegro.Application.DTOs.Order
-@model OrderDto
+﻿@model OrderViewModel
 @{
     ViewData["Title"] = "Detail";
 }
@@ -35,7 +34,7 @@
                                         <div class="d-flex justify-content-start align-items-center product-name">
                                             <div class="avatar-wrapper">
                                                 <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                                                    <img src="@item.Product.MainPicture?.Url" class="rounded">
+                                                    <img src="@item.Product.PictureUrl?" class="rounded">
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-column">
@@ -59,7 +58,7 @@
                         <tfoot>
                             <tr>
                                 <td colspan="5" class="text-end"><strong>Toplam Tutar:</strong></td>
-                                <td colspan="2"><strong>@Model.CalculateTotalAmount() ₺</strong></td>
+                                <td colspan="2"><strong>@Model.CalculateTotalAmount ₺</strong></td>
                             </tr>
                         </tfoot>
                     </table>

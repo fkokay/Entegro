@@ -31,7 +31,7 @@ namespace Entegro.Web.Models
         public decimal TotalAmount { get; set; }
         public bool Deleted { get; set; }
         public bool IsTransient { get; set; }
-
+        public decimal CalculateTotalAmount { get; set; }
         public List<OrderItemViewModel> OrderItems { get; set; } = new();
         public CustomerViewModel? Customer { get; set; }
     }
