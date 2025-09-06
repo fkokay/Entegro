@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250906182446_EditInvoice")]
+    partial class EditInvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,32 +383,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductMediaFile");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductSpecificationAttribute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpecificationAttributeOptionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("SpecificationAttributeOptionId");
-
-                    b.ToTable("Product_SpecificationAttribute_Mapping");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductVariantAttribute", b =>
@@ -1539,25 +1516,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("MediaFile");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductSpecificationAttribute", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.Catalog.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Catalog.SpecificationAttributeOption", "SpecificationAttributeOption")
-                        .WithMany()
-                        .HasForeignKey("SpecificationAttributeOptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("SpecificationAttributeOption");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductVariantAttribute", b =>

@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250906183424_EditSpec")]
+    partial class EditSpec
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,7 +408,7 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasIndex("SpecificationAttributeOptionId");
 
-                    b.ToTable("Product_SpecificationAttribute_Mapping");
+                    b.ToTable("ProductSpecificationAttribute");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductVariantAttribute", b =>
