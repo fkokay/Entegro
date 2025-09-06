@@ -6,7 +6,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Caching;
 using Entegro.Collections;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
 using System.Text;
 

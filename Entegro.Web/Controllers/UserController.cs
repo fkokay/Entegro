@@ -3,7 +3,7 @@ using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;
-using Entegro.Web.Models;
+using Entegro.Web.Models.Platform.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

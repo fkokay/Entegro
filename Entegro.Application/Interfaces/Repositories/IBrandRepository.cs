@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Catalog;
 
 namespace Entegro.Application.Interfaces.Repositories
 {

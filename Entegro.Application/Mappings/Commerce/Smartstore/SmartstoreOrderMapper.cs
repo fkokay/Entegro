@@ -57,7 +57,9 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
             orderDto.TaxRates = smartstoreOrder.TaxRates;
 
             orderDto.OrderItems.AddRange(SmartstoreOrderItemMapper.ToDtoList(smartstoreOrder.OrderItems));
-            if(smartstoreOrder.Customer != null)
+            orderDto.OrderNotes.AddRange(SmartstoreOrderNoteMapper.ToDtoList(smartstoreOrder.OrderNotes));
+
+            if (smartstoreOrder.Customer != null)
             {
                 SmartstoreCustomerMapper.ConfigureLogger(_logger);
                 orderDto.Customer = SmartstoreCustomerMapper.ToDto(smartstoreOrder.Customer);

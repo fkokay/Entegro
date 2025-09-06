@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Platform.Identity;
 
 namespace Entegro.Application.Interfaces.Repositories
 {

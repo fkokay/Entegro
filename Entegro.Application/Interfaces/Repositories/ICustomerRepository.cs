@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Checkout;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,6 @@
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;

@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models;
+using Entegro.Web.Models.Platform.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

@@ -1,4 +1,5 @@
-﻿@model OrderViewModel
+﻿@using Entegro.Web.Models.Checkout.Orders
+@model OrderViewModel
 @{
     ViewData["Title"] = "Detail";
 }
@@ -83,14 +84,18 @@
 
                             }
                         }
-                        <li class="timeline-item timeline-item-transparent">
-                            <span class="timeline-point timeline-point-primary"></span>
-                            <div class="timeline-event">
-                                <div class="timeline-header mb-1">
-                                    <small class="text-muted">Sipariş Notu Yok</small>
+                        else
+                        {
+                            <li class="timeline-item timeline-item-transparent">
+                                <span class="timeline-point timeline-point-primary"></span>
+                                <div class="timeline-event">
+                                    <div class="timeline-header mb-1">
+                                        <small class="text-muted">Sipariş Notu Yok</small>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>

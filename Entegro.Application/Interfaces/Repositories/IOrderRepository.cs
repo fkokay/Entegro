@@ -1,6 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Domain.Entities;
-using Order = Entegro.Domain.Entities.Order;
+using Order = Entegro.Domain.Entities.Checkout.Order;
 
 namespace Entegro.Application.Interfaces.Repositories
 {

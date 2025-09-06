@@ -2,7 +2,7 @@
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace Entegro.Application.Services
         {
             var customer = await _customerRepository.GetByIdAsync(customerId);
 
-            if (customer == null)
+            if (customer is null)
             {
                 throw new KeyNotFoundException($"Customer with ID {customerId} not found.");
             }
@@ -47,24 +47,24 @@ namespace Entegro.Application.Services
             return await _customerRepository.ExistsByEmailAsync(email);
         }
 
-        public async Task<CustomerDto> GetCustomerByEmailAsync(string email)
+        public async Task<CustomerDto?> GetCustomerByEmailAsync(string email)
         {
             var customer = await _customerRepository.GetByEmailAsync(email);
-            if (customer == null)
+            if (customer is null)
             {
-                throw new KeyNotFoundException($"Customer with Email {email} not found.");
+                return null;
             }
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
             return customerDto;
         }
 
-        public async Task<CustomerDto> GetCustomerByIdAsync(int customerId)
+        public async Task<CustomerDto?> GetCustomerByIdAsync(int customerId)
         {
             var customer = await _customerRepository.GetByIdAsync(customerId);
-            if (customer == null)
+            if (customer is null)
             {
-                throw new KeyNotFoundException($"Customer with ID {customerId} not found.");
+                return null;
             }
 
             var customerDto = _mapper.Map<CustomerDto>(customer);

@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Common;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

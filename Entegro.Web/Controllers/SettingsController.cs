@@ -3,6 +3,7 @@ using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Integration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

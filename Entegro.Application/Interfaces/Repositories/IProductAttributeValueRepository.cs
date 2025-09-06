@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductAttributeValue;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Catalog;
 
 namespace Entegro.Application.Interfaces.Repositories
 {

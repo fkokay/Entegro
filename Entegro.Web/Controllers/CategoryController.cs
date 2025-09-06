@@ -2,6 +2,8 @@
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Catalog.Categories;
+using Entegro.Web.Models.Content;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Azure.Core.HttpHeader;

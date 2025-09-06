@@ -20,7 +20,7 @@
         </li>
         <li class="menu-item" style="">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ti ti-color-swatch"></i>
+                <i class="menu-icon tf-icons ti ti-package"></i>
                 <div data-i18n="Ürün Yönetimi">Ürün Yönetimi</div>
             </a>
             <ul class="menu-sub">
@@ -49,11 +49,16 @@
                         <div data-i18n="Varyant Değerleri">Varyant Değerleri</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a asp-controller="SpecificationAttribute" asp-action="List" class="menu-link">
+                        <div data-i18n="Ürün Özellikleri">Ürün Özellikleri</div>
+                    </a>
+                </li>
             </ul>
         </li>
         <li class="menu-item" style="">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ti ti-smart-home"></i>
+                <i class="menu-icon tf-icons ti ti-list"></i>
                 <div data-i18n="Sipariş Yönetimi">Sipariş Yönetimi</div>
             </a>
             <ul class="menu-sub">
@@ -71,7 +76,20 @@
         </li>
         <li class="menu-item" style="">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ti ti-file-dollar"></i>
+                <i class="menu-icon tf-icons ti ti-truck"></i>
+                <div data-i18n="Nakliye Yönetimi">Nakliye Yönetimi</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a asp-controller="Shipment" asp-action="List" class="menu-link">
+                        <div data-i18n="Nakliyeler">Nakliyeler</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="menu-item" style="">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons ti ti-file"></i>
                 <div data-i18n="Fatura Yönetimi">Fatura Yönetimi</div>
             </a>
             <ul class="menu-sub">
@@ -83,7 +101,20 @@
             </ul>
         </li>
         <li class="menu-item" style="">
-            <a href="javascript:void(0);" class="menu-link">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons ti ti-users"></i>
+                <div data-i18n="Müşteri Yönetimi">Müşteri Yönetimi</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a asp-controller="Customer" asp-action="List" class="menu-link">
+                        <div data-i18n="Müşteriler">Müşteriler</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="menu-item" style="">
+            <a asp-controller="Notification" asp-action="List" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-bell"></i>
                 <div data-i18n="Bildirimler">Bildirimler</div>
             </a>
@@ -95,12 +126,12 @@
             </a>
             <ul class="menu-sub">
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Import" asp-action="Excel" class="menu-link">
                         <div data-i18n="Excel İşlemleri">Excel İşlemleri</div>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Import" asp-action="Xml" class="menu-link">
                         <div data-i18n="Xml İşlemleri">Xml İşlemleri</div>
                     </a>
                 </li>
@@ -111,13 +142,6 @@
                 <i class="menu-icon tf-icons ti ti-chart-pie"></i>
                 <div data-i18n="Raporlar">Raporlar</div>
             </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
-                        <div data-i18n="Excel İşlemleri">Excel İşlemleri</div>
-                    </a>
-                </li>
-            </ul>
         </li>
         <li class="menu-item" style="">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
