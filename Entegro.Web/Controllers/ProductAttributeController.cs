@@ -27,7 +27,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateProductAttributeViewModel model)
+        public async Task<IActionResult> Create(ProductAttributeViewModel model)
         {
             var createDto = new CreateProductAttributeDto
             {
@@ -63,7 +63,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateProductAttributeViewModel model)
+        public async Task<IActionResult> Edit(ProductAttributeViewModel model)
         {
             if (ModelState.IsValid)
             {
