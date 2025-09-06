@@ -50,7 +50,7 @@
 </div>
 
 @section Scripts {
-    <script src="/assets/js/entegro.product.list.js"></script>
+    <script src="/assets/js/entegro.product.list.js" asp-append-version="true"></script>
     <script>
         $(function () {
             window.commerces = @Html.Raw(JsonSerializer.Serialize(ViewBag.Commerces));
