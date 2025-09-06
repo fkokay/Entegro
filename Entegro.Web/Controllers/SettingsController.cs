@@ -57,31 +57,6 @@ namespace Entegro.Web.Controllers
             return View(integrationSystemErp);
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> Erp(CreateIntegrationSystemViewModel model)
-        {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.ModalName,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.ERP,
-                Description = model.ModalDescription
-            };
-
-            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
-
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "ErpType",
-                Value = model.IntegrationSystemType
-            });
-
-
-            return Json(new { success = true });
-        }
-
         public async Task<IActionResult> ErpSettings(int integrationSystemErpId)
         {
 
@@ -441,31 +416,6 @@ namespace Entegro.Web.Controllers
             return View(integrationSystemCommerce);
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> ECommerce(CreateIntegrationSystemViewModel model)
-        {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.ModalName,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.Commerce,
-                Description = model.ModalDescription
-            };
-
-            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
-
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "CommerceType",
-                Value = model.IntegrationSystemType
-            });
-
-
-            return Json(new { success = true });
-        }
-
         public async Task<IActionResult> ECommerceSettings(int integrationSystemCommerceId)
         {
 
@@ -629,29 +579,6 @@ namespace Entegro.Web.Controllers
 
 
             return View(integrationSystemCargo);
-        }
-        [HttpPost]
-        public async Task<IActionResult> Cargo(CreateIntegrationSystemViewModel model)
-        {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.ModalName,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.Cargo,
-                Description = model.ModalDescription
-            };
-
-            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
-
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "CargoType",
-                Value = model.IntegrationSystemType
-            });
-
-
-            return Json(new { success = true });
         }
 
         public async Task<IActionResult> CargoSettings(int integrationSystemCargoId)
@@ -1012,31 +939,6 @@ namespace Entegro.Web.Controllers
             return View(integrationSystemMarketplace);
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> Marketplace(CreateIntegrationSystemViewModel model)
-        {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.ModalName,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.Marketplace,
-                Description = model.ModalDescription
-            };
-
-            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
-
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "MarketplaceType",
-                Value = model.IntegrationSystemType
-            });
-
-
-            return Json(new { success = true });
-        }
-
         public async Task<IActionResult> MarketplaceSettings(int integrationSystemMarketplaceId)
         {
 
@@ -1202,42 +1104,17 @@ namespace Entegro.Web.Controllers
             return View(integrationSystemEinvoice);
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> EInvoice(CreateIntegrationSystemViewModel model)
-        {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.ModalName,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.EInvoice,
-                Description = model.ModalDescription
-            };
-
-            var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
-
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "EinvoiceType",
-                Value = model.IntegrationSystemType
-            });
-
-
-            return Json(new { success = true });
-        }
-
-        public async Task<IActionResult> EInvoiceSettings(int integrationSystemEinvoiceId)
+        public async Task<IActionResult> EInvoiceSettings(int integrationSystemId)
         {
 
-            var integrationSystemEinvoice = await _integrationSystemService.GetByIdAsync(integrationSystemEinvoiceId);
+            var integrationSystemEinvoice = await _integrationSystemService.GetByIdAsync(integrationSystemId);
             if (integrationSystemEinvoice == null)
             {
                 return View();
             }
 
 
-            var einvoiceType = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "EinvoiceType" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
+            var einvoiceType = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "EinvoiceType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
             if (einvoiceType == null)
             {
                 return NotFound();
@@ -1248,16 +1125,16 @@ namespace Entegro.Web.Controllers
                     var id = integrationSystemEinvoice.Id;
                     var name = integrationSystemEinvoice.Name;
                     var description = integrationSystemEinvoice.Description;
-                    var apiUrl = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
-                    var apiUser = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
-                    var apiPassword = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemEinvoiceId).FirstOrDefault();
+                    var apiUrl = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+                    var apiUser = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+                    var apiPassword = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
 
                     TrendyolEFaturamSettingsViewModel model = new TrendyolEFaturamSettingsViewModel();
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
                     model.IntegrationSystemTypeId = integrationSystemEinvoice.IntegrationSystemTypeId;
-                    model.IntegrationSystemId = integrationSystemEinvoiceId;
+                    model.IntegrationSystemId = integrationSystemId;
                     model.CommerceType = einvoiceType.Value;
                     model.ApiUrl = apiUrl?.Value;
                     model.ApiUser = apiUser?.Value;

@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystemParameter;
+using Entegro.Domain.Enums;
 
 namespace Entegro.Web.Models.Integration
 {
@@ -6,6 +7,7 @@ namespace Entegro.Web.Models.Integration
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }
+        public IntegrationSystemType IntegrationSystemType { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
 
