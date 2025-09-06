@@ -369,7 +369,7 @@ namespace Entegro.Web.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message});
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
@@ -558,7 +558,7 @@ namespace Entegro.Web.Controllers
                         ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault(),
                     };
                     var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                    var existingTrendyolProduct = await _trenyolService. GetProductWithBarcodeAsync(context,existingProductIntegration.IntegrationCode);
+                    var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, existingProductIntegration.IntegrationCode);
 
                     var createModel = new TrendyolProductIntegrationViewModel
                     {
@@ -655,6 +655,12 @@ namespace Entegro.Web.Controllers
 
             try
             {
+                var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
+                if (integrationSystem == null)
+                {
+                    return Json(new { success = false, message = $"Entegrasyon sistemi bulunamadı" });
+                }
+
                 var existingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, model.IntegrationCode);
                 if (existingProductIntegration != null)
                 {
@@ -672,9 +678,9 @@ namespace Entegro.Web.Controllers
 
                 TrendyolApiContext context = new TrendyolApiContext
                 {
-                    SupplierId = existingProductIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault(),
-                    ApiUser = existingProductIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault(),
-                    ApiPassword = existingProductIntegration.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault(),
+                    SupplierId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault() ?? "",
+                    ApiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "",
+                    ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "",
                 };
 
                 var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, model.IntegrationCode);

@@ -126,7 +126,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.IsEsd = false;
                 smartstoreProduct.TaxCategoryId = 1;
                 smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
-                smartstoreProduct.StockQuantity = 10000;
+                smartstoreProduct.StockQuantity = product.StockQuantity;
                 smartstoreProduct.DisplayStockAvailability = false;
                 smartstoreProduct.DisplayStockQuantity = false;
                 smartstoreProduct.MinStockQuantity = 0;

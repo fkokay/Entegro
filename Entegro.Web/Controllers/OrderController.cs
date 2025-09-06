@@ -53,8 +53,6 @@ namespace Entegro.Web.Controllers
             {
                 Id = orderDetail.Id,
                 OrderSourceId = orderDetail.OrderSourceId,
-                OrderSource = orderDetail.OrderSource,
-                OrderSourceLabelHint = orderDetail.OrderSourceLabelHint,
                 OrderNumber = orderDetail.OrderNumber,
                 OrderGuid = orderDetail.OrderGuid,
                 CustomerId = orderDetail.CustomerId,
