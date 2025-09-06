@@ -216,6 +216,7 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("erp");
         }
+
         [HttpPost]
         public async Task<IActionResult> ErpParameterNetsis(NetsisErpSettingsViewModel model)
         {
@@ -606,18 +607,18 @@ namespace Entegro.Web.Controllers
                     var apiUser = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
                     var apiPassword = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
 
-                    YurticiCargoSettingsViewModel model = new YurticiCargoSettingsViewModel();
-                    model.Id = id;
-                    model.Name = name;
-                    model.Description = description;
-                    model.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
-                    model.IntegrationSystemId = integrationSystemCargo.Id;
-                    model.CommerceType = commerceType.Value;
-                    model.ApiUrl = apiUrl?.Value;
-                    model.ApiUser = apiUser?.Value;
-                    model.ApiPassword = apiPassword?.Value;
+                    YurticiCargoSettingsViewModel yurticiCargoSettings = new YurticiCargoSettingsViewModel();
+                    yurticiCargoSettings.Id = id;
+                    yurticiCargoSettings.Name = name;
+                    yurticiCargoSettings.Description = description;
+                    yurticiCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
+                    yurticiCargoSettings.IntegrationSystemId = integrationSystemCargo.Id;
+                    yurticiCargoSettings.CommerceType = commerceType.Value;
+                    yurticiCargoSettings.ApiUrl = apiUrl?.Value;
+                    yurticiCargoSettings.ApiUser = apiUser?.Value;
+                    yurticiCargoSettings.ApiPassword = apiPassword?.Value;
 
-                    return View($"Cargo.Yurtici", model);
+                    return View($"Cargo.Yurtici", yurticiCargoSettings);
 
                 case "PTT":
                     var idForPTT = integrationSystemCargo.Id;
@@ -628,19 +629,19 @@ namespace Entegro.Web.Controllers
                     var barkodStartPrefix = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "BarkodStartPrefix" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
                     var barkodEndPrefix = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "BarkodEndPrefix" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
 
-                    PTTCargoSettingsViewModel modelPTT = new PTTCargoSettingsViewModel();
-                    modelPTT.Id = idForPTT;
-                    modelPTT.Name = nameForPTT;
-                    modelPTT.Description = descriptionForPTT;
-                    modelPTT.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
-                    modelPTT.IntegrationSystemId = integrationSystemCargo.Id;
-                    modelPTT.CommerceType = commerceType.Value;
-                    modelPTT.MusteriId = musteriId?.Value;
-                    modelPTT.Password = password?.Value;
-                    modelPTT.BarkodStartPrefix = barkodStartPrefix?.Value;
-                    modelPTT.BarkodEndPrefix = barkodEndPrefix?.Value;
+                    PTTCargoSettingsViewModel pTTCargoSettings = new PTTCargoSettingsViewModel();
+                    pTTCargoSettings.Id = idForPTT;
+                    pTTCargoSettings.Name = nameForPTT;
+                    pTTCargoSettings.Description = descriptionForPTT;
+                    pTTCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
+                    pTTCargoSettings.IntegrationSystemId = integrationSystemCargo.Id;
+                    pTTCargoSettings.CommerceType = commerceType.Value;
+                    pTTCargoSettings.MusteriId = musteriId?.Value;
+                    pTTCargoSettings.Password = password?.Value;
+                    pTTCargoSettings.BarkodStartPrefix = barkodStartPrefix?.Value;
+                    pTTCargoSettings.BarkodEndPrefix = barkodEndPrefix?.Value;
 
-                    return View($"Cargo.PTT", modelPTT);
+                    return View($"Cargo.PTT", pTTCargoSettings);
 
                 case "Aras":
                     var username = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "Username" & m.IntegrationSystemId == integrationSystemCargoId).FirstOrDefault();
@@ -649,17 +650,17 @@ namespace Entegro.Web.Controllers
                     var nameForAras = integrationSystemCargo.Name;
                     var descriptionForAras = integrationSystemCargo.Description;
 
-                    ArasCargoSettingsViewModel modelAras = new ArasCargoSettingsViewModel();
-                    modelAras.Id = idForAras;
-                    modelAras.Name = nameForAras;
-                    modelAras.Description = descriptionForAras;
-                    modelAras.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
-                    modelAras.IntegrationSystemId = integrationSystemCargoId;
-                    modelAras.CommerceType = commerceType.Value;
-                    modelAras.Username = username?.Value;
-                    modelAras.Password = passwordAras?.Value;
+                    ArasCargoSettingsViewModel arasCargoSettings = new ArasCargoSettingsViewModel();
+                    arasCargoSettings.Id = idForAras;
+                    arasCargoSettings.Name = nameForAras;
+                    arasCargoSettings.Description = descriptionForAras;
+                    arasCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
+                    arasCargoSettings.IntegrationSystemId = integrationSystemCargoId;
+                    arasCargoSettings.CommerceType = commerceType.Value;
+                    arasCargoSettings.Username = username?.Value;
+                    arasCargoSettings.Password = passwordAras?.Value;
 
-                    return View($"Cargo.Aras", modelAras);
+                    return View($"Cargo.Aras", arasCargoSettings);
 
             }
             return NotFound();
@@ -839,6 +840,7 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("cargo");
         }
+
         [HttpPost]
         public async Task<IActionResult> CargoParameterAras(ArasCargoSettingsViewModel model)
         {
