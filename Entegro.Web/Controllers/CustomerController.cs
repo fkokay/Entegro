@@ -8,5 +8,22 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        public IActionResult Edit(int id)
+        {
+            ViewBag.CustomerId = id;
+            return View();
+        }
+
+
+        public IActionResult List()
+        {
+            return View();
+        }
     }
 }
