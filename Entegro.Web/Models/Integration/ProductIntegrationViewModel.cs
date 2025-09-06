@@ -1,8 +1,7 @@
-﻿namespace Entegro.Web.Models
+﻿namespace Entegro.Web.Models.Integration
 {
-    public class CreateProductIntegrationViewModel
+    public class ProductIntegrationViewModel
     {
-
         public int Id { get; set; }
         public int ProductId { get; set; }
         public int IntegrationSystemId { get; set; }
