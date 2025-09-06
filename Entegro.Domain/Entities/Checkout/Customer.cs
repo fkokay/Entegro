@@ -1,5 +1,4 @@
-﻿using Entegro.Domain.Entities.Checkout;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Domain.Entities.Common
+namespace Entegro.Domain.Entities.Checkout
 {
     public class CustomerMap : IEntityTypeConfiguration<Customer>
     {
