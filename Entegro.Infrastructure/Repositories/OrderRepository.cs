@@ -1,6 +1,10 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Catalog;
+using Entegro.Domain.Entities.Checkout;
+using Entegro.Domain.Entities.Common;
+using Entegro.Domain.Entities.Content;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Order = Entegro.Domain.Entities.Checkout.Order;
