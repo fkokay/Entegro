@@ -1,7 +1,7 @@
 ﻿@using Entegro.Web.Models.Integration
+@model ECommercePageViewModel
 @{
     ViewData["Title"] = "E-Ticaret Entegrasyonları";
-    var myCommerceList = ViewBag.MyCommerce as IEnumerable<IntegrationSystemViewModel>;
 }
 
 <div class="flex-grow-1 container-p-y container-fluid">
@@ -38,13 +38,13 @@
         </div>
     </div>
 
-    @if (myCommerceList != null)
+    @if (Model.MyEcommerceList != null)
     {
 
 
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> E-Ticaret Entegrasyonlarım</h4>
         <div class="row">
-            @foreach (var commerce in myCommerceList)
+            @foreach (var commerce in Model.MyEcommerceList)
             {
                 <div class="col-4">
 
@@ -93,20 +93,20 @@
                     <h3 class="mb-2">Mağaza Ekle</h3>
                 </div>
                 <form id="addCommerceForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemType" />
+                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemTypeName" />
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModalName">Mağaza Adı</label>
+                        <label class="form-label" for="Name">Adı</label>
                         <input type="text"
-                               id="ModalName"
-                               name="ModalName"
+                               id="Name"
+                               name="Name"
                                class="form-control"
-                               placeholder="Mağaza Adı" required />
+                               placeholder="Adı" required />
                     </div>
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModalDescription">Mağaza Açıklaması</label>
+                        <label class="form-label" for="Description">Açıklaması</label>
                         <textarea type="text"
-                                  id="ModalDescription"
-                                  name="ModalDescription"
+                                  id="Description"
+                                  name="Description"
                                   class="form-control" rows="3"></textarea>
                     </div>
 

@@ -1,7 +1,8 @@
 ﻿@using Entegro.Web.Models.Integration
+@model ErpPageViewModel
 @{
     ViewData["Title"] = "Erp Entegrasyonları";
-    var myErpList = ViewBag.MyErp as IEnumerable<IntegrationSystemViewModel>;
+   
     var logoUrls = new Dictionary<string, string>
     {
         { "Logo", "https://www.logo.com.tr/_next/image?url=%2Flogo.webp&w=1920&q=75" },
@@ -96,13 +97,11 @@
 
 
 
-    @if (myErpList != null)
+    @if (Model.MyErpList != null)
     {
-
-
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Erp Entegrasyonlarım</h4>
         <div class="row">
-            @foreach (var erp in myErpList)
+            @foreach (var erp in Model.MyErpList)
             {
                 var value = erp.IntegrationSystemParameter.Value;
 
@@ -160,20 +159,20 @@
                     <h3 class="mb-2">Entegrasyon Ekle</h3>
                 </div>
                 <form id="addErpForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemType" />
+                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemTypeName" />
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModalName">Adı</label>
+                        <label class="form-label" for="Name">Adı</label>
                         <input type="text"
-                               id="ModalName"
-                               name="ModalName"
+                               id="Name"
+                               name="Name"
                                class="form-control"
                                placeholder="Adı" required />
                     </div>
                     <div class="col-12 col-md-12">
-                        <label class="form-label" for="ModalDescription">Açıklaması</label>
+                        <label class="form-label" for="Description">Açıklaması</label>
                         <textarea type="text"
-                                  id="ModalDescription"
-                                  name="ModalDescription"
+                                  id="Description"
+                                  name="Description"
                                   class="form-control" rows="3"></textarea>
                     </div>
 
