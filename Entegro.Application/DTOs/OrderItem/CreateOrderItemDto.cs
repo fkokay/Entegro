@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.Product;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +12,7 @@ namespace Entegro.Application.DTOs.OrderItem
     {
         public int OrderId { get; set; }
         public int ProductId { get; set; }
+        public ProductDto Product { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Price { get; set; }

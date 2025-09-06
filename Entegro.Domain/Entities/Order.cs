@@ -62,7 +62,7 @@ namespace Entegro.Domain.Entities
         public string OrderNumber { get; set; }
         public Guid OrderGuid { get; set; }
         public int CustomerId { get; set; }
-        public virtual Customer? Customer { get; set; }
+        public virtual Customer Customer { get; set; }
         public int? BillingAddressId { get; set; }
         public virtual Address? BillingAddress { get; set; }
         public int? ShippingAddressId { get; set; }

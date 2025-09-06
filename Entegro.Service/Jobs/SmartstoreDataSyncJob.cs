@@ -1,4 +1,5 @@
 ﻿
+using Entegro.Application.DTOs.Address;
 using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Customer;
@@ -36,6 +37,7 @@ namespace Entegro.Service.Jobs
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly IAddressService _addressService;
         private readonly IMapper _mapper;
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
 
@@ -49,6 +51,7 @@ namespace Entegro.Service.Jobs
             ICustomerService customerService,
             IBrandService brandService,
             IProductIntegrationService productIntegrationService,
+            IAddressService addressService,
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
         {
@@ -61,6 +64,7 @@ namespace Entegro.Service.Jobs
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productIntegrationService = productIntegrationService ?? throw new ArgumentNullException(nameof(productIntegrationService));
+            _addressService = addressService ?? throw new ArgumentNullException(nameof(addressService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -69,7 +73,7 @@ namespace Entegro.Service.Jobs
         {
             //await ProductSync();
             await OrderSync();
-            await ProductWriter();
+            //await ProductWriter();
         }
 
         private async Task ProductWriter()
@@ -151,9 +155,9 @@ namespace Entegro.Service.Jobs
 
             foreach (var order in orders)
             {
-                if (await _orderService.ExistsByOrderNoAsync(order.OrderNo))
+                if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                 {
-                    _logger.LogInformation("'{OrderNo}' nolu sipariş zaten kayıtlı", order.OrderNo);
+                    _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
                     continue;
                 }
 
@@ -182,6 +186,21 @@ namespace Entegro.Service.Jobs
                     order.Customer = null;
                 }
 
+                if (order.ShippingAddress != null)
+                {
+                    var address = await _addressService.AddAsync(_mapper.Map<CreateAddressDto>(order.ShippingAddress));
+                    order.ShippingAddressId = address.Id;
+                    order.ShippingAddress = null;
+                }
+
+                if (order.BillingAddress != null)
+                {
+                    var address = await _addressService.AddAsync(_mapper.Map<CreateAddressDto>(order.BillingAddress));
+                    order.BillingAddressId = address.Id;
+                    order.BillingAddress = null;
+                }
+
+
                 foreach (var item in order.OrderItems)
                 {
                     if (item.Product != null)
@@ -190,10 +209,10 @@ namespace Entegro.Service.Jobs
 
                         if (product == null)
                         {
-                            throw new Exception($"{item.Product.Code} kodlu ürün {order.OrderNo} ' +nolu siparişte bulunamadı");
+                            throw new Exception($"{item.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
                         }
 
-                        item.Product = product;
+                        item.Product = null;
                         item.ProductId = product.Id;
                     }
                 }
@@ -204,12 +223,12 @@ namespace Entegro.Service.Jobs
                     {
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
                         await _orderService.CreateOrderAsync(createOrder);
-                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
+                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                     });
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNo);
+                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNumber);
                 }
             }
 

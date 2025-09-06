@@ -112,7 +112,7 @@ namespace Entegro.Application.Services.Commerce
 
             while (moreData)
             {
-                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer,OrderItems($expand=Product)";
+                var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer,OrderItems($expand=Product),ShippingAddress";
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 

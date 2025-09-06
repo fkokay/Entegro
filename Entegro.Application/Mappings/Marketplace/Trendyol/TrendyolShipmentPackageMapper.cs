@@ -29,9 +29,9 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             TrendyolOrderLineMapper.ConfigureLogger(_logger);
 
             OrderDto order = new OrderDto();
-            order.OrderNo = trendyolShipmentPackage.OrderNumber;
+            order.OrderNumber = trendyolShipmentPackage.OrderNumber;
             order.OrderDate = FromUnixTimeMilliseconds(trendyolShipmentPackage.OrderDate);
-            order.TotalAmount = trendyolShipmentPackage.TotalPrice;
+            order.OrderTotal = trendyolShipmentPackage.TotalPrice;
             order.OrderSource = Domain.Enums.OrderSource.Trendyol;
             order.CustomerId = 0;
             order.Deleted = false;

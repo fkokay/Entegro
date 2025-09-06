@@ -13,7 +13,9 @@ namespace Entegro.Application.DTOs.Commerce.Smartstore
         public int StoreId { get; set; }
         public int? CustomerId { get; set; }
         public int BillingAddressId { get; set; }
+        public SmartstoreAddressDto BillingAddress { get; set; }
         public int ShippingAddressId { get; set; }
+        public SmartstoreAddressDto ShippingAddress { get; set; }
         public string PaymentMethodSystemName { get; set; }
         public string CustomerCurrencyCode { get; set; }
         public decimal CurrencyRate { get; set; }
