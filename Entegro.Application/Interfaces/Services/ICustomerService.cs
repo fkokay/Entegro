@@ -11,8 +11,8 @@ namespace Entegro.Application.Interfaces.Services
 {
     public interface ICustomerService
     {
-        Task<CustomerDto> GetCustomerByIdAsync(int customerId);
-        Task<CustomerDto> GetCustomerByEmailAsync(string email);
+        Task<CustomerDto?> GetCustomerByIdAsync(int customerId);
+        Task<CustomerDto?> GetCustomerByEmailAsync(string email);
         Task<IEnumerable<CustomerDto>> GetCustomersAsync();
         Task<PagedResult<CustomerDto>> GetCustomersAsync(int pageNumber, int pageSize);
         Task<int> CreateCustomerAsync(CreateCustomerDto createCustomer);
