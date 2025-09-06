@@ -50,7 +50,7 @@ namespace Entegro.Web.Controllers
             {
                 Id = orderDetail.Id,
                 OrderSourceId = orderDetail.OrderSourceId,
-                OrderSource = orderDetail.OrderSource == null ? null : orderDetail.OrderSource,
+                OrderSource = orderDetail.OrderSource,
                 OrderSourceLabelHint = orderDetail.OrderSourceLabelHint,
                 OrderNumber = orderDetail.OrderNumber,
                 OrderGuid = orderDetail.OrderGuid,
