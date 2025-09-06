@@ -150,8 +150,45 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <span class="badge bg-label-primary">Sipariş Adresi</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-1 fw-semibold text-heading mt-3">
-                        <span>@Model.BillingAddress?.Address1</span>
+                    <div class="info-container mt-3">
+                        <ul class="list-unstyled">
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Ad Soyad:</span>
+                                <span>@Model.ShippingAddress?.FirstName @Model.ShippingAddress?.LastName</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Telefon:</span>
+                                <span>@Model.ShippingAddress?.PhoneNumber</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Şirket Adı:</span>
+                                <span>@Model.ShippingAddress?.Company</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Adres 1:</span>
+                                <span>@Model.ShippingAddress?.Address1</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Adres 2:</span>
+                                <span>@Model.ShippingAddress?.Address2</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Telefon Numarası:</span>
+                                <span>@Model.ShippingAddress?.PhoneNumber</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Vergi Dairesi:</span>
+                                <span>@Model.ShippingAddress?.TaxOffice</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Vergi Daire Numarası:</span>
+                                <span>@Model.ShippingAddress?.TaxOfficeNumber</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Posta Kodu:</span>
+                                <span>@Model.ShippingAddress?.ZipPostalCode</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -162,9 +199,47 @@
                         <span class="badge bg-label-primary">Fatura Adresi</span>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-1 fw-semibold text-heading mt-3">
-                        <span>@Model.ShippingAddress?.Address1</span>
+                    <div class="info-container mt-3">
+                        <ul class="list-unstyled">
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Ad Soyad:</span>
+                                <span>@Model.BillingAddress?.FirstName @Model.BillingAddress?.LastName</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Telefon:</span>
+                                <span>@Model.BillingAddress?.PhoneNumber</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Şirket Adı:</span>
+                                <span>@Model.BillingAddress?.Company</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Adres 1:</span>
+                                <span>@Model.BillingAddress?.Address1</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Adres 2:</span>
+                                <span>@Model.BillingAddress?.Address2</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Telefon Numarası:</span>
+                                <span>@Model.BillingAddress?.PhoneNumber</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Vergi Dairesi:</span>
+                                <span>@Model.BillingAddress?.TaxOffice</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Vergi Daire Numarası:</span>
+                                <span>@Model.BillingAddress?.TaxOfficeNumber</span>
+                            </li>
+                            <li class="mb-2 pt-1">
+                                <span class="fw-semibold me-1">Posta Kodu:</span>
+                                <span>@Model.BillingAddress?.ZipPostalCode</span>
+                            </li>
+                        </ul>
                     </div>
+                   
 
                 </div>
             </div>
@@ -173,3 +248,24 @@
 </div>
 
 
+@* public int Id { get; set; }
+        public string? Salutation { get; set; }
+        public string? Title { get; set; }
+        public string? AddressType { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
+        public string? Company { get; set; }
+        public int? CountryId { get; set; }
+        public int? CityId { get; set; }
+        public int? TownId { get; set; }
+        public int? DistrictId { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string? ZipPostalCode { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? FaxNumber { get; set; }
+        public string? TaxOffice { get; set; }
+        public string? TaxOfficeNumber { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; } *@
