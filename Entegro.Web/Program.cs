@@ -12,7 +12,6 @@ using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Application.Services.Marketplace;
-using Entegro.Caching;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.EventBus;
@@ -24,20 +23,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using Serilog.Extensions.Logging;
-using Serilog.Filters;
 using Serilog.Sinks.Graylog;
 using Serilog.Sinks.Graylog.Core.Transport;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
 
 var rgSystemSource = new Regex("^File|^System|^Microsoft|^Serilog|^Autofac|^Castle|^MiniProfiler|^Newtonsoft|^Pipelines|^Azure|^StackExchange|^Superpower|^Dasync", RegexOptions.Compiled);
 var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? Environments.Production;
@@ -109,7 +102,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<EntegroContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    
+
     options.UseLazyLoadingProxies(); // Lazy loading proxy kullanacaksan
 });
 var configuration = (IConfiguration)builder.Configuration;
@@ -216,6 +209,9 @@ builder.Services.AddScoped<ICityService, CityService>();
 
 builder.Services.AddScoped<ITownRepository, TownRepository>();
 builder.Services.AddScoped<ITownService, TownService>();
+
+builder.Services.AddScoped<IOrderNoteRepository, OrderNoteRepository>();
+builder.Services.AddScoped<IOrderNoteService, OrderNoteService>();
 
 
 builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();

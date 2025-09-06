@@ -78,6 +78,7 @@ namespace Entegro.Infrastructure.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<EmailAccount> EmailAccounts { get; set; }
         public DbSet<Log> Logs { get; set; }
+        public DbSet<OrderNote> OrderNote { get; set; }
 
     }
 }

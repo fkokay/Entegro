@@ -126,6 +126,14 @@ namespace Entegro.Application.Mappings
             // ---------------- Address & Email ----------------
             config.NewConfig<Address, AddressDto>().TwoWays();
             config.NewConfig<EmailAccount, EmailAccountDto>().TwoWays();
+
+
+            // ---------------- Order ----------------
+            config.NewConfig<Order, OrderDto>().TwoWays();
+            config.NewConfig<Order, CreateOrderDto>().TwoWays();
+            config.NewConfig<Order, UpdateOrderDto>().TwoWays();
+
+
         }
     }
 }

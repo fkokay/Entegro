@@ -2,7 +2,6 @@
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.OrderNote;
-using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -102,7 +101,7 @@ namespace Entegro.Application.DTOs.Order
         }
 
         public virtual List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
-        public virtual List<OrderNoteDto> OrderNotes { get; set; } = new List<OrderNoteDto>();    
+        public virtual List<OrderNoteDto> OrderNotes { get; set; } = new List<OrderNoteDto>();
 
 
     }
