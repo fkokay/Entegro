@@ -1,7 +1,7 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.EmailAccount;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models;
+using Entegro.Web.Models.Platform.Messaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

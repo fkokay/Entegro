@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.Country;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

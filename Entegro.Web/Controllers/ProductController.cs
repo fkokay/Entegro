@@ -9,14 +9,17 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Domain.Entities;
-using Entegro.Web.Models;
+using Entegro.Web.Models.Catalog.Attributes;
+using Entegro.Web.Models.Catalog.Products;
+using Entegro.Web.Models.Content;
+using Entegro.Web.Models.Integration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using System.Net;
-using static Entegro.Web.Models.ProductViewModel;
+using static Entegro.Web.Models.Catalog.Products.ProductViewModel;
 
 namespace Entegro.Web.Controllers
 {
@@ -770,7 +773,7 @@ namespace Entegro.Web.Controllers
                 }).ToList();
 
 
-                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductImageViewModel()
+                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileViewModel()
                 {
                     Id = m.Id,
                     DisplayOrder = m.DisplayOrder,

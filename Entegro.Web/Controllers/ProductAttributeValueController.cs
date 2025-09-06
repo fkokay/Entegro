@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Catalog.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Entegro.Web.Models.Integration
+@{
     ViewData["Title"] = "Kargo Entegrasyonları";
     var myCargoList = ViewBag.MyCargo as IEnumerable<IntegrationSystemViewModel>;
     var logoUrls = new Dictionary<string, string>

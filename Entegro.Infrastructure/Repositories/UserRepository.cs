@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities.Platform;
+using Entegro.Domain.Entities.Platform.Identity;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

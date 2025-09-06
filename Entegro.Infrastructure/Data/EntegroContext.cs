@@ -2,7 +2,10 @@
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Domain.Entities.Common;
 using Entegro.Domain.Entities.Content;
+using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform;
+using Entegro.Domain.Entities.Platform.Identity;
+using Entegro.Domain.Entities.Platform.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Data
