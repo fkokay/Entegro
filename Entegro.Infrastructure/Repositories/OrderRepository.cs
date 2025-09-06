@@ -3,7 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Order = Entegro.Domain.Entities.Order;
+using Order = Entegro.Domain.Entities.Checkout.Order;
 
 namespace Entegro.Infrastructure.Repositories
 {

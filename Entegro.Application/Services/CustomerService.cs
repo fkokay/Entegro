@@ -2,7 +2,7 @@
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Common;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;

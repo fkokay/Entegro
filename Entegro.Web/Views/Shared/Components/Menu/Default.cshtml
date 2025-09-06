@@ -49,6 +49,11 @@
                         <div data-i18n="Varyant Değerleri">Varyant Değerleri</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a asp-controller="SpecificationAttribute" asp-action="List" class="menu-link">
+                        <div data-i18n="Ürün Özellikleri">Ürün Özellikleri</div>
+                    </a>
+                </li>
             </ul>
         </li>
         <li class="menu-item" style="">
@@ -109,7 +114,7 @@
             </ul>
         </li>
         <li class="menu-item" style="">
-            <a href="javascript:void(0);" class="menu-link">
+            <a asp-controller="Notification" asp-action="List" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-bell"></i>
                 <div data-i18n="Bildirimler">Bildirimler</div>
             </a>
@@ -121,12 +126,12 @@
             </a>
             <ul class="menu-sub">
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Import" asp-action="Excel" class="menu-link">
                         <div data-i18n="Excel İşlemleri">Excel İşlemleri</div>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
+                    <a asp-controller="Import" asp-action="Xml" class="menu-link">
                         <div data-i18n="Xml İşlemleri">Xml İşlemleri</div>
                     </a>
                 </li>
@@ -137,13 +142,6 @@
                 <i class="menu-icon tf-icons ti ti-chart-pie"></i>
                 <div data-i18n="Raporlar">Raporlar</div>
             </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a asp-controller="Order" asp-action="List" class="menu-link">
-                        <div data-i18n="Excel İşlemleri">Excel İşlemleri</div>
-                    </a>
-                </li>
-            </ul>
         </li>
         <li class="menu-item" style="">
             <a href="javascript:void(0);" class="menu-link menu-toggle">

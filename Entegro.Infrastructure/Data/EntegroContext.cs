@@ -1,4 +1,8 @@
-﻿using Entegro.Domain.Entities;
+﻿using Entegro.Domain.Entities.Catalog;
+using Entegro.Domain.Entities.Checkout;
+using Entegro.Domain.Entities.Common;
+using Entegro.Domain.Entities.Content;
+using Entegro.Domain.Entities.Platform;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Data

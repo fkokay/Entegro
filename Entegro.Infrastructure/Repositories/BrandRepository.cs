@@ -1,7 +1,7 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

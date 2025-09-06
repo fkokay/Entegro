@@ -1,4 +1,4 @@
-﻿using Entegro.Domain.Entities;
+﻿using Entegro.Domain.Entities.Common;
 
 namespace Entegro.Application.Interfaces.Repositories
 {

@@ -2,7 +2,7 @@
 using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Platform;
 using MapsterMapper;
 
 namespace Entegro.Application.Services

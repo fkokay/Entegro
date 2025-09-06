@@ -1,7 +1,7 @@
 ﻿using Entegro.Application.DTOs.City;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Common;
 using MapsterMapper;
 
 namespace Entegro.Application.Services

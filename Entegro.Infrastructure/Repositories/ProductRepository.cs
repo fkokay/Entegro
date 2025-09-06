@@ -1,10 +1,10 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
+using Entegro.Domain.Entities.Catalog;
 
 namespace Entegro.Infrastructure.Repositories
 {
