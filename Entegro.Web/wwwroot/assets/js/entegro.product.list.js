@@ -294,7 +294,7 @@ Entegro.product.list = (function ($) {
                                         <i class="icon-base ti ti-dots-vertical icon-22px"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end m-0">
-                                        <li><a href="Edit?id=${row.Id}" class="dropdown-item">Güncelle</a></li>
+                                        <li><a href="Edit?id=${row.Id}" class="dropdown-item">Düzenle</a></li>
                                         <li><a href="javascript:void(0);" class="dropdown-item text-danger" onclick="Entegro.product.list.deleteProduct(${row.Id})">Sil</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li class="dropend">
