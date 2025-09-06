@@ -4,8 +4,8 @@ namespace Entegro.Application.DTOs.Category
 {
     public class CreateCategoryDto
     {
-        public int? ParentCategoryId { get; set; }
-        public CreateCategoryDto? ParentCategory { get; set; }
+        public int? ParentId { get; set; }
+        public CreateCategoryDto? Parent { get; set; }
         public string TreePath { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }

@@ -38,8 +38,6 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             productDto.MetaTitle = "";
             productDto.StockQuantity = trendyolProduct.quantity;
             productDto.Barcode = trendyolProduct.barcode;
-            productDto.CreatedOn = DateTime.Now;
-            productDto.UpdatedOn = DateTime.Now;
             productDto.Brand = new BrandDto()
             {
                 Name = trendyolProduct.brand,

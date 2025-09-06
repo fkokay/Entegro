@@ -12,6 +12,38 @@ namespace Entegro.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Address",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Salutation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddressType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Company = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CountryId = table.Column<int>(type: "int", nullable: true),
+                    CityId = table.Column<int>(type: "int", nullable: true),
+                    TownId = table.Column<int>(type: "int", nullable: true),
+                    DistrictId = table.Column<int>(type: "int", nullable: true),
+                    Address1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ZipPostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FaxNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaxOffice = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaxOfficeNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Country",
                 columns: table => new
                 {
@@ -43,12 +75,33 @@ namespace Entegro.Infrastructure.Migrations
                     CustomerType = table.Column<int>(type: "int", nullable: false),
                     TaxOffice = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TaxNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customer", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailAccount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Host = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Port = table.Column<int>(type: "int", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnableSsl = table.Column<bool>(type: "bit", nullable: false),
+                    SecureOption = table.Column<int>(type: "int", nullable: false),
+                    UserDefaultCredentials = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailAccount", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,6 +117,23 @@ namespace Entegro.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IntegrationSystem", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Log",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LogLevelId = table.Column<int>(type: "int", nullable: false),
+                    ShortMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Logger = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Log", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,6 +180,34 @@ namespace Entegro.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SpecificationAttribute",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecificationAttribute", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpecificationAttributeOption",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SpecificationAttributeId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecificationAttributeOption", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -119,7 +217,7 @@ namespace Entegro.Infrastructure.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -155,18 +253,86 @@ namespace Entegro.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderSourceId = table.Column<int>(type: "int", nullable: false),
-                    OrderNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderGuid = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
+                    BillingAddressId = table.Column<int>(type: "int", nullable: true),
+                    ShippingAddressId = table.Column<int>(type: "int", nullable: true),
+                    PaymentMethodSystemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CurrencyRate = table.Column<decimal>(type: "decimal(18,8)", precision: 18, scale: 8, nullable: false),
+                    VatNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderSubtotalInclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderSubtotalExclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderSubTotalDiscountInclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderSubTotalDiscountExclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderShippingInclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderShippingExclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderShippingTaxRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentMethodAdditionalFeeInclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentMethodAdditionalFeeExclTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentMethodAdditionalFeeTaxRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderTax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderTotal = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    RefundedAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CustomerIp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsTransient = table.Column<bool>(type: "bit", nullable: false)
+                    IsTransient = table.Column<bool>(type: "bit", nullable: false),
+                    TaxRates = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaidDateUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ShippingMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderStatusId = table.Column<int>(type: "int", nullable: false),
+                    PaymentStatusId = table.Column<int>(type: "int", nullable: false),
+                    ShippingStatusId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Order", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Order_Address_BillingAddressId",
+                        column: x => x.BillingAddressId,
+                        principalTable: "Address",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Order_Address_ShippingAddressId",
+                        column: x => x.ShippingAddressId,
+                        principalTable: "Address",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
                         name: "FK_Order_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReturnRequest",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderItemId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ReasonForReturn = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    RequestedAction = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    RequestedActionUpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CustomerComments = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StaffNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdminComment = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    ReturnRequestStatusId = table.Column<int>(type: "int", nullable: false),
+                    RefundToWallet = table.Column<bool>(type: "bit", nullable: true),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReturnRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReturnRequest_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
                         principalColumn: "Id",
@@ -223,7 +389,7 @@ namespace Entegro.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FolderId = table.Column<int>(type: "int", nullable: true),
+                    MediaFolderId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Alt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -246,8 +412,8 @@ namespace Entegro.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_MediaFile", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MediaFile_MediaFolder_FolderId",
-                        column: x => x.FolderId,
+                        name: "FK_MediaFile_MediaFolder_MediaFolderId",
+                        column: x => x.MediaFolderId,
                         principalTable: "MediaFolder",
                         principalColumn: "Id");
                 });
@@ -295,6 +461,82 @@ namespace Entegro.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Invoice",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TaxAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoice", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invoice_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderNote",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderNote", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderNote_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Shipment",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    TrackingNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TrackingUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalWeight = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    ShippedDateUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeliveryDateUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Shipment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Shipment_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Brand",
                 columns: table => new
                 {
@@ -307,8 +549,9 @@ namespace Entegro.Infrastructure.Migrations
                     MetaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaKeywords = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Published = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -335,8 +578,10 @@ namespace Entegro.Infrastructure.Migrations
                     MetaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaKeywords = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    Published = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -345,13 +590,13 @@ namespace Entegro.Infrastructure.Migrations
                         name: "FK_Category_Category_ParentCategoryId",
                         column: x => x.ParentCategoryId,
                         principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Category_MediaFile_MediaFileId",
                         column: x => x.MediaFileId,
                         principalTable: "MediaFile",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -376,6 +621,50 @@ namespace Entegro.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InvoiceItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    InvoiceId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvoiceItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InvoiceItem_Invoice_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoice",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ShipmentItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ShipmentId = table.Column<int>(type: "int", nullable: false),
+                    OrderItemId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShipmentItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ShipmentItem_Shipment_ShipmentId",
+                        column: x => x.ShipmentId,
+                        principalTable: "Shipment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Product",
                 columns: table => new
                 {
@@ -386,19 +675,19 @@ namespace Entegro.Infrastructure.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ManufacturerPartNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gtin = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    OldPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    SpecialPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    OldPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    SpecialPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Unit = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VatRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    VatRate = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     VatInc = table.Column<bool>(type: "bit", nullable: false),
                     BrandId = table.Column<int>(type: "int", nullable: true),
                     StockQuantity = table.Column<int>(type: "int", nullable: false),
-                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Length = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Width = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Height = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Weight = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Length = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Width = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Height = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     MetaKeywords = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MetaTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -406,8 +695,8 @@ namespace Entegro.Infrastructure.Migrations
                     MainPictureId = table.Column<int>(type: "int", nullable: true),
                     Published = table.Column<bool>(type: "bit", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -433,10 +722,10 @@ namespace Entegro.Infrastructure.Migrations
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TaxRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    TaxRate = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    DiscountAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -512,15 +801,45 @@ namespace Entegro.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Product_SpecificationAttribute_Mapping",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SpecificationAttributeOptionId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Product_SpecificationAttribute_Mapping", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Product_SpecificationAttribute_Mapping_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Product_SpecificationAttribute_Mapping_SpecificationAttributeOption_SpecificationAttributeOptionId",
+                        column: x => x.SpecificationAttributeOptionId,
+                        principalTable: "SpecificationAttributeOption",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductIntegration",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     IntegrationSystemId = table.Column<int>(type: "int", nullable: false),
+                    IntegrationCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Custom = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastSyncDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsSync = table.Column<bool>(type: "bit", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -574,12 +893,12 @@ namespace Entegro.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    StokCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gtin = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ManufacturerPartNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    StokCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gtin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ManufacturerPartNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     StockQuantity = table.Column<int>(type: "int", nullable: false),
-                    AttributeXml = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    RawAttribute = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -588,6 +907,26 @@ namespace Entegro.Infrastructure.Migrations
                         name: "FK_ProductVariantAttributeCombination_Product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductVariantAttributeValue",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductVariantAttributeId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductVariantAttributeValue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductVariantAttributeValue_Product_ProductAttribute_Mapping_ProductVariantAttributeId",
+                        column: x => x.ProductVariantAttributeId,
+                        principalTable: "Product_ProductAttribute_Mapping",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -628,9 +967,19 @@ namespace Entegro.Infrastructure.Migrations
                 column: "IntegrationSystemId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaFile_FolderId",
+                name: "IX_Invoice_OrderId",
+                table: "Invoice",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceItem_InvoiceId",
+                table: "InvoiceItem",
+                column: "InvoiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MediaFile_MediaFolderId",
                 table: "MediaFile",
-                column: "FolderId");
+                column: "MediaFolderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MediaFolder_ParentId",
@@ -638,9 +987,19 @@ namespace Entegro.Infrastructure.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Order_BillingAddressId",
+                table: "Order",
+                column: "BillingAddressId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Order_CustomerId",
                 table: "Order",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_ShippingAddressId",
+                table: "Order",
+                column: "ShippingAddressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItem_OrderId",
@@ -651,6 +1010,11 @@ namespace Entegro.Infrastructure.Migrations
                 name: "IX_OrderItem_ProductId",
                 table: "OrderItem",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderNote_OrderId",
+                table: "OrderNote",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_BrandId",
@@ -688,14 +1052,25 @@ namespace Entegro.Infrastructure.Migrations
                 columns: new[] { "ProductId", "DisplayOrder" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Product_SpecificationAttribute_Mapping_ProductId",
+                table: "Product_SpecificationAttribute_Mapping",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_SpecificationAttribute_Mapping_SpecificationAttributeOptionId",
+                table: "Product_SpecificationAttribute_Mapping",
+                column: "SpecificationAttributeOptionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductAttributeValue_ProductAttributeId",
                 table: "ProductAttributeValue",
                 column: "ProductAttributeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductIntegration_IntegrationSystemId",
+                name: "IX_ProductIntegration_IntegrationSystemId_IntegrationCode",
                 table: "ProductIntegration",
-                column: "IntegrationSystemId");
+                columns: new[] { "IntegrationSystemId", "IntegrationCode" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductIntegration_ProductId",
@@ -718,6 +1093,26 @@ namespace Entegro.Infrastructure.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductVariantAttributeValue_ProductVariantAttributeId",
+                table: "ProductVariantAttributeValue",
+                column: "ProductVariantAttributeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReturnRequest_CustomerId",
+                table: "ReturnRequest",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Shipment_OrderId",
+                table: "Shipment",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShipmentItem_ShipmentId",
+                table: "ShipmentItem",
+                column: "ShipmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Town_CityId",
                 table: "Town",
                 column: "CityId");
@@ -730,19 +1125,31 @@ namespace Entegro.Infrastructure.Migrations
                 name: "District");
 
             migrationBuilder.DropTable(
+                name: "EmailAccount");
+
+            migrationBuilder.DropTable(
                 name: "IntegrationSystemLog");
 
             migrationBuilder.DropTable(
                 name: "IntegrationSystemParameter");
 
             migrationBuilder.DropTable(
+                name: "InvoiceItem");
+
+            migrationBuilder.DropTable(
+                name: "Log");
+
+            migrationBuilder.DropTable(
                 name: "OrderItem");
+
+            migrationBuilder.DropTable(
+                name: "OrderNote");
 
             migrationBuilder.DropTable(
                 name: "Product_Category_Mapping");
 
             migrationBuilder.DropTable(
-                name: "Product_ProductAttribute_Mapping");
+                name: "Product_SpecificationAttribute_Mapping");
 
             migrationBuilder.DropTable(
                 name: "ProductAttributeValue");
@@ -757,37 +1164,64 @@ namespace Entegro.Infrastructure.Migrations
                 name: "ProductVariantAttributeCombination");
 
             migrationBuilder.DropTable(
+                name: "ProductVariantAttributeValue");
+
+            migrationBuilder.DropTable(
+                name: "ReturnRequest");
+
+            migrationBuilder.DropTable(
+                name: "ShipmentItem");
+
+            migrationBuilder.DropTable(
+                name: "SpecificationAttribute");
+
+            migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
                 name: "Town");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "Invoice");
 
             migrationBuilder.DropTable(
                 name: "Category");
 
             migrationBuilder.DropTable(
-                name: "ProductAttribute");
+                name: "SpecificationAttributeOption");
 
             migrationBuilder.DropTable(
                 name: "IntegrationSystem");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "Product_ProductAttribute_Mapping");
+
+            migrationBuilder.DropTable(
+                name: "Shipment");
 
             migrationBuilder.DropTable(
                 name: "City");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "ProductAttribute");
+
+            migrationBuilder.DropTable(
+                name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "Order");
+
+            migrationBuilder.DropTable(
+                name: "Country");
 
             migrationBuilder.DropTable(
                 name: "Brand");
 
             migrationBuilder.DropTable(
-                name: "Country");
+                name: "Address");
+
+            migrationBuilder.DropTable(
+                name: "Customer");
 
             migrationBuilder.DropTable(
                 name: "MediaFile");

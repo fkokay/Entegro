@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroContext))]
-    [Migration("20250906183517_EditSpec2")]
-    partial class EditSpec2
+    [Migration("20250906211709_DatabaseInitialize")]
+    partial class DatabaseInitialize
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -880,6 +880,68 @@ namespace Entegro.Infrastructure.Migrations
                     b.ToTable("OrderNote");
                 });
 
+            modelBuilder.Entity("Entegro.Domain.Entities.Checkout.ReturnRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminComment")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerComments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReasonForReturn")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<bool?>("RefundToWallet")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RequestedAction")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime?>("RequestedActionUpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReturnRequestStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StaffNotes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("ReturnRequest");
+                });
+
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.Shipment", b =>
                 {
                     b.Property<int>("Id")
@@ -1678,6 +1740,17 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Entegro.Domain.Entities.Checkout.ReturnRequest", b =>
+                {
+                    b.HasOne("Entegro.Domain.Entities.Checkout.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.Shipment", b =>

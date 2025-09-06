@@ -42,7 +42,7 @@ namespace Entegro.Web.Controllers
             var createDto = new CreateCategoryDto
             {
                 Name = model.Name,
-                ParentCategoryId = model.ParentCategoryId,
+                ParentId = model.ParentCategoryId,
                 MediaFileId = model.MediaFileId,
                 Description = model.Description,
                 MetaDescription = model.MetaDescription,
@@ -132,7 +132,7 @@ namespace Entegro.Web.Controllers
                 var updateDto = new UpdateCategoryDto
                 {
                     Id = model.Id,
-                    ParentCategoryId = model.ParentCategoryId,
+                    ParentId = model.ParentCategoryId,
                     Name = model.Name,
                     MediaFileId = model.MediaFileId,
                     Description = model.Description,

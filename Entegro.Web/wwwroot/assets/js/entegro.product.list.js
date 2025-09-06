@@ -220,7 +220,7 @@ Entegro.product.list = (function ($) {
                     render: $.fn.dataTable.render.number(".", ",", 2)
                 },
                 {
-                    data: 'UpdatedOn',
+                    data: 'UpdatedOnUtc',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.YYYY HH:mm");

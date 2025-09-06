@@ -5,8 +5,8 @@ namespace Entegro.Application.DTOs.Category
     public class UpdateCategoryDto
     {
         public int Id { get; set; }
-        public int? ParentCategoryId { get; set; }
-        public CreateCategoryDto? ParentCategory { get; set; }
+        public int? ParentId { get; set; }
+        public CreateCategoryDto? Parent { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public int? MediaFileId { get; set; }

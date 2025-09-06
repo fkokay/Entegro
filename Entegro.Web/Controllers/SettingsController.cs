@@ -480,7 +480,7 @@ namespace Entegro.Web.Controllers
                     model.ApiUser = apiUser?.Value;
                     model.ApiPassword = apiPassword?.Value;
 
-                    return View($"ECommerce.Smartstore", model);
+                    return View($"Commerce.Smartstore", model);
             }
             return NotFound();
         }
@@ -561,8 +561,7 @@ namespace Entegro.Web.Controllers
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            //return View($"ECommerce.{model.CommerceType}", model);
-            return RedirectToAction("ecommerce");
+            return RedirectToAction("Commerce");
         }
 
         [HttpPost]

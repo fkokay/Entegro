@@ -43,7 +43,7 @@ namespace Entegro.Web.Controllers
             {
                 var createDto = new CreateUserDto
                 {
-                    FirsName = model.FirstName,
+                    FirstName = model.FirstName,
                     LastName = model.LastName,
                     Email = model.Email,
                     Password = model.Password,

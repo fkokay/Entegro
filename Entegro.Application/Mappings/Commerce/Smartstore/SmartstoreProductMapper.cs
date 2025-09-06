@@ -37,8 +37,6 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 productDto.MetaDescription = smartstoreProduct.MetaDescription;
                 productDto.MetaTitle = smartstoreProduct.MetaTitle;
                 productDto.StockQuantity = smartstoreProduct.StockQuantity;
-                productDto.CreatedOn = DateTime.Now;
-                productDto.UpdatedOn = DateTime.Now;
                 productDto.Id = smartstoreProduct.Id;
 
                 if (smartstoreProduct.ProductManufacturers.Any())
