@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Collections;
 using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 using System;
@@ -81,6 +82,13 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<CustomerDto>> GetCustomersAsync(int pageNumber, int pageSize)
         {
             var customers = await _customerRepository.GetAllAsync(pageNumber, pageSize);
+            var customerDtos = _mapper.Map<PagedResult<CustomerDto>>(customers);
+            return customerDtos;
+        }
+
+        public async Task<PagedResult<CustomerDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var customers = await _customerRepository.GetPagedAsync(gridCommand);
             var customerDtos = _mapper.Map<PagedResult<CustomerDto>>(customers);
             return customerDtos;
         }

@@ -46,8 +46,6 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             order.Customer.TaxOffice = trendyolShipmentPackage.InvoiceAddress.TaxOffice;
             order.Customer.CustomerType = trendyolShipmentPackage.IdentityNumber != null ? 1 : 0;
             order.Customer.PhoneNumber = trendyolShipmentPackage.InvoiceAddress.Phone;
-            order.Customer.CreatedOn = DateTime.Now;
-            order.Customer.UpdatedOn = DateTime.Now;
 
 
             return order;

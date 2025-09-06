@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
 using System;
@@ -15,6 +16,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<CustomerDto?> GetCustomerByEmailAsync(string email);
         Task<IEnumerable<CustomerDto>> GetCustomersAsync();
         Task<PagedResult<CustomerDto>> GetCustomersAsync(int pageNumber, int pageSize);
+        Task<PagedResult<CustomerDto>> GetPagedAsync(GridCommand gridCommand);
         Task<int> CreateCustomerAsync(CreateCustomerDto createCustomer);
         Task<bool> UpdateCustomerAsync(UpdateCustomerDto updateCustomer);
         Task<bool> DeleteCustomerAsync(int customerId);

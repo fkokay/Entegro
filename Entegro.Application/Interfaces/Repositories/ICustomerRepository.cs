@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<Customer?> GetByEmailAsync(string email);
         Task<List<Customer>> GetAllAsync();
         Task<PagedResult<Customer>> GetAllAsync(int pageNumber, int pageSize);
+        Task<PagedResult<Customer>> GetPagedAsync(GridCommand gridCommand);
         Task AddAsync(Customer customer);
         Task UpdateAsync(Customer customer);
         Task DeleteAsync(Customer customer);

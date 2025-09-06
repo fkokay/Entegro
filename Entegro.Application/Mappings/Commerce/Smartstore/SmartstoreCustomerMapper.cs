@@ -30,8 +30,6 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 CustomerDto customer = new CustomerDto();
                 customer.Name = smartstoreCustomer.FullName;
                 customer.Email = smartstoreCustomer.Email;
-                customer.CreatedOn = DateTime.Now;
-                customer.UpdatedOn = DateTime.Now;
 
                 return customer;
             }

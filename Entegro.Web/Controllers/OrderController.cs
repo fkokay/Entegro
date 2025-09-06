@@ -59,10 +59,10 @@ namespace Entegro.Web.Controllers
                 Customer = new CustomerViewModel
                 {
                     Id = orderDetail.Customer.Id,
-                    UpdatedOn = orderDetail.Customer.UpdatedOn,
+                    UpdatedOn = orderDetail.Customer.UpdatedOnUtc,
                     Address = orderDetail.Customer.Address,
                     City = orderDetail.Customer.City,
-                    CreatedOn = orderDetail.Customer.CreatedOn,
+                    CreatedOn = orderDetail.Customer.CreatedOnUtc,
                     District = orderDetail.Customer.District,
                     CustomerType = orderDetail.Customer.CustomerType,
                     Email = orderDetail.Customer.Email,
