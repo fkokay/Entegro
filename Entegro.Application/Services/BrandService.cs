@@ -59,11 +59,6 @@ namespace Entegro.Application.Services
             }
 
             var brand = await _brandRepository.GetByNameAsync(name);
-            if (brand == null)
-            {
-                return null;
-            }
-
             var brandDto = _mapper.Map<BrandDto>(brand);
 
             return brandDto;

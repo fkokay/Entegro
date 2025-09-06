@@ -1,6 +1,8 @@
 ﻿
+using Entegro.Application.DTOs.Address;
 using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
@@ -35,6 +37,7 @@ namespace Entegro.Service.Jobs
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly IAddressService _addressService;
         private readonly IMapper _mapper;
         private readonly ILogger<SmartstoreDataSyncJob> _logger;
 
@@ -48,6 +51,7 @@ namespace Entegro.Service.Jobs
             ICustomerService customerService,
             IBrandService brandService,
             IProductIntegrationService productIntegrationService,
+            IAddressService addressService,
             IMapper mapper,
             ILogger<SmartstoreDataSyncJob> logger)
         {
@@ -60,6 +64,7 @@ namespace Entegro.Service.Jobs
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productIntegrationService = productIntegrationService ?? throw new ArgumentNullException(nameof(productIntegrationService));
+            _addressService = addressService ?? throw new ArgumentNullException(nameof(addressService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -68,7 +73,7 @@ namespace Entegro.Service.Jobs
         {
             //await ProductSync();
             await OrderSync();
-            await ProductWriter();
+            //await ProductWriter();
         }
 
         private async Task ProductWriter()
@@ -150,13 +155,52 @@ namespace Entegro.Service.Jobs
 
             foreach (var order in orders)
             {
-                if (await _orderService.ExistsByOrderNoAsync(order.OrderNo))
+                if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                 {
-                    _logger.LogInformation("'{OrderNo}' nolu sipariş zaten kayıtlı", order.OrderNo);
+                    _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
                     continue;
                 }
 
-                order.OrderSource = OrderSource.Smartstore;
+                var customer = await _customerService.GetCustomerByEmailAsync(order.Customer.Email);
+                if (customer == null)
+                {
+                    var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
+                    createCustomer.Address = order.Customer.Address;
+                    createCustomer.City = order.Customer.City;
+                    createCustomer.Town = order.Customer.Town;
+                    createCustomer.Street = order.Customer.Street;
+                    createCustomer.PhoneNumber = order.Customer.PhoneNumber;
+                    createCustomer.Name = order.Customer.Name;
+                    createCustomer.CustomerType = 1;
+                    createCustomer.Email = order.Customer.Email;
+                    createCustomer.CreatedOn = DateTime.Now;
+                    createCustomer.UpdatedOn = DateTime.Now;
+
+                    var customerId = await _customerService.CreateCustomerAsync(createCustomer);
+                    order.CustomerId = customerId;
+                    order.Customer = null;
+                }
+                else
+                {
+                    order.CustomerId = customer.Id;
+                    order.Customer = null;
+                }
+
+                if (order.ShippingAddress != null)
+                {
+                    var address = await _addressService.AddAsync(_mapper.Map<CreateAddressDto>(order.ShippingAddress));
+                    order.ShippingAddressId = address.Id;
+                    order.ShippingAddress = null;
+                }
+
+                if (order.BillingAddress != null)
+                {
+                    var address = await _addressService.AddAsync(_mapper.Map<CreateAddressDto>(order.BillingAddress));
+                    order.BillingAddressId = address.Id;
+                    order.BillingAddress = null;
+                }
+
+
                 foreach (var item in order.OrderItems)
                 {
                     if (item.Product != null)
@@ -165,10 +209,10 @@ namespace Entegro.Service.Jobs
 
                         if (product == null)
                         {
-                            throw new Exception($"{item.Product.Code} kodlu ürün {order.OrderNo} ' +nolu siparişte bulunamadı");
+                            throw new Exception($"{item.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
                         }
 
-                        item.Product = product;
+                        item.Product = null;
                         item.ProductId = product.Id;
                     }
                 }
@@ -179,12 +223,12 @@ namespace Entegro.Service.Jobs
                     {
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
                         await _orderService.CreateOrderAsync(createOrder);
-                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
+                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                     });
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNo);
+                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNumber);
                 }
             }
 

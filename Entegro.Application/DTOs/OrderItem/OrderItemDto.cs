@@ -19,7 +19,6 @@ namespace Entegro.Application.DTOs.OrderItem
         public decimal TaxRate { get; set; }
         public decimal DiscountAmount { get; set; }
 
-        public OrderDto? Order { get; set; }
         public ProductDto? Product { get; set; }
     }
 }

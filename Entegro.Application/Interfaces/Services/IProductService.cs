@@ -12,7 +12,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<ProductDto?> GetProductByCodeAsync(string productCode);
         Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode);
         Task<IEnumerable<ProductDto>> GetProductsAsync();
-        Task<PagedResult<ProductDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<PagedResult<ProductDto>> GetPagedAsync(GridCommand gridCommand);
         Task<ProductDto> CreateProductAsync(CreateProductDto createProduct);
         Task<ProductDto> UpdateProductAsync(UpdateProductDto updateProduct);
         Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId);

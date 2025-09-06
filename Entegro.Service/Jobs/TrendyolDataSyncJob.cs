@@ -111,8 +111,8 @@ namespace Entegro.Service.Jobs
                         else
                         {
                             _logger.LogWarning(
-                                "Sipariş {OrderNo} içindeki '{ProductCode}' kodlu ürün eşleştirilmesi yapılmamış",
-                                order.OrderNo, item.Product.Code);
+                                "Sipariş {OrderNumber} içindeki '{ProductCode}' kodlu ürün eşleştirilmesi yapılmamış",
+                                order.OrderNumber, item.Product.Code);
                         }
                     }
                 }
@@ -130,9 +130,9 @@ namespace Entegro.Service.Jobs
 
             foreach (var order in orders)
             {
-                if (await _orderService.ExistsByOrderNoAsync(order.OrderNo))
+                if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                 {
-                    _logger.LogInformation("'{OrderNo}' nolu sipariş zaten kayıtlı", order.OrderNo);
+                    _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
 
                     continue;
                 }
@@ -143,12 +143,12 @@ namespace Entegro.Service.Jobs
                     {
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
                         await _orderService.CreateOrderAsync(createOrder);
-                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNo);
+                        _logger.LogInformation("'{OrderNumber}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                     });
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNo);
+                    _logger.LogError(ex, "'{OrderNumber}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNumber);
                 }
             }
 

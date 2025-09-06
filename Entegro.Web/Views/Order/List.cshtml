@@ -60,7 +60,7 @@
                     { data: 'Id', orderable: false }, // checkbox
                     { data: 'Id', visible: false }, // hidden ID
                     { data: 'OrderSourceLabelHint' },
-                    { data: 'OrderNo' },
+                    { data: 'OrderNumber' },
                     { data: 'Customer.Name' },
                     {
                         data: 'OrderDate',
@@ -70,7 +70,7 @@
                         }
                     },
                     {
-                        data: 'TotalAmount',
+                        data: 'OrderTotal',
                         render: $.fn.dataTable.render.number(".", ",", 2)
                     },
                     { data: 'Id' } // İşlemler
@@ -191,7 +191,6 @@
                 }
             });
 
-            // Sınıf düzeltmeleri (opsiyonel; görünüm için)
             setTimeout(() => {
                 const adjustments = [
                     { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -212,7 +211,6 @@
                 });
             }, 100);
 
-            // Silme akışı
             $(document).on('click', '.delete-record', function () {
                 const orderId = $(this).data('id');
                 Swal.fire({

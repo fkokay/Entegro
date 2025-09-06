@@ -28,19 +28,50 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
             SmartstoreOrderItemMapper.ConfigureLogger(_logger);
 
             OrderDto orderDto = new OrderDto();
-            orderDto.OrderNo = smartstoreOrder.OrderNumber ?? smartstoreOrder.Id.ToString();
+            orderDto.OrderNumber = smartstoreOrder.OrderNumber ?? smartstoreOrder.Id.ToString();
             orderDto.OrderDate = smartstoreOrder.CreatedOnUtc;
-            orderDto.TotalAmount = smartstoreOrder.OrderTotal;
+            orderDto.OrderTotal = smartstoreOrder.OrderTotal;
             orderDto.OrderSource = Domain.Enums.OrderSource.Smartstore;
             orderDto.CustomerId = 0;
             orderDto.Deleted = smartstoreOrder.Deleted;
             orderDto.IsTransient = true;
+            orderDto.PaymentMethodSystemName = smartstoreOrder.PaymentMethodSystemName;
+            orderDto.CurrencyRate = smartstoreOrder.CurrencyRate;
+            orderDto.VatNumber = smartstoreOrder.VatNumber;
+            orderDto.OrderSubtotalInclTax = smartstoreOrder.OrderSubtotalInclTax;
+            orderDto.OrderSubtotalExclTax = smartstoreOrder.OrderSubtotalExclTax;
+            orderDto.OrderSubTotalDiscountInclTax = smartstoreOrder.OrderSubTotalDiscountInclTax;
+            orderDto.OrderSubTotalDiscountExclTax = smartstoreOrder.OrderSubTotalDiscountExclTax;
+            orderDto.OrderShippingInclTax = smartstoreOrder.OrderShippingInclTax;
+            orderDto.OrderShippingExclTax = smartstoreOrder.OrderShippingExclTax;
+            orderDto.OrderShippingTaxRate = smartstoreOrder.OrderShippingTaxRate;
+            orderDto.PaymentMethodAdditionalFeeInclTax = smartstoreOrder.PaymentMethodAdditionalFeeInclTax;
+            orderDto.PaymentMethodAdditionalFeeExclTax = smartstoreOrder.PaymentMethodAdditionalFeeExclTax;
+            orderDto.PaymentMethodAdditionalFeeTaxRate = smartstoreOrder.PaymentMethodAdditionalFeeTaxRate;
+            orderDto.OrderTax = smartstoreOrder.OrderTax;
+            orderDto.OrderDiscount = smartstoreOrder.OrderDiscount;
+            orderDto.RefundedAmount = smartstoreOrder.RefundedAmount;
+            orderDto.CustomerIp = smartstoreOrder.CustomerIp;
+            orderDto.OrderGuid = smartstoreOrder.OrderGuid;
+            orderDto.ShippingMethod = smartstoreOrder.ShippingMethod;
+            orderDto.TaxRates = smartstoreOrder.TaxRates;
 
             orderDto.OrderItems.AddRange(SmartstoreOrderItemMapper.ToDtoList(smartstoreOrder.OrderItems));
             if(smartstoreOrder.Customer != null)
             {
                 SmartstoreCustomerMapper.ConfigureLogger(_logger);
                 orderDto.Customer = SmartstoreCustomerMapper.ToDto(smartstoreOrder.Customer);
+            }
+
+            SmartstoreAddressMapper.ConfigureLogger(_logger);
+            if (smartstoreOrder.ShippingAddress != null)
+            {
+                orderDto.ShippingAddress = SmartstoreAddressMapper.ToDto(smartstoreOrder.ShippingAddress);
+            }
+
+            if (smartstoreOrder.BillingAddress != null)
+            {
+                orderDto.BillingAddress = SmartstoreAddressMapper.ToDto(smartstoreOrder.BillingAddress);
             }
            
 

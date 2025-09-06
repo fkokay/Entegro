@@ -23,7 +23,7 @@ namespace Entegro.Domain.Entities
     }
 
     [Table("Category")]
-    public class Category : BaseEntity, ITreeNode, ICategoryNode, ISoftDeletable,IDisplayOrder, IAuditable
+    public class  Category : BaseEntity, ITreeNode, ICategoryNode, ISoftDeletable,IDisplayOrder, IAuditable
     {
         [Column("ParentCategoryId")]
         public int? ParentId { get; set; }

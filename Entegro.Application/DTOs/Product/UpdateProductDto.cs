@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.ProductMediaFile;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 
 namespace Entegro.Application.DTOs.Product
@@ -15,6 +16,7 @@ namespace Entegro.Application.DTOs.Product
         public decimal VatRate { get; set; }
         public bool VatInc { get; set; }
         public int? BrandId { get; set; }
+        public BrandDto? Brand { get; set; }
         public int StockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }

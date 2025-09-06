@@ -27,31 +27,7 @@ namespace Entegro.Application.Services
 
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrder)
         {
-            int customerId = 0;
-            if (await _customerService.ExistsByEmailAsync(createOrder.Customer.Email))
-            {
-                var customer = await _customerService.GetCustomerByEmailAsync(createOrder.Customer.Email);
-                customerId = customer.Id;
-            }
-            else
-            {
-                CreateCustomerDto createCustomer = new CreateCustomerDto();
-                createCustomer.Address = createOrder.Customer.Address;
-                createCustomer.City = createOrder.Customer.City;
-                createCustomer.Town = createOrder.Customer.Town;
-                createCustomer.Street = createOrder.Customer.Street;
-                createCustomer.PhoneNumber = createOrder.Customer.PhoneNumber;
-                createCustomer.Name = createOrder.Customer.Name;
-                createCustomer.CustomerType = 1;
-                createCustomer.Email = createOrder.Customer.Email;
-                createCustomer.CreatedOn = DateTime.Now;
-                createCustomer.UpdatedOn = DateTime.Now;
-                customerId = await _customerService.CreateCustomerAsync(createCustomer);
-            }
-
             var order = _mapper.Map<Order>(createOrder);
-            order.Customer = null;
-            order.CustomerId = customerId;
 
             await _orderRepository.AddAsync(order);
 

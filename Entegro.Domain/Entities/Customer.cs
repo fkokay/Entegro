@@ -33,5 +33,7 @@ namespace Entegro.Domain.Entities
         public string? TaxNumber { get; set; }
         public DateTime CreatedOnUtc { get; set; }
         public DateTime UpdatedOnUtc { get; set; }
+
+        public virtual ICollection<Order> Orders { get; set; } = new HashSet<Order>();
     }
 }

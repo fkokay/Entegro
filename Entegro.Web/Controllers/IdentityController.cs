@@ -65,8 +65,9 @@ namespace Entegro.Web.Controllers
 
 
         [HttpGet]
-        public IActionResult Logout()
+        public async Task<IActionResult> LogoutAsync()
         {
+            await HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Identity");
         }
     }

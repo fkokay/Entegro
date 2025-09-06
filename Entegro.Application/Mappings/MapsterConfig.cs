@@ -14,6 +14,7 @@ using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
+using Entegro.Application.DTOs.OrderNote;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
@@ -73,6 +74,7 @@ namespace Entegro.Application.Mappings
             config.NewConfig<OrderItem, OrderItemDto>().TwoWays();
             config.NewConfig<OrderItem, CreateOrderItemDto>().TwoWays();
             config.NewConfig<OrderItem, UpdateOrderItemDto>().TwoWays();
+            config.NewConfig<OrderNote, OrderNoteDto>().TwoWays();
 
             // ---------------- Customer ----------------
             config.NewConfig<Customer, CustomerDto>().TwoWays();
