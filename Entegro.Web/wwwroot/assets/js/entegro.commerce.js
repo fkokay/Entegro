@@ -3,8 +3,8 @@ Entegro.commerce = Entegro.commerce || {};
 
 Entegro.commerce = (function ($) {
 
-    function SelectECommerce(integrationSystemType) {
-        $('#IntegrationSystemType').val(integrationSystemType);
+    function SelectCommerce(commerceType) {
+        $('#CommerceType').val(commerceType);
         const modalEl = document.getElementById('addCommerce');
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
@@ -18,7 +18,7 @@ Entegro.commerce = (function ($) {
 
             $.ajax({
                 
-                url: '/settings/ECommerce',
+                url: '/settings/Commerce',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function (res) {
@@ -48,7 +48,7 @@ Entegro.commerce = (function ($) {
         }).then((result) => {
             if (!result.isConfirmed) return;
 
-            fetch('/settings/ECommerceDelete', {
+            fetch('/settings/CommerceDelete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(integrationSystemId)
@@ -63,7 +63,7 @@ Entegro.commerce = (function ($) {
                             timer: 1500,
                             showConfirmButton: false
                         }).then(() => {
-                            window.location.href = '/settings/ecommerce';
+                            window.location.href = '/settings/commerce';
                         });
                     } else {
                         Swal.fire('Hata!', (data && data.message) || 'Bir hata oluştu.', 'error');
@@ -74,7 +74,7 @@ Entegro.commerce = (function ($) {
     }
 
     return {
-        SelectECommerce,
+        SelectCommerce,
         initFormSubmit,
         iptalEt
     };

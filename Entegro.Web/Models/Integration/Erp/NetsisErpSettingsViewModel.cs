@@ -1,4 +1,4 @@
-﻿namespace Entegro.Web.Models.Integration
+﻿namespace Entegro.Web.Models.Integration.Erp
 {
     public class NetsisErpSettingsViewModel
     {   //mağaza bilgileri

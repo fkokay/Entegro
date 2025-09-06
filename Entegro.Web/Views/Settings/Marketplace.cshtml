@@ -1,7 +1,7 @@
 ﻿@using Entegro.Web.Models.Integration
+@model MarketplaceListViewModel
 @{
     ViewData["Title"] = "Pazaryeri Entegrasyonları";
-    var myMarketPlaceList = ViewBag.MyMarketPlace as IEnumerable<IntegrationSystemViewModel>;
     var logoUrls = new Dictionary<string, string>
     {
         { "Smartstore", "https://smartstore.com/Themes/HP/images/smartstore-logo-black.svg" },
@@ -37,47 +37,20 @@
                 </div>
             </div>
         </div>
-        <div class="col-4">
-            <div class="card mb-3">
-                <div class="row g-0">
-                    <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://smartstore.com/Themes/HP/images/smartstore-logo-black.svg" alt="Card image">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">Smartstore</h5>
-                            <p class="card-text">
-                                Smartstore yazılım ürünleri ile entegre çalışabilmektedir.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="row p-3">
-                    <div class="mb-0">
-                        <button type="button" class="btn btn-success w-100" onclick="Entegro.marketplace.SelectMarketplace('Smartstore')">
-                            <i class="ti ti-plus me-1"></i>
-                            <span class="align-middle"> Entegrasyon Ekle</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    @if (myMarketPlaceList != null)
+    @if (Model != null)
     {
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Pazaryeri Entegrasyonlarım</h4>
         <div class="row">
-            @foreach (var marketPlace in myMarketPlaceList)
+            @foreach (var marketPlace in Model.MarketplaceList)
             {
-                var value = marketPlace.IntegrationSystemParameter.Value;
-
-                if (!logoUrls.ContainsKey(value))
+                if (!logoUrls.ContainsKey(marketPlace.MarketplaceType))
                 {
                     continue;
                 }
 
-                var logoUrl = logoUrls[value];
+                var logoUrl = logoUrls[marketPlace.MarketplaceType];
                 <div class="col-4">
                     <div class="card mb-3">
                         <div class="row g-0">
@@ -124,7 +97,7 @@
                     <h3 class="mb-2">Entegrasyon Ekle</h3>
                 </div>
                 <form id="addMarketplaceForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemTypeName" />
+                    <input type="hidden" id="MarketplaceType" name="MarketplaceType" />
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Name">Adı</label>
                         <input type="text"
@@ -161,7 +134,7 @@
 @section Scripts {
     <script src="/assets/js/entegro.marketplace.js"></script>
     <script>
-               
+
         $(function () {
             Entegro.marketplace.initFormSubmit();
         });

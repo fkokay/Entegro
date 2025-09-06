@@ -1,5 +1,5 @@
-﻿@using Entegro.Web.Models.Integration
-@model ECommercePageViewModel
+﻿@using Entegro.Web.Models.Integration.Commerce
+@model CommerceListViewModel
 @{
     ViewData["Title"] = "E-Ticaret Entegrasyonları";
 }
@@ -24,30 +24,23 @@
                 </div>
                 <div class="row p-3">
                     <div class="mb-0">
-                        <button type="button" class="btn btn-success w-100" onclick="Entegro.commerce.SelectECommerce('Smartstore')">
+                        <button type="button" class="btn btn-success w-100" onclick="Entegro.commerce.SelectCommerce('Smartstore')">
                             <i class="ti ti-plus me-1"></i>
                             <span class="align-middle"> Entegrasyon Ekle</span>
                         </button>
-                        @*  <button type="button" onclick="SelectECommerce('Smartstore')" class="btn btn-success waves-effect waves-light w-100 mt-3">
-                            <i class="ti ti-plus me-1"></i>
-                            <span class="align-middle">Aktif Et</span>
-                        </button> *@
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    @if (Model.MyEcommerceList != null)
+    @if (Model.CommerceList != null)
     {
-
-
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> E-Ticaret Entegrasyonlarım</h4>
         <div class="row">
-            @foreach (var commerce in Model.MyEcommerceList)
+            @foreach (var commerce in Model.CommerceList)
             {
                 <div class="col-4">
-
                     <div class="card mb-3">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center">
@@ -93,7 +86,7 @@
                     <h3 class="mb-2">Mağaza Ekle</h3>
                 </div>
                 <form id="addCommerceForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemTypeName" />
+                    <input type="hidden" id="CommerceType" name="CommerceType" />
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Name">Adı</label>
                         <input type="text"
@@ -131,8 +124,8 @@
 @section Scripts {
     <script src="/assets/js/entegro.commerce.js"></script>
     <script>
-                $(function () {
-          Entegro.commerce.initFormSubmit();
+        $(function () {
+            Entegro.commerce.initFormSubmit();
         });
     </script>
 

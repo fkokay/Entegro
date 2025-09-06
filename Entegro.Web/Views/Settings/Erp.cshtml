@@ -1,8 +1,9 @@
 ﻿@using Entegro.Web.Models.Integration
-@model ErpPageViewModel
+@using Entegro.Web.Models.Integration.Erp
+@model ErpListViewModel
 @{
     ViewData["Title"] = "Erp Entegrasyonları";
-   
+
     var logoUrls = new Dictionary<string, string>
     {
         { "Logo", "https://www.logo.com.tr/_next/image?url=%2Flogo.webp&w=1920&q=75" },
@@ -40,9 +41,6 @@
             </div>
 
         </div>
-
-
-
         <div class="col-4">
             <div class="card mb-3">
                 <div class="row g-0">
@@ -97,23 +95,20 @@
 
 
 
-    @if (Model.MyErpList != null)
+    @if (Model.ErpList != null)
     {
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Erp Entegrasyonlarım</h4>
         <div class="row">
-            @foreach (var erp in Model.MyErpList)
+            @foreach (var erp in Model.ErpList)
             {
-                var value = erp.IntegrationSystemParameter.Value;
-
-                if (!logoUrls.ContainsKey(value))
+                if (!logoUrls.ContainsKey(erp.ErpType))
                 {
                     continue;
                 }
 
-                var logoUrl = logoUrls[value];
+                var logoUrl = logoUrls[erp.ErpType];
 
                 <div class="col-4">
-
                     <div class="card mb-3">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center">
@@ -149,7 +144,6 @@
     }
 </div>
 
-
 <div class="modal fade" id="addErp" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
         <div class="modal-content p-3 p-md-5">
@@ -159,33 +153,18 @@
                     <h3 class="mb-2">Entegrasyon Ekle</h3>
                 </div>
                 <form id="addErpForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemTypeName" />
+                    <input type="hidden" id="ErpType" name="ErpType" />
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Name">Adı</label>
-                        <input type="text"
-                               id="Name"
-                               name="Name"
-                               class="form-control"
-                               placeholder="Adı" required />
+                        <input type="text" id="Name" name="Name" class="form-control" placeholder="Adı" required />
                     </div>
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Description">Açıklaması</label>
-                        <textarea type="text"
-                                  id="Description"
-                                  name="Description"
-                                  class="form-control" rows="3"></textarea>
+                        <textarea type="text" id="Description" name="Description" class="form-control" rows="3"></textarea>
                     </div>
-
-
-
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset"
-                                class="btn btn-label-secondary"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Kapat
-                        </button>
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
                     </div>
                 </form>
 
@@ -197,10 +176,10 @@
 @section Scripts {
     <script src="/assets/js/entegro.erp.js"></script>
     <script>
-               
+
         $(function () {
             Entegro.erp.initFormSubmit();
         });
     </script>
-    
+
 }

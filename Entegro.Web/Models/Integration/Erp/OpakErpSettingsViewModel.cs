@@ -1,18 +1,18 @@
-﻿namespace Entegro.Web.Models.Integration
+﻿namespace Entegro.Web.Models.Integration.Erp
 {
-    public class TrendyolMarketplaceSettingsViewModel
-    {
-        //mağaza bilgileri
+    public class OpakErpSettingsViewModel
+    { //mağaza bilgileri
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public int IntegrationSystemTypeId { get; set; }
-        //entegro entegrasyon sistemi id
+
+
+        //entegro entegrasyon sistemi bilgileri
         public int IntegrationSystemId { get; set; }
-        public string CommerceType { get; set; }
+        public string ErpType { get; set; }
+        public string ApiUrl { get; set; }
         public string ApiUser { get; set; }
         public string ApiPassword { get; set; }
-        public string SupplierId { get; set; }
     }
-
 }

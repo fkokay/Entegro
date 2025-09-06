@@ -1,5 +1,5 @@
-﻿@using Entegro.Web.Models.Integration
-@model EInvoicePageViewModel
+﻿@using Entegro.Web.Models.Integration.EInvoice
+@model EInvoiceListViewModel
 @{
     ViewData["Title"] = "E-Ticaret Entegrasyonları";
 }
@@ -34,16 +34,13 @@
         </div>
     </div>
 
-    @if (Model.MyEInvoiceList != null)
+    @if (Model.EInvoiceList != null)
     {
-
-
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> E-Faturalarım</h4>
         <div class="row">
-            @foreach (var invoice in Model.MyEInvoiceList)
+            @foreach (var invoice in Model.EInvoiceList)
             {
                 <div class="col-4">
-
                     <div class="card mb-3">
                         <div class="row g-0">
                             <div class="col-md-4 d-flex align-items-center justify-content-center">
@@ -89,7 +86,7 @@
                     <h3 class="mb-2">Entegrasyon Ekle</h3>
                 </div>
                 <form id="addEinvoiceForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="IntegrationSystemType" name="IntegrationSystemTypeName" />
+                    <input type="hidden" id="EInvoiceType" name="EInvoiceType" />
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Name">Adı</label>
                         <input type="text"

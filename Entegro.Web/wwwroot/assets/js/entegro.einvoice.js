@@ -3,8 +3,8 @@ Entegro.einvoice = Entegro.einvoice || {};
 
 Entegro.einvoice = (function ($) {
 
-    function SelectEInvoice(integrationSystemType) {
-        $('#IntegrationSystemType').val(integrationSystemType);
+    function SelectEInvoice(eInvoiceType) {
+        $('#EInvoiceType').val(eInvoiceType);
         const modalEl = document.getElementById('addEinvoice');
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }

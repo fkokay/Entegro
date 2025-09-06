@@ -3,8 +3,8 @@ Entegro.marketplace = Entegro.marketplace || {};
 
 Entegro.marketplace = (function ($) {
 
-    function SelectMarketplace(integrationSystemType) {
-        $('#IntegrationSystemType').val(integrationSystemType);
+    function SelectMarketplace(marketplaceType) {
+        $('#MarketplaceType').val(marketplaceType);
         const modalEl = document.getElementById('addMarketplace');
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
@@ -17,7 +17,7 @@ Entegro.marketplace = (function ($) {
             e.preventDefault();
 
             $.ajax({
-                url: '/settings/Marketplace', // JS dosyasında @Url.Action yerine direkt path
+                url: '/settings/Marketplace',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function (res) {

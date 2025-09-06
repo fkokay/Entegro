@@ -3,8 +3,8 @@ Entegro.cargo = Entegro.cargo || {};
 
 Entegro.cargo = (function ($) {
 
-    function SelectCargo(integrationSystemType) {
-        $('#IntegrationSystemType').val(integrationSystemType);
+    function SelectCargo(cargoType) {
+        $('#CargoType').val(cargoType);
         bootstrap.Modal.getOrCreateInstance(document.getElementById('addCargo')).show();
     }
 

@@ -2,8 +2,12 @@
 using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
-using Entegro.Web.Models;
 using Entegro.Web.Models.Integration;
+using Entegro.Web.Models.Integration.Cargo;
+using Entegro.Web.Models.Integration.Commerce;
+using Entegro.Web.Models.Integration.EInvoice;
+using Entegro.Web.Models.Integration.Erp;
+using Entegro.Web.Models.Integration.Marketplace;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,89 +33,39 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Erp()
         {
-            var integrationSystemErp = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.ERP);
-            if (integrationSystemErp == null)
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP);
+
+            var model = new ErpListViewModel();
+            model.ErpList = allErpIntegrationSystem.Select(m => new ErpIntegrationSystemViewModel
             {
-                return View(new ErpPageViewModel());
-            }
-
-            var erpType = integrationSystemErp.IntegrationSystemParameters
-                .FirstOrDefault(m => m.Key == "ErpType");
-
-            if (erpType == null)
-            {
-                return NotFound();
-            }
-
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
-            var model = new ErpPageViewModel
-            {
-                CurrentErp = new IntegrationSystemViewModel
-                {
-                    Id = integrationSystemErp.Id,
-                    Name = integrationSystemErp.Name,
-                    Description = integrationSystemErp.Description,
-                    IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId,
-                    IntegrationSystemType = integrationSystemErp.IntegrationSystemType,
-                    IntegrationSystemTypeName = integrationSystemErp.IntegrationSystemTypeLabelHint,
-                    IntegrationSystemParameter = integrationSystemErp.IntegrationSystemParameters
-                     .Where(p => p.Key == "ErpType")
-                     .Select(p => new IntegrationSystemParameterViewModel
-                     {
-                         Id = p.Id,
-                         Key = p.Key,
-                         IntegrationSystemTypeId = p.IntegrationSystemId,
-                         Value = p.Value
-                     })
-                     .FirstOrDefault()
-                },
-
-                MyErpList = allIntegrationSystems
-                 .Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.ERP)
-                 .Select(m => new IntegrationSystemViewModel
-                 {
-                     Id = m.Id,
-                     Name = m.Name,
-                     Description = m.Description,
-                     IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                     IntegrationSystemType = m.IntegrationSystemType,
-                     IntegrationSystemTypeName = m.IntegrationSystemTypeLabelHint,
-                     IntegrationSystemParameter = m.IntegrationSystemParameters
-                                .Where(p => p.Key == "ErpType")
-                                .Select(p => new IntegrationSystemParameterViewModel
-                                {
-                                    Id = p.Id,
-                                    Key = p.Key,
-                                    IntegrationSystemTypeId = p.IntegrationSystemId,
-                                    Value = p.Value
-                                })
-                                .FirstOrDefault()
-                 })
-                        .ToList()
-            };
-
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType,
+                IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
+                ErpType = m.IntegrationSystemParameters.Where(p => p.Key == "ErpType").Select(p => p.Value).FirstOrDefault() ?? ""
+            }).ToList();
 
             return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Erp(IntegrationSystemViewModel model)
+        public async Task<IActionResult> Erp(ErpIntegrationSystemViewModel model)
         {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.Name,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.ERP,
-                Description = model.Description
-            };
+            var createIntegrationSystem = new CreateIntegrationSystemDto();
+            createIntegrationSystem.Name = model.Name;
+            createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.ERP;
+            createIntegrationSystem.Description = model.Description;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "ErpType",
-                Value = model.IntegrationSystemTypeName
-            });
+            var erpTypeIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+            erpTypeIntegrationSystemParameter.IntegrationSystemId = integrationSystemId;
+            erpTypeIntegrationSystemParameter.Key = "ErpType";
+            erpTypeIntegrationSystemParameter.Value = model.ErpType ?? "";
+
+            await _integrationSystemParameterService.AddAsync(erpTypeIntegrationSystemParameter);
 
 
             return Json(new { success = true });
@@ -132,6 +86,8 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
+
+
             switch (erpType.Value)
             {
                 case "Logo":
@@ -448,94 +404,47 @@ namespace Entegro.Web.Controllers
 
         #region E-Ticaret Entegrasyonları 
         [HttpGet]
-        public async Task<IActionResult> ECommerce()
+        public async Task<IActionResult> Commerce()
         {
-            var integrationSystemCommerce = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.Commerce);
-            if (integrationSystemCommerce == null)
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce);
+
+            var model = new CommerceListViewModel();
+            model.CommerceList = allErpIntegrationSystem.Select(m => new CommerceIntegrationSystemViewModel
             {
-                return View();
-            }
-
-
-            var commerceType = integrationSystemCommerce.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").FirstOrDefault();
-            if (commerceType == null)
-            {
-                return NotFound();
-            }
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
-            var model = new ECommercePageViewModel
-            {
-                CurrentEcommerce = new IntegrationSystemViewModel
-                {
-                    Id = integrationSystemCommerce.Id,
-                    Name = integrationSystemCommerce.Name,
-                    Description = integrationSystemCommerce.Description,
-                    IntegrationSystemTypeId = integrationSystemCommerce.IntegrationSystemTypeId,
-                    IntegrationSystemType = integrationSystemCommerce.IntegrationSystemType,
-                    IntegrationSystemTypeName = integrationSystemCommerce.IntegrationSystemTypeLabelHint,
-                    IntegrationSystemParameter = integrationSystemCommerce.IntegrationSystemParameters
-                    .Where(p => p.Key == "CommerceType")
-                    .Select(p => new IntegrationSystemParameterViewModel
-                    {
-                        Id = p.Id,
-                        Key = p.Key,
-                        IntegrationSystemTypeId = p.IntegrationSystemId,
-                        Value = p.Value
-                    })
-                    .FirstOrDefault()
-                },
-
-                MyEcommerceList = allIntegrationSystems
-                .Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.Commerce)
-                .Select(m => new IntegrationSystemViewModel
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Description = m.Description,
-                    IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                    IntegrationSystemType = m.IntegrationSystemType,
-                    IntegrationSystemTypeName = m.IntegrationSystemTypeLabelHint,
-                    IntegrationSystemParameter = m.IntegrationSystemParameters
-                               .Where(p => p.Key == "CommerceType")
-                               .Select(p => new IntegrationSystemParameterViewModel
-                               {
-                                   Id = p.Id,
-                                   Key = p.Key,
-                                   IntegrationSystemTypeId = p.IntegrationSystemId,
-                                   Value = p.Value
-                               })
-                               .FirstOrDefault()
-                })
-                       .ToList()
-            };
-
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType,
+                IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
+                CommerceType = m.IntegrationSystemParameters.Where(p => p.Key == "CommerceType").Select(p => p.Value).FirstOrDefault() ?? ""
+            }).ToList();
 
             return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> ECommerce(IntegrationSystemViewModel model)
+        public async Task<IActionResult> Commerce(CommerceIntegrationSystemViewModel model)
         {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.Name,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.Commerce,
-                Description = model.Description
-            };
+            var createIntegrationSystem = new CreateIntegrationSystemDto();
+            createIntegrationSystem.Name = model.Name;
+            createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Commerce;
+            createIntegrationSystem.Description = model.Description;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "CommerceType",
-                Value = model.IntegrationSystemTypeName
-            });
+            var commerceTypeIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+            commerceTypeIntegrationSystemParameter.IntegrationSystemId = integrationSystemId;
+            commerceTypeIntegrationSystemParameter.Key = "CommerceType";
+            commerceTypeIntegrationSystemParameter.Value = model.CommerceType;
 
+            await _integrationSystemParameterService.AddAsync(commerceTypeIntegrationSystemParameter);
 
             return Json(new { success = true });
         }
-        public async Task<IActionResult> ECommerceSettings(int integrationSystemCommerceId)
+
+        [HttpGet]
+        public async Task<IActionResult> CommerceSettings(int integrationSystemCommerceId)
         {
 
             var integrationSystemCommerce = await _integrationSystemService.GetByIdAsync(integrationSystemCommerceId);
@@ -657,7 +566,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ECommerceDelete([FromBody] int integrationSystemId)
+        public async Task<IActionResult> CommerceDelete([FromBody] int integrationSystemId)
         {
             var isSuccess = await _integrationSystemService.DeleteAsync(integrationSystemId);
             if (isSuccess)
@@ -672,90 +581,45 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Cargo()
         {
-            var integrationSystemCargo = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.Cargo);
-            if (integrationSystemCargo == null)
-            {
-                return View();
-            }
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Cargo);
 
-
-            var cargoType = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "CargoType").FirstOrDefault();
-            if (cargoType == null)
+            var model = new CargoListViewModel();
+            model.CargoList = allErpIntegrationSystem.Select(m => new CargoIntegrationSystemViewModel
             {
-                return NotFound();
-            }
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
-            var model = new CargoPageViewModel
-            {
-                CurrentCargo = new IntegrationSystemViewModel
-                {
-                    Id = integrationSystemCargo.Id,
-                    Name = integrationSystemCargo.Name,
-                    Description = integrationSystemCargo.Description,
-                    IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId,
-                    IntegrationSystemType = integrationSystemCargo.IntegrationSystemType,
-                    IntegrationSystemTypeName = integrationSystemCargo.IntegrationSystemTypeLabelHint,
-                    IntegrationSystemParameter = integrationSystemCargo.IntegrationSystemParameters
-                     .Where(p => p.Key == "CargoType")
-                     .Select(p => new IntegrationSystemParameterViewModel
-                     {
-                         Id = p.Id,
-                         Key = p.Key,
-                         IntegrationSystemTypeId = p.IntegrationSystemId,
-                         Value = p.Value
-                     })
-                     .FirstOrDefault()
-                },
-
-                MyCargoList = allIntegrationSystems
-                 .Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.Cargo)
-                 .Select(m => new IntegrationSystemViewModel
-                 {
-                     Id = m.Id,
-                     Name = m.Name,
-                     Description = m.Description,
-                     IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                     IntegrationSystemType = m.IntegrationSystemType,
-                     IntegrationSystemTypeName = m.IntegrationSystemTypeLabelHint,
-                     IntegrationSystemParameter = m.IntegrationSystemParameters
-                                .Where(p => p.Key == "CargoType")
-                                .Select(p => new IntegrationSystemParameterViewModel
-                                {
-                                    Id = p.Id,
-                                    Key = p.Key,
-                                    IntegrationSystemTypeId = p.IntegrationSystemId,
-                                    Value = p.Value
-                                })
-                                .FirstOrDefault()
-                 })
-                        .ToList()
-            };
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType,
+                IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
+                CargoType = m.IntegrationSystemParameters.Where(p => p.Key == "CargoType").Select(p => p.Value).FirstOrDefault() ?? ""
+            }).ToList();
 
             return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Cargo(IntegrationSystemViewModel model)
+        public async Task<IActionResult> Cargo(CargoIntegrationSystemViewModel model)
         {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.Name,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.Cargo,
-                Description = model.Description
-            };
+            var createIntegrationSystem = new CreateIntegrationSystemDto();
+            createIntegrationSystem.Name = model.Name;
+            createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Cargo;
+            createIntegrationSystem.Description = model.Description;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "CargoType",
-                Value = model.IntegrationSystemTypeName
-            });
+            var cargoTypeIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+            cargoTypeIntegrationSystemParameter.IntegrationSystemId = integrationSystemId;
+            cargoTypeIntegrationSystemParameter.Key = "CargoType";
+            cargoTypeIntegrationSystemParameter.Value = model.CargoType;
+
+            await _integrationSystemParameterService.AddAsync(cargoTypeIntegrationSystemParameter);
 
 
             return Json(new { success = true });
         }
+
+        [HttpGet]
         public async Task<IActionResult> CargoSettings(int integrationSystemCargoId)
         {
 
@@ -917,6 +781,7 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("cargo");
         }
+
         [HttpPost]
         public async Task<IActionResult> CargoParameterPTT(PTTCargoSettingsViewModel model)
         {
@@ -1087,92 +952,45 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Marketplace()
         {
-            var integrationSystemMarketplace = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.Marketplace);
-            if (integrationSystemMarketplace == null)
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Marketplace);
+
+            var model = new MarketplaceListViewModel();
+            model.MarketplaceList = allErpIntegrationSystem.Select(m => new MarketplaceIntegrationSystemViewModel
             {
-                return View();
-            }
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType,
+                IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
+                MarketplaceType = m.IntegrationSystemParameters.Where(p => p.Key == "MarketplaceType").Select(p => p.Value).FirstOrDefault() ?? ""
+            }).ToList();
 
-
-            var commerceType = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").FirstOrDefault();
-            if (commerceType == null)
-            {
-                return NotFound();
-            }
-
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
-            var model = new MarketplacePageViewModel
-            {
-                CurrentMarketplace = new IntegrationSystemViewModel
-                {
-                    Id = integrationSystemMarketplace.Id,
-                    Name = integrationSystemMarketplace.Name,
-                    Description = integrationSystemMarketplace.Description,
-                    IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId,
-                    IntegrationSystemType = integrationSystemMarketplace.IntegrationSystemType,
-                    IntegrationSystemTypeName = integrationSystemMarketplace.IntegrationSystemTypeLabelHint,
-                    IntegrationSystemParameter = integrationSystemMarketplace.IntegrationSystemParameters
-                     .Where(p => p.Key == "MarketplaceType")
-                     .Select(p => new IntegrationSystemParameterViewModel
-                     {
-                         Id = p.Id,
-                         Key = p.Key,
-                         IntegrationSystemTypeId = p.IntegrationSystemId,
-                         Value = p.Value
-                     })
-                     .FirstOrDefault()
-                },
-
-                MyMarketplaceList = allIntegrationSystems
-                 .Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.Marketplace)
-                 .Select(m => new IntegrationSystemViewModel
-                 {
-                     Id = m.Id,
-                     Name = m.Name,
-                     Description = m.Description,
-                     IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                     IntegrationSystemType = m.IntegrationSystemType,
-                     IntegrationSystemTypeName = m.IntegrationSystemTypeLabelHint,
-                     IntegrationSystemParameter = m.IntegrationSystemParameters
-                                .Where(p => p.Key == "MarketplaceType")
-                                .Select(p => new IntegrationSystemParameterViewModel
-                                {
-                                    Id = p.Id,
-                                    Key = p.Key,
-                                    IntegrationSystemTypeId = p.IntegrationSystemId,
-                                    Value = p.Value
-                                })
-                                .FirstOrDefault()
-                 })
-                        .ToList()
-            };
-
-
-            return View(integrationSystemMarketplace);
+            return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Marketplace(IntegrationSystemViewModel model)
+        public async Task<IActionResult> Marketplace(MarketplaceIntegrationSystemViewModel model)
         {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.Name,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.Marketplace,
-                Description = model.Description
-            };
+            var createIntegrationSystem = new CreateIntegrationSystemDto();
+            createIntegrationSystem.Name = model.Name;
+            createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Marketplace;
+            createIntegrationSystem.Description = model.Description;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "MarketplaceType",
-                Value = model.IntegrationSystemTypeName
-            });
+            var marketplaceTypeIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+            marketplaceTypeIntegrationSystemParameter.IntegrationSystemId = integrationSystemId;
+            marketplaceTypeIntegrationSystemParameter.Key = "MarketplaceType";
+            marketplaceTypeIntegrationSystemParameter.Value = model.MarketplaceType;
+
+            await _integrationSystemParameterService.AddAsync(marketplaceTypeIntegrationSystemParameter);
 
 
             return Json(new { success = true });
         }
+
+        [HttpGet]
         public async Task<IActionResult> MarketplaceSettings(int integrationSystemMarketplaceId)
         {
 
@@ -1213,7 +1031,6 @@ namespace Entegro.Web.Controllers
             }
             return NotFound();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> MarketplaceParameterTrendyol(TrendyolMarketplaceSettingsViewModel model)
@@ -1311,92 +1128,46 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> EInvoice()
         {
-            var integrationSystemEinvoice = await _integrationSystemService.GetByTypeIdAsync((int)IntegrationSystemType.EInvoice);
-            if (integrationSystemEinvoice == null)
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.EInvoice);
+
+            var model = new EInvoiceListViewModel();
+            model.EInvoiceList = allErpIntegrationSystem.Select(m => new EInvoiceIntegrationSystemViewModel
             {
-                return View();
-            }
-
-
-            var commerceType = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "EinvoiceType").FirstOrDefault();
-            if (commerceType == null)
-            {
-                return NotFound();
-            }
-
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
-            var model = new EInvoicePageViewModel
-            {
-                CurrentEInvoice = new IntegrationSystemViewModel
-                {
-                    Id = integrationSystemEinvoice.Id,
-                    Name = integrationSystemEinvoice.Name,
-                    Description = integrationSystemEinvoice.Description,
-                    IntegrationSystemTypeId = integrationSystemEinvoice.IntegrationSystemTypeId,
-                    IntegrationSystemType = integrationSystemEinvoice.IntegrationSystemType,
-                    IntegrationSystemTypeName = integrationSystemEinvoice.IntegrationSystemTypeLabelHint,
-                    IntegrationSystemParameter = integrationSystemEinvoice.IntegrationSystemParameters
-                     .Where(p => p.Key == "EinvoiceType")
-                     .Select(p => new IntegrationSystemParameterViewModel
-                     {
-                         Id = p.Id,
-                         Key = p.Key,
-                         IntegrationSystemTypeId = p.IntegrationSystemId,
-                         Value = p.Value
-                     })
-                     .FirstOrDefault()
-                },
-
-                MyEInvoiceList = allIntegrationSystems
-                 .Where(x => x.IntegrationSystemTypeId == (int)IntegrationSystemType.EInvoice)
-                 .Select(m => new IntegrationSystemViewModel
-                 {
-                     Id = m.Id,
-                     Name = m.Name,
-                     Description = m.Description,
-                     IntegrationSystemTypeId = m.IntegrationSystemTypeId,
-                     IntegrationSystemType = m.IntegrationSystemType,
-                     IntegrationSystemTypeName = m.IntegrationSystemTypeLabelHint,
-                     IntegrationSystemParameter = m.IntegrationSystemParameters
-                                .Where(p => p.Key == "EinvoiceType")
-                                .Select(p => new IntegrationSystemParameterViewModel
-                                {
-                                    Id = p.Id,
-                                    Key = p.Key,
-                                    IntegrationSystemTypeId = p.IntegrationSystemId,
-                                    Value = p.Value
-                                })
-                                .FirstOrDefault()
-                 })
-                        .ToList()
-            };
-
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                IntegrationSystemTypeId = m.IntegrationSystemTypeId,
+                IntegrationSystemType = m.IntegrationSystemType,
+                IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
+                EInvoiceType = m.IntegrationSystemParameters.Where(p => p.Key == "EInvoiceType").Select(p => p.Value).FirstOrDefault() ?? ""
+            }).ToList();
 
             return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> EInvoice(IntegrationSystemViewModel model)
+        public async Task<IActionResult> EInvoice(EInvoiceIntegrationSystemViewModel model)
         {
-            var createIntegrationSystem = new CreateIntegrationSystemDto
-            {
-                Name = model.Name,
-                IntegrationSystemTypeId = (int)IntegrationSystemType.EInvoice,
-                Description = model.Description
-            };
+            var createIntegrationSystem = new CreateIntegrationSystemDto();
+            createIntegrationSystem.Name = model.Name;
+            createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.EInvoice;
+            createIntegrationSystem.Description = model.Description;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
-            // Ana parametre
-            await _integrationSystemParameterService.AddAsync(new CreateIntegrationSystemParameterDto
-            {
-                IntegrationSystemId = integrationSystemId,
-                Key = "EinvoiceType",
-                Value = model.IntegrationSystemTypeName
-            });
+            var eInvoiceTypeIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+            eInvoiceTypeIntegrationSystemParameter.IntegrationSystemId = integrationSystemId;
+            eInvoiceTypeIntegrationSystemParameter.Key = "EInvoiceType";
+            eInvoiceTypeIntegrationSystemParameter.Value = model.EInvoiceType;
+
+            await _integrationSystemParameterService.AddAsync(eInvoiceTypeIntegrationSystemParameter);
 
 
             return Json(new { success = true });
         }
+
+
+        [HttpGet]
         public async Task<IActionResult> EInvoiceSettings(int integrationSystemId)
         {
 

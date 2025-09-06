@@ -3,8 +3,8 @@ Entegro.erp = Entegro.erp || {};
 
 Entegro.erp = (function ($) {
 
-    function SelectErp(integrationSystemType) {
-        $('#IntegrationSystemType').val(integrationSystemType);
+    function SelectErp(erpType) {
+        $('#ErpType').val(erpType);
         const modalEl = document.getElementById('addErp');
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
@@ -17,7 +17,7 @@ Entegro.erp = (function ($) {
             e.preventDefault();
 
             $.ajax({
-                url: '/settings/Erp', // JS dosyasında @Url.Action yerine direkt path
+                url: '/Settings/Erp',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function (res) {

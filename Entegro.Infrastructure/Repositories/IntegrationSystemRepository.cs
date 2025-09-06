@@ -36,6 +36,22 @@ namespace Entegro.Infrastructure.Repositories
             return integrationSystems;
         }
 
+        public async Task<List<IntegrationSystem>> GetAllAsync(int? integrationSystemTypeId)
+        {
+            var query = _context.IntegrationSystems
+            .Include(x => x.IntegrationSystemParameters)
+            .AsNoTracking();
+
+            if (integrationSystemTypeId.HasValue)
+            {
+                query = query.Where(x => x.IntegrationSystemTypeId == integrationSystemTypeId.Value);
+            }
+
+            var integrationSystems = await query.ToListAsync();
+
+            return integrationSystems;
+        }
+
         public async Task<PagedResult<IntegrationSystem>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.IntegrationSystems.AsNoTracking().AsQueryable();

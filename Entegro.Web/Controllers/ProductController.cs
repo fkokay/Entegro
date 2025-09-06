@@ -13,6 +13,8 @@ using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
+using Entegro.Web.Models.Integration.Common;
+using Entegro.Web.Models.Integration.Marketplace;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -65,7 +67,7 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> List()
         {
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync();
+            var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null);
             ViewBag.Commerces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce).Select(
                 m => new { m.Id, m.Name }
                 ).ToList();
