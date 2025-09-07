@@ -1,70 +1,110 @@
 ﻿var Entegro = Entegro || {};
-Entegro.Attribute = Entegro.Attribute || {};
-
-Entegro.Attribute.Form = (function ($) {
+Entegro.AttributeForm = (function ($) {
     'use strict';
 
-    const init = function () {
-        const formEl = document.getElementById('productAttributeForm');
-        if (!formEl) return;
+    function focusFieldAndShowTab(el) {
+        if (!el) return;
+        const tabPane = el.closest('.tab-pane');
+        if (tabPane) {
+            const tabId = tabPane.id;
+            const trigger = document.querySelector(`*[data-bs-target="#${tabId}"]`);
+            if (trigger) new bootstrap.Tab(trigger).show();
+        }
+        setTimeout(() => {
+            try { el.focus({ preventScroll: true }); } catch (_) { }
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 50);
+    }
 
-        const fv = FormValidation.formValidation(formEl, {
+    function initValidation(formSelector, postUrl, successMessage, redirectUrl) {
+        const form = document.querySelector(formSelector);
+        if (!form) return;
+
+        const fv = FormValidation.formValidation(form, {
             locale: 'tr_TR',
             localization: FormValidation.locales.tr_TR,
             fields: {
-                Name: {
+                'Name': {
                     validators: {
                         notEmpty: { message: 'Ad alanı boş bırakılamaz.' },
-                        stringLength: { min: 3, max: 100, message: 'Ad 3–100 karakter olmalıdır.' }
+                        stringLength: {
+                            min: 3,
+                            max: 100,
+                            message: 'Ad 3-100 karakter arasında olmalıdır.'
+                        }
                     }
                 },
-                Description: {
+                'DisplayOrder': {
                     validators: {
-                        stringLength: { max: 1000, message: 'Açıklama en fazla 1000 karakter olabilir.' }
+                        notEmpty: { message: 'Sıralama boş bırakılamaz.' },
+                        integer: { message: 'Geçerli bir sayı giriniz.' },
+                        between: {
+                            min: 0,
+                            max: 1000,
+                            message: 'Sıralama 0 ile 1000 arasında olmalıdır.'
+                        }
                     }
                 },
-                DisplayOrder: {
+                'Description': {
                     validators: {
-                        notEmpty: { message: 'Gösterim sırası boş bırakılamaz.' },
-                        integer: { message: 'Tam sayı olmalıdır.' },
-                        greaterThan: { inclusive: true, min: 0, message: '0 veya daha büyük olmalıdır.' }
+                        stringLength: {
+                            max: 500,
+                            message: 'Açıklama en fazla 500 karakter olabilir.'
+                        }
                     }
                 }
+                // Gerekirse "Values" alanı buraya eklenebilir.
             },
             plugins: {
                 trigger: new FormValidation.plugins.Trigger(),
-                bootstrap5: new FormValidation.plugins.Bootstrap5({ eleValidClass: '', rowSelector: '.mb-3' }),
+                bootstrap5: new FormValidation.plugins.Bootstrap5({
+                    eleValidClass: '',
+                    rowSelector: '.mb-3'
+                }),
                 submitButton: new FormValidation.plugins.SubmitButton(),
                 autoFocus: new FormValidation.plugins.AutoFocus()
             },
             init: (instance) => {
+                instance.on('plugins.message.placed', function (e) {
+                    if (e.element.parentElement.classList.contains('input-group')) {
+                        e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                    }
+                });
+
+                instance.on('core.field.invalid', function (e) {
+                    const fieldEl = e.elements && e.elements.length ? e.elements[0] : null;
+                    if (fieldEl) focusFieldAndShowTab(fieldEl);
+                });
+
+                instance.on('core.form.invalid', function () {
+                    const invalidEl = document.querySelector('[data-field].is-invalid, .is-invalid');
+                    if (invalidEl) focusFieldAndShowTab(invalidEl);
+                });
+
                 instance.on('core.form.valid', function () {
-                    const $form = $('#productAttributeForm');
-                    const id = $('#Attribute_Id').val();
-                    const isEdit = !!id;
-                    const url = isEdit ? '/ProductAttribute/Edit' : '/ProductAttribute/Create';
+                    const $form = $(formSelector);
+                    const serializedData = $form.serialize();
 
                     $.ajax({
-                        url: url,
+                        url: postUrl,
                         type: 'POST',
-                        data: $form.serialize(),
-                        success: function (res) {
-                            if (res && res.success) {
+                        data: serializedData,
+                        success: function (response) {
+                            if (response.success) {
                                 Swal.fire({
-                                    title: isEdit ? 'Güncellendi!' : 'Başarılı!',
-                                    text: isEdit ? 'Kayıt başarıyla güncellendi.' : 'Kayıt başarıyla eklendi.',
+                                    title: 'Başarılı!',
+                                    text: successMessage,
                                     icon: 'success',
                                     confirmButtonText: 'Tamam',
                                     customClass: { confirmButton: 'btn btn-success' },
                                     buttonsStyling: false
                                 }).then(() => {
-                                    $('#productAttributeModal').modal('hide');
-                                    $(document).trigger('attributeTable.reload');
+                                    if (redirectUrl) window.location.href = redirectUrl;
                                 });
                             } else {
                                 Swal.fire({
                                     title: 'Hata!',
-                                    text: res?.message || 'İşlem sırasında hata oluştu.',
+                                    text: response.message || 'Bir hata oluştu.',
                                     icon: 'error',
                                     confirmButtonText: 'Tamam',
                                     customClass: { confirmButton: 'btn btn-danger' },
@@ -75,7 +115,7 @@ Entegro.Attribute.Form = (function ($) {
                         error: function (xhr) {
                             Swal.fire({
                                 title: 'Hata!',
-                                text: xhr.responseText || 'İşlem sırasında hata oluştu.',
+                                text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
                                 icon: 'error',
                                 confirmButtonText: 'Tamam',
                                 customClass: { confirmButton: 'btn btn-danger' },
@@ -86,116 +126,29 @@ Entegro.Attribute.Form = (function ($) {
                 });
             }
         });
+    }
 
-        // Yeni kayıt formu
-        $(document).on('attributeForm.openCreate', function () {
-            const $form = $('#productAttributeForm');
-            if ($form.length) $form[0].reset();
-            $('#Attribute_Id').val('');
-            $('#Attribute_DisplayOrder').val(0);
-            fv.resetForm(true);
-            $('#productAttributeModal .modal-title-text').text('Yeni Varyant Kaydı');
-            $('#productAttributeModal').modal('show');
-        });
+    function initCreateForm(options) {
+        initValidation(
+            options.formSelector || '#attribute-form',
+            options.postUrl || '/ProductAttribute/Create',
+            'Özellik başarıyla oluşturuldu.',
+            options.redirectUrl || '/ProductAttribute/List'
+        );
+    }
 
-        $(document).on('click', '.edit-attribute', function () {
-            const id = $(this).data('id');
-            if (!id) return;
+    function initUpdateForm(options) {
+        initValidation(
+            options.formSelector || '#attribute-form',
+            options.postUrl || '/ProductAttribute/Edit',
+            'Özellik başarıyla güncellendi.',
+            options.redirectUrl || '/ProductAttribute/List'
+        );
+    }
 
-            $.getJSON('/ProductAttribute/Edit', { id })
-                .done(function (m) {
-                    // Her iki ihtimali de karşıla
-                    const Id = m.id ?? m.Id;
-                    const Name = m.name ?? m.Name;
-                    const Description = m.description ?? m.Description;
-                    const DisplayOrder = m.displayOrder ?? m.DisplayOrder;
-
-                    // (Opsiyonel) fv varsa önce temizleyip sonra doldur
-                    if (window.fv?.resetForm) {
-                        fv.resetForm(true);
-                    }
-
-                    $('#Attribute_Id').val(Id ?? 0);
-                    $('#Attribute_Name').val(Name ?? '');
-                    $('#Attribute_Description').val(Description ?? '');
-                    $('#Attribute_DisplayOrder').val(DisplayOrder ?? 0);
-
-                    $('#productAttributeModal .modal-title-text').text('Varyant Güncelle');
-                    $('#productAttributeModal').modal('show');
-                })
-                .fail(function (xhr) {
-                    Swal.fire({
-                        title: 'Hata!',
-                        text: xhr.responseText || 'Kayıt bilgisi alınamadı.',
-                        icon: 'error',
-                        confirmButtonText: 'Tamam',
-                        customClass: { confirmButton: 'btn btn-danger' },
-                        buttonsStyling: false
-                    });
-                });
-        });
-
-
-        // Silme
-        $(document).on('click', '.delete-attribute', function () {
-            const id = $(this).data('id');
-            if (!id) return;
-
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: 'Bu işlem geri alınamaz!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Vazgeç',
-                customClass: {
-                    confirmButton: 'btn btn-danger me-2',
-                    cancelButton: 'btn btn-label-secondary'
-                },
-                buttonsStyling: false
-            }).then((result) => {
-                if (!result.isConfirmed) return;
-
-                $.ajax({
-                    url: '/ProductAttribute/Delete',
-                    type: 'POST',
-                    data: { id: id },
-                    success: function (res) {
-                        if (res && res.success) {
-                            Swal.fire({
-                                title: 'Silindi!',
-                                text: 'Kayıt başarıyla silindi.',
-                                icon: 'success',
-                                confirmButtonText: 'Tamam',
-                                customClass: { confirmButton: 'btn btn-success' },
-                                buttonsStyling: false
-                            });
-                            $(document).trigger('attributeTable.reload');
-                        } else {
-                            Swal.fire({
-                                title: 'Hata!',
-                                text: res?.message || 'Silme sırasında hata oluştu.',
-                                icon: 'error',
-                                confirmButtonText: 'Tamam',
-                                customClass: { confirmButton: 'btn btn-danger' },
-                                buttonsStyling: false
-                            });
-                        }
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            title: 'Hata!',
-                            text: xhr.responseText || 'İşlem sırasında hata oluştu.',
-                            icon: 'error',
-                            confirmButtonText: 'Tamam',
-                            customClass: { confirmButton: 'btn btn-danger' },
-                            buttonsStyling: false
-                        });
-                    }
-                });
-            });
-        });
+    return {
+        initCreateForm: initCreateForm,
+        initUpdateForm: initUpdateForm
     };
 
-    return { init };
 })(jQuery);

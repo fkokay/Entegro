@@ -29,7 +29,7 @@
     </div>
 </div>
 
-@await Html.PartialAsync("_ProductAttributeFormPartial")
+
 
 
 
@@ -39,7 +39,8 @@
     <script src="/assets/js/entegro.attribute.list.js"></script>
     <script src="/assets/js/entegro.attribute.js"></script>
     <script>
-        Entegro.Attribute.List.init();
-        Entegro.Attribute.Form.init();
+        $(function () {
+            Entegro.Attribute.List.init();
+        });
     </script>
 }
