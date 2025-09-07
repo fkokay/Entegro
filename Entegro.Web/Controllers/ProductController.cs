@@ -779,8 +779,6 @@ namespace Entegro.Web.Controllers
                         }).ToList()
                     }
                 }).ToList();
-
-
                 model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileViewModel()
                 {
                     Id = m.Id,
@@ -824,7 +822,7 @@ namespace Entegro.Web.Controllers
                     StockQuantity = m.StockQuantity,
                     StokCode = m.StokCode
                 }).ToList();
-
+                
                 var productAttributes = await _productAttributeService.GetAllAsync();
                 ViewBag.ProductAttributes = productAttributes.Select(x => new SelectListItem
                 {
@@ -843,19 +841,11 @@ namespace Entegro.Web.Controllers
             }).ToList();
             ViewBag.Currencies = new List<SelectListItem>
             {
-                new SelectListItem { Text = "TRY", Value = "TRY" },
+                new SelectListItem { Text = "TL", Value = "TL" },
                 new SelectListItem { Text = "USD", Value = "USD" },
                 new SelectListItem { Text = "EUR", Value = "EUR" },
                 new SelectListItem { Text = "GBP", Value = "GBP" },
                 new SelectListItem { Text = "JPY", Value = "JPY" }
-            };
-            ViewBag.VatRates = new List<SelectListItem>
-            {
-                new SelectListItem { Text = "0%", Value = "0" },
-                new SelectListItem { Text = "1%", Value = "1" },
-                new SelectListItem { Text = "8%", Value = "8" },
-                new SelectListItem { Text = "18%", Value = "18" },
-                new SelectListItem { Text = "20%", Value = "20" }
             };
             ViewBag.Units = new List<SelectListItem>
             {

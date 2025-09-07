@@ -33,7 +33,7 @@
             <!-- Ürün Bilgisi -->
             <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3 p-3">
-                    <input type="hidden" id="productId" value="@Model.Id" asp-for="Id" />
+                    <input type="hidden" value="@Model.Id" asp-for="Id" />
                     <input type="hidden" asp-for="Description" />
 
                     <!-- Ürün Kodu -->
@@ -41,7 +41,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Code">Ürün Kodu</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Code, new { @class = "form-control", @id = "Code" })
+                                @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Name">Ad</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name" })
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Barcode">Barkod</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Barcode, new { @class = "form-control", @id = "Barcode" })
+                                @Html.TextBoxFor(m => m.Barcode, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="ManufacturerPartNumber">Üretici Numarası</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.ManufacturerPartNumber, new { @class = "form-control", @id = "ManufacturerPartNumber" })
+                                @Html.TextBoxFor(m => m.ManufacturerPartNumber, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Gtin">Gtin</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Gtin, new { @class = "form-control", @id = "Gtin" })
+                                @Html.TextBoxFor(m => m.Gtin, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Price">Fiyat</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Price, new { @class = "form-control", @type = "number", step = "0.01", @id = "Price" })
+                                @Html.TextBoxFor(m => m.Price, new { @class = "form-control", @type = "number", step = "0.01" })
                             </div>
                         </div>
                     </div>
@@ -127,9 +127,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Currency">Para Birimi</label>
                             <div class="col-sm-9">
-                                <select asp-for="Currency" asp-items="ViewBag.Currencies" class="form-select">
-                                    <option>Belirtilmemiş</option>
-                                </select>
+                                <select asp-for="Currency" asp-items="ViewBag.Currencies" class="form-select"></select>
                             </div>
                         </div>
                     </div>
@@ -139,7 +137,7 @@
                             <label class="col-sm-3 col-form-label text-sm-start" for="VatInc">KDV Dahil</label>
                             <div class="col-sm-9">
                                 <div class="form-check">
-                                    @Html.CheckBoxFor(m => m.VatInc, new { @class = "form-check-input", @id = "VatInc" })
+                                    @Html.CheckBoxFor(m => m.VatInc, new { @class = "form-check-input" })
                                     <label class="form-check-label" for="VatInc">Evet</label>
                                 </div>
                             </div>
@@ -150,7 +148,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="VatRate">KDV Oranı (%)</label>
                             <div class="col-sm-9">
-                                <select asp-for="VatRate" asp-items="ViewBag.VatRates" class="form-select"></select>
+                                @Html.TextBoxFor(m => m.VatRate, new { @class = "form-control", @type = "number", step = "1" })
                             </div>
                         </div>
                     </div>
@@ -160,9 +158,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Unit">Birim</label>
                             <div class="col-sm-9">
-                                <select asp-for="Unit" asp-items="ViewBag.Units" class="form-select">
-                                    <option>Belirtilmemiş</option>
-                                </select>
+                                <select asp-for="Unit" asp-items="ViewBag.Units" class="form-select"></select>
                             </div>
                         </div>
                     </div>
@@ -171,7 +167,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Weight">Ağırlık (kg)</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Weight, new { @class = "form-control", @type = "number", step = "0.01", @id = "Weight" })
+                                @Html.TextBoxFor(m => m.Weight, new { @class = "form-control", @type = "number", step = "0.01" })
                             </div>
                         </div>
                     </div>
@@ -180,7 +176,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Length">Uzunluk (cm)</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Length, new { @class = "form-control", @type = "number", step = "0.01", @id = "Length" })
+                                @Html.TextBoxFor(m => m.Length, new { @class = "form-control", @type = "number", step = "0.01" })
                             </div>
                         </div>
                     </div>
@@ -189,7 +185,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Width">Genişlik (cm)</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Width, new { @class = "form-control", @type = "number", step = "0.01", @id = "Width" })
+                                @Html.TextBoxFor(m => m.Width, new { @class = "form-control", @type = "number", step = "0.01" })
                             </div>
                         </div>
                     </div>
@@ -198,7 +194,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="Height">Yükseklik (cm)</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Height, new { @class = "form-control", @type = "number", step = "0.01", @id = "Height" })
+                                @Html.TextBoxFor(m => m.Height, new { @class = "form-control", @type = "number", step = "0.01" })
                             </div>
                         </div>
                     </div>
@@ -225,7 +221,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="StockQuantity">Stok</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.StockQuantity, new { @class = "form-control", @type = "number", min = "0", @id = "StockQuantity" })
+                                @Html.TextBoxFor(m => m.StockQuantity, new { @class = "form-control", @type = "number", min = "0" })
                             </div>
                         </div>
                     </div>
@@ -256,7 +252,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="MetaTitle">Meta Başlık</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.MetaTitle, new { @class = "form-control", @id = "MetaTitle" })
+                                @Html.TextBoxFor(m => m.MetaTitle, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -265,7 +261,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="MetaKeywords">Anahtar Kelimeler</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.MetaKeywords, new { @class = "form-control", @id = "MetaKeywords" })
+                                @Html.TextBoxFor(m => m.MetaKeywords, new { @class = "form-control" })
                             </div>
                         </div>
                     </div>
@@ -274,7 +270,7 @@
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="MetaDescription">Meta Açıklama</label>
                             <div class="col-sm-9">
-                                @Html.TextAreaFor(m => m.MetaDescription, new { @class = "form-control", rows = 3, @id = "MetaDescription" })
+                                @Html.TextAreaFor(m => m.MetaDescription, new { @class = "form-control", rows = 3 })
                             </div>
                         </div>
                     </div>

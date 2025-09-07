@@ -34,6 +34,9 @@ namespace Entegro.Infrastructure.Repositories
         public async Task UpdateAsync(Product product)
         {
             product.UpdatedOnUtc = DateTime.UtcNow;
+
+            _context.Entry(product).State = EntityState.Modified;
+            _context.Entry(product).Collection(p => p.ProductIntegrations).IsModified = false;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }
