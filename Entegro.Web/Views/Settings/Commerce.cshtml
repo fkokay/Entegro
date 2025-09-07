@@ -77,7 +77,7 @@
 </div>
 
 
-@Html.PartialAsync("_CommerceAdd", new CommerceIntegrationSystemViewModel())
+@await Html.PartialAsync("_CommerceAdd", new CommerceIntegrationSystemViewModel())
 
 @section Scripts {
     <script src="/assets/js/entegro.commerce.js" asp-append-version="true"></script>

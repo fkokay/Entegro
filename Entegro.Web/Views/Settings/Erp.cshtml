@@ -144,7 +144,7 @@
     }
 </div>
 
-@Html.PartialAsync("_ErpAdd", new ErpIntegrationSystemViewModel())
+@await Html.PartialAsync("_ErpAdd", new ErpIntegrationSystemViewModel())
 
 @section Scripts {
     <script src="/assets/js/entegro.erp.js" asp-append-version="true"></script>

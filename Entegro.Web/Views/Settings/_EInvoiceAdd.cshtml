@@ -8,14 +8,14 @@
                     <h3 class="mb-2">Entegrasyon Ekle</h3>
                 </div>
                 <form id="addEinvoiceForm" class="row g-3" onsubmit="return false">
-                    @Html.HiddenFor(m => m.EInvoiceType))
+                    @Html.HiddenFor(m => m.EInvoiceType)
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Name">Adı</label>
-                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Adı", required = "required" }))
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Adı", required = "required" })
                     </div>
                     <div class="col-12 col-md-12">
                         <label class="form-label" for="Description">Açıklaması</label>
-                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Açıklaması", rows = "3" })))
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Açıklaması", rows = "3" })
                     </div>
 
                     <div class="col-12 text-center">

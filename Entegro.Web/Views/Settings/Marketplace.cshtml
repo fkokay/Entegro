@@ -87,7 +87,7 @@
     }
 </div>
 
-@Html.PartialAsync("_MarketplaceAdd", new MarketplaceIntegrationSystemViewModel())
+@await Html.PartialAsync("_MarketplaceAdd", new MarketplaceIntegrationSystemViewModel())
 
 @section Scripts {
     <script src="/assets/js/entegro.marketplace.js" asp-append-version="true"></script>
