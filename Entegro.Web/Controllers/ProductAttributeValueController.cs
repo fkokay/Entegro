@@ -125,13 +125,5 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllProductAttribute()
-        {
-            var data = await _productAttributeService.GetAllAsync();
-            var results = data.Select(d => new { id = d.Id, text = d.Name, });
-            return Json(new { results });
-        }
     }
 }
