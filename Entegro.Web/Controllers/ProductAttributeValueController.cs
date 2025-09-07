@@ -80,18 +80,13 @@ namespace Entegro.Web.Controllers
             return Json(new { success = false });
         }
         [HttpPost]
-        public async Task<IActionResult> ProductAttributeValueList([FromBody] GridCommand model)
+        public async Task<IActionResult> ProductAttributeValueList([FromBody] GridCommand gridCommand)
         {
-
-            int pageNumber = model.Start / model.Length;
-            int pageSize = model.Length;
-
-
-            var result = await _productAttributeValueService.GetPagedAsync(pageNumber, model.Length);
+            var result = await _productAttributeValueService.GetPagedAsync(gridCommand);
 
             return Json(new
             {
-                draw = model.Draw,
+                draw = gridCommand.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

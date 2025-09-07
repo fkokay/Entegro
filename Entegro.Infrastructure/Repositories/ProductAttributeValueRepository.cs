@@ -3,6 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -37,7 +38,7 @@ namespace Entegro.Infrastructure.Repositories
             return await IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking()).OrderBy(p => p.Id).ToListAsync();
         }
 
-        public async Task<PagedResult<ProductAttributeValue>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<Application.DTOs.Common.PagedResult<ProductAttributeValue>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking()).OrderBy(p => p.Id);
 
@@ -48,7 +49,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<ProductAttributeValue>
+            return new Application.DTOs.Common.PagedResult<ProductAttributeValue>
             {
                 Items = productAttributeValues,
                 TotalCount = totalCount,
@@ -78,6 +79,45 @@ namespace Entegro.Infrastructure.Repositories
         private IQueryable<ProductAttributeValue> IncludeAllProperties(IQueryable<ProductAttributeValue> query)
         {
             return query.Include(p => p.ProductAttribute).AsSplitQuery();
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<ProductAttributeValue>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var query = IncludeAllProperties(_context.ProductAttributeValues.AsNoTracking());
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<ProductAttributeValue>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
         }
     }
 }

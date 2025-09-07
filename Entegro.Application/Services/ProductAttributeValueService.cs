@@ -98,5 +98,17 @@ namespace Entegro.Application.Services
             var productAttributeValueDto = _mapper.Map<ProductAttributeValueDto>(productAttributeValue);
             return productAttributeValueDto;
         }
+
+        public async Task<PagedResult<ProductAttributeValueDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var productAttributeValues = await _productAttributeValueRepository.GetPagedAsync(gridCommand);
+            var productAttributeValueDtos = _mapper.Map<PagedResult<ProductAttributeValueDto>>(productAttributeValues);
+
+            foreach (var item in productAttributeValueDtos.Items)
+            {
+                item.ProductAttributeName = productAttributeValues.Items.Where(m => m.Id == item.Id).Select(m => m.ProductAttribute?.Name).FirstOrDefault() ?? "";
+            }
+            return productAttributeValueDtos;
+        }
     }
 }

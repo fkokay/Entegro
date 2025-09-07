@@ -81,5 +81,12 @@ namespace Entegro.Application.Services
             await _productAttributeRepository.UpdateAsync(_mapper.Map<ProductAttribute>(productAttribute));
             return _mapper.Map<ProductAttributeDto>(productAttribute);
         }
+
+        public async Task<PagedResult<ProductAttributeDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var productAttributes = await _productAttributeRepository.GetPagedAsync(gridCommand);
+            var productAttributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(productAttributes);
+            return productAttributeDtos;
+        }
     }
 }
