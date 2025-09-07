@@ -629,12 +629,12 @@ namespace Entegro.Web.Controllers
             }
 
 
-            var commerceType = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "CargoType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-            if (commerceType == null)
+            var cargoType = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "CargoType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+            if (cargoType == null)
             {
                 return NotFound();
             }
-            switch (commerceType.Value)
+            switch (cargoType.Value)
             {
                 case "Yurtici":
                     var id = integrationSystemCargo.Id;
@@ -650,7 +650,7 @@ namespace Entegro.Web.Controllers
                     yurticiCargoSettings.Description = description;
                     yurticiCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
                     yurticiCargoSettings.IntegrationSystemId = integrationSystemCargo.Id;
-                    yurticiCargoSettings.CommerceType = commerceType.Value;
+                    yurticiCargoSettings.CargoType = cargoType.Value;
                     yurticiCargoSettings.ApiUrl = apiUrl?.Value;
                     yurticiCargoSettings.ApiUser = apiUser?.Value;
                     yurticiCargoSettings.ApiPassword = apiPassword?.Value;
@@ -672,7 +672,7 @@ namespace Entegro.Web.Controllers
                     pTTCargoSettings.Description = descriptionForPTT;
                     pTTCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
                     pTTCargoSettings.IntegrationSystemId = integrationSystemCargo.Id;
-                    pTTCargoSettings.CommerceType = commerceType.Value;
+                    pTTCargoSettings.CargoType = cargoType.Value;
                     pTTCargoSettings.MusteriId = musteriId?.Value;
                     pTTCargoSettings.Password = password?.Value;
                     pTTCargoSettings.BarkodStartPrefix = barkodStartPrefix?.Value;
@@ -693,7 +693,7 @@ namespace Entegro.Web.Controllers
                     arasCargoSettings.Description = descriptionForAras;
                     arasCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
                     arasCargoSettings.IntegrationSystemId = integrationSystemId;
-                    arasCargoSettings.CommerceType = commerceType.Value;
+                    arasCargoSettings.CargoType = cargoType.Value;
                     arasCargoSettings.Username = username?.Value;
                     arasCargoSettings.Password = passwordAras?.Value;
 
@@ -1021,7 +1021,7 @@ namespace Entegro.Web.Controllers
                     model.Description = description;
                     model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
                     model.IntegrationSystemId = integrationSystemId;
-                    model.CommerceType = marketPlaceType.Value;
+                    model.MarketplaceType = marketPlaceType.Value;
                     model.ApiUser = apiUser?.Value;
                     model.ApiPassword = apiPassword?.Value;
                     model.SupplierId = supplierId?.Value;
@@ -1177,12 +1177,12 @@ namespace Entegro.Web.Controllers
             }
 
 
-            var einvoiceType = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "EInvoiceType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-            if (einvoiceType == null)
+            var eInvoiceType = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "EInvoiceType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+            if (eInvoiceType == null)
             {
                 return NotFound();
             }
-            switch (einvoiceType.Value)
+            switch (eInvoiceType.Value)
             {
                 case "TrendyolEfaturam":
                     var id = integrationSystemEinvoice.Id;
@@ -1198,7 +1198,7 @@ namespace Entegro.Web.Controllers
                     model.Description = description;
                     model.IntegrationSystemTypeId = integrationSystemEinvoice.IntegrationSystemTypeId;
                     model.IntegrationSystemId = integrationSystemId;
-                    model.CommerceType = einvoiceType.Value;
+                    model.EInvoiceType = eInvoiceType.Value;
                     model.ApiUrl = apiUrl?.Value;
                     model.ApiUser = apiUser?.Value;
                     model.ApiPassword = apiPassword?.Value;
@@ -1211,8 +1211,6 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CommerceParameterTrendyolEFaturam(SmartstoreCommerceSettingsViewModel model)
         {
-
-            //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
             {
                 Id = model.Id,

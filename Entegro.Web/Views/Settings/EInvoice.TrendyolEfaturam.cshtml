@@ -7,7 +7,7 @@
 
 <form asp-action="CommerceParameterTrendyolEFaturam" id="einvoice-setting-trendyol-form">
     @Html.HiddenFor(m => m.IntegrationSystemId)
-    @Html.HiddenFor(m => m.CommerceType)
+    @Html.HiddenFor(m => m.EInvoiceType)
     @Html.HiddenFor(m => m.IntegrationSystemTypeId)
     @Html.HiddenFor(m => m.Id)
 
@@ -39,7 +39,7 @@
                         <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
                             <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
                         </button>
-                        <a href="/settings/Einvoice" class="btn btn-label-secondary d-grid w-100 waves-effect">İptal Et</a>
+                        <a href="/Settings/EInvoice" class="btn btn-label-secondary d-grid w-100 waves-effect">İptal Et</a>
                     </div>
                 </div>
             </div>
