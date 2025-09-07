@@ -174,7 +174,7 @@ Entegro.customer.list = (function ($) {
 
         // Silme işlemi
         $(document).on('click', '.delete-record', function () {
-            const brandId = $(this).data('id');
+            const customerId = $(this).data('id');
             Swal.fire({
                 title: 'Emin misiniz?',
                 text: 'Bu müşteri silinecek!',
@@ -193,7 +193,7 @@ Entegro.customer.list = (function ($) {
                     $.ajax({
                         url: '/customer/delete',
                         type: 'POST',
-                        data: { id: brandId },
+                        data: { id: customerId },
                         success: function (response) {
                             if (response.success) {
                                 Swal.fire({

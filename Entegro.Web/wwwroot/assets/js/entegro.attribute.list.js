@@ -131,7 +131,6 @@ Entegro.Attribute.List = (function ($) {
                                         <span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
                                 className: "add-new btn btn-primary",
                                 action: function () {
-                                    // ❗️Popup yerine direkt sayfaya yönlendir
                                     window.location.href = "/ProductAttribute/Create";
                                 }
                             }
@@ -182,7 +181,7 @@ Entegro.Attribute.List = (function ($) {
                                     customClass: { confirmButton: 'btn btn-success' },
                                     buttonsStyling: false
                                 }).then(() => {
-                                    table.ajax.reload(null, false);
+                                    location.reload();
                                 });
                             } else {
                                 Swal.fire({

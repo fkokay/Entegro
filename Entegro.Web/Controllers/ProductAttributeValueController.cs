@@ -4,6 +4,7 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Entegro.Web.Controllers
 {
@@ -27,9 +28,17 @@ namespace Entegro.Web.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ProductAttributeViewModel model = new ProductAttributeViewModel();
+            ProductAttributeValueViewModel model = new ProductAttributeValueViewModel();
+
+            var pd = await _productAttributeService.GetAllAsync();
+            ViewBag.ProductAttributes = pd.Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.Name
+            }).ToList();
+
             return View(model);
         }
         [HttpPost]
@@ -63,8 +72,13 @@ namespace Entegro.Web.Controllers
                 Id = productAttributeValue.Id
             };
 
-
-            return Json(productAttributeValueModel);
+            var pd = await _productAttributeService.GetAllAsync();
+            ViewBag.ProductAttributes = pd.Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.Name
+            }).ToList();
+            return View(productAttributeValueModel);
         }
 
         [HttpPost]

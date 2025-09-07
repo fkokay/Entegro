@@ -31,16 +31,12 @@
 </div>
 
 
-
-@await Html.PartialAsync("_ProductAttributeValueFormPartial")
 @section Scripts {
-    
-    <script src="/assets/js/entegro.attributevalue.js"></script>
+
     <script src="/assets/js/entegro.attributevalue.list.js"></script>
     <script>
         $(function () {
             Entegro.AttributeValue.List.init();
-            Entegro.AttributeValue.Form.init();
         });
     </script>
 
