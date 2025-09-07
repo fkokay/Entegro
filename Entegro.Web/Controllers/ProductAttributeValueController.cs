@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models;
 using Entegro.Web.Models.Catalog.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +25,12 @@ namespace Entegro.Web.Controllers
         public IActionResult List()
         {
             return View();
+        }
+        [HttpGet]
+        public IActionResult Create()
+        {
+            ProductAttributeViewModel model = new ProductAttributeViewModel();
+            return View(model);
         }
         [HttpPost]
         public async Task<IActionResult> Create(ProductAttributeValueViewModel model)
