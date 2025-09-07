@@ -32,8 +32,8 @@ namespace Entegro.Web.Controllers
         {
             ProductAttributeValueViewModel model = new ProductAttributeValueViewModel();
 
-            var pd = await _productAttributeService.GetAllAsync();
-            ViewBag.ProductAttributes = pd.Select(x => new SelectListItem
+            var productAttributeDtos = await _productAttributeService.GetAllAsync();
+            ViewBag.ProductAttributes = productAttributeDtos.Select(x => new SelectListItem
             {
                 Value = x.Id.ToString(),
                 Text = x.Name
@@ -72,8 +72,8 @@ namespace Entegro.Web.Controllers
                 Id = productAttributeValue.Id
             };
 
-            var pd = await _productAttributeService.GetAllAsync();
-            ViewBag.ProductAttributes = pd.Select(x => new SelectListItem
+            var productAttributeDtos = await _productAttributeService.GetAllAsync();
+            ViewBag.ProductAttributes = productAttributeDtos.Select(x => new SelectListItem
             {
                 Value = x.Id.ToString(),
                 Text = x.Name
