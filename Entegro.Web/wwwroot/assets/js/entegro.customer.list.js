@@ -50,23 +50,6 @@ Entegro.customer.list = (function ($) {
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 },
                 {
-                    targets: 2,
-                    responsivePriority: 1,
-                    render: (data, type, row) => {
-                        const image = row.MediaFile == null ? '' : `<img src="${row.MediaFile.Url}" class="rounded">`;
-                        return `<div class="d-flex justify-content-start align-items-center product-name">
-                                    <div class="avatar-wrapper">
-                                        <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                                            ${image}
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="text-nowrap mb-0">${row.Name}</h6>
-                                    </div>
-                                </div>`;
-                    }
-                },
-                {
                     targets: -1,
                     title: 'İşlemler',
                     searchable: false,
@@ -80,10 +63,7 @@ Entegro.customer.list = (function ($) {
                                 <i class="icon-base ti ti-dots-vertical icon-22px"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end m-0">
-                                <a href="Details?id=${row.Id}" class="dropdown-item">Detaylar</a>
-                                <a href="Archive?id=${row.Id}" class="dropdown-item">Arşiv</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Marka Sil</a>
+                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Müşteri Sil</a>
                             </div>
                         </div>`
                 }
@@ -197,7 +177,7 @@ Entegro.customer.list = (function ($) {
             const brandId = $(this).data('id');
             Swal.fire({
                 title: 'Emin misiniz?',
-                text: 'Bu marka silinecek!',
+                text: 'Bu müşteri silinecek!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Evet, sil!',
@@ -211,7 +191,7 @@ Entegro.customer.list = (function ($) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/brand/delete',
+                        url: '/customer/delete',
                         type: 'POST',
                         data: { id: brandId },
                         success: function (response) {
@@ -219,7 +199,7 @@ Entegro.customer.list = (function ($) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Silindi!',
-                                    text: 'Marka başarıyla silindi.',
+                                    text: 'Müşteri başarıyla silindi.',
                                     confirmButtonText: 'Tamam',
                                     customClass: { confirmButton: 'btn btn-success' },
                                     buttonsStyling: false

@@ -1,5 +1,32 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model CustomerViewModel
+<form asp-action="Create" id="customer-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Müşteri Yönetimi /</span><span class="text-muted fw-light"> Müşteri /</span> Yeni Bir Müşteri Ekle</h4>
+        <div class="row">
+            <partial name="_CreateOrUpdate" model="Model" />
+            <div class="col-lg-3 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" id="save-btn" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">Vazgeç</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+    <script src="/assets/js/entegro.customer.js"></script>
+    <script>
+        $(function () {
+            Entegro.customer.initCreateForm({
+                formSelector: '#customer-form',
+                postUrl: '/Customer/Create',
+                redirectUrl: '/Customer/List'
+            });
+        });
+
+    </script>
 }

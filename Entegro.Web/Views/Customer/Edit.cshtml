@@ -1,5 +1,111 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model CustomerViewModel
+
+<form asp-action="Edit" id="customer-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">Müşteri Bilgilerini Düzenle</h4>
+        <div class="row">
+            <partial name="_CreateOrUpdate" />
+            <div class="col-lg-3 col-12 product-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        @if (Model.Id > 0)
+                        {
+                            <button type="button" id="btnDeleteCustomer" class="btn btn-danger d-grid w-100 mb-2 waves-effect waves-light">
+                                <span class="d-flex align-items-center justify-content-center text-nowrap">
+                                    <i class="ti ti-trash ti-xs me-1"></i>Sil
+                                </span>
+                            </button>
+                        }
+                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-cancel ti-xs me-1"></i>Vazgeç</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="/assets/js/entegro.customer.js"></script>
+    <script>
+        $(function () {
+            Entegro.customer.initUpdateForm({
+                formSelector: '#customer-form',
+                postUrl: '/Customer/Edit',
+                redirectUrl: '/Customer/List'
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#btnDeleteCustomer').on('click', function () {
+                Swal.fire({
+                    title: 'Emin misiniz?',
+                    text: "Bu kayıt silinecek.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet, sil!',
+                    cancelButtonText: 'Hayır, iptal et',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("Delete", "Customer")',
+                            type: 'POST',
+                            data: { id: @Model.Id },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Silindi!',
+                                        text: 'Kayıt başarıyla silindi.',
+                                        icon: 'success',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-success'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(() => {
+                                        window.location.href = '@Url.Action("List", "Customer")';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Hata!',
+                                        text: response.message || 'Silme işlemi başarısız oldu.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Tamam',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                }
+                            },
+                            error: function (xhr) {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
 }
