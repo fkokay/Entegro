@@ -1,7 +1,7 @@
 ﻿@model CargoListViewModel
 @{
     ViewData["Title"] = "Kargo Entegrasyonları";
- 
+
     var logoUrls = new Dictionary<string, string>
     {
         { "Yurtici", "https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg" },
@@ -118,19 +118,11 @@
                         </div>
                         <div class="row p-3">
                             <div class="mb-0 d-flex">
-                                <a type="button"
-                                   asp-action="CargoSettings"
-                                   asp-controller="Settings"
-                                   asp-route-integrationSystemCargoId="@cargo.Id"
-                                   target="_blank"
-                                   class="btn btn-success waves-effect waves-light w-50">
+                                <a asp-action="CargoSettings" asp-controller="Settings" asp-route-integrationSystemId="@cargo.Id" class="btn btn-success waves-effect waves-light w-50">
                                     <i class="ti ti-settings me-1"></i>
                                     <span class="align-middle">Ayarla</span>
                                 </a>
-                                <a href="javascript:void(0);"
-                                   type="button"
-                                   onclick="Entegro.cargo.iptalEt(@cargo.Id)"
-                                   class="btn btn-danger waves-effect waves-light w-50 ms-2">
+                                <a href="javascript:void(0);" onclick="Entegro.cargo.iptalEt(@cargo.Id)" class="btn btn-danger waves-effect waves-light w-50 ms-2">
                                     <i class="ti ti-eraser me-1"></i>
                                     <span class="align-middle">Sil</span>
                                 </a>
@@ -144,55 +136,13 @@
 </div>
 
 
-<div class="modal fade" id="addCargo" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Entegrasyon Ekle</h3>
-                </div>
-                <form id="addCargoForm" class="row g-3" onsubmit="return false">
-                    <input type="hidden" id="CargoType" name="CargoType" />
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="Name">Adı</label>
-                        <input type="text"
-                               id="Name"
-                               name="Name"
-                               class="form-control"
-                               placeholder="Adı" required />
-                    </div>
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="Description">Açıklaması</label>
-                        <textarea type="text"
-                                  id="Description"
-                                  name="Description"
-                                  class="form-control" rows="3"></textarea>
-                    </div>
-
-
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset"
-                                class="btn btn-label-secondary"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Kapat
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
+@Html.PartialAsync("_CargoAdd", new CargoIntegrationSystemViewModel())
 
 @section Scripts {
 
     <script src="/assets/js/entegro.cargo.js" asp-append-version="true"></script>
     <script>
-                $(function () {
+        $(function () {
             Entegro.cargo.initFormSubmit();
         });
     </script>
