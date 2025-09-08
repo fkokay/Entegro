@@ -160,6 +160,9 @@ namespace Entegro.Service.Jobs
             _logger.LogInformation("Trendyol ürün senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
 
             TrendyolApiContext context = new TrendyolApiContext();
+            context.ApiUser = "9tjWr2F7zHJKnMDMbcqb";
+            context.ApiPassword = "09WZjNvN6ZJU4Tg2z53r";
+            context.SupplierId = "474352";
 
             IEnumerable<TrendyolProductDto> trendyolProducts;
 
