@@ -103,12 +103,11 @@ namespace Entegro.Application.Services
                             category.ParentId = null;
                         }
 
-                        await _categoryRepository.UpdateAsync(category);
-                    }
+                        var ids = await GetSubCategoryIds(categoryIds);
+                        await SoftDeleteCategories(ids);
 
-                    // Process sub-categories.
-                    var ids = await GetSubCategoryIds(categoryIds);
-                    await SoftDeleteCategories(ids);
+                        await _categoryRepository.UpdateAsync(category);
+                    }              
                 }
             }
         }
