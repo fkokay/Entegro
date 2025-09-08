@@ -1,56 +1,37 @@
 ﻿@using Entegro.Web.Models.Catalog.Attributes
 @model ProductAttributeValueViewModel
 
-<div class="col-lg-9 col-12 mb-lg-0 mb-4">
-    <div class="card mb-3">
-        <div class="card-header">
-            <ul class="nav nav-tabs card-header-tabs" id="attributeValue-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#attributeValue-general" type="button" role="tab">Varyant Değeri</button>
-                </li>
-            </ul>
-        </div>
 
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="attributeValue-general" role="tabpanel">
-                <div class="row g-3 p-3">
-                    @Html.HiddenFor(m => m.Id)
+<form id="ProductAttributeValueForm" class="row g-3" onsubmit="return false;">
+    @Html.HiddenFor(m => m.Id)
 
-                    <!-- ProductAttributeId -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="ProductAttributeId">Varyant Adı</label>
-                            <div class="col-sm-9">
-                                @Html.DropDownListFor(m => m.ProductAttributeId,
-                                                                new SelectList(ViewBag.ProductAttributes, "Value", "Text", Model.ProductAttributeId),
-                                                                "Varyant adı seçin...",
-                                                                new { @class = "form-select", @id = "ProductAttributeId" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Name -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Name">Değer Adı</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name", placeholder = "Örn: Kırmızı" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DisplayOrder -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="DisplayOrder">Gösterim Sırası</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @id = "DisplayOrder", type = "number", placeholder = "0" })
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
+    <!-- ProductAttributeId -->
+    <div class="col-12 mb-3">
+        <label class="form-label" for="ProductAttributeId">Varyant Adı <span class="text-danger">*</span></label>
+        <select asp-for="ProductAttributeId" asp-items="ViewBag.ProductAttributes" class="form-select">
+            <option value="">Lütfen bir varyant seçiniz</option>
+        </select>
     </div>
-</div>
+
+    <!-- Name -->
+    <div class="col-12 mb-3">
+        <label class="form-label" for="Name">
+            Ad <span class="text-danger">*</span>
+        </label>
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Örn: Renk" })
+    </div>
+
+    <!-- DisplayOrder -->
+    <div class="col-12 mb-3">
+        <label class="form-label" for="DisplayOrder">
+            Gösterim Sırası <span class="text-danger">*</span>
+        </label>
+        @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" })
+    </div>
+
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">Vazgeç</button>
+    </div>
+</form>
+

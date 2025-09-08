@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -42,8 +43,28 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateOrUpdate(ProductAttributeViewModel model)
+        public async Task<IActionResult> CreateOrUpdate(ProductAttributeViewModel model)
         {
+            if (model.Id > 0)
+            {
+                var updateModelDto = new UpdateProductAttributeDto
+                {
+                    Description = model.Description,
+                    Name = model.Name,
+                    Id = model.Id,
+                    DisplayOrder = model.DisplayOrder,
+                };
+                await _productAttributeService.UpdateAsync(updateModelDto);
+                return Json(new { success = true });
+            }
+
+            var createModelDto = new CreateProductAttributeDto
+            {
+                Description = model.Description,
+                Name = model.Name,
+                DisplayOrder = model.DisplayOrder
+            };
+            await _productAttributeService.AddAsync(createModelDto);
             return Json(new { success = true });
         }
 

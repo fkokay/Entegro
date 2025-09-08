@@ -76,11 +76,12 @@ Entegro.Attribute = (function ($) {
                 instance.on('core.form.valid', function () {
                     const $form = $('#ProductAttributeForm');
                     $.ajax({
-                        url: '/ProductAttribute/CreateOrderUpdate',
+                        url: '/ProductAttribute/CreateOrUpdate',
                         type: 'POST',
                         data: $form.serialize(),
                         success: function (res) {
                             if (res && res.success) {
+                                $('#CreateOrUpdateModal').modal('hide');
                                 Swal.fire({
                                     title: 'Başarılı!',
                                     text: 'Kayıt başarıyla eklendi.',
@@ -89,8 +90,7 @@ Entegro.Attribute = (function ($) {
                                     customClass: { confirmButton: 'btn btn-success' },
                                     buttonsStyling: false
                                 }).then(() => {
-                                    $('#createProductAttribute').modal('hide');
-                                    dt.ajax.reload(null, false);
+                                    location.reload();
                                 });
                             } else {
                                 Swal.fire({

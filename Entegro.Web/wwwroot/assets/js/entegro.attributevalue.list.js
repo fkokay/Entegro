@@ -113,19 +113,7 @@ Entegro.AttributeValue.List = (function ($) {
                                     //    window.location.href = "/ProductAttributeValue/Create";
                                     //}
                                     action: function () {
-                                        const $form = $('#createAttributeValueForm');
-                                        if ($form.length) $form[0].reset();
-                                        if (window.createPAVValidation) window.createPAVValidation.resetForm(true);
-
-                                        const $pa = $('#ProductAttributeId');
-                                        if ($pa.data('select2')) $pa.val(null).trigger('change');
-
-                                        $('#createAttributeValue').find('h3.mb-2').text('Yeni Varyant Değeri');
-
-                                        $('#createAttributeValue').one('shown.bs.modal', function () {
-                                            $('#DisplayOrder').val(0);
-                                        });
-                                        $('#createAttributeValue').modal('show');
+                                        Entegro.AttributeValue.create();
                                     }
                                 }
                             ]
