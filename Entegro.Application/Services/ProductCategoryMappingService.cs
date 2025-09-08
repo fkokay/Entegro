@@ -41,7 +41,7 @@ namespace Entegro.Application.Services
             var productCategory = await _productCategoryMappingRepository.GetByIdAsync(productCategoryId);
             if (productCategory == null)
             {
-                throw new KeyNotFoundException($"Brand with ID {productCategoryId} not found.");
+                throw new KeyNotFoundException($"ProductCategory with ID {productCategoryId} not found.");
             }
 
             var productCategoryDto = _mapper.Map<ProductCategoryDto>(productCategory);
@@ -60,24 +60,12 @@ namespace Entegro.Application.Services
             await _productCategoryMappingRepository.UpdateAsync(_mapper.Map<ProductCategory>(updateProductCategory));
             return _mapper.Map<ProductCategoryDto>(updateProductCategory);
         }
-        private static IReadOnlyList<int> SplitTreePathIds(string? treePath)
-        {
-            if (string.IsNullOrWhiteSpace(treePath))
-                return Array.Empty<int>();
 
-            var normalized = treePath.Replace('>', '/').Replace('\\', '/').Replace('|', '/');
-            return normalized.Split('/', StringSplitOptions.RemoveEmptyEntries)
-                             .Select(s => int.TryParse(s, out var id) ? id : (int?)null)
-                             .Where(id => id.HasValue)
-                             .Select(id => id!.Value)
-                             .ToArray();
-        }
-
-        private static string BuildPathString(string? treePath, IReadOnlyDictionary<int, string> nameDict)
+        public async Task<List<ProductCategoryDto>> GetByProductWithCategoryAsync(int productId)
         {
-            var ids = SplitTreePathIds(treePath);
-            var names = ids.Select(id => nameDict.TryGetValue(id, out var nm) ? nm : $"#{id}");
-            return string.Join(" > ", names);
+            var productCategories = await _productCategoryMappingRepository.GetByProductWithCategoryAsync(productId);
+            var productCategoryDtos = _mapper.Map<List<ProductCategoryDto>>(productCategories);
+            return productCategoryDtos;
         }
     }
 }

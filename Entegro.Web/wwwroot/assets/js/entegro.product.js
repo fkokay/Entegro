@@ -122,32 +122,6 @@ Entegro.product = (function ($) {
     }
 
     // -------------------- PRODUCT CATEGORIES --------------------
-    function loadProductCategories(productId, tableSelector) {
-        const $tbody = $(tableSelector + " tbody");
-        $tbody.html("<tr><td colspan='3'>Yükleniyor...</td></tr>");
-
-        $.ajax({
-            url: '/Product/ProductCategoryList',
-            type: 'POST',
-            data: { productId },
-            success: function (response) {
-                $tbody.empty();
-                if (response?.results?.length) {
-                    response.results.forEach(function (item) {
-                        $tbody.append(`<tr data-mapping-id="${item.id}">
-                            <td>${item.text}</td>
-                            <td>${item.displayOrder}</td>
-                            <td style="width:120px;"><button type="button" class="btn btn-sm btn-outline-danger btn-delete"><i class="ti ti-trash"></i></button></td>
-                        </tr>`);
-                    });
-                } else {
-                    $tbody.append("<tr><td colspan='3'>Kategori bulunamadı</td></tr>");
-                }
-            },
-            error: function () { $tbody.html("<tr><td colspan='3'>Kategoriler yüklenirken hata oluştu</td></tr>"); }
-        });
-    }
-
     function initCategoryModal(modalSelector, tableSelector) {
         const $modal = $(modalSelector);
         if (!$modal.length) return;
@@ -236,6 +210,36 @@ Entegro.product = (function ($) {
             });
         });
     }
+
+    function initCategoryTabLoader(tabBtnSelector, tabPaneSelector) {
+        const tabBtn = document.querySelector(tabBtnSelector);
+        const tabPane = document.querySelector(tabPaneSelector);
+
+        if (!tabBtn || !tabPane) return;
+
+        tabBtn.addEventListener('shown.bs.tab', async function () {
+            const loaded = tabPane.getAttribute('data-loaded') === 'true';
+            if (loaded) return;
+
+            const url = tabBtn.getAttribute('data-url');
+            if (!url) return;
+
+            // İsteğe bağlı: Yükleniyor mesajı
+            tabPane.innerHTML = `<div class="m-3">Yükleniyor...</div>`;
+
+            try {
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!res.ok) throw new Error('Yükleme başarısız: ' + res.status);
+
+                const html = await res.text();
+                tabPane.innerHTML = html;
+                tabPane.setAttribute('data-loaded', 'true');
+            } catch (err) {
+                tabPane.innerHTML = `<div class="alert alert-danger m-3">Kategori içerikleri yüklenemedi. ${err.message}</div>`;
+            }
+        });
+    }
+
 
     // -------------------- REPEATER / VARIANTS --------------------
     function initVariantsTabLoader(tabBtnSelector, tabPaneSelector) {
@@ -416,12 +420,12 @@ Entegro.product = (function ($) {
         initFullEditor: initFullEditor,
         getFullEditorHtml: getFullEditorHtml,
         initFormSubmit: initFormSubmit,
-        loadProductCategories: loadProductCategories,
         initCategoryModal: initCategoryModal,
         initVariantsTabLoader: initVariantsTabLoader,
         initVariantsRepeater: initVariantsRepeater,
         fillRepeater: fillRepeater,
         updateRepeaterIndexes: updateRepeaterIndexes,
+        initCategoryTabLoader: initCategoryTabLoader,
         activateTab: activateTab,
         saveActiveTab: saveActiveTab,
         restoreActiveTab: restoreActiveTab,

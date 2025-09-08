@@ -46,10 +46,10 @@
             Entegro.product.initImageTab(productId);
             Entegro.product.initFullEditor('#full-editor', '#Description');
             Entegro.product.initFormSubmit('#product-form', '/Product/Edit', '/Product/List');
-            Entegro.product.loadProductCategories(productId, '#productCategoryTable');
             Entegro.product.initCategoryModal('#ProductCategoryModel', '#productCategoryTable');
             Entegro.product.initVariantsTabLoader('#tab-variants-btn', '#form-tabs-variants');
             Entegro.product.initTabPersistence();
+                    Entegro.product.initCategoryTabLoader('button[data-bs-target="#form-tabs-categories"]','#form-tabs-categories');
             Entegro.product.restoreActiveTab(); 
         });
     </script>

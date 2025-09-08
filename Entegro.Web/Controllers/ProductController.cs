@@ -9,6 +9,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Web.Models.Catalog.Attributes;
+using Entegro.Web.Models.Catalog.Categories;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
@@ -261,6 +262,25 @@ namespace Entegro.Web.Controllers
         #endregion
 
         #region Product Categories
+
+        [HttpGet]
+        public async Task<IActionResult> ProductCategoryList(int productId)
+        {
+            var productCategory = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
+
+            return PartialView("_CategoryProductPartial", productCategory.Select(x => new ProductCategoryViewModel
+            {
+                Id = x.Id,
+                CategoryId = x.CategoryId,
+                ProductId = x.ProductId,
+                DisplayOrder = x.DisplayOrder,
+                Category = new CategoryViewModel
+                {
+                    Id = x.Category.Id,
+                    Name = x.Category.Name
+                }
+            }).ToList());
+        }
 
         [HttpPost]
         public async Task<IActionResult> ProductCategoryInsert([FromBody] CreateProductCategoryDto createProductCategoryDto)
