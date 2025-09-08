@@ -106,9 +106,7 @@ namespace Entegro.Application.Services.Marketplace
                 }
             }
         }
-
-
-
+        
         public async Task<IEnumerable<BrandDto>> GetBrandsAsync(TrendyolApiContext context)
         {
             using var client = CreateHttpClient(context);
