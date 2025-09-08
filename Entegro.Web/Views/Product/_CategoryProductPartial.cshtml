@@ -8,7 +8,7 @@
         </button>
     </div>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="productCategoryTable">
         <thead>
             <tr>
                 <th>Kategori Yolu</th>
@@ -19,14 +19,16 @@
         <tbody class="table-border-bottom-3">
             @foreach (var item in Model)
             {
-                <tr>
-                    <th>@item.Category.Name</th>
-                    <th>@item.DisplayOrder</th>
-                    <th>#</th>
+                <tr data-mapping-id="@item.Id">
+                    <td>@item.Category.Name</td>
+                    <td>@item.DisplayOrder</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm btn-delete">
+                            Sil
+                        </button>
+                    </td>
                 </tr>
             }
-
-
         </tbody>
     </table>
 </div>

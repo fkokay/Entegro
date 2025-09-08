@@ -182,7 +182,8 @@ Entegro.product = (function ($) {
         });
 
         // Silme işlemi
-        $(document).on('click', tableSelector + ' .btn-delete', function () {
+        $(document).on('click', '#productCategoryTable .btn-delete', function () {
+            console.log('Sil butonuna tıklandı'); 
             const $tr = $(this).closest('tr');
             const mappingId = $tr.data('mapping-id');
             if (!mappingId) return;
