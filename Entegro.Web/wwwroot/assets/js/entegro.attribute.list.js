@@ -87,14 +87,7 @@ Entegro.Attribute.List = (function ($) {
                                     text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i> <span class="d-none d-sm-inline-block">Yeni Kayıt</span>`,
                                     className: "add-new btn btn-primary",
                                     action: function () {
-                                        const $form = $('#createProductAttributeForm');
-                                        if ($form.length) $form[0].reset();
-                                        $('#createProductAttribute').find('h3.mb-2').text('Yeni Varyant Kaydı');
-                                        if (window.createFormValidation) window.createFormValidation.resetForm(true);
-                                        $('#createProductAttribute').one('shown.bs.modal', function () {
-                                            $('#DisplayOrder').val(0);
-                                        });
-                                        $('#createProductAttribute').modal('show');
+                                        Entegro.Attribute.create();
                                     }
                                 }
                             ]

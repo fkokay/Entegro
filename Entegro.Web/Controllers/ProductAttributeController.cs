@@ -1,5 +1,4 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -25,59 +24,82 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(ProductAttributeViewModel model)
+        public async Task<IActionResult> CreateOrUpdate(int id)
         {
-            var createDto = new CreateProductAttributeDto
+            ProductAttributeViewModel model = new ProductAttributeViewModel();
+            if (id > 0)
             {
-                Name = model.Name,
-                Description = model.Description,
-                DisplayOrder = model.DisplayOrder,
-            };
-            await _productAttributeService.AddAsync(createDto);
+                var productAttribute = await _productAttributeService.GetByIdAsync(id);
+                if (productAttribute != null)
+                {
+                    model.Id = productAttribute.Id;
+                    model.DisplayOrder = productAttribute.DisplayOrder;
+                    model.Description = productAttribute.Description;
+                    model.Name = productAttribute.Name;
+                }
+            }
+            return PartialView("_CreateOrUpdate", model);
+        }
 
+        [HttpPost]
+        public IActionResult CreateOrUpdate(ProductAttributeViewModel model)
+        {
             return Json(new { success = true });
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Create(ProductAttributeViewModel model)
+        //{
+        //    var createDto = new CreateProductAttributeDto
+        //    {
+        //        Name = model.Name,
+        //        Description = model.Description,
+        //        DisplayOrder = model.DisplayOrder,
+        //    };
+        //    await _productAttributeService.AddAsync(createDto);
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var productAttribute = await _productAttributeService.GetByIdAsync(id);
-            if (productAttribute == null)
-            {
-                return NotFound();
-            }
-
-            var productAttributeModel = new ProductAttributeViewModel
-            {
-                Description = productAttribute.Description,
-                DisplayOrder = productAttribute.DisplayOrder,
-                Name = productAttribute.Name,
-                Id = productAttribute.Id
-            };
+        //    return Json(new { success = true });
+        //}
 
 
-            return Json(productAttributeModel);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Edit(int id)
+        //{
+        //    var productAttribute = await _productAttributeService.GetByIdAsync(id);
+        //    if (productAttribute == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(ProductAttributeViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var updateDto = new UpdateProductAttributeDto
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Description = model.Description,
-                    DisplayOrder = model.DisplayOrder
-                };
-                await _productAttributeService.UpdateAsync(updateDto);
-                return Json(new { success = true });
-            }
-            return Json(new { success = false });
-        }
+        //    var productAttributeModel = new ProductAttributeViewModel
+        //    {
+        //        Description = productAttribute.Description,
+        //        DisplayOrder = productAttribute.DisplayOrder,
+        //        Name = productAttribute.Name,
+        //        Id = productAttribute.Id
+        //    };
+
+
+        //    return Json(productAttributeModel);
+        //}
+
+        //[HttpPost]
+        //public async Task<IActionResult> Edit(ProductAttributeViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var updateDto = new UpdateProductAttributeDto
+        //        {
+        //            Id = model.Id,
+        //            Name = model.Name,
+        //            Description = model.Description,
+        //            DisplayOrder = model.DisplayOrder
+        //        };
+        //        await _productAttributeService.UpdateAsync(updateDto);
+        //        return Json(new { success = true });
+        //    }
+        //    return Json(new { success = false });
+        //}
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
