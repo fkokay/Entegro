@@ -42,6 +42,8 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.ProductCategories.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
+
+
         public async Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds)
         {
             var ids = productIds.Distinct().ToArray();

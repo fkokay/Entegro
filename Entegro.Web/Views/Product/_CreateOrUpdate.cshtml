@@ -13,7 +13,7 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-stock" type="button" role="tab">Stok</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-variants-btn" data-bs-toggle="tab" data-bs-target="#form-tabs-variants" data-url="@Url.Action("VariantsPartial", "Product", new { id = Model.Id })" type="button" role="tab">
+                    <button class="nav-link" id="tab-variants-btn" data-bs-toggle="tab" data-bs-target="#form-tabs-variants" data-url="@Url.Action("ProductVariantPartial", "Product", new { id = Model.Id })" type="button" role="tab">
                         Varyantlar
                     </button>
                 </li>
@@ -24,7 +24,11 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-image" type="button" role="tab">Resimler</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-categories" type="button" role="tab">Kategori Eşleştirmeleri</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-categories"
+                            type="button" role="tab"
+                            data-url="@Url.Action("ProductCategoryList", "Product", new { productId = Model.Id })">
+                        Kategori Eşleştirmeleri
+                    </button>
                 </li>
             </ul>
         </div>
@@ -278,7 +282,7 @@
             </div>
 
             <!-- Resimler -->
-            
+
 
             <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
                 @if (Model.Id > 0)
@@ -293,33 +297,17 @@
                         Bu ürüne resim yüklemek için önce ürünü kaydetmeniz gerekmektedir.
                     </div>
                 }
-                
+
             </div>
 
 
             <!--Kategori Eşleştirmeleri-->
-            <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel">
+            <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel" data-loaded="false">
                 @if (Model.Id > 0)
                 {
-                    <div class="row g-3 p-3">
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ProductCategoryModel">
-                                Ürün Kategorisi Ekle
-                            </button>
-                        </div>
-
-                        <table class="table table-bordered" id="productCategoryTable">
-                            <thead>
-                                <tr>
-                                    <th>Kategori Yolu</th>
-                                    <th>Sırası</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-border-bottom-3"></tbody>
-                        </table>
+                    <div class="p-4 text-center text-muted" id="productcategories-loading" style="display:none">
+                        Yükleniyor...
                     </div>
-
                 }
                 else
                 {
@@ -333,45 +321,8 @@
 </div>
 
 
-<div class="modal fade" id="ProductCategoryModel" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Ürün Kategorisi Ekle</h3>
-                </div>
+@await Html.PartialAsync("_CreateCategoryProductPartial", Model.Id)
 
-                <div id="productCategoryForm" class="row g-3">
-                    <input type="hidden" id="ProductId" value="@Model?.Id" />
 
-                    <div class="col-md-12 mt-3">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="CategoryId">Kategori</label>
-                            <div class="col-sm-9">
-                                <select id="CategoryId" class="select2 form-select form-select-lg"></select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12 mt-3">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="DisplayOrder">Sıra</label>
-                            <div class="col-sm-9">
-                                <input type="number" id="DisplayOrder" class="form-control" value="0" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 text-center mt-3">
-                        <button type="button" id="btnSaveProductCategory" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
 
 
