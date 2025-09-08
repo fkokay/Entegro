@@ -16,9 +16,9 @@ namespace Entegro.Application.Interfaces.Services
         Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand);
         Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategory);
         Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory);
-        Task DeleteCategoryAsync(int categoryId);
-        Task<string> GetCategoryPathAsync(ICategoryNode categoryNode, string separator = " » ");
-        string GetCategoryPath(TreeNode<ICategoryNode> treeNode, string separator = " » ");
+        Task DeleteCategoryAsync(int categoryId,bool deleteSubCategories);
+        Task<string> GetCategoryPathAsync(ICategoryNode categoryNode, string aliasPattern = null, string separator = " » ");
+        string GetCategoryPath(TreeNode<ICategoryNode> treeNode, string aliasPattern = null, string separator = " » ");
         Task<TreeNode<ICategoryNode>> GetCategoryTreeAsync(int rootCategoryId = 0, bool includeHidden = false);
     }
 }

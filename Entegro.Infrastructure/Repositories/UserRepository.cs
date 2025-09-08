@@ -8,8 +8,8 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly EntegroContext _context;
-        public UserRepository(EntegroContext context)
+        private readonly EntegroDbContext _context;
+        public UserRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

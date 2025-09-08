@@ -9,9 +9,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public CategoryRepository(EntegroContext context)
+        public CategoryRepository(EntegroDbContext context)
         {
             _context = context;
         }
@@ -21,10 +21,6 @@ namespace Entegro.Infrastructure.Repositories
             category.CreatedOnUtc = DateTime.UtcNow;
             category.UpdatedOnUtc = DateTime.UtcNow;
             await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
-
-            category.TreePath = $"/{category.Id}/";
-            _context.Categories.Update(category);
             await _context.SaveChangesAsync();
         }
 
@@ -44,7 +40,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Category>> GetAllAsync(bool includeHidden = false)
         {
-            var query = _context.Categories
+            var query = _context.Categories.Where(m => m.Deleted == includeHidden)
                 .Include(c => c.Parent)
                 .Include(m => m.MediaFile)
                 .ThenInclude(m => m.MediaFolder).AsNoTracking();
@@ -59,12 +55,13 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<Category>> GetAllAsync(string term, int pageNumber, int pageSize)
         {
-            var query = _context.Categories
+            var query = _context.Categories.Where(m=> m.Deleted == false)
                 .Include(c => c.Parent)
                 .Include(m => m.MediaFile)
                 .ThenInclude(m => m.MediaFolder)
                 .OrderBy(b => b.Id)
                 .AsNoTracking();
+
 
             if (!string.IsNullOrEmpty(term))
             {
@@ -99,6 +96,19 @@ namespace Entegro.Infrastructure.Repositories
             .Include(b => b.MediaFile)
             .ThenInclude(b => b.MediaFolder)
             .FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<List<Category>> GetManyAsync(IEnumerable<int> ids, bool tracked = false)
+        {
+            var query = _context.Categories
+                .Where(c => ids.Contains(c.Id));
+            if (tracked)
+                query = query.AsTracking();
+            else
+                query = query.AsNoTracking();
+
+            return await query.ToListAsync();
+
         }
     }
 }

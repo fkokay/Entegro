@@ -1,19 +1,18 @@
-﻿using Entegro.Application.DTOs.Brand;
+﻿
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Linq.Dynamic.Core;
 
 namespace Entegro.Infrastructure.Repositories
 {
     public class BrandRepository : IBrandRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public BrandRepository(EntegroContext context)
+        public BrandRepository(EntegroDbContext context)
         {
             _context = context;
         }

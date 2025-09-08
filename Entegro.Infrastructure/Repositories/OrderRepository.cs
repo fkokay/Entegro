@@ -13,9 +13,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
         private readonly IProductRepository _productRepository;
-        public OrderRepository(EntegroContext context, IProductRepository productRepository)
+        public OrderRepository(EntegroDbContext context, IProductRepository productRepository)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));

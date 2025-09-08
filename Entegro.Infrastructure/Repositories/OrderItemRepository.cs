@@ -9,8 +9,8 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class OrderItemRepository : IOrderItemRepository
     {
-        private readonly EntegroContext _context;
-        public OrderItemRepository(EntegroContext context)
+        private readonly EntegroDbContext _context;
+        public OrderItemRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

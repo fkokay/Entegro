@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class CountryRepository : ICountryRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public CountryRepository(EntegroContext context)
+        public CountryRepository(EntegroDbContext context)
         {
             _context = context;
         }

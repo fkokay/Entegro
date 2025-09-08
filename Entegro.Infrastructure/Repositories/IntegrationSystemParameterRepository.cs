@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class IntegrationSystemParameterRepository : IIntegrationSystemParameterRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public IntegrationSystemParameterRepository(EntegroContext context)
+        public IntegrationSystemParameterRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

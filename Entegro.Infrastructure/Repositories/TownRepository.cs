@@ -7,9 +7,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class TownRepository : ITownRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public TownRepository(EntegroContext context)
+        public TownRepository(EntegroDbContext context)
         {
             _context = context;
         }

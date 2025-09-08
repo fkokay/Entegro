@@ -7,9 +7,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class ProductCategoryMappingRepository : IProductCategoryMappingRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public ProductCategoryMappingRepository(EntegroContext context)
+        public ProductCategoryMappingRepository(EntegroDbContext context)
         {
             _context = context;
         }

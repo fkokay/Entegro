@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class SpecificationAttributeRepository : ISpecificationAttributeRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public SpecificationAttributeRepository(EntegroContext context)
+        public SpecificationAttributeRepository(EntegroDbContext context)
         {
             _context = context;
         }

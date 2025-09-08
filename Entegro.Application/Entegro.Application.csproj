@@ -7,13 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
+    <Compile Remove="Commands\**" />
+    <Compile Remove="Extensions\**" />
+    <Compile Remove="Queries\**" />
+    <EmbeddedResource Remove="Commands\**" />
+    <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="Queries\**" />
+    <None Remove="Commands\**" />
+    <None Remove="Extensions\**" />
+    <None Remove="Queries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="DTOs\Marketplace\CicekSepeti\" />
     <Folder Include="DTOs\Marketplace\Hepsiburada\" />
     <Folder Include="DTOs\Marketplace\Idefix\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Interfaces\Services\Invoice\" />
-    <Folder Include="Queries\" />
   </ItemGroup>
 
   <ItemGroup>

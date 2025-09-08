@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class EmailAccountRepository : IEmailAccountRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public EmailAccountRepository(EntegroContext context)
+        public EmailAccountRepository(EntegroDbContext context)
         {
             _context = context;
         }

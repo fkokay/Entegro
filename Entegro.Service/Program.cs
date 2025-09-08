@@ -75,7 +75,7 @@ var host = Host.CreateDefaultBuilder(args)
         engineStarter.ConfigureServices(services);
 
 
-        services.AddDbContext<EntegroContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<EntegroDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         MapsterConfig.RegisterMappings();
         services.AddSingleton(TypeAdapterConfig.GlobalSettings);

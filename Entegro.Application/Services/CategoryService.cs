@@ -14,8 +14,14 @@ namespace Entegro.Application.Services
 {
     public class CategoryService : ICategoryService
     {
-        internal static TimeSpan CategoryTreeCacheDuration = TimeSpan.FromHours(6);
-        internal readonly static CompositeFormat CategoryTreeKey = CompositeFormat.Parse("category:tree-{0}");
+        // {0} = IncludeHidden,
+        public static TimeSpan CategoryTreeCacheDuration = TimeSpan.FromHours(6);
+        public readonly static CompositeFormat CategoryTreeKey = CompositeFormat.Parse("category:tree-{0}");
+        public const string CategoryTreePatternKey = "category:tree-*";
+
+        // {0} = IncludeHidden, {1} = ParentCategoryId
+        internal readonly static CompositeFormat CategoriesByParentIdKey = CompositeFormat.Parse("category:byparent-{0}-{1}");
+        public const string CategoriesPatternKey = "category:*";
 
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICacheManager _cache;
@@ -37,19 +43,73 @@ namespace Entegro.Application.Services
 
         public async Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
         {
-            var category = _mapper.Map<Category>(updateCategory);
+            var category = await _categoryRepository.GetByAsync(m => m.Id == updateCategory.Id);
+            if (category == null)
+            {
+                throw new KeyNotFoundException($"Category with ID {updateCategory.Id} not found.");
+            }
+
+            _mapper.Map<UpdateCategoryDto, Category>(updateCategory, category);
             await _categoryRepository.UpdateAsync(category);
 
             return _mapper.Map<CategoryDto>(category);
         }
 
-        public async Task DeleteCategoryAsync(int categoryId)
+        public async Task DeleteCategoryAsync(int categoryId, bool deleteSubCategories = false)
         {
             var category = await _categoryRepository.GetByAsync(m => m.Id == categoryId);
+
             if (category == null)
                 throw new KeyNotFoundException($"Category with ID {categoryId} not found.");
 
-            await _categoryRepository.DeleteAsync(category);
+            category.Deleted = true;
+            await _categoryRepository.UpdateAsync(category);
+
+            var subCategoryIds = await GetSubCategoryIds(new[] { category.Id });
+            await SoftDeleteCategories(subCategoryIds);
+
+            async Task<IEnumerable<int>> GetSubCategoryIds(IEnumerable<int> categoryIds)
+            {
+                var result = new HashSet<int>();
+                var ids = categoryIds.Distinct().ToArray();
+
+                foreach (var id in ids)
+                {
+                    var tree = await GetCategoryTreeAsync(id, false);
+                    if (tree?.HasChildren ?? false)
+                    {
+                        result.AddRange(tree.Children.Select(x => x.Value.Id));
+                    }
+                }
+
+                return result;
+            }
+
+            async Task SoftDeleteCategories(IEnumerable<int> categoryIds)
+            {
+                if (categoryIds.Any())
+                {
+                    var categories = await _categoryRepository.GetManyAsync(categoryIds, true);
+
+                    foreach (var category in categories)
+                    {
+                        if (deleteSubCategories)
+                        {
+                            category.Deleted = true;
+                        }
+                        else
+                        {
+                            category.ParentId = null;
+                        }
+
+                        await _categoryRepository.UpdateAsync(category);
+                    }
+
+                    // Process sub-categories.
+                    var ids = await GetSubCategoryIds(categoryIds);
+                    await SoftDeleteCategories(ids);
+                }
+            }
         }
 
         public async Task<bool> ExistsByNameAsync(string name)
@@ -72,32 +132,44 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<CategoryDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             var categories = await _categoryRepository.GetAllAsync("", pageNumber, pageSize);
+            var items = await categories.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<CategoryDto>(x);
+                model.Breadcrumb = await GetCategoryPathAsync(x, "<small class='text-muted d-none d-sm-block'>{0}</small>");
+                return model;
+            }).AsyncToList();
+
             return new PagedResult<CategoryDto>
             {
-                Items = _mapper.Map<IEnumerable<CategoryDto>>(categories.Items),
+                Items = items,
                 TotalCount = categories.TotalCount,
                 PageNumber = categories.PageNumber,
                 PageSize = categories.PageSize
             };
         }
 
-
-        public async Task<string> GetCategoryPathAsync(ICategoryNode categoryNode, string separator = " » ")
+        public Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand)
         {
-            var treeNode = await GetCategoryTreeAsync(categoryNode.Id, true);
+            throw new NotImplementedException();
+        }
+
+
+        public async Task<string> GetCategoryPathAsync(ICategoryNode categoryNode, string aliasPattern = null, string separator = " » ")
+        {
+            var treeNode = await GetCategoryTreeAsync(categoryNode.Id, false);
             if (treeNode != null)
             {
-                return GetCategoryPath(treeNode, separator);
+                return GetCategoryPath(treeNode,aliasPattern, separator);
             }
 
             return string.Empty;
         }
 
-        public string GetCategoryPath(TreeNode<ICategoryNode> treeNode, string separator = " » ")
+        public string GetCategoryPath(TreeNode<ICategoryNode> treeNode, string aliasPattern = null, string separator = " » ")
         {
             Guard.NotNull(treeNode);
 
-            var lookupKey = "Path.{0}".FormatInvariant(separator);
+            var lookupKey = "Path.{0}.{1}".FormatInvariant(separator, aliasPattern.HasValue());
             var cachedPath = treeNode.GetMetadata<string>(lookupKey, false);
 
             if (cachedPath != null)
@@ -168,12 +240,6 @@ namespace Entegro.Application.Services
             return root;
         }
 
-        public Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand)
-        {
-            throw new NotImplementedException();
-        }
-
-
         private static void AddChildTreeNodes(TreeNode<ICategoryNode> parentNode, int parentItemId, Multimap<int, CategoryNode> nodeMap)
         {
             if (parentNode == null)
@@ -192,7 +258,5 @@ namespace Entegro.Application.Services
                 AddChildTreeNodes(newNode, node.Id, nodeMap);
             }
         }
-
-
     }
 }
