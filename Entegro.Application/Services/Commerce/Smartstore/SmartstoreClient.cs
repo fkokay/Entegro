@@ -77,7 +77,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 throw; // sessiz geçmek yerine fırlatalım
             }
         }
-
         public async Task UpsertProductAsync(UpsertProductRequest request)
         {
             // 1. Ürün var mı kontrolü
@@ -163,7 +162,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 await DeleteProductAsync(sku);
             }
         }
-
         private async Task HandleBrandAsync(int productId, ProductDto product)
         {
             if (string.IsNullOrEmpty(product.Brand?.Name))
