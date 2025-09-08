@@ -48,14 +48,16 @@ Entegro.AttributeValue.List = (function ($) {
                         orderable: false,
                         render: (data, type, row) => `
                             <div class="d-inline-block text-nowrap">
-                                <a href="/ProductAttributeValue/Edit/${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
+                                 <a href="javascript:void(0);"
+                                   class="btn btn-text-secondary rounded-pill waves-effect btn-icon edit-attributeValue"
+                                   data-id="${row.Id}">
                                     <i class="icon-base ti ti-pencil icon-22px"></i>
                                 </a>
                                 <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                     <i class="icon-base ti ti-dots-vertical icon-22px"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end m-0">
-                                    <a href="/ProductAttributeValue/Edit/${row.Id}" class="dropdown-item">Güncelle</a>
+                                    <a href="javascript:void(0);" class="dropdown-item edit-attributeValue" data-id="${row.Id}">Güncelle</a>
                                     <a href="javascript:void(0);" class="dropdown-item text-danger delete-attributeValue" data-id="${row.Id}">Sil</a>
                                 </div>
                             </div>`
@@ -107,8 +109,23 @@ Entegro.AttributeValue.List = (function ($) {
                                         <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
                                         <span class="d-none d-sm-inline-block">Yeni Kayıt</span>`,
                                     className: "add-new btn btn-primary",
+                                    //action: function () {
+                                    //    window.location.href = "/ProductAttributeValue/Create";
+                                    //}
                                     action: function () {
-                                        window.location.href = "/ProductAttributeValue/Create";
+                                        const $form = $('#createAttributeValueForm');
+                                        if ($form.length) $form[0].reset();
+                                        if (window.createPAVValidation) window.createPAVValidation.resetForm(true);
+
+                                        const $pa = $('#ProductAttributeId');
+                                        if ($pa.data('select2')) $pa.val(null).trigger('change');
+
+                                        $('#createAttributeValue').find('h3.mb-2').text('Yeni Varyant Değeri');
+
+                                        $('#createAttributeValue').one('shown.bs.modal', function () {
+                                            $('#DisplayOrder').val(0);
+                                        });
+                                        $('#createAttributeValue').modal('show');
                                     }
                                 }
                             ]

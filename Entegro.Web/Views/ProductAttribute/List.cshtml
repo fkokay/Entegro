@@ -130,10 +130,12 @@
 
 
 @section Scripts {
-    @* <script src="~/assets/js/customjs/product-attribute/attribute.js"></script> *@
+   
     <script src="/assets/js/entegro.attribute.js"></script>
+    <script src="/assets/js/entegro.attribute.list.js"></script>
     <script>
          $(function () {
+            Entegro.Attribute.init();
             Entegro.Attribute.List.init();
         });
     </script>
