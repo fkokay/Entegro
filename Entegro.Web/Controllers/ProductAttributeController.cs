@@ -24,12 +24,7 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
-        [HttpGet]
-        public IActionResult Create()
-        {
-            ProductAttributeViewModel model = new ProductAttributeViewModel();
-            return View(model);
-        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ProductAttributeViewModel model)
         {
@@ -63,7 +58,7 @@ namespace Entegro.Web.Controllers
             };
 
 
-            return View(productAttributeModel);
+            return Json(productAttributeModel);
         }
 
         [HttpPost]

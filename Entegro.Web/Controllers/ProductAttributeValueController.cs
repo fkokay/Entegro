@@ -4,7 +4,6 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Entegro.Web.Controllers
 {
@@ -26,20 +25,6 @@ namespace Entegro.Web.Controllers
         public IActionResult List()
         {
             return View();
-        }
-        [HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            ProductAttributeValueViewModel model = new ProductAttributeValueViewModel();
-
-            var productAttributeDtos = await _productAttributeService.GetAllAsync();
-            ViewBag.ProductAttributes = productAttributeDtos.Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString(),
-                Text = x.Name
-            }).ToList();
-
-            return View(model);
         }
         [HttpPost]
         public async Task<IActionResult> Create(ProductAttributeValueViewModel model)
@@ -72,13 +57,8 @@ namespace Entegro.Web.Controllers
                 Id = productAttributeValue.Id
             };
 
-            var productAttributeDtos = await _productAttributeService.GetAllAsync();
-            ViewBag.ProductAttributes = productAttributeDtos.Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString(),
-                Text = x.Name
-            }).ToList();
-            return View(productAttributeValueModel);
+
+            return Json(productAttributeValueModel);
         }
 
         [HttpPost]
@@ -124,6 +104,14 @@ namespace Entegro.Web.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllProductAttribute()
+        {
+            var data = await _productAttributeService.GetAllAsync();
+            var results = data.Select(d => new { id = d.Id, text = d.Name, });
+            return Json(new { results });
         }
     }
 }
