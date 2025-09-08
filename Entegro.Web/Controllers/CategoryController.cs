@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Category;
+﻿using Autofac.Core;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
@@ -32,7 +33,10 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            CategoryViewModel model = new CategoryViewModel();
+            CategoryViewModel model = new CategoryViewModel()
+            {
+                Published = true
+            };
             return View(model);
         }
 
@@ -50,6 +54,7 @@ namespace Entegro.Web.Controllers
                 DisplayOrder = model.DisplayOrder,
                 MetaKeywords = model.MetaKeywords,
                 Published = model.Published,
+                
             };
             await _categoryService.CreateCategoryAsync(createDto);
 
@@ -76,7 +81,6 @@ namespace Entegro.Web.Controllers
                 MetaTitle = category.MetaTitle,
                 Name = category.Name,
                 ParentCategoryId = category.ParentCategoryId,
-                TreePath = category.TreePath,
                 Parent = category.Parent == null ? null : new CategoryViewModel()
                 {
                     Id = category.Parent.Id,
@@ -89,7 +93,6 @@ namespace Entegro.Web.Controllers
                     MetaTitle = category.Parent.MetaTitle,
                     Name = category.Parent.Name,
                     ParentCategoryId = category.Parent.ParentCategoryId,
-                    TreePath = category.Parent.TreePath,
                     Published = category.Parent.Published,
                 },
                 Published = category.Published,
@@ -154,16 +157,8 @@ namespace Entegro.Web.Controllers
 
             try
             {
-                if (chooseType == 1)
-                {
-                    await _categoryService.DeleteCategoryAsync(id);
-                    return Json(new { success = true });
-                }
-                else
-                {
-                    await _categoryService.DeleteCategoryAsync(id);
-                    return Json(new { success = true });
-                }
+                await _categoryService.DeleteCategoryAsync(id, chooseType == 1);
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -193,7 +188,7 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AllCategory([FromForm] int page = 1, [FromForm] string? term = null)
         {
-            var categoryTree = await _categoryService.GetCategoryTreeAsync(includeHidden: true);
+            var categoryTree = await _categoryService.GetCategoryTreeAsync(includeHidden: false);
             var categories = categoryTree.Flatten(false);
 
             var query = categories.SelectAwait(async c => new

@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class ProductIntegrationRepository : IProductIntegrationRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public ProductIntegrationRepository(EntegroContext context)
+        public ProductIntegrationRepository(EntegroDbContext context)
         {
             _context = context;
         }

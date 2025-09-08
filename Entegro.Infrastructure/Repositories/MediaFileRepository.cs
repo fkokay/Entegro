@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class MediaFileRepository : IMediaFileRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public MediaFileRepository(EntegroContext context)
+        public MediaFileRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

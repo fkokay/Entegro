@@ -8,8 +8,8 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class ProductImageMappingRepository : IProductImageMappingRepository
     {
-        private readonly EntegroContext _context;
-        public ProductImageMappingRepository(EntegroContext context)
+        private readonly EntegroDbContext _context;
+        public ProductImageMappingRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

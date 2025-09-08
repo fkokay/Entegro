@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\assets\js\customjs\**" />
+    <Content Remove="wwwroot\assets\js\customjs\**" />
+    <EmbeddedResource Remove="wwwroot\assets\js\customjs\**" />
+    <None Remove="wwwroot\assets\js\customjs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
@@ -25,10 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Entegro.Infrastructure\Entegro.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\assets\js\customjs\" />
   </ItemGroup>
 
 </Project>

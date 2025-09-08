@@ -15,21 +15,5 @@ namespace Entegro.Domain.Entities.Catalog
         IEnumerable<ITreeNode> GetChildNodes();
     }
 
-    public static class ITreeNodeExtensions
-    {
-        const char PathSeparator = '/';
-
-        public static string BuildTreePath(this ITreeNode node)
-        {
-            if (node.ParentId == null || node.GetParentNode() is not ITreeNode parentNode)
-            {
-                return $"/{node.Id}/";
-            }
-
-            var parentPath = parentNode.TreePath.NullEmpty() ?? parentNode.BuildTreePath();
-            parentPath = parentPath.EmptyNull().EnsureEndsWith(PathSeparator);
-
-            return $"{parentPath}{node.Id}/";
-        }
-    }
+   
 }

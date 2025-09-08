@@ -12,19 +12,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Data
 {
-    public abstract class AsyncDbSaveHook<TEntity> : AsyncDbSaveHook<EntegroContext, TEntity>
+    public abstract class AsyncDbSaveHook<TEntity> : AsyncDbSaveHook<EntegroDbContext, TEntity>
       where TEntity : class
     {
     }
 
-    public abstract class DbSaveHook<TEntity> : DbSaveHook<EntegroContext, TEntity>
+    public abstract class DbSaveHook<TEntity> : DbSaveHook<EntegroDbContext, TEntity>
         where TEntity : class
     {
     }
 
-    public class EntegroContext : HookingDbContext
+    public class EntegroDbContext : HookingDbContext
     {
-        public EntegroContext(DbContextOptions<EntegroContext> options) : base(options)
+        public EntegroDbContext(DbContextOptions<EntegroDbContext> options) : base(options)
         {
 
         }

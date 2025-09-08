@@ -15,9 +15,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class CustomerRepository : ICustomerRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public CustomerRepository(EntegroContext context)
+        public CustomerRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

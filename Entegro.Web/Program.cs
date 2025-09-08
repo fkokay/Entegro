@@ -12,6 +12,7 @@ using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Application.Services.Marketplace;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.EventBus;
@@ -89,7 +90,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddDbContext<EntegroContext>(options =>
+builder.Services.AddDbContext<EntegroDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.UseLazyLoadingProxies();
@@ -221,6 +222,8 @@ builder.Services.AddScoped<IEmailAccountService, EmailAccountService>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 
+builder.Services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
+
 
 builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 
@@ -293,7 +296,7 @@ app.MapControllerRoute(
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<EntegroContext>();
+    var db = scope.ServiceProvider.GetRequiredService<EntegroDbContext>();
     await db.Database.MigrateAsync();
 }
 

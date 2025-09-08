@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Entegro.Infrastructure.Migrations
 {
-    [DbContext(typeof(EntegroContext))]
+    [DbContext(typeof(EntegroDbContext))]
     partial class EntegroContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

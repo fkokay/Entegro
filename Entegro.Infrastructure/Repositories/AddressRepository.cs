@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class AddressRepository : IAddressRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public AddressRepository(EntegroContext context)
+        public AddressRepository(EntegroDbContext context)
         {
             _context = context;
         }

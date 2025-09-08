@@ -9,9 +9,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class OrderNoteRepository : IOrderNoteRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public OrderNoteRepository(EntegroContext context)
+        public OrderNoteRepository(EntegroDbContext context)
         {
             _context = context;
         }

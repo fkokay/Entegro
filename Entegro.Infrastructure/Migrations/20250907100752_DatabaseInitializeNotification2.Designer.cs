@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Entegro.Infrastructure.Migrations
 {
-    [DbContext(typeof(EntegroContext))]
+    [DbContext(typeof(EntegroDbContext))]
     [Migration("20250907100752_DatabaseInitializeNotification2")]
     partial class DatabaseInitializeNotification2
     {

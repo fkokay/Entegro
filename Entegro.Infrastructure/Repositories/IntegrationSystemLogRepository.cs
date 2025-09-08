@@ -8,9 +8,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class IntegrationSystemLogRepository : IIntegrationSystemLogRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public IntegrationSystemLogRepository(EntegroContext context)
+        public IntegrationSystemLogRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

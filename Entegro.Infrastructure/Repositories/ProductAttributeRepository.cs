@@ -9,9 +9,9 @@ namespace Entegro.Infrastructure.Repositories
 {
     public class ProductAttributeRepository : IProductAttributeRepository
     {
-        private readonly EntegroContext _context;
+        private readonly EntegroDbContext _context;
 
-        public ProductAttributeRepository(EntegroContext context)
+        public ProductAttributeRepository(EntegroDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

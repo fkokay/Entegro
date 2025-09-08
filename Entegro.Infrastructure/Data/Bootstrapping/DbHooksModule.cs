@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Infrastructure.Hooks
+namespace Entegro.Infrastructure.Bootstrapping
 {
     public class DbHooksModule : Autofac.Module
     {
@@ -52,7 +52,7 @@ namespace Entegro.Infrastructure.Hooks
                         m.For(em => em.HookedType, types.EntityType);
                         m.For(em => em.ServiceTypes, serviceTypes.Length > 0 ? serviceTypes : new[] { hookType });
                         m.For(em => em.ImplType, hookType);
-                        m.For(em => em.DbContextType, types.ContextType ?? typeof(EntegroContext));
+                        m.For(em => em.DbContextType, types.ContextType ?? typeof(EntegroDbContext));
                         m.For(em => em.Importance, importantAttribute?.Importance ?? HookImportance.Normal);
                         m.For(em => em.Order, 0);
                     });
@@ -80,7 +80,7 @@ namespace Entegro.Infrastructure.Hooks
                     var gtd = x.GetGenericTypeDefinition();
                     if (gtd == typeof(AsyncDbSaveHook<>) || gtd == typeof(DbSaveHook<>))
                     {
-                        return (typeof(EntegroContext), x.GetGenericArguments()[0]);
+                        return (typeof(EntegroDbContext), x.GetGenericArguments()[0]);
                     }
                     if (gtd == typeof(AsyncDbSaveHook<,>) || gtd == typeof(DbSaveHook<,>))
                     {
@@ -104,7 +104,7 @@ namespace Entegro.Infrastructure.Hooks
                 }
             }
 
-            return (typeof(EntegroContext), typeof(BaseEntity));
+            return (typeof(EntegroDbContext), typeof(BaseEntity));
         }
     }
 }
