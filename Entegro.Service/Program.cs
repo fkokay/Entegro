@@ -128,41 +128,41 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddQuartz(q =>
         {
 
-            var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+            //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
-            q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
-
-            q.AddTrigger(opts => opts
-                .ForJob(jobKeySmartstore)
-                .WithIdentity("SmartstoreDataSyncJob-trigger")
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(1)
-                    .RepeatForever())
-                );
-
-            //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
-
-            //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+            //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
 
             //q.AddTrigger(opts => opts
-            //    .ForJob(jobKeyTrendyol)
-            //    .WithIdentity("TrendyolDataSyncJob-trigger")
+            //    .ForJob(jobKeySmartstore)
+            //    .WithIdentity("SmartstoreDataSyncJob-trigger")
             //    .WithSimpleSchedule(x => x
-            //        .WithIntervalInMinutes(10)
+            //        .WithIntervalInMinutes(1)
             //        .RepeatForever())
-            //);
+            //    );
 
-            var jobKeyErp = new JobKey("ErpDataSyncJob");
+            var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
-            q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+            q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
 
             q.AddTrigger(opts => opts
-                .ForJob(jobKeyErp)
-                .WithIdentity("ErpDataSyncJob-trigger")
+                .ForJob(jobKeyTrendyol)
+                .WithIdentity("TrendyolDataSyncJob-trigger")
                 .WithSimpleSchedule(x => x
                     .WithIntervalInMinutes(10)
                     .RepeatForever())
             );
+
+            //var jobKeyErp = new JobKey("ErpDataSyncJob");
+
+            //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+
+            //q.AddTrigger(opts => opts
+            //    .ForJob(jobKeyErp)
+            //    .WithIdentity("ErpDataSyncJob-trigger")
+            //    .WithSimpleSchedule(x => x
+            //        .WithIntervalInMinutes(10)
+            //        .RepeatForever())
+            //);
         });
     }).Build();
 

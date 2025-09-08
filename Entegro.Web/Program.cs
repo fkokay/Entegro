@@ -71,16 +71,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add services to the container.
-builder.Services.AddDbContext<EntegroContext>(options =>
-    options
-        .UseLazyLoadingProxies()
-        .UseSqlServer(
-            builder.Configuration.GetConnectionString("DefaultConnection"),
-            sqlOptions => sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
-        )
-);
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
@@ -102,8 +92,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<EntegroContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-
-    options.UseLazyLoadingProxies(); // Lazy loading proxy kullanacaksan
+    options.UseLazyLoadingProxies();
 });
 var configuration = (IConfiguration)builder.Configuration;
 
@@ -255,7 +244,22 @@ builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 var app = builder.Build();
+var providerContainer = appContext as IServiceProviderContainer;
+providerContainer.ApplicationServices = app.Services;
 
+// At this stage we can set the scoped service container.
+engine.Scope = new ScopedServiceContainer(
+    app.Services.GetRequiredService<ILifetimeScopeAccessor>(),
+    app.Services.GetRequiredService<IHttpContextAccessor>(),
+    app.Services.AsLifetimeScope());
+
+// Build request pipeline
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    appContext.Freeze();
+    engineStarter.Dispose();
+    engineStarter = null;
+});
 
 var supportedCultures = new[] { new CultureInfo("en-US") };
 

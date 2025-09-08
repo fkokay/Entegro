@@ -1,4 +1,6 @@
-﻿using Entegro.Domain.Entities.Catalog;
+﻿using Entegro.Data;
+using Entegro.Data.Hooks;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Domain.Entities.Common;
 using Entegro.Domain.Entities.Content;
@@ -10,7 +12,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Data
 {
-    public class EntegroContext : DbContext
+    public abstract class AsyncDbSaveHook<TEntity> : AsyncDbSaveHook<EntegroContext, TEntity>
+      where TEntity : class
+    {
+    }
+
+    public abstract class DbSaveHook<TEntity> : DbSaveHook<EntegroContext, TEntity>
+        where TEntity : class
+    {
+    }
+
+    public class EntegroContext : HookingDbContext
     {
         public EntegroContext(DbContextOptions<EntegroContext> options) : base(options)
         {
