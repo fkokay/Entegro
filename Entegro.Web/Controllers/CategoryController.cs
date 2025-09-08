@@ -154,7 +154,6 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id, int chooseType)
         {
-
             try
             {
                 await _categoryService.DeleteCategoryAsync(id, chooseType == 1);
