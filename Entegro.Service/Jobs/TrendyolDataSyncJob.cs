@@ -45,7 +45,7 @@ namespace Entegro.Service.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            await ProductSync();
+            //await ProductSync();
             await OrderSync();
 
             //await CategorySync();
@@ -74,6 +74,9 @@ namespace Entegro.Service.Jobs
         private async Task OrderSync()
         {
             TrendyolApiContext context = new TrendyolApiContext();
+            context.ApiUser = "9tjWr2F7zHJKnMDMbcqb";
+            context.ApiPassword = "09WZjNvN6ZJU4Tg2z53r";
+            context.SupplierId = "474352";
             _logger.LogInformation("Trendyol sipariş senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
 
             IEnumerable<TrendyolShipmentPackageDto> trendyolShipmentPackages;
