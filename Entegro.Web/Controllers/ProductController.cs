@@ -8,7 +8,6 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Domain.Entities;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Content;
@@ -246,7 +245,7 @@ namespace Entegro.Web.Controllers
             await PrepareProductModel(model, product);
             return PartialView("_ProductImages", model);
         }
-        public async Task<IActionResult> VariantsPartial(int id)
+        public async Task<IActionResult> ProductVariantPartial(int id)
         {
             ProductViewModel model = new ProductViewModel();
 
@@ -257,7 +256,7 @@ namespace Entegro.Web.Controllers
             }
 
             await PrepareProductModel(model, product);
-            return PartialView("_VariantsTab", model);
+            return PartialView("_ProductVariantPartial", model);
         }
         #endregion
 
@@ -822,7 +821,7 @@ namespace Entegro.Web.Controllers
                     StockQuantity = m.StockQuantity,
                     StokCode = m.StokCode
                 }).ToList();
-                
+
                 var productAttributes = await _productAttributeService.GetAllAsync();
                 ViewBag.ProductAttributes = productAttributes.Select(x => new SelectListItem
                 {
