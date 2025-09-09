@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models;
 using Entegro.Web.Models.Catalog.Brands;
 using Entegro.Web.Models.Content;
 using Microsoft.AspNetCore.Authorization;
@@ -96,10 +95,10 @@ namespace Entegro.Web.Controllers
                     Title = brand.MediaFile.Title,
                     UpdatedOn = brand.MediaFile.UpdatedOn,
                     Width = brand.MediaFile.Width,
-                    Folder = brand.MediaFile.MediaFolder == null ? null : new MediaFolderViewModel()
+                    Folder = brand.MediaFile.Folder == null ? null : new MediaFolderViewModel()
                     {
-                        Id = brand.MediaFile.MediaFolder.Id,
-                        Name = brand.MediaFile.MediaFolder.Name,
+                        Id = brand.MediaFile.Folder.Id,
+                        Name = brand.MediaFile.Folder.Name,
                     }
                 }
             };

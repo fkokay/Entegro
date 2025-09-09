@@ -3,6 +3,7 @@
     public class CreateMediaFileDto
     {
         public int? FolderId { get; set; }
+        public MediaFileDto? Folder { get; set; }
         public string Name { get; set; } = null!;
         public string Alt { get; set; } = null!;
         public string Title { get; set; } = null!;
