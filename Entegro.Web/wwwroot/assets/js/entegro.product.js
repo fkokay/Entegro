@@ -317,7 +317,7 @@ Entegro.product = (function ($) {
                 };
             },
             repeaters: [{
-                selector: '.AttributesRepeater',
+                selector: '.ProductVariantAttributeSelectionRepeater',
                 initEmpty: false,
                 show: function () { $(this).slideDown(); },
                 hide: function (deleteElement) { if (confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement); }
@@ -347,11 +347,11 @@ Entegro.product = (function ($) {
             $row.find('[name$="[Price]"]').val(item.Price);
             $row.find('[name$="[StockQuantity]"]').val(item.StockQuantity);
 
-            $.each(item.Attributes, function (j, attr) {
-                var $attrRow = $row.find('[data-repeater-list="Attributes"]');
+            $.each(item.ProductVariantAttributeSelections, function (j, attr) {
+                var $attrRow = $row.find('[data-repeater-list="ProductVariantAttributeSelections"]');
                 if ($attrRow.length) {
-                    $attrRow.find('[name$="[Attributes][' + j + '][ProductAttributeId]"]').val(attr.ProductVariantAttributeId);
-                    $attrRow.find('[name$="[Attributes][' + j + '][ProductAttributeValueId]"]').val(attr.ProductVariantAttributeValueId);
+                    $attrRow.find('[name$="[ProductVariantAttributeSelections][' + j + '][ProductVariantAttributeId]"]').val(attr.ProductVariantAttributeId);
+                    $attrRow.find('[name$="[ProductVariantAttributeSelections][' + j + '][ProductVariantAttributeValueId]"]').val(attr.ProductVariantAttributeValueId);
                 }
             });
 
@@ -371,19 +371,17 @@ Entegro.product = (function ($) {
                 $(this).attr('name', name.replace(/ProductVariantAttributeCombinations\[\d+\]/, 'ProductVariantAttributeCombinations[' + i + ']'));
             });
 
-            $row.find('[data-repeater-list="Attributes"]').children('[data-repeater-item]').each(function (j) {
+            $row.find('[data-repeater-list="ProductVariantAttributeSelections"]').children('[data-repeater-item]').each(function (j) {
                 var $attr = $(this);
                 $attr.find('input, select').each(function () {
                     var name = $(this).attr('name');
                     if (!name) return;
 
-                    var newName = 'ProductVariantAttributeCombinations[' + i + '][Attributes][' + j + ']';
-                    if (name.includes('ProductAttributeId')) newName += '[ProductAttributeId]';
-                    else if (name.includes('ProductAttributeValueId')) newName += '[ProductAttributeValueId]';
+                    var newName = 'ProductVariantAttributeCombinations[' + i + '][ProductVariantAttributeSelections][' + j + ']';
+                    if (name.includes('ProductVariantAttributeId')) newName += '[ProductVariantAttributeId]';
+                    else if (name.includes('ProductVariantAttributeValueId')) newName += '[ProductVariantAttributeValueId]';
 
                     $(this).attr('name', newName);
-
-                    if (name.includes('ProductAttributeId') && !$(this).val()) $(this).val($attr.data('attribute-id'));
                 });
             });
         });

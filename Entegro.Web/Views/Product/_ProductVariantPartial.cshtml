@@ -20,15 +20,15 @@
                 <div class="d-flex border rounded position-relative pe-0">
                     <div class="row w-100 p-3">
                         <!-- Nested Attributes -->
-                        <div class="AttributesRepeater">
-                            <div data-repeater-list="Attributes">
+                        <div class="ProductVariantAttributeSelectionRepeater">
+                            <div data-repeater-list="ProductVariantAttributeSelections">
                                 @foreach (var productVariantAttribute in Model.ProductVariantAttributes)
                                 {
                                     <div data-repeater-item class="repeater-wrapper row mb-2">
-                                        <input type="hidden" name="ProductAttributeId" />
+                                        <input type="hidden" name="ProductVariantAttributeId" value="@productVariantAttribute.Id" />
                                         <div class="col-md-2 col-12 mb-md-0 mb-3">
                                             <p class="mb-2 repeater-title">@productVariantAttribute.ProductAttribute</p>
-                                            <select name="ProductAttributeValueId" class="form-select item-details mb-3">
+                                            <select name="ProductVariantAttributeValueId" class="form-select item-details mb-3">
                                                 @foreach (var val in productVariantAttribute.ProductVariantAttributeValues)
                                                 {
                                                     <option value="@val.Id">@val.Name</option>
@@ -56,11 +56,11 @@
                         </div>
                         <div class="col-md-2">
                             <p>Fiyat</p>
-                            <input name="Price" type="text" class="form-control" id="VariantPrice" value="0"/>
+                            <input name="Price" type="number" class="form-control" id="VariantPrice" value="0" step="0.01" />
                         </div>
                         <div class="col-md-2">
                             <p>Stok Miktarı</p>
-                            <input name="StockQuantity" type="text" class="form-control" id="VariantStockQuantity" value="0" />
+                            <input name="StockQuantity" type="number" class="form-control" id="VariantStockQuantity" value="0" min="0" />
                         </div>
                     </div>
                     <div class="d-flex flex-column align-items-center justify-content-between border-start p-2">

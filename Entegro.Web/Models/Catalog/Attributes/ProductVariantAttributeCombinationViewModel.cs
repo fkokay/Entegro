@@ -13,6 +13,6 @@ namespace Entegro.Web.Models.Catalog.Attributes
         public decimal Price { get; set; } = 0;
         public int StockQuantity { get; set; } = 0;
 
-        public List<ProductVariantAttributeSelection> Attributes { get; set; } = new List<ProductVariantAttributeSelection>();
+        public List<ProductVariantAttributeSelection> ProductVariantAttributeSelections { get; set; } = new List<ProductVariantAttributeSelection>();
     }
 }

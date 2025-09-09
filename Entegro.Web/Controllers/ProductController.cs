@@ -170,7 +170,7 @@ namespace Entegro.Web.Controllers
                 updateDto.Published = model.Published;
                 updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
                 {
-                    RawAttribute = JsonConvert.SerializeObject(m.Attributes),
+                    RawAttribute = JsonConvert.SerializeObject(m.ProductVariantAttributeSelections),
                     Gtin = m.Gtin,
                     Id = m.Id,
                     ManufacturerPartNumber = m.ManufacturerPartNumber,
@@ -581,12 +581,12 @@ namespace Entegro.Web.Controllers
                         Price = m.Price,
                         StockQuantity = m.StockQuantity,
                         StokCode = m.StokCode,
-                        Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                        ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
                     }).ToList();
 
                     foreach (var item in productVariantAttributeCombinations)
                     {
-                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.Attributes);
+                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
                     }
                     ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
                     {
@@ -633,12 +633,12 @@ namespace Entegro.Web.Controllers
                         Price = m.Price,
                         StockQuantity = m.StockQuantity,
                         StokCode = m.StokCode,
-                        Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                        ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
                     }).ToList();
 
                     foreach (var item in productVariantAttributeCombinations)
                     {
-                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.Attributes);
+                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
                     }
                     ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
                     {
@@ -893,7 +893,7 @@ namespace Entegro.Web.Controllers
                 model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
                 {
                     Id = m.Id,
-                    Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
                     Gtin = m.Gtin,
                     ManufacturerPartNumber = m.ManufacturerPartNumber,
                     Price = m.Price,
