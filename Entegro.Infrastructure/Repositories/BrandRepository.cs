@@ -52,13 +52,13 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<Brand>> GetAllAsync()
         {
-            return await _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking().OrderBy(b => b.Id).ToListAsync();
+            return await _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().OrderBy(b => b.Id).ToListAsync();
         }
 
         public async Task<Application.DTOs.Common.PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.Brands
-                .Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder)
+                .Include(m => m.MediaFile).ThenInclude(m => m.Folder)
                 .AsNoTracking()
                 .OrderBy(b => b.Id);
 
@@ -86,7 +86,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Brands
              .Include(b => b.MediaFile)
-             .ThenInclude(b => b.MediaFolder)
+             .ThenInclude(b => b.Folder)
              .FirstOrDefaultAsync(b => b.Id == id);
         }
 
@@ -97,7 +97,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<Brand>> GetPagedAsync(GridCommand gridCommand)
         {
-            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.MediaFolder).AsNoTracking();
+            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking();
 
             if (gridCommand.Search != null)
             {

@@ -14,7 +14,7 @@ namespace Entegro.Domain.Entities.Content
     public class MediaFile : BaseEntity, ITransient
     {
         public int? FolderId { get; set; }
-        public virtual MediaFolder? MediaFolder { get; set; }
+        public virtual MediaFolder? Folder { get; set; }
         public string Name { get; set; }
         public string Alt { get; set; }
         public string Title { get; set; }

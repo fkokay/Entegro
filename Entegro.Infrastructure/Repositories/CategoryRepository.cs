@@ -43,7 +43,7 @@ namespace Entegro.Infrastructure.Repositories
             var query = _context.Categories.Where(m => m.Deleted == includeHidden)
                 .Include(c => c.Parent)
                 .Include(m => m.MediaFile)
-                .ThenInclude(m => m.MediaFolder).AsNoTracking();
+                .ThenInclude(m => m.Folder).AsNoTracking();
 
             query = includeHidden ? query : query.Where(c => c.Published);
             query = query.OrderBy(x => x.ParentId)
@@ -58,7 +58,7 @@ namespace Entegro.Infrastructure.Repositories
             var query = _context.Categories.Where(m=> m.Deleted == false)
                 .Include(c => c.Parent)
                 .Include(m => m.MediaFile)
-                .ThenInclude(m => m.MediaFolder)
+                .ThenInclude(m => m.Folder)
                 .OrderBy(b => b.Id)
                 .AsNoTracking();
 
@@ -94,7 +94,7 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Categories
             .Include(b => b.Parent)
             .Include(b => b.MediaFile)
-            .ThenInclude(b => b.MediaFolder)
+            .ThenInclude(b => b.Folder)
             .FirstOrDefaultAsync(predicate);
         }
 

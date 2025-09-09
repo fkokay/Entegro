@@ -227,7 +227,7 @@ namespace Entegro.Infrastructure.Repositories
                             CreatedOn = x.Product.MainPicture.CreatedOn,
                             Deleted = x.Product.MainPicture.Deleted,
                             Extension = x.Product.MainPicture.Extension,
-                            MediaFolder = x.Product.MainPicture.MediaFolder,
+                            Folder = x.Product.MainPicture.Folder,
                             FolderId = x.Product.MainPicture.FolderId,
                             Height = x.Product.MainPicture.Height,
                             Hidden = x.Product.MainPicture.Hidden,

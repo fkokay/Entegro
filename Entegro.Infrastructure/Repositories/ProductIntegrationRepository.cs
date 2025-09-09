@@ -40,7 +40,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(m => m.IntegrationSystem).ThenInclude(m => m.IntegrationSystemParameters)
                 .Include(m => m.Product).ThenInclude(m => m.Brand)
                 .Include(m => m.Product.ProductCategories).ThenInclude(m => m.Category).ThenInclude(m => m.Parent)
-                .Include(m => m.Product.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.MediaFolder)
+                .Include(m => m.Product.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
                 .Include(m => m.Product.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute)
                 .Include(m => m.Product.ProductVariantAttributes).ThenInclude(m => m.ProductVariantAttributeValues)
                 .Include(m => m.Product.ProductVariantAttributeCombinations).ToListAsync();
@@ -82,7 +82,7 @@ namespace Entegro.Infrastructure.Repositories
              .Include(pi => pi.Product)
                  .ThenInclude(p => p.ProductMediaFiles)
                      .ThenInclude(pm => pm.MediaFile)
-             .ThenInclude(mf => mf.MediaFolder) // sadece Folder ekledik
+             .ThenInclude(mf => mf.Folder) // sadece Folder ekledik
              .Include(pi => pi.Product)
                  .ThenInclude(p => p.ProductVariantAttributes)
                      .ThenInclude(pv => pv.ProductAttribute)
