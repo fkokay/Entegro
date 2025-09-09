@@ -1,0 +1,186 @@
+﻿var Entegro = Entegro || {};
+Entegro.User = Entegro.User || {};
+
+Entegro.User.List = (function ($) {
+    'use strict';
+
+    const init = function () {
+        $(function () {
+            const dt = $('#UserTable').DataTable({
+                language: {
+                    paginate: {
+                        next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                        previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                        first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                        last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                    },
+                    url: '//cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
+                },
+                serverSide: true,
+                ajax: {
+                    url: '/User/UserList',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: (d) => JSON.stringify(d),
+                },
+                columns: [
+                    { data: 'Id' },
+                    { data: 'Id', orderable: false, render: DataTable.render.select() },
+                    { data: 'FirstName' },
+                    { data: 'LastName' },
+                    { data: 'Email' },
+                    { data: 'PhoneNumber' },
+                    { data: 'Id' }
+                ],
+                columnDefs: [
+                    {
+                        className: "control",
+                        searchable: false,
+                        orderable: false,
+                        responsivePriority: 2,
+                        targets: 0,
+                        render: () => ""
+                    },
+                    {
+                        targets: 1,
+                        orderable: false,
+                        searchable: false,
+                        responsivePriority: 3,
+                        checkboxes: {
+                            selectAllRender: '<input type="checkbox" class="form-check-input">'
+                        },
+                        render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                    },
+                    {
+                        targets: -1,
+                        title: "İşlemler",
+                        searchable: false,
+                        orderable: false,
+                        render: (data, type, row) => `
+                            <div class="d-inline-block text-nowrap">
+                                <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon">
+                                    <i class="icon-base ti ti-pencil icon-22px"></i>
+                                </a>
+                                <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:void(0);" class="dropdown-item">View</a>
+                                    <a href="javascript:void(0);" class="dropdown-item">Suspend</a>
+                                </div>
+                            </div>`
+                    }
+                ],
+                select: {
+                    style: "multi",
+                    selector: "td:nth-child(2)"
+                },
+                order: [3, "asc"],
+                displayLength: 7,
+                layout: {
+                    topStart: {
+                        rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                        features: [{
+                            search: {
+                                className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                                placeholder: "Ara..",
+                                text: "_INPUT_"
+                            }
+                        }]
+                    },
+                    topEnd: {
+                        rowClass: "row m-3 my-0 justify-content-between",
+                        features: [{
+                            pageLength: { menu: [7, 10, 25, 50, 100], text: "_MENU_" },
+                            buttons: [
+                                {
+                                    extend: "collection",
+                                    className: "btn btn-label-secondary dropdown-toggle me-4",
+                                    text: `
+                                        <span class="d-flex align-items-center gap-1">
+                                            <i class="icon-base ti ti-upload icon-xs"></i>
+                                            <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                                        </span>`,
+                                    buttons: [
+                                        { extend: "print", className: "dropdown-item", text: `<i class="icon-base ti tabler-printer me-1"></i> Print`, exportOptions: { columns: [3, 4, 5, 6, 7] } },
+                                        { extend: "csv", className: "dropdown-item", text: `<i class="icon-base ti tabler-file me-1"></i> CSV`, exportOptions: { columns: [3, 4, 5, 6, 7] } },
+                                        { extend: "excel", className: "dropdown-item", text: `<i class="icon-base ti tabler-upload me-1"></i> Excel`, exportOptions: { columns: [3, 4, 5, 6, 7] } },
+                                        { extend: "pdf", className: "dropdown-item", text: `<i class="icon-base ti tabler-file-text me-1"></i> PDF`, exportOptions: { columns: [3, 4, 5, 6, 7] } },
+                                        { extend: "copy", className: "dropdown-item", text: `<i class="icon-base ti tabler-copy me-1"></i> Kopyala`, exportOptions: { columns: [3, 4, 5, 6, 7] } }
+                                    ]
+                                },
+                                {
+                                    text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i> <span class="d-none d-sm-inline-block">Yeni Kayıt</span>`,
+                                    className: "add-new btn btn-primary",
+                                    action: function () {
+                                        window.location.href = "Create";
+                                    }
+                                }
+                            ]
+                        }]
+                    },
+                    bottomStart: {
+                        rowClass: "row mx-3 justify-content-between",
+                        features: ["info"]
+                    },
+                    bottomEnd: "paging"
+                },
+                initComplete: function () {
+                    const api = this.api();
+                }
+            });
+
+            // Stil düzeltmeleri
+            setTimeout(() => {
+                const adjustments = [
+                    { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
+                    { selector: ".dt-buttons.btn-group", classToAdd: "mb-md-0 mb-6" },
+                    { selector: ".dt-search .form-control", classToRemove: "form-control-sm", classToAdd: "ms-0" },
+                    { selector: ".dt-search", classToAdd: "mb-0 mb-md-6" },
+                    { selector: ".dt-length .form-select", classToRemove: "form-select-sm" },
+                    { selector: ".dt-layout-end", classToAdd: "gap-md-2 gap-0 mt-0" },
+                    { selector: ".dt-layout-start", classToAdd: "mt-0" },
+                    { selector: ".dt-layout-table", classToRemove: "row mt-2" },
+                    { selector: ".dt-layout-full", classToRemove: "col-md col-12", classToAdd: "table-responsive" }
+                ];
+
+                adjustments.forEach(({ selector, classToRemove, classToAdd }) => {
+                    document.querySelectorAll(selector).forEach(element => {
+                        if (classToRemove) {
+                            classToRemove.split(" ").forEach(cls => element.classList.remove(cls));
+                        }
+
+                        if (classToAdd) {
+                            classToAdd.split(" ").forEach(cls => element.classList.add(cls));
+                        }
+                    });
+                });
+            }, 100);
+
+            // Eğer özel filtre dropdown'ı eklenecekse
+            function addFilterDropdown(column, containerSelector, placeholder, map) {
+                let select = document.createElement("select");
+                select.className = "form-select text-capitalize";
+                select.innerHTML = `<option value="">${placeholder}</option>`;
+                document.querySelector(containerSelector).appendChild(select);
+
+                select.addEventListener("change", function () {
+                    const val = select.value ? `^${select.value}$` : "";
+                    column.search(val, true, false).draw();
+                });
+
+                column.data().unique().sort().each(function (value) {
+                    const item = map.find(x => x.id === value);
+                    if (item) {
+                        let option = document.createElement("option");
+                        option.value = item.id;
+                        option.textContent = item.title;
+                        select.appendChild(option);
+                    }
+                });
+            }
+        });
+    };
+
+    return { init };
+})(jQuery);
