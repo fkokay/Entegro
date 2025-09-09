@@ -22,14 +22,14 @@
                         <!-- Nested Attributes -->
                         <div class="AttributesRepeater">
                             <div data-repeater-list="Attributes">
-                                @foreach (var productAttribute in Model.ProductAttributeMappings)
+                                @foreach (var productVariantAttribute in Model.ProductVariantAttributes)
                                 {
-                                    <div data-repeater-item class="repeater-wrapper row mb-2" data-attribute-id="@productAttribute.ProductAttributeId">
-                                        <input type="hidden" name="ProductAttributeId" value="@productAttribute.Id" />
+                                    <div data-repeater-item class="repeater-wrapper row mb-2">
+                                        <input type="hidden" name="ProductAttributeId" />
                                         <div class="col-md-2 col-12 mb-md-0 mb-3">
-                                            <p class="mb-2 repeater-title">@productAttribute.ProductAttribute</p>
+                                            <p class="mb-2 repeater-title">@productVariantAttribute.ProductAttribute</p>
                                             <select name="ProductAttributeValueId" class="form-select item-details mb-3">
-                                                @foreach (var val in productAttribute.Attribute.Values)
+                                                @foreach (var val in productVariantAttribute.ProductVariantAttributeValues)
                                                 {
                                                     <option value="@val.Id">@val.Name</option>
                                                 }
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        @if (Model.ProductAttributeMappings.Any())
+        @if (Model.ProductVariantAttributes.Any())
         {
             <div class="col-12 mt-2 p-3">
                 <button type="button" class="btn btn-primary" data-repeater-create>Yeni Varyant</button>

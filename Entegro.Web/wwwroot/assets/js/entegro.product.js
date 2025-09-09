@@ -150,7 +150,7 @@ Entegro.product = (function ($) {
                     }
                 });
             }
-           /* clearCategoryValidationUI();*/
+            /* clearCategoryValidationUI();*/
         });
 
         $(document).on('click', '#btnSaveProductCategory', function () {
@@ -175,11 +175,11 @@ Entegro.product = (function ($) {
                             text: 'Kategori başarıyla kaydedildi.',
                             confirmButtonText: 'Tamam'
                         }).then(() => {
-                            location.reload(); 
+                            location.reload();
                         });
                         //$modal.modal('hide');
                         //loadProductCategories($('#productId').val(), tableSelector);
-                        
+
                     } else {
                         Swal.fire({ icon: 'error', title: 'Hata!', text: json?.errors?.join('\n') || 'Kayıt başarısız.' });
                     }
@@ -194,7 +194,7 @@ Entegro.product = (function ($) {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');
             const mappingId = $tr.data('mapping-id');
-            
+
             if (mappingId === undefined || mappingId === null) return;
 
             Swal.fire({
@@ -306,7 +306,7 @@ Entegro.product = (function ($) {
     function initVariantsRepeater(data) {
         const $repeater = $('#ProductVariantAttributeCombinationRepeater');
         if (!$repeater.length) return;
- 
+
         $repeater.repeater({
             initEmpty: false,
             show: function () { $(this).slideDown(); },
@@ -314,7 +314,8 @@ Entegro.product = (function ($) {
                 if (confirm('Varyant silinecek emin misiniz?')) {
                     console.log($(this)); // Bu, silinecek olan elemanı temsil eder
                     $(this).slideUp(deleteElement);
-                }; },
+                };
+            },
             repeaters: [{
                 selector: '.AttributesRepeater',
                 initEmpty: false,
@@ -347,10 +348,10 @@ Entegro.product = (function ($) {
             $row.find('[name$="[StockQuantity]"]').val(item.StockQuantity);
 
             $.each(item.Attributes, function (j, attr) {
-                var $attrRow = $row.find('[data-attribute-id="' + attr.ProductAttributeId + '"]');
+                var $attrRow = $row.find('[data-repeater-list="Attributes"]');
                 if ($attrRow.length) {
-                    $attrRow.find('[name$="[ProductAttributeId]"]').val(attr.ProductAttributeId);
-                    $attrRow.find('[name$="[ProductAttributeValueId]"]').val(attr.ProductAttributeValueId);
+                    $attrRow.find('[name$="[Attributes][' + j + '][ProductAttributeId]"]').val(attr.ProductVariantAttributeId);
+                    $attrRow.find('[name$="[Attributes][' + j + '][ProductAttributeValueId]"]').val(attr.ProductVariantAttributeValueId);
                 }
             });
 
