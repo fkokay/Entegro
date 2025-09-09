@@ -1,6 +1,4 @@
-﻿using Entegro.Web.Models.Catalog.Categories;
-
-namespace Entegro.Web.Models.Catalog.Products
+﻿namespace Entegro.Web.Models.Catalog.Products
 {
     public class ProductCategoryViewModel
     {
@@ -8,7 +6,7 @@ namespace Entegro.Web.Models.Catalog.Products
         public int CategoryId { get; set; }
         public int ProductId { get; set; }
         public int DisplayOrder { get; set; }
-        public CategoryViewModel Category { get; set; }
+        public string CategoryBreadcrumb { get; set; } = string.Empty;
 
     }
 }

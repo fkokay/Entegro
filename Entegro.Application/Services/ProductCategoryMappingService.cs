@@ -10,13 +10,19 @@ namespace Entegro.Application.Services
     public class ProductCategoryMappingService : IProductCategoryMappingService
     {
         private readonly IProductCategoryMappingRepository _productCategoryMappingRepository;
-        private readonly ICategoryRepository _catRepo;
+        private readonly ICategoryService _categoryService;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        public ProductCategoryMappingService(IProductCategoryMappingRepository productCategoryMappingRepository, IMapper mapper, ICategoryRepository catRepo)
+        public ProductCategoryMappingService(
+            IProductCategoryMappingRepository productCategoryMappingRepository,
+            IMapper mapper,
+            ICategoryService categoryService,
+            ICategoryRepository categoryRepository)
         {
             _productCategoryMappingRepository = productCategoryMappingRepository ?? throw new ArgumentNullException(nameof(productCategoryMappingRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _catRepo = catRepo;
+            _categoryService = categoryService;
+            _categoryRepository = categoryRepository;
         }
         public async Task<ProductCategoryDto> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategoryDto)
         {
@@ -64,7 +70,19 @@ namespace Entegro.Application.Services
         public async Task<List<ProductCategoryDto>> GetByProductWithCategoryAsync(int productId)
         {
             var productCategories = await _productCategoryMappingRepository.GetByProductWithCategoryAsync(productId);
-            var productCategoryDtos = _mapper.Map<List<ProductCategoryDto>>(productCategories);
+
+            var productCategoryDtos = await productCategories.SelectAwait(async c =>
+            {
+                var model = _mapper.Map<ProductCategoryDto>(productCategories);
+                model.Id = c.Id;
+                model.CategoryId = c.CategoryId;
+                model.ProductId = c.ProductId;
+                model.DisplayOrder = c.DisplayOrder;
+                model.CategoryBreadcrumb = await _categoryService.GetCategoryPathAsync(c.Category);
+
+                return model;
+            }).ToListAsync();
+
             return productCategoryDtos;
         }
     }
