@@ -747,7 +747,19 @@ namespace Entegro.Web.Controllers
 
 
         }
-
+        [HttpPost]
+        public async Task<IActionResult> DeleteProductIntegration(int id)
+        {
+            try
+            {
+                await _productIntegrationService.DeleteProductIntegrationAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         #endregion
 
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)

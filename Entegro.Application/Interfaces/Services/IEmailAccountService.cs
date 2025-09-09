@@ -9,6 +9,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<List<EmailAccountDto>> GetAllAsync();
         Task<EmailAccountDto> AddAsync(CreateEmailAccountDto mail);
         Task<PagedResult<EmailAccountDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<PagedResult<EmailAccountDto>> GetPagedAsync(GridCommand gridCommand);
         Task<EmailAccountDto> UpdateAsync(UpdateEmailAccountDto mail);
         Task DeleteAsync(int id);
     }

@@ -1,5 +1,4 @@
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
 using Entegro.Application.Events;
@@ -10,7 +9,6 @@ using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings;
-using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Application.Services.Commerce.Smartstore;
@@ -20,14 +18,11 @@ using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.EventBus;
 using Entegro.Infrastructure.Repositories;
-using Entegro.Service;
 using Entegro.Service.Jobs;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Quartz;
 using Serilog;
 using Serilog.Extensions.Logging;
@@ -140,29 +135,29 @@ var host = Host.CreateDefaultBuilder(args)
             //        .RepeatForever())
             //    );
 
-            var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+            //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
-            q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
-
-            q.AddTrigger(opts => opts
-                .ForJob(jobKeyTrendyol)
-                .WithIdentity("TrendyolDataSyncJob-trigger")
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(10)
-                    .RepeatForever())
-            );
-
-            //var jobKeyErp = new JobKey("ErpDataSyncJob");
-
-            //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+            //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
 
             //q.AddTrigger(opts => opts
-            //    .ForJob(jobKeyErp)
-            //    .WithIdentity("ErpDataSyncJob-trigger")
+            //    .ForJob(jobKeyTrendyol)
+            //    .WithIdentity("TrendyolDataSyncJob-trigger")
             //    .WithSimpleSchedule(x => x
             //        .WithIntervalInMinutes(10)
             //        .RepeatForever())
             //);
+
+            var jobKeyErp = new JobKey("ErpDataSyncJob");
+
+            q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+
+            q.AddTrigger(opts => opts
+                .ForJob(jobKeyErp)
+                .WithIdentity("ErpDataSyncJob-trigger")
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInMinutes(10)
+                    .RepeatForever())
+            );
         });
     }).Build();
 

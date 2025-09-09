@@ -1,5 +1,4 @@
-﻿
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.EmailAccount;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -80,6 +79,18 @@ namespace Entegro.Application.Services
                 TotalCount = emails.TotalCount,
                 PageNumber = emails.PageNumber,
                 PageSize = emails.PageSize
+            };
+        }
+
+        public async Task<PagedResult<EmailAccountDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var brands = await _emailAccountRepository.GetPagedAsync(gridCommand);
+            return new PagedResult<EmailAccountDto>
+            {
+                Items = _mapper.Map<IEnumerable<EmailAccountDto>>(brands.Items),
+                TotalCount = brands.TotalCount,
+                PageNumber = brands.PageNumber,
+                PageSize = brands.PageSize
             };
         }
 
