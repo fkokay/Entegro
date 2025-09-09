@@ -150,7 +150,7 @@ Entegro.product = (function ($) {
                     }
                 });
             }
-           /* clearCategoryValidationUI();*/
+            /* clearCategoryValidationUI();*/
         });
 
         $(document).on('click', '#btnSaveProductCategory', function () {
@@ -175,11 +175,11 @@ Entegro.product = (function ($) {
                             text: 'Kategori başarıyla kaydedildi.',
                             confirmButtonText: 'Tamam'
                         }).then(() => {
-                            location.reload(); 
+                            location.reload();
                         });
                         //$modal.modal('hide');
                         //loadProductCategories($('#productId').val(), tableSelector);
-                        
+
                     } else {
                         Swal.fire({ icon: 'error', title: 'Hata!', text: json?.errors?.join('\n') || 'Kayıt başarısız.' });
                     }
@@ -194,7 +194,7 @@ Entegro.product = (function ($) {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');
             const mappingId = $tr.data('mapping-id');
-            
+
             if (mappingId === undefined || mappingId === null) return;
 
             Swal.fire({
@@ -306,7 +306,7 @@ Entegro.product = (function ($) {
     function initVariantsRepeater(data) {
         const $repeater = $('#ProductVariantAttributeCombinationRepeater');
         if (!$repeater.length) return;
- 
+
         $repeater.repeater({
             initEmpty: false,
             show: function () { $(this).slideDown(); },
@@ -314,9 +314,10 @@ Entegro.product = (function ($) {
                 if (confirm('Varyant silinecek emin misiniz?')) {
                     console.log($(this)); // Bu, silinecek olan elemanı temsil eder
                     $(this).slideUp(deleteElement);
-                }; },
+                };
+            },
             repeaters: [{
-                selector: '.AttributesRepeater',
+                selector: '.ProductVariantAttributeSelectionRepeater',
                 initEmpty: false,
                 show: function () { $(this).slideDown(); },
                 hide: function (deleteElement) { if (confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement); }
@@ -346,11 +347,11 @@ Entegro.product = (function ($) {
             $row.find('[name$="[Price]"]').val(item.Price);
             $row.find('[name$="[StockQuantity]"]').val(item.StockQuantity);
 
-            $.each(item.Attributes, function (j, attr) {
-                var $attrRow = $row.find('[data-attribute-id="' + attr.ProductAttributeId + '"]');
+            $.each(item.ProductVariantAttributeSelections, function (j, attr) {
+                var $attrRow = $row.find('[data-repeater-list="ProductVariantAttributeSelections"]');
                 if ($attrRow.length) {
-                    $attrRow.find('[name$="[ProductAttributeId]"]').val(attr.ProductAttributeId);
-                    $attrRow.find('[name$="[ProductAttributeValueId]"]').val(attr.ProductAttributeValueId);
+                    $attrRow.find('[name$="[ProductVariantAttributeSelections][' + j + '][ProductVariantAttributeId]"]').val(attr.ProductVariantAttributeId);
+                    $attrRow.find('[name$="[ProductVariantAttributeSelections][' + j + '][ProductVariantAttributeValueId]"]').val(attr.ProductVariantAttributeValueId);
                 }
             });
 
@@ -370,19 +371,17 @@ Entegro.product = (function ($) {
                 $(this).attr('name', name.replace(/ProductVariantAttributeCombinations\[\d+\]/, 'ProductVariantAttributeCombinations[' + i + ']'));
             });
 
-            $row.find('[data-repeater-list="Attributes"]').children('[data-repeater-item]').each(function (j) {
+            $row.find('[data-repeater-list="ProductVariantAttributeSelections"]').children('[data-repeater-item]').each(function (j) {
                 var $attr = $(this);
                 $attr.find('input, select').each(function () {
                     var name = $(this).attr('name');
                     if (!name) return;
 
-                    var newName = 'ProductVariantAttributeCombinations[' + i + '][Attributes][' + j + ']';
-                    if (name.includes('ProductAttributeId')) newName += '[ProductAttributeId]';
-                    else if (name.includes('ProductAttributeValueId')) newName += '[ProductAttributeValueId]';
+                    var newName = 'ProductVariantAttributeCombinations[' + i + '][ProductVariantAttributeSelections][' + j + ']';
+                    if (name.includes('ProductVariantAttributeId')) newName += '[ProductVariantAttributeId]';
+                    else if (name.includes('ProductVariantAttributeValueId')) newName += '[ProductVariantAttributeValueId]';
 
                     $(this).attr('name', newName);
-
-                    if (name.includes('ProductAttributeId') && !$(this).val()) $(this).val($attr.data('attribute-id'));
                 });
             });
         });

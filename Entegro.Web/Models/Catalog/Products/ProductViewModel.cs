@@ -47,37 +47,7 @@ namespace Entegro.Web.Models.Catalog.Products
         public BrandViewModel? Brand { get; set; }
         public string? PictureUrl { get; set; }
         public List<ProductMediaFileViewModel> ProductMediaFiles { get; set; } = new List<ProductMediaFileViewModel>();
-        public List<ProductAttributeMappingViewModel> ProductAttributeMappings { get; set; } = new List<ProductAttributeMappingViewModel>();
+        public List<ProductVariantAttributeViewModel> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeViewModel>();
         public List<ProductVariantAttributeCombinationViewModel> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationViewModel>();
-
-        public class ProductVariantAttributeCombinationViewModel
-        {
-            public int Id { get; set; }
-            public int ProductId { get; set; }
-            public string Name { get; set; }
-            public string? StokCode { get; set; }
-            public string? Gtin { get; set; }
-            public string? ManufacturerPartNumber { get; set; }
-            public decimal Price { get; set; } = 0;
-            public int StockQuantity { get; set; } = 0;
-
-            public List<ProductVariantAttributeSelection> Attributes { get; set; } = new List<ProductVariantAttributeSelection>();
-
-        }
-
-        public class ProductAttributeMappingViewModel
-        {
-            public int Id { get; set; }
-            public int ProductId { get; set; }
-            public int ProductAttributeId { get; set; }
-            public string ProductAttribute { get; set; }
-            public bool IsRequried { get; set; }
-            public int AttributeControlTypeId { get; set; }
-            public int DisplayOrder { get; set; }
-
-
-            public ProductViewModel Product { get; set; }
-            public ProductAttributeViewModel Attribute { get; set; }
-        }
     }
 }
