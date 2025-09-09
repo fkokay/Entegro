@@ -20,6 +20,18 @@ Entegro.product = (function ($) {
         });
     }
 
+    function Init() {
+        if ($('#SelectedProductAttributeIds').length && !$('#SelectedProductAttributeIds').data('select2')) {
+            $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
+            $('#SelectedProductAttributeIds').select2({
+                width: '100%',
+                placeholder: 'Varyant seçiniz',
+                allowClear: true,
+                dropdownParent: $('#SelectedProductAttributeIds').parent()
+            });
+        };
+    }
+
     function TabsInit() {
         const tabButtons = document.querySelectorAll('#product-tabs button[data-bs-toggle="tab"]');
 
@@ -354,8 +366,8 @@ Entegro.product = (function ($) {
                     },
                     'VatRate': {
                         validators: {
-                            notEmpty: { message: 'Yükseklik boş bırakılamaz.' },
-                            numeric: { message: 'Yükseklik geçerli bir sayı olmalıdır.' }
+                            notEmpty: { message: 'Kdv oranı boş bırakılamaz.' },
+                            numeric: { message: 'Kdv oranı geçerli bir sayı olmalıdır.' }
                         }
                     },
                     'Barcode': {
@@ -397,16 +409,18 @@ Entegro.product = (function ($) {
 
                     instance.on('core.field.invalid', function (e) {
                         const fieldEl = e.elements && e.elements.length ? e.elements[0] : null;
-                        if (fieldEl) focusFieldAndShowTab(fieldEl);
+                        if (fieldEl) FocusFieldAndShowTab(fieldEl);
                     });
 
                     instance.on('core.form.invalid', function () {
                         const invalidEl = document.querySelector('[data-field].is-invalid, .is-invalid');
-                        if (invalidEl) focusFieldAndShowTab(invalidEl);
+                        if (invalidEl) FocusFieldAndShowTab(invalidEl);
                     });
 
                     instance.on('core.form.valid', function () {
-                        document.getElementById('Description').value = fullEditor.root.innerHTML;
+                        if (typeof fullEditor !== "undefined" && fullEditor.root) {
+                            document.getElementById('Description').value = fullEditor.root.innerHTML;
+                        }
 
                         const form = $('#product-form');
                         const action = $('#product-form').attr("action");
@@ -418,7 +432,7 @@ Entegro.product = (function ($) {
                             data: formData,
                             success: function (response) {
                                 if (response.success) {
-                                    showMessage("Hata!", response.message || 'Bir hata oluştu.', "success","/Product/List");
+                                    showMessage("Başarılı!", 'Ürün başarıyla kaydedildi.', "success", "/Product/List");
                                 } else {
                                     showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
                                 }
@@ -431,6 +445,60 @@ Entegro.product = (function ($) {
                 }
             }
         );
+
+        document.querySelectorAll('[name^="ProductVariantAttributeCombinations"][name$="[StokCode]"]').forEach(function (el) {
+            const name = el.getAttribute('name');
+
+            formValidation.addField(name, {
+                validators: {
+                    notEmpty: { message: 'Varyant Stok kodu boş bırakılamaz.' },
+                    stringLength: {
+                        max: 50,
+                        message: 'Varyant Stok kodu en fazla 50 karakter olabilir.'
+                    }
+                }
+            });
+
+            el.addEventListener('input', function () {
+                formValidation.revalidateField(name);
+            });
+        });
+        document.querySelectorAll('[name^="ProductVariantAttributeCombinations"][name$="[Price]"]').forEach(function (el) {
+            const name = el.getAttribute('name');
+
+            formValidation.addField(name, {
+                validators: {
+                    notEmpty: { message: 'Varyant fiyatı boş bırakılamaz.' },
+                }
+            });
+
+            el.addEventListener('input', function () {
+                formValidation.revalidateField(name);
+            });
+        });
+        document.querySelectorAll('[name^="ProductVariantAttributeCombinations"][name$="[StockQuantity]"]').forEach(function (el) {
+            const name = el.getAttribute('name');
+
+            formValidation.addField(name, {
+                validators: {
+                    notEmpty: { message: 'Varyant stok miktarı boş bırakılamaz.' },
+                }
+            });
+
+            el.addEventListener('input', function () {
+                formValidation.revalidateField(name);
+            });
+        });
+    }
+
+    function FocusFieldAndShowTab(fieldEl) {
+        const tabPane = fieldEl.closest('.tab-pane');
+        if (tabPane) {
+            const tabId = tabPane.getAttribute('id');
+            const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
+            if (tabTrigger) new bootstrap.Tab(tabTrigger).show();
+        }
+        fieldEl.focus();
     }
 
     function RefreshTab(tabSelector) {
@@ -457,6 +525,7 @@ Entegro.product = (function ($) {
     }
 
     return {
+        Init: Init,
         TabsInit: TabsInit,
         DescriptionEditor: DescriptionEditor,
         ProductCategoryCreatePopup: ProductCategoryCreatePopup,

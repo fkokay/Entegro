@@ -175,7 +175,7 @@ namespace Entegro.Web.Controllers
                     ManufacturerPartNumber = m.ManufacturerPartNumber,
                     Price = m.Price,
                     StockQuantity = m.StockQuantity,
-                    ProductId = m.ProductId,
+                    ProductId = model.Id,
                     StokCode = m.StokCode,
                 }).ToList();
 

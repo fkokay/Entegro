@@ -37,6 +37,8 @@ namespace Entegro.Infrastructure.Repositories
 
             _context.Entry(product).State = EntityState.Modified;
             _context.Entry(product).Collection(p => p.ProductIntegrations).IsModified = false;
+            _context.Entry(product).Collection(p => p.ProductVariantAttributeCombinations).IsModified = false;
+            _context.Entry(product).Collection(p => p.ProductVariantAttributes).IsModified = false;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
         }

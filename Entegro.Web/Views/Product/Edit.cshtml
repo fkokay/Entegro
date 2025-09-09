@@ -58,6 +58,7 @@
             const productId = @Html.Raw(Model.Id);
             window.variantData = @Html.Raw(JsonSerializer.Serialize(Model.ProductVariantAttributeCombinations));
 
+            Entegro.product.Init();
             Entegro.product.TabsInit();
             Entegro.product.DescriptionEditor();
             Entegro.product.ProductVariantAttributeCombinationRepeaterInit(window.variantData);

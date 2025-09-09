@@ -13,16 +13,19 @@ namespace Entegro.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IProductVariantAttributeCombinationRepository _productVariantAttributeCombinationRepository;
         private readonly IBrandService _brandService;
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
         public ProductService(
             IProductRepository productRepository,
+            IProductVariantAttributeCombinationRepository productVariantAttributeCombinationRepository,
             IBrandService brandService,
             ICategoryService categoryService,
             IMapper mapper)
         {
             _productRepository = productRepository;
+            _productVariantAttributeCombinationRepository = productVariantAttributeCombinationRepository;
             _brandService = brandService;
             _categoryService = categoryService;
             _mapper = mapper;
@@ -159,6 +162,18 @@ namespace Entegro.Application.Services
 
             _mapper.Map(updateProduct, existingProduct);
             await _productRepository.UpdateAsync(existingProduct);
+
+            foreach (var item in existingProduct.ProductVariantAttributeCombinations)
+            {
+                if (item.Id == 0)
+                {
+                    await _productVariantAttributeCombinationRepository.AddAsync(item);
+                }
+                else
+                {
+                    await _productVariantAttributeCombinationRepository.UpdateAsync(item);
+                }
+            }
 
             return _mapper.Map<ProductDto>(existingProduct);
         }
