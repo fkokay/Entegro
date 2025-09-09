@@ -503,6 +503,54 @@ Entegro.product.list = (function ($) {
         });
     }
 
+    function deleteIntegration(integrationId) {
+        Swal.fire({
+            title: 'Emin misiniz?',
+            text: 'Bu entegrasyon silinecek!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Evet, sil!',
+            cancelButtonText: 'Vazgeç'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Product/DeleteProductIntegration',
+                    type: 'POST',
+                    data: { id: integrationId },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Silindi!',
+                                text: 'Entegrasyon başarıyla silindi.',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // Sayfayı yenile
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: response.message || 'Bir hata oluştu.',
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: 'Silme işlemi sırasında bir hata oluştu.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+
     return {
         getIntegrationLogo: getIntegrationLogo,
         createDropdownLinks: createDropdownLinks,
@@ -511,5 +559,6 @@ Entegro.product.list = (function ($) {
         editIntegration: editIntegration,
         initList: initList,
         deleteProduct: deleteProduct,
+        deleteIntegration: deleteIntegration 
     };
 })(jQuery);

@@ -1,8 +1,6 @@
-﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Services;
 using Entegro.Web.Models.Platform.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +12,7 @@ namespace Entegro.Web.Controllers
     {
         private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
-        public UserController(IUserService userService,ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -109,23 +107,16 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UserList([FromBody] GridCommand model)
+        public async Task<IActionResult> UserList([FromBody] GridCommand gridCommand)
         {
-
-            int pageNumber = model.Start / model.Length;
-            int pageSize = model.Length;
-
-
-            var result = await _userService.GetUsersAsync(pageNumber, model.Length);
-
+            var result = await _userService.GetPagedAsync(gridCommand);
             return Json(new
             {
-                draw = model.Draw,
+                draw = gridCommand.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
-
         }
     }
 }

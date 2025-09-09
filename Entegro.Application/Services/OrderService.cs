@@ -1,6 +1,5 @@
 ﻿
 using Entegro.Application.DTOs.Common;
-using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -71,6 +70,18 @@ namespace Entegro.Application.Services
             var orders = await _orderRepository.GetAllAsync(pageNumber, pageSize);
             var orderDtos = _mapper.Map<PagedResult<OrderDto>>(orders);
             return orderDtos;
+        }
+
+        public async Task<PagedResult<OrderDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var orders = await _orderRepository.GetPagedAsync(gridCommand);
+            return new PagedResult<OrderDto>
+            {
+                Items = _mapper.Map<IEnumerable<OrderDto>>(orders.Items),
+                TotalCount = orders.TotalCount,
+                PageNumber = orders.PageNumber,
+                PageSize = orders.PageSize
+            };
         }
 
         public async Task<OrderDto> UpdateOrderAsync(UpdateOrderDto updateOrder)

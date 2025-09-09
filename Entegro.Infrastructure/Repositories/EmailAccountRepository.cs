@@ -3,7 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Platform.Messaging;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq.Dynamic.Core;
 namespace Entegro.Infrastructure.Repositories
 {
     public class EmailAccountRepository : IEmailAccountRepository
@@ -36,7 +36,7 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.EmailAccounts.ToListAsync();
         }
 
-        public async Task<PagedResult<EmailAccount>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<Application.DTOs.Common.PagedResult<EmailAccount>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.EmailAccounts.AsQueryable();
 
@@ -46,7 +46,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<EmailAccount>
+            return new Application.DTOs.Common.PagedResult<EmailAccount>
             {
                 Items = brands,
                 TotalCount = totalCount,
@@ -58,6 +58,45 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<EmailAccount?> GetByIdAsync(int id)
         {
             return await _context.EmailAccounts.FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<EmailAccount>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var query = _context.EmailAccounts.AsNoTracking();
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.Email.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var accounts = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<EmailAccount>
+            {
+                Items = accounts,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
         }
 
         public async Task UpdateAsync(EmailAccount email)

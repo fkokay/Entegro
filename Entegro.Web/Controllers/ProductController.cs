@@ -9,7 +9,6 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Web.Models.Catalog.Attributes;
-using Entegro.Web.Models.Catalog.Categories;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
@@ -31,6 +30,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductService _productService;
         private readonly IProductCategoryMappingService _productCategoryMappingService;
         private readonly IBrandService _brandService;
+        private readonly ICategoryService _categoryService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductVariantAttributeService _productAttributeMappingService;
         private readonly IProductImageMappingService _productImageMappingService;
@@ -60,6 +60,7 @@ namespace Entegro.Web.Controllers
             _productIntegrationService = productIntegrationService;
             _productAttributeFormatter = productAttributeFormatter;
             _trenyolService = trendyolService;
+            _categoryService = categoryService;
         }
 
         #region Product list / create / edit / delete
@@ -269,19 +270,19 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ProductCategoryList(int productId)
         {
-            var productCategory = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
+            var productCategories = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
 
-            return PartialView("_CategoryProductPartial", productCategory.Select(x => new ProductCategoryViewModel
+            var categoryTree = await _categoryService.GetCategoryTreeAsync(includeHidden: false);
+            var categories = categoryTree.Flatten(false);
+
+
+            return PartialView("_CategoryProductPartial", productCategories.Select(x => new ProductCategoryViewModel
             {
                 Id = x.Id,
                 CategoryId = x.CategoryId,
+                CategoryBreadcrumb = x.CategoryBreadcrumb,
                 ProductId = x.ProductId,
                 DisplayOrder = x.DisplayOrder,
-                Category = new CategoryViewModel
-                {
-                    Id = x.Category.Id,
-                    Name = x.Category.Name
-                }
             }).ToList());
         }
 
@@ -798,7 +799,19 @@ namespace Entegro.Web.Controllers
 
 
         }
-
+        [HttpPost]
+        public async Task<IActionResult> DeleteProductIntegration(int id)
+        {
+            try
+            {
+                await _productIntegrationService.DeleteProductIntegrationAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         #endregion
 
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)

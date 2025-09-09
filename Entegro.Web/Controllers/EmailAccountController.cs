@@ -4,7 +4,6 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Platform.Messaging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -104,18 +103,12 @@ namespace Entegro.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> EmailAccountList([FromBody] GridCommand model)
+        public async Task<IActionResult> EmailAccountList([FromBody] GridCommand gridCommand)
         {
-
-            int pageNumber = model.Start / model.Length;
-            int pageSize = model.Length;
-
-
-            var result = await _emailAccountService.GetPagedAsync(pageNumber, model.Length);
-
+            var result = await _emailAccountService.GetPagedAsync(gridCommand);
             return Json(new
             {
-                draw = model.Draw,
+                draw = gridCommand.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

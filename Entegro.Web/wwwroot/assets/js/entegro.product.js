@@ -150,14 +150,14 @@ Entegro.product = (function ($) {
                     }
                 });
             }
-            //clearCategoryValidationUI();
+           /* clearCategoryValidationUI();*/
         });
 
         $(document).on('click', '#btnSaveProductCategory', function () {
             //if (!validateProductCategoryModal().valid) return;
 
             const payload = {
-                productId: Number($('#productId').val()) || 0,
+                productId: Number($('#ProductId').val()) || 0,
                 categoryId: Number($('#CategoryId').val()) || 0,
                 displayOrder: Number($('#DisplayOrder').val()) || 0
             };
@@ -169,8 +169,17 @@ Entegro.product = (function ($) {
                 data: JSON.stringify(payload),
                 success: function (json) {
                     if (json?.success) {
-                        $modal.modal('hide');
-                        loadProductCategories($('#productId').val(), tableSelector);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı!',
+                            text: 'Kategori başarıyla kaydedildi.',
+                            confirmButtonText: 'Tamam'
+                        }).then(() => {
+                            location.reload(); 
+                        });
+                        //$modal.modal('hide');
+                        //loadProductCategories($('#productId').val(), tableSelector);
+                        
                     } else {
                         Swal.fire({ icon: 'error', title: 'Hata!', text: json?.errors?.join('\n') || 'Kayıt başarısız.' });
                     }
@@ -183,10 +192,10 @@ Entegro.product = (function ($) {
 
         // Silme işlemi
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
-            console.log('Sil butonuna tıklandı'); 
             const $tr = $(this).closest('tr');
             const mappingId = $tr.data('mapping-id');
-            if (!mappingId) return;
+            
+            if (mappingId === undefined || mappingId === null) return;
 
             Swal.fire({
                 title: 'Emin misiniz?',
@@ -206,10 +215,13 @@ Entegro.product = (function ($) {
                         $tr.remove();
                         Swal.fire({ icon: 'success', title: 'Silindi', timer: 1200, showConfirmButton: false });
                     },
-                    error: function () { Swal.fire({ icon: 'error', title: 'Silme başarısız', text: 'Bir hata oluştu.' }); }
+                    error: function () {
+                        Swal.fire({ icon: 'error', title: 'Silme başarısız', text: 'Bir hata oluştu.' });
+                    }
                 });
             });
         });
+
     }
 
     function initCategoryTabLoader(tabBtnSelector, tabPaneSelector) {

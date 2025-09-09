@@ -1,5 +1,4 @@
-﻿
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -47,6 +46,18 @@ namespace Entegro.Application.Services
             }
             var userDto = _mapper.Map<UserDto>(user);
             return userDto;
+        }
+
+        public async Task<PagedResult<UserDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var users = await _userRepository.GetPagedAsync(gridCommand);
+            return new PagedResult<UserDto>
+            {
+                Items = _mapper.Map<IEnumerable<UserDto>>(users.Items),
+                TotalCount = users.TotalCount,
+                PageNumber = users.PageNumber,
+                PageSize = users.PageSize
+            };
         }
 
         public async Task<UserDto> GetUserByIdAsync(int userId)

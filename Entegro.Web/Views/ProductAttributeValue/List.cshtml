@@ -30,49 +30,6 @@
     </div>
 </div>
 
-
-@* <!-- Create Product Attribute Value Modal -->
-<div class="modal fade" id="createAttributeValue" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Yeni Varyant Değeri</h3>
-                </div>
-
-                <form id="createAttributeValueForm" class="row g-3" onsubmit="return false;">
-                    <!-- ProductAttributeId -->
-                    <div class="col-12 mb-3">
-                        <label class="form-label" for="ProductAttributeId">Varyant Adı <span class="text-danger">*</span></label>
-                        <select id="ProductAttributeId" name="ProductAttributeId" class="form-select" style="width:100%"></select>
-                    </div>
-
-                    <!-- Name -->
-                    <div class="col-12 mb-3">
-                        <label class="form-label" for="Name">Değer Adı <span class="text-danger">*</span></label>
-                        <input type="text" id="Name" name="Name" class="form-control" placeholder="Örn: Kırmızı" />
-                    </div>
-
-                    <!-- DisplayOrder -->
-                    <div class="col-12 mb-3">
-                        <label class="form-label" for="DisplayOrder">Gösterim Sırası <span class="text-danger">*</span></label>
-                        <input type="number" id="DisplayOrder" name="DisplayOrder" class="form-control" placeholder="0" />
-                    </div>
-
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">Vazgeç</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div> *@
-
-
-<!-- Edit Product Attribute Value Modal -->
 <div class="modal fade" id="CreateOrUpdateModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-dialog-centered">
         <div class="modal-content p-3 p-md-5">
@@ -91,8 +48,8 @@
 
 @section Scripts {
 
-    <script src="/assets/js/entegro.attributevalue.js"></script>
-    <script src="/assets/js/entegro.attributevalue.list.js"></script>
+    <script src="/assets/js/entegro.attributevalue.js" asp-append-version="true"></script>
+    <script src="/assets/js/entegro.attributevalue.list.js" asp-append-version="true"></script>
     <script>
              $(function () {
              Entegro.AttributeValue.List.init();

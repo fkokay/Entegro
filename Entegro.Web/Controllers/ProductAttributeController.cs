@@ -68,60 +68,6 @@ namespace Entegro.Web.Controllers
             return Json(new { success = true });
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create(ProductAttributeViewModel model)
-        //{
-        //    var createDto = new CreateProductAttributeDto
-        //    {
-        //        Name = model.Name,
-        //        Description = model.Description,
-        //        DisplayOrder = model.DisplayOrder,
-        //    };
-        //    await _productAttributeService.AddAsync(createDto);
-
-        //    return Json(new { success = true });
-        //}
-
-
-        //[HttpGet]
-        //public async Task<IActionResult> Edit(int id)
-        //{
-        //    var productAttribute = await _productAttributeService.GetByIdAsync(id);
-        //    if (productAttribute == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var productAttributeModel = new ProductAttributeViewModel
-        //    {
-        //        Description = productAttribute.Description,
-        //        DisplayOrder = productAttribute.DisplayOrder,
-        //        Name = productAttribute.Name,
-        //        Id = productAttribute.Id
-        //    };
-
-
-        //    return Json(productAttributeModel);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Edit(ProductAttributeViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var updateDto = new UpdateProductAttributeDto
-        //        {
-        //            Id = model.Id,
-        //            Name = model.Name,
-        //            Description = model.Description,
-        //            DisplayOrder = model.DisplayOrder
-        //        };
-        //        await _productAttributeService.UpdateAsync(updateDto);
-        //        return Json(new { success = true });
-        //    }
-        //    return Json(new { success = false });
-        //}
-
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

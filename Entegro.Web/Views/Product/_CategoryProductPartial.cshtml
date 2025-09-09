@@ -11,6 +11,7 @@
     <table class="table table-bordered" id="productCategoryTable">
         <thead>
             <tr>
+                <th>#</th>
                 <th>Kategori Yolu</th>
                 <th>Sırası</th>
                 <th>İşlemler</th>
@@ -20,7 +21,8 @@
             @foreach (var item in Model)
             {
                 <tr data-mapping-id="@item.Id">
-                    <td>@item.Category.Name</td>
+                    <td>@item.Id</td>
+                    <td>@item.CategoryBreadcrumb</td>
                     <td>@item.DisplayOrder</td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm btn-delete">

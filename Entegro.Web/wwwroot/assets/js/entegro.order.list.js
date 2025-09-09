@@ -14,7 +14,7 @@ Entegro.order.OrderList = (function ($) {
                 url: '//cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[2, 'asc']],
+            order: [[3, 'asc']],
             ajax: {
                 url: '/Order/OrderList',
                 type: 'POST',
@@ -26,7 +26,7 @@ Entegro.order.OrderList = (function ($) {
             columns: [
                 { data: 'Id', orderable: false }, // checkbox
                 { data: 'Id', visible: false }, // hidden ID
-                { data: 'OrderSourceLabelHint' },
+                { data: 'OrderSourceLabelHint',name:'OrderSourceId' },
                 { data: 'OrderNumber' },
                 { data: 'Customer.Name' },
                 {
