@@ -1,6 +1,4 @@
-﻿using Entegro.Application.DTOs.Address;
-using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Category;
+﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -107,7 +105,7 @@ namespace Entegro.Application.Services
                         await SoftDeleteCategories(ids);
 
                         await _categoryRepository.UpdateAsync(category);
-                    }              
+                    }
                 }
             }
         }
@@ -148,7 +146,7 @@ namespace Entegro.Application.Services
             };
         }
 
-        public Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand)
+        public Task<PagedResult<CategoryDto>> GetPagedAsync(GridCommand gridCommand)
         {
             throw new NotImplementedException();
         }
@@ -159,7 +157,7 @@ namespace Entegro.Application.Services
             var treeNode = await GetCategoryTreeAsync(categoryNode.Id, false);
             if (treeNode != null)
             {
-                return GetCategoryPath(treeNode,aliasPattern, separator);
+                return GetCategoryPath(treeNode, aliasPattern, separator);
             }
 
             return string.Empty;

@@ -1,12 +1,12 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Domain.Entities.Common;
 using Entegro.Domain.Entities.Content;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using Order = Entegro.Domain.Entities.Checkout.Order;
 
 namespace Entegro.Infrastructure.Repositories
@@ -39,7 +39,7 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Orders.AsNoTracking().ToListAsync();
         }
 
-        public async Task<PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<Application.DTOs.Common.PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.Orders.AsNoTracking().AsQueryable();
 
@@ -74,7 +74,7 @@ namespace Entegro.Infrastructure.Repositories
                 .ToListAsync();
 
 
-            return new PagedResult<Order>
+            return new Application.DTOs.Common.PagedResult<Order>
             {
                 Items = orders,
                 TotalCount = totalCount,
@@ -253,6 +253,59 @@ namespace Entegro.Infrastructure.Repositories
 
 
             return order;
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<Order>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var query = _context.Orders
+                .Include(o => o.OrderItems)
+                .Include(c => c.Customer)
+            .AsNoTracking();
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.OrderNumber.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    string field = "";
+                    if (string.IsNullOrEmpty(gridCommand.Columns[item.Column].Name))
+                    {
+                        field = gridCommand.Columns[item.Column].Data;
+                    }
+                    else
+                    {
+                        field = gridCommand.Columns[item.Column].Name;
+                    }
+
+
+                    query = query.OrderBy($"{field} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var orders = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<Order>
+            {
+                Items = orders,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
         }
 
         public async Task UpdateAsync(Order order)

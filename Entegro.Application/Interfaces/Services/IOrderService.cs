@@ -9,6 +9,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<bool> ExistsByOrderNoAsync(string orderNo);
         Task<IEnumerable<OrderDto>> GetOrdersAsync();
         Task<PagedResult<OrderDto>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<PagedResult<OrderDto>> GetPagedAsync(GridCommand gridCommand);
         Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrder);
         Task<OrderDto> UpdateOrderAsync(UpdateOrderDto updateOrder);
         Task DeleteOrderAsync(int orderId);

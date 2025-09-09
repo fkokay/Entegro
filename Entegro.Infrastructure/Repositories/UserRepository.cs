@@ -3,6 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Platform.Identity;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -30,7 +31,7 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<PagedResult<User>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<Application.DTOs.Common.PagedResult<User>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.Users.AsQueryable();
 
@@ -41,7 +42,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<User>
+            return new Application.DTOs.Common.PagedResult<User>
             {
                 Items = users,
                 TotalCount = totalCount,
@@ -58,6 +59,45 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<User?> GetByIdAsync(int id)
         {
             return await _context.Users.FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<User>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var query = _context.Users.AsNoTracking();
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.FirstName.Contains(gridCommand.Search.Value) || b.LastName.Contains(gridCommand.Search.Value) || b.Email.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var users = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<User>
+            {
+                Items = users,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
         }
 
         public async Task UpdateAsync(User user)

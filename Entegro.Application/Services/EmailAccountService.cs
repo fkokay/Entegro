@@ -84,13 +84,13 @@ namespace Entegro.Application.Services
 
         public async Task<PagedResult<EmailAccountDto>> GetPagedAsync(GridCommand gridCommand)
         {
-            var brands = await _emailAccountRepository.GetPagedAsync(gridCommand);
+            var accounts = await _emailAccountRepository.GetPagedAsync(gridCommand);
             return new PagedResult<EmailAccountDto>
             {
-                Items = _mapper.Map<IEnumerable<EmailAccountDto>>(brands.Items),
-                TotalCount = brands.TotalCount,
-                PageNumber = brands.PageNumber,
-                PageSize = brands.PageSize
+                Items = _mapper.Map<IEnumerable<EmailAccountDto>>(accounts.Items),
+                TotalCount = accounts.TotalCount,
+                PageNumber = accounts.PageNumber,
+                PageSize = accounts.PageSize
             };
         }
 

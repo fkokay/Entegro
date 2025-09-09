@@ -8,6 +8,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<User?> GetByIdAsync(int id);
         Task<List<User>> GetAllAsync();
         Task<PagedResult<User>> GetAllAsync(int pageNumber, int pageSize);
+        Task<PagedResult<User>> GetPagedAsync(GridCommand gridCommand);
         Task AddAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);

@@ -76,58 +76,7 @@ namespace Entegro.Web.Controllers
             await _productAttributeValueService.AddAsync(createModelDto);
             return Json(new { success = true });
         }
-        //[HttpPost]
-        //public async Task<IActionResult> Create(ProductAttributeValueViewModel model)
-        //{
-        //    var createDto = new CreateProductAttributeValueDto
-        //    {
-        //        Name = model.Name,
-        //        DisplayOrder = model.DisplayOrder,
-        //        ProductAttributeId = model.ProductAttributeId
-        //    };
-        //    await _productAttributeValueService.AddAsync(createDto);
 
-        //    return Json(new { success = true });
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> Edit(int id)
-        //{
-        //    var productAttributeValue = await _productAttributeValueService.GetByIdAsync(id);
-        //    if (productAttributeValue == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var productAttributeValueModel = new ProductAttributeValueViewModel
-        //    {
-        //        ProductAttributeId = productAttributeValue.ProductAttributeId,
-        //        DisplayOrder = productAttributeValue.DisplayOrder,
-        //        Name = productAttributeValue.Name,
-        //        Id = productAttributeValue.Id
-        //    };
-
-
-        //    return Json(productAttributeValueModel);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Edit(ProductAttributeValueViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var updateDto = new UpdateProductAttributeValueDto
-        //        {
-        //            Id = model.Id,
-        //            Name = model.Name,
-        //            ProductAttributeId = model.ProductAttributeId,
-        //            DisplayOrder = model.DisplayOrder
-        //        };
-        //        await _productAttributeValueService.UpdateAsync(updateDto);
-        //        return Json(new { success = true });
-        //    }
-        //    return Json(new { success = false });
-        //}
         [HttpPost]
         public async Task<IActionResult> ProductAttributeValueList([FromBody] GridCommand gridCommand)
         {

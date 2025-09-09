@@ -85,14 +85,14 @@ namespace Entegro.Infrastructure.Repositories
             }
 
             var totalCount = await query.CountAsync();
-            var brands = await query
+            var accounts = await query
             .Skip(gridCommand.Start)
             .Take(gridCommand.Length)
             .ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<EmailAccount>
             {
-                Items = brands,
+                Items = accounts,
                 TotalCount = totalCount,
                 PageNumber = gridCommand.Start + 1,
                 PageSize = gridCommand.Length
