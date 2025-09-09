@@ -26,22 +26,12 @@
 
 
 @section Scripts {
-    <link rel="stylesheet" href="~/assets/vendor/libs/dropzone/dropzone.css" />
-    <link rel="stylesheet" href="~/assets/vendor/libs/quill/typography.css" />
-    <link rel="stylesheet" href="~/assets/vendor/libs/quill/katex.css" />
-    <link rel="stylesheet" href="~/assets/vendor/libs/quill/editor.css" />
-    <script src="~/assets/vendor/libs/quill/katex.js"></script>
-    <script src="~/assets/vendor/libs/quill/quill.js"></script>
-    <script src="~/assets/vendor/libs/dropzone/dropzone.js"></script>
-
-
     <script src="~/assets/js/entegro.product.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function(){
-            Entegro.product.tabInit();
-            Entegro.product.textEditorInit('#full-editor', '#Description');
-            Entegro.product.formInit('#product-form', '/Product/Create', '/Product/List');
-            
+            Entegro.product.TabsInit();
+            Entegro.product.DescriptionEditor();
+            Entegro.product.Validation();  
         });
     </script>
 }

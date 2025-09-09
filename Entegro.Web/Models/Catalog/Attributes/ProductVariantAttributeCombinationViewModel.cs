@@ -6,7 +6,7 @@ namespace Entegro.Web.Models.Catalog.Attributes
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? StokCode { get; set; }
         public string? Gtin { get; set; }
         public string? ManufacturerPartNumber { get; set; }

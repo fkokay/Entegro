@@ -20,44 +20,33 @@ Entegro.product = (function ($) {
         });
     }
 
-    function tabInit(productId) {
+    function TabsInit() {
         const tabButtons = document.querySelectorAll('#product-tabs button[data-bs-toggle="tab"]');
 
         tabButtons.forEach(function (button) {
             button.addEventListener('shown.bs.tab', function (event) {
-                if (event.target.dataset.bsTarget == "#form-tabs-image") {
-                    $("#imageTabContent").load("/Product/LoadTabImages?productId=" + productId, function () {
-                        productUploaderInit();
-                        productMainPictureClick();
-                    });
+                if (event.target.dataset.bsTarget == "#form-tabs-images") {
+                    if (event.target.dataset.url.length > 0) {
+                        $("#form-tabs-images").load(event.target.dataset.url, function () {
+                            ProductImageDropzone();
+                            ProductImageMianPicture();
+                        });
+                    }
+
                 }
 
                 if (event.target.dataset.bsTarget == "#form-tabs-categories") {
-                    $("#form-tabs-categories").load("/Product/LoadTabCategories?productId=" + productId, function () {
-                        categoryDelete();
-                    });
-                }
-
-                if (event.target.dataset.bsTarget == "#form-tabs-variants") {
-                    $("#form-tabs-variants").load("/Product/LoadTabVariants?productId=" + productId, function () {
-                        if ($('#SelectedProductAttributeIds').length && !$('#SelectedProductAttributeIds').data('select2')) {
-                            $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
-                            $('#SelectedProductAttributeIds').select2({
-                                width: '100%',
-                                placeholder: 'Varyant seçiniz',
-                                allowClear: true,
-                                dropdownParent: $('#SelectedProductAttributeIds').parent()
-                            });
-                        };
-
-                        initVariantsRepeater(window.variantData || []);
-                    });
+                    if (event.target.dataset.url.length > 0) {
+                        $("#form-tabs-categories").load(event.target.dataset.url, function () {
+                            ProductCategoryDelete();
+                        });
+                    }
                 }
             });
         });
     }
 
-    function productUploaderInit() {
+    function ProductImageDropzone() {
         $("#upload").dropzoneWrapper({
             maxFiles: 500,
             maxFilesSize: 102400,
@@ -69,7 +58,7 @@ Entegro.product = (function ($) {
         });
     }
 
-    function productMainPictureClick() {
+    function ProductImageMianPicture() {
         $(document).on("click", ".set-main-picture", function (e) {
             var el = $(this).closest('.dz-image-preview');
             var previewContainer = $(this).closest(".preview-container");
@@ -79,7 +68,7 @@ Entegro.product = (function ($) {
         });
     }
 
-    function textEditorInit(selector, initialValueSelector) {
+    function DescriptionEditor() {
         const fullToolbar = [
             [{ font: [] }, { size: [] }],
             ['bold', 'italic', 'underline', 'strike'],
@@ -92,67 +81,31 @@ Entegro.product = (function ($) {
             ['clean']
         ];
 
-        fullEditor = new Quill(selector, {
-            bounds: selector,
+        fullEditor = new Quill("#full-editor", {
+            bounds: "#full-editor",
             placeholder: 'Açıklama Giriniz...',
             modules: { formula: true, toolbar: fullToolbar },
             theme: 'snow'
         });
 
-        const initialDesc = document.querySelector(initialValueSelector);
-        if (initialDesc && initialDesc.value) {
-            fullEditor.root.innerHTML = initialDesc.value;
+        const description = document.querySelector("#Description");
+        if (description && description.value) {
+            fullEditor.root.innerHTML = description.value;
         }
     }
 
-    function getTextEditorValue() {
-        return fullEditor ? fullEditor.root.innerHTML : '';
-    }
-
-    function formInit(form, url, rediect) {
-        const $form = $(form);
-        if (!$form.length) return;
-
-        $form.on('submit', function (e) {
-            e.preventDefault();
-
-            if (!fullEditor) {
-                console.log("Text Editör Düzgün Yüklenemedi");
-                return;
-            }
-
-            $('#Description').val(getTextEditorValue());
-
-            const data = $form.serialize();
-
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: data,
-                success: function (response) {
-                    if (response.success) {
-                        showMessage("Başarılı", "Ürün başarıyla kaydedildi.", "success", rediect);
-                    } else {
-                        showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
-                    }
-                },
-                error: function (xhr) {
-                    howMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
-                }
-            });
-        });
-    }
-
     function ProductCategoryCreatePopup(productId) {
+        var popup = $('#ProductCategoryPopup');
+        var popupContent = $("#ProductCategoryPopupContent");
         $.ajax({
             url: '/Product/ProductCategoryCreatePopup?productId=' + productId,
             type: 'GET',
             dataType: 'html',
             success: function (html) {
-                var popup = $('#ProductCategoryPopup');
-                $('#ProductCategoryPopupContent').html(html);
-                const categorySelect = $('#CategoryId');
-                selectLoad(categorySelect, popup, "/Category/AllCategory");
+                $(popupContent).html(html);
+
+                ProductCategoryCreatePopupInit(popup, popupContent);
+
                 categorySave();
                 $(popup).modal('show');
             },
@@ -163,7 +116,36 @@ Entegro.product = (function ($) {
         });
     }
 
-    function categorySave() {
+    function ProductCategoryCreatePopupInit(popup, popupContent) {
+        var categorySelect = $(popupContent).find("#CategoryId");
+        $(categorySelect).select2({
+            placeholder: 'Kategori seçiniz',
+            allowClear: true,
+            dropdownParent: popup,
+            width: '100%',
+            ajax: {
+                url: "/Category/AllCategory",
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '', page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination?.more === true
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
         $(document).on('click', '#btnSaveProductCategory', function () {
             const payload = {
                 productId: Number($('#ProductId').val()) || 0,
@@ -184,8 +166,7 @@ Entegro.product = (function ($) {
                             text: 'Kategori başarıyla kaydedildi.',
                             confirmButtonText: 'Tamam'
                         }).then(() => {
-                            refreshTab("#form-tabs-categories");
-                            var popup = $('#ProductCategoryPopup');
+                            RefreshTab("#form-tabs-categories");
                             $(popup).modal('hide');
                         });
                     } else {
@@ -198,7 +179,8 @@ Entegro.product = (function ($) {
             });
         });
     }
-    function categoryDelete() {
+
+    function ProductCategoryDelete() {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');
             const mappingId = $tr.data('mapping-id');
@@ -230,59 +212,8 @@ Entegro.product = (function ($) {
             });
         });
     }
-    function selectLoad(select,parent, url) {
-        $(select).select2({
-            placeholder: 'Kategori seçiniz',
-            allowClear: true,
-            dropdownParent: parent,
-            width: '100%',
-            ajax: {
-                url: url,
-                type: 'POST',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        term: params.term || '', page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.results,
-                        pagination: {
-                            more: data.pagination?.more === true
-                        }
-                    };
-                },
-                cache: true
-            }
-        });
-    }
-    function refreshTab(tabSelector) {
-        const tabButton = document.querySelector(`#product-tabs button[data-bs-target="${tabSelector}"]`);
-        if (!tabButton) return;
 
-        const url = tabButton.dataset.url;
-        const paneEl = document.querySelector(tabSelector);
-
-        if (url && paneEl) {
-            // loading animasyonu istersen
-            paneEl.innerHTML = '<div class="p-3 text-center text-muted">Yükleniyor...</div>';
-
-            fetch(url)
-                .then(response => response.text())
-                .then(html => {
-                    paneEl.innerHTML = html;
-                    console.log(tabSelector + ' tabı yenilendi.');
-                })
-                .catch(err => {
-                    paneEl.innerHTML = '<div class="p-3 text-danger">Yükleme hatası!</div>';
-                    console.error('Tab refresh hatası:', err);
-                });
-        }
-    }
-    function initVariantsRepeater(data) {
+    function ProductVariantAttributeCombinationRepeaterInit(data) {
         const $repeater = $('#ProductVariantAttributeCombinationRepeater');
         if (!$repeater.length) return;
 
@@ -291,7 +222,6 @@ Entegro.product = (function ($) {
             show: function () { $(this).slideDown(); },
             hide: function (deleteElement) {
                 if (confirm('Varyant silinecek emin misiniz?')) {
-                    console.log($(this)); // Bu, silinecek olan elemanı temsil eder
                     $(this).slideUp(deleteElement);
                 };
             },
@@ -299,22 +229,22 @@ Entegro.product = (function ($) {
                 selector: '.ProductVariantAttributeSelectionRepeater',
                 initEmpty: false,
                 show: function () { $(this).slideDown(); },
-                hide: function (deleteElement) { if (confirm('Attribute silinecek emin misiniz?')) $(this).slideUp(deleteElement); }
+                hide: function (deleteElement) {
+                    if (confirm('Attribute silinecek emin misiniz?')) {
+                        $(this).slideUp(deleteElement); 
+                    }
+                }
             }]
         });
 
-        fillRepeater(data || []);
-        updateRepeaterIndexes();
+        ProductVariantAttributeCombinationRepeaterLoad(data || []);
+        ProductVariantAttributeCombinationRepeaterIndexes();
     }
-    function fillRepeater(data) {
+
+    function ProductVariantAttributeCombinationRepeaterLoad(data) {
         var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
         var $template = $list.find('[data-repeater-item]:first').clone(true, true);
         $list.empty();
-
-        if (!data.length) {
-            if ($("#SelectedProductAttributeIds").val().length > 0) $list.append($template);
-            return;
-        }
 
         $.each(data, function (i, item) {
             var $row = $template.clone(); i
@@ -336,7 +266,8 @@ Entegro.product = (function ($) {
             $list.append($row);
         });
     }
-    function updateRepeaterIndexes() {
+
+    function ProductVariantAttributeCombinationRepeaterIndexes() {
         var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
 
         $list.children('[data-repeater-item]').each(function (i) {
@@ -364,11 +295,172 @@ Entegro.product = (function ($) {
         });
     }
 
-    return {
-        tabInit: tabInit,
-        textEditorInit: textEditorInit,
-        formInit: formInit,
-        ProductCategoryCreatePopup: ProductCategoryCreatePopup,
+    function Validation() {
+        const formValidation = FormValidation.formValidation(
+            document.getElementById('product-form'),
+            {
+                locale: 'tr_TR',
+                localization: FormValidation.locales.tr_TR,
+                fields: {
+                    'Name': {
+                        validators: {
+                            notEmpty: { message: 'Ürün adı boş bırakılamaz.' },
+                            stringLength: { min: 3, message: 'Ürün adı en az 3 karakter olmalıdır.' }
+                        }
+                    },
+                    'Code': {
+                        validators: {
+                            notEmpty: { message: 'Ürün kodu boş bırakılamaz.' }
+                        }
+                    },
+                    'Price': {
+                        validators: {
+                            notEmpty: { message: 'Fiyat boş bırakılamaz.' },
+                            numeric: { message: 'Fiyat yalnızca sayı olabilir.' }
+                        }
+                    },
+                    'Currency': {
+                        validators: { notEmpty: { message: 'Para birimi seçilmelidir.' } }
+                    },
+                    'StockQuantity': {
+                        validators: {
+                            notEmpty: { message: 'Stok miktarı boş bırakılamaz.' },
+                            integer: { message: 'Stok miktarı tam sayı olmalıdır.' }
+                        }
+                    },
+                    'Weight': {
+                        validators: {
+                            notEmpty: { message: 'Ağırlık boş bırakılamaz.' },
+                            numeric: { message: 'Ağırlık geçerli bir sayı olmalıdır.' }
+                        }
+                    },
+                    'Length': {
+                        validators: {
+                            notEmpty: { message: 'Uzunluk boş bırakılamaz.' },
+                            numeric: { message: 'Uzunluk geçerli bir sayı olmalıdır.' }
+                        }
+                    },
+                    'Width': {
+                        validators: {
+                            notEmpty: { message: 'Genişlik boş bırakılamaz.' },
+                            numeric: { message: 'Genişlik geçerli bir sayı olmalıdır.' }
+                        }
+                    },
+                    'Height': {
+                        validators: {
+                            notEmpty: { message: 'Yükseklik boş bırakılamaz.' },
+                            numeric: { message: 'Yükseklik geçerli bir sayı olmalıdır.' }
+                        }
+                    },
+                    'VatRate': {
+                        validators: {
+                            notEmpty: { message: 'Yükseklik boş bırakılamaz.' },
+                            numeric: { message: 'Yükseklik geçerli bir sayı olmalıdır.' }
+                        }
+                    },
+                    'Barcode': {
+                        validators: {
+                            stringLength: { max: 100, message: 'Barkod en fazla 100 karakter olabilir.' }
+                        }
+                    },
+                    'MetaTitle': {
+                        validators: {
+                            stringLength: { max: 60, message: 'Meta başlık en fazla 60 karakter olabilir.' }
+                        }
+                    },
+                    'MetaKeywords': {
+                        validators: {
+                            stringLength: { max: 150, message: 'Anahtar kelimeler en fazla 150 karakter olabilir.' }
+                        }
+                    },
+                    'MetaDescription': {
+                        validators: {
+                            stringLength: { max: 160, message: 'Meta açıklama en fazla 160 karakter olabilir.' }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap5: new FormValidation.plugins.Bootstrap5({
+                        eleValidClass: '',
+                        rowSelector: '.mb-3'
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    autoFocus: new FormValidation.plugins.AutoFocus()
+                },
+                init: (instance) => {
+                    instance.on('plugins.message.placed', function (e) {
+                        if (e.element.parentElement.classList.contains('input-group')) {
+                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
+                        }
+                    });
 
+                    instance.on('core.field.invalid', function (e) {
+                        const fieldEl = e.elements && e.elements.length ? e.elements[0] : null;
+                        if (fieldEl) focusFieldAndShowTab(fieldEl);
+                    });
+
+                    instance.on('core.form.invalid', function () {
+                        const invalidEl = document.querySelector('[data-field].is-invalid, .is-invalid');
+                        if (invalidEl) focusFieldAndShowTab(invalidEl);
+                    });
+
+                    instance.on('core.form.valid', function () {
+                        document.getElementById('Description').value = fullEditor.root.innerHTML;
+
+                        const form = $('#product-form');
+                        const action = $('#product-form').attr("action");
+                        const formData = $(form).serialize();
+
+                        $.ajax({
+                            url: action,
+                            type: 'POST',
+                            data: formData,
+                            success: function (response) {
+                                if (response.success) {
+                                    showMessage("Hata!", response.message || 'Bir hata oluştu.', "success","/Product/List");
+                                } else {
+                                    showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
+                                }
+                            },
+                            error: function (xhr) {
+                                showMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
+                            }
+                        });
+                    });
+                }
+            }
+        );
+    }
+
+    function RefreshTab(tabSelector) {
+        const tabButton = document.querySelector(`#product-tabs button[data-bs-target="${tabSelector}"]`);
+        if (!tabButton) return;
+
+        const url = tabButton.dataset.url;
+        const paneEl = document.querySelector(tabSelector);
+
+        if (url && paneEl) {
+            paneEl.innerHTML = '<div class="p-3 text-center text-muted">Yükleniyor...</div>';
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    paneEl.innerHTML = html;
+                    console.log(tabSelector + ' tabı yenilendi.');
+                })
+                .catch(err => {
+                    paneEl.innerHTML = '<div class="p-3 text-danger">Yükleme hatası!</div>';
+                    console.error('Tab refresh hatası:', err);
+                });
+        }
+    }
+
+    return {
+        TabsInit: TabsInit,
+        DescriptionEditor: DescriptionEditor,
+        ProductCategoryCreatePopup: ProductCategoryCreatePopup,
+        ProductVariantAttributeCombinationRepeaterInit: ProductVariantAttributeCombinationRepeaterInit,
+        Validation: Validation,
     };
 })(jQuery);

@@ -58,9 +58,10 @@
             const productId = @Html.Raw(Model.Id);
             window.variantData = @Html.Raw(JsonSerializer.Serialize(Model.ProductVariantAttributeCombinations));
 
-            Entegro.product.tabInit(productId);
-            Entegro.product.textEditorInit('#full-editor', '#Description');
-            Entegro.product.formInit('#product-form', '/Product/Edit', '/Product/List');
+            Entegro.product.TabsInit();
+            Entegro.product.DescriptionEditor();
+            Entegro.product.ProductVariantAttributeCombinationRepeaterInit(window.variantData);
+            Entegro.product.Validation();
         });
     </script>
 }

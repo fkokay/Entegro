@@ -484,23 +484,6 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
-        #region Product Variants
-        public async Task<IActionResult> LoadTabVariants(int productId)
-        {
-            ProductViewModel model = new ProductViewModel();
-
-            var product = await _productService.GetProductByIdAsync(productId);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            await PrepareProductModel(model, product);
-            return PartialView("_CreateOrUpdate.Attributes", model);
-        }
-
-        #endregion
-
         #region Product Integration
 
         [HttpPost]
