@@ -30,13 +30,13 @@ namespace Entegro.Web.Controllers
         private readonly IProductService _productService;
         private readonly IProductCategoryMappingService _productCategoryMappingService;
         private readonly IBrandService _brandService;
-        private readonly ICategoryService _categoryService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductVariantAttributeService _productAttributeMappingService;
         private readonly IProductImageMappingService _productImageMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
+        private readonly ICategoryService _categoryService;
         private readonly ITrendyolService _trenyolService;
         public ProductController(
             IProductService productService,
@@ -48,6 +48,7 @@ namespace Entegro.Web.Controllers
             IIntegrationSystemService integrationSystemService,
             IProductIntegrationService productIntegrationService,
             IProductAttributeFormatter productAttributeFormatter,
+            ICategoryService categoryService,
             ITrendyolService trendyolService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
