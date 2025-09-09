@@ -109,12 +109,6 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"Product with ID {productId} not found.");
             }
 
-            var productIntegraitons = await _productIntegrationRepository.GetAllAsync(productId);
-            foreach (var item in productIntegraitons)
-            {
-                await _productIntegrationRepository.DeleteAsync(item);
-            }
-
             await _productRepository.DeleteAsync(product);
         }
 

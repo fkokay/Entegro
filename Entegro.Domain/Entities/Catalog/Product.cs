@@ -16,6 +16,26 @@ namespace Entegro.Domain.Entities.Catalog
                    .HasForeignKey(pc => pc.ProductId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasMany(p => p.ProductIntegrations)
+                    .WithOne(pc => pc.Product)
+                    .HasForeignKey(pc => pc.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(p => p.ProductVariantAttributeCombinations)
+                    .WithOne(pc => pc.Product)
+                    .HasForeignKey(pc => pc.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(p => p.ProductVariantAttributes)
+                    .WithOne(pc => pc.Product)
+                    .HasForeignKey(pc => pc.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(p => p.ProductMediaFiles)
+                    .WithOne(pc => pc.Product)
+                    .HasForeignKey(pc => pc.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(p => p.Price).HasPrecision(18, 4);
             builder.Property(p => p.OldPrice).HasPrecision(18, 4);
             builder.Property(p => p.SpecialPrice).HasPrecision(18, 4);
