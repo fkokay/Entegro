@@ -6,6 +6,7 @@ namespace Entegro.Application.DTOs.MediaFile
     {
         public int Id { get; set; }
         public int? FolderId { get; set; }
+        public MediaFolderDto? Folder { get; set; }
         public string Name { get; set; } = null!;
         public string Alt { get; set; } = null!;
         public string Title { get; set; } = null!;
@@ -26,18 +27,18 @@ namespace Entegro.Application.DTOs.MediaFile
         {
             get
             {
-                if (this.MediaFolder == null)
+                if (this.Folder == null)
                 {
                     return $"/media/{Id}/{Name}";
                 }
                 else
                 {
-                    return $"/media/{Id}/{MediaFolder.Name}/{Name}";
+                    return $"/media/{Id}/{Folder.Name}/{Name}";
                 }
 
             }
         }
 
-        public MediaFolderDto? MediaFolder { get; set; }
+
     }
 }

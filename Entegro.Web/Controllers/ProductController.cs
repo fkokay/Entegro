@@ -20,7 +20,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using System.Net;
-using static Entegro.Web.Models.Catalog.Products.ProductViewModel;
 
 namespace Entegro.Web.Controllers
 {
@@ -851,7 +850,7 @@ namespace Entegro.Web.Controllers
                     ProductAttribute = m.ProductAttribute.Name,
                     ProductAttributeId = m.ProductAttributeId,
                     ProductId = m.ProductId,
-                    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x=> new ProductVariantAttributeValueViewModel()
+                    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new ProductVariantAttributeValueViewModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -883,10 +882,10 @@ namespace Entegro.Web.Controllers
                         Title = m.MediaFile.Title,
                         UpdatedOn = m.MediaFile.UpdatedOn,
                         Width = m.MediaFile.Width,
-                        Folder = m.MediaFile.MediaFolder == null ? null : new MediaFolderViewModel()
+                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
                         {
-                            Id = m.MediaFile.MediaFolder.Id,
-                            Name = m.MediaFile.MediaFolder.Name,
+                            Id = m.MediaFile.Folder.Id,
+                            Name = m.MediaFile.Folder.Name,
                         }
                     }
                 }).ToList();

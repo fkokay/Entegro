@@ -1,10 +1,10 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
-using Entegro.Domain.Entities.Catalog;
+using System.Linq.Expressions;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -75,12 +75,12 @@ namespace Entegro.Infrastructure.Repositories
         private IQueryable<Product> IncludeAllProperties(IQueryable<Product> query)
         {
             return query
-                .Include(x => x.Brand)
-                .Include(x => x.ProductMediaFiles).ThenInclude(pm => pm.MediaFile)
+                .Include(x => x.Brand).AsNoTracking()
+                .Include(x => x.ProductMediaFiles).ThenInclude(pm => pm.MediaFile).ThenInclude(x => x.Folder)
                 .Include(x => x.ProductCategories).ThenInclude(pc => pc.Category)
                 .Include(x => x.ProductVariantAttributes).ThenInclude(pi => pi.ProductVariantAttributeValues)
                 .Include(x => x.ProductVariantAttributeCombinations)
-                .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters);
+                .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters).AsNoTracking();
         }
 
         public async Task<Application.DTOs.Common.PagedResult<Product>> GetPagedAsync(GridCommand gridCommand)
@@ -91,8 +91,8 @@ namespace Entegro.Infrastructure.Repositories
             {
                 if (!string.IsNullOrEmpty(gridCommand.Search.Value))
                 {
-                    query = query.Where(b => 
-                    b.Name.Contains(gridCommand.Search.Value) || 
+                    query = query.Where(b =>
+                    b.Name.Contains(gridCommand.Search.Value) ||
                     b.Code.Contains(gridCommand.Search.Value) ||
                     b.Barcode.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
@@ -115,6 +115,7 @@ namespace Entegro.Infrastructure.Repositories
             var products = await query
                 .Skip(gridCommand.Start)
                 .Take(gridCommand.Length)
+                .AsNoTracking()
                 .ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<Product>

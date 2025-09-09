@@ -29,12 +29,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<MediaFolder>> GetAllAsync()
         {
-            return await _context.MediaFolders.ToListAsync();
+            return await _context.MediaFolders.AsNoTracking().ToListAsync();
         }
 
         public async Task<PagedResult<MediaFolder>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.MediaFolders.AsQueryable();
+            var query = _context.MediaFolders.AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
             var customers = await query
@@ -54,12 +54,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<MediaFolder?> GetByIdAsync(int id)
         {
-            return await _context.MediaFolders.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.MediaFolders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<MediaFolder?> GetMediaFolderByNameAsync(string folderName)
         {
-            return await _context.MediaFolders.FirstOrDefaultAsync(o => o.Name == folderName);
+            return await _context.MediaFolders.AsNoTracking().FirstOrDefaultAsync(o => o.Name == folderName);
         }
 
         public async Task<string?> GetTreePathByIdAsync(int id)

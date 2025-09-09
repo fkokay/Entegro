@@ -1,13 +1,10 @@
-﻿using Autofac.Core;
-using Entegro.Application.DTOs.Category;
+﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models;
 using Entegro.Web.Models.Catalog.Categories;
 using Entegro.Web.Models.Content;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Azure.Core.HttpHeader;
 
 namespace Entegro.Web.Controllers
 {
@@ -54,7 +51,7 @@ namespace Entegro.Web.Controllers
                 DisplayOrder = model.DisplayOrder,
                 MetaKeywords = model.MetaKeywords,
                 Published = model.Published,
-                
+
             };
             await _categoryService.CreateCategoryAsync(createDto);
 
@@ -116,10 +113,10 @@ namespace Entegro.Web.Controllers
                     Title = category.MediaFile.Title,
                     UpdatedOn = category.MediaFile.UpdatedOn,
                     Width = category.MediaFile.Width,
-                    Folder = category.MediaFile.MediaFolder == null ? null : new MediaFolderViewModel()
+                    Folder = category.MediaFile.Folder == null ? null : new MediaFolderViewModel()
                     {
-                        Id = category.MediaFile.MediaFolder.Id,
-                        Name = category.MediaFile.MediaFolder.Name,
+                        Id = category.MediaFile.Folder.Id,
+                        Name = category.MediaFile.Folder.Name,
                     }
                 }
             };
