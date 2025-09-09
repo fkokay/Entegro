@@ -46,6 +46,18 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(m => m.Product.ProductVariantAttributeCombinations).ToListAsync();
         }
 
+        public async Task<List<ProductIntegration>> GetAllAsync(int productId)
+        {
+            return await _context.ProductIntegrations.Where(m=>m.ProductId == productId).AsNoTracking()
+                .Include(m => m.IntegrationSystem).ThenInclude(m => m.IntegrationSystemParameters)
+                .Include(m => m.Product).ThenInclude(m => m.Brand)
+                .Include(m => m.Product.ProductCategories).ThenInclude(m => m.Category).ThenInclude(m => m.Parent)
+                .Include(m => m.Product.ProductMediaFiles).ThenInclude(m => m.MediaFile).ThenInclude(m => m.Folder)
+                .Include(m => m.Product.ProductVariantAttributes).ThenInclude(m => m.ProductAttribute)
+                .Include(m => m.Product.ProductVariantAttributes).ThenInclude(m => m.ProductVariantAttributeValues)
+                .Include(m => m.Product.ProductVariantAttributeCombinations).ToListAsync();
+        }
+
         public async Task<PagedResult<ProductIntegration>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.ProductIntegrations.AsNoTracking().AsQueryable();

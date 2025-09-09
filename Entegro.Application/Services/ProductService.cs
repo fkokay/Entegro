@@ -13,18 +13,21 @@ namespace Entegro.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IProductIntegrationRepository _productIntegrationRepository;
         private readonly IProductVariantAttributeCombinationRepository _productVariantAttributeCombinationRepository;
         private readonly IBrandService _brandService;
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
         public ProductService(
             IProductRepository productRepository,
+            IProductIntegrationRepository productIntegrationRepository,
             IProductVariantAttributeCombinationRepository productVariantAttributeCombinationRepository,
             IBrandService brandService,
             ICategoryService categoryService,
             IMapper mapper)
         {
             _productRepository = productRepository;
+            _productIntegrationRepository = productIntegrationRepository;
             _productVariantAttributeCombinationRepository = productVariantAttributeCombinationRepository;
             _brandService = brandService;
             _categoryService = categoryService;
@@ -104,6 +107,12 @@ namespace Entegro.Application.Services
             if (product == null)
             {
                 throw new KeyNotFoundException($"Product with ID {productId} not found.");
+            }
+
+            var productIntegraitons = await _productIntegrationRepository.GetAllAsync(productId);
+            foreach (var item in productIntegraitons)
+            {
+                await _productIntegrationRepository.DeleteAsync(item);
             }
 
             await _productRepository.DeleteAsync(product);

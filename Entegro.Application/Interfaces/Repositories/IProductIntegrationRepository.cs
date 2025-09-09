@@ -10,6 +10,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<ProductIntegration?> GetByIntegrationCodeAsync(string integrationCode);
         Task<ProductIntegration?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId);
         Task<List<ProductIntegration>> GetAllAsync();
+        Task<List<ProductIntegration>> GetAllAsync(int productId);
         Task AddAsync(ProductIntegration productIntegration);
         Task UpdateAsync(ProductIntegration productIntegration);
         Task DeleteAsync(ProductIntegration productIntegration);

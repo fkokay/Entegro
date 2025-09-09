@@ -30,7 +30,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductCategoryMappingService _productCategoryMappingService;
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
-        private readonly IProductVariantAttributeService _productAttributeMappingService;
+        private readonly IProductVariantAttributeService _productVariantAttributeService;
         private readonly IProductImageMappingService _productImageMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
@@ -42,7 +42,7 @@ namespace Entegro.Web.Controllers
             IProductCategoryMappingService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
-            IProductVariantAttributeService productAttributeMappingService,
+            IProductVariantAttributeService productVariantAttributeService,
             IProductImageMappingService productImageMappingService,
             IIntegrationSystemService integrationSystemService,
             IProductIntegrationService productIntegrationService,
@@ -54,7 +54,7 @@ namespace Entegro.Web.Controllers
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
-            _productAttributeMappingService = productAttributeMappingService ?? throw new ArgumentNullException(nameof(productAttributeMappingService));
+            _productVariantAttributeService = productVariantAttributeService ?? throw new ArgumentNullException(nameof(productVariantAttributeService));
             _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
             _integrationSystemService = integrationSystemService ?? throw new ArgumentNullException(nameof(integrationSystemService));
             _productIntegrationService = productIntegrationService;
@@ -181,9 +181,17 @@ namespace Entegro.Web.Controllers
 
                 await _productService.UpdateProductAsync(updateDto);
 
+                var productVariantAttributes = await _productVariantAttributeService.GetAllAsync(model.Id);
+
+                var deletedProductVariantAttributes = productVariantAttributes.Where(m=> !model.SelectedProductAttributeIds.Contains(m.ProductAttributeId)).ToList();
+                foreach (var item in deletedProductVariantAttributes)
+                {
+                    await _productVariantAttributeService.DeleteAsync(item.Id);
+                }
+
                 foreach (var item in model.SelectedProductAttributeIds)
                 {
-                    var exist = await _productAttributeMappingService.GetByAttibuteIdAsync(model.Id, item);
+                    var exist = productVariantAttributes.Where(m => m.ProductAttributeId == item).FirstOrDefault();
 
                     if (exist == null)
                     {
@@ -195,7 +203,7 @@ namespace Entegro.Web.Controllers
                             AttributeControlTypeId = 0
                         };
 
-                        await _productAttributeMappingService.AddAsync(createProductAttributeMappingDto);
+                        await _productVariantAttributeService.AddAsync(createProductAttributeMappingDto);
                     }
                 }
 

@@ -31,6 +31,11 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.ProductVariantAttributes.ToListAsync();
         }
 
+        public async Task<List<ProductVariantAttribute>> GetAllAsync(int productId)
+        {
+            return await _context.ProductVariantAttributes.Where(m=>m.ProductId == productId).ToListAsync();
+        }
+
         public async Task<PagedResult<ProductVariantAttribute>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.ProductVariantAttributes.AsQueryable();
