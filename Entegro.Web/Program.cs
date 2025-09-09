@@ -166,6 +166,10 @@ builder.Services.AddScoped<IProductAttributeValueService, ProductAttributeValueS
 builder.Services.AddScoped<IProductVariantAttributeRepository, ProductVariantAttributeRepository>();
 builder.Services.AddScoped<IProductVariantAttributeService, ProductVariantAttributeService>();
 
+builder.Services.AddScoped<IProductVariantAttributeValueRepository, ProductVariantAttributeValueRepository>();
+builder.Services.AddScoped<IProductVariantAttributeValueService, ProductVariantAttributeValueService>();
+
+builder.Services.AddScoped<IProductAttributeFormatter, ProductAttributeFormatter>();
 
 builder.Services.AddScoped<IProductImageMappingRepository, ProductImageMappingRepository>();
 builder.Services.AddScoped<IProductImageMappingService, ProductImageMappingService>();

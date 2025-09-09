@@ -18,8 +18,10 @@ namespace Entegro.Domain.Entities.Catalog
     public class ProductIntegration : BaseEntity
     {
         public int ProductId { get; set; }
-        public decimal Price { get; set; }
         public virtual Product Product { get; set; }
+        public int ? ProductVariantAttributeCombinationId { get; set; }
+        public virtual ProductVariantAttributeCombination? ProductVariantAttributeCombination { get; set; }
+        public decimal Price { get; set; }
         public int IntegrationSystemId { get; set; }
         public virtual IntegrationSystem IntegrationSystem { get; set; }
         public string IntegrationCode { get; set; }

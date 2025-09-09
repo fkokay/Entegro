@@ -172,10 +172,17 @@ namespace Entegro.Service.Jobs
                 AttributeControlTypeId = 0
             })).Id;
 
+            var existingVariantValue = await _productVariantAttributeValueService.GetByNameAsync(variantId, attributeValue);
+            int variantValueId = existingVariantValue?.Id ?? (await _productVariantAttributeValueService.AddAsync(new CreateProductVariantAttributeValueDto()
+            {
+                Name = attributeValue,
+                ProductVariantAttributeId = variantId
+            })).Id;
+
             variantAttributes.Add(new ProductVariantAttributeModel
             {
                 ProductVariantAttributeId = variantId,
-                ProductVariantAttributeValueId = attrValueId
+                ProductVariantAttributeValueId = variantValueId
             });
         }
 

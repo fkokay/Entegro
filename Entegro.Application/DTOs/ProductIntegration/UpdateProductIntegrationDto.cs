@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
+        public int? ProductVariantAttributeCombinationId { get; set; }
         public int IntegrationSystemId { get; set; }
         public string IntegrationCode { get; set; }
         public decimal Price { get; set; }

@@ -334,8 +334,8 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                 foreach (var rawAttibute in rawAttributes)
                 {
-                    var productVariantAttribute = product.ProductVariantAttributes.Where(m => m.EntityId == rawAttibute.ProductAttributeId).First();
-                    var productVariantAttributeValue = productVariantAttribute.ProductVariantAttributeValues.Where(m => m.EntityId == rawAttibute.ProductAttributeValueId).ToList();
+                    var productVariantAttribute = product.ProductVariantAttributes.Where(m => m.EntityId == rawAttibute.ProductVariantAttributeId).First();
+                    var productVariantAttributeValue = productVariantAttribute.ProductVariantAttributeValues.Where(m => m.EntityId == rawAttibute.ProductVariantAttributeValueId).ToList();
 
                     attributes.Add(new KeyValuePair<int, ICollection<object>>(productVariantAttribute.Id, productVariantAttributeValue.Select(m => m.Id as object).ToList()));
                 }
@@ -1012,7 +1012,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
     public class ProductVariantAttributeModel
     {
-        public int ProductAttributeId { get; set; }
-        public int ProductAttributeValueId { get; set; }
+        public int ProductVariantAttributeId { get; set; }
+        public int ProductVariantAttributeValueId { get; set; }
     }
 }

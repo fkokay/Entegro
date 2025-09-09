@@ -1,9 +1,13 @@
-﻿namespace Entegro.Web.Models.Integration.Marketplace
+﻿using Entegro.Domain.Entities.Catalog;
+using static Entegro.Web.Models.Catalog.Products.ProductViewModel;
+
+namespace Entegro.Web.Models.Integration.Marketplace
 {
     public class TrendyolProductIntegrationViewModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
+        public int? ProductVariantAttributeCombinationId { get; set; }
         public string? ProductName { get; set; }
         public string? ProductCode { get; set; }
         public string? ProductMainPicture { get; set; }

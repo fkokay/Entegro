@@ -36,6 +36,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductImageMappingService _productImageMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly ITrendyolService _trenyolService;
         public ProductController(
             IProductService productService,
@@ -46,6 +47,7 @@ namespace Entegro.Web.Controllers
             IProductImageMappingService productImageMappingService,
             IIntegrationSystemService integrationSystemService,
             IProductIntegrationService productIntegrationService,
+            IProductAttributeFormatter productAttributeFormatter,
             ITrendyolService trendyolService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
@@ -56,6 +58,7 @@ namespace Entegro.Web.Controllers
             _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
             _integrationSystemService = integrationSystemService ?? throw new ArgumentNullException(nameof(integrationSystemService));
             _productIntegrationService = productIntegrationService;
+            _productAttributeFormatter = productAttributeFormatter;
             _trenyolService = trendyolService;
         }
 
@@ -561,10 +564,33 @@ namespace Entegro.Web.Controllers
                         ProductName = product.Name,
                         ProductCode = product.Code,
                         ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
+                        ProductVariantAttributeCombinationId = null,
                         Price = product.Price,
                         IntegrationCode = product.Code,
                         Active = true,
                     };
+
+                    var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                    {
+                        Id = m.Id,
+                        ProductId = m.Id,
+                        Gtin = m.Gtin,
+                        ManufacturerPartNumber = m.ManufacturerPartNumber,
+                        Price = m.Price,
+                        StockQuantity = m.StockQuantity,
+                        StokCode = m.StokCode,
+                        Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                    }).ToList();
+
+                    foreach (var item in productVariantAttributeCombinations)
+                    {
+                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.Attributes);
+                    }
+                    ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                    {
+                        Text = m.Name,
+                        Value = m.Id.ToString()
+                    });
 
                     return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
                 }
@@ -572,9 +598,9 @@ namespace Entegro.Web.Controllers
                 {
                     TrendyolApiContext context = new TrendyolApiContext
                     {
-                        SupplierId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault(),
-                        ApiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault(),
-                        ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault(),
+                        SupplierId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault() ?? "",
+                        ApiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "",
+                        ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "",
                     };
                     var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                     var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, existingProductIntegration.IntegrationCode);
@@ -593,7 +619,30 @@ namespace Entegro.Web.Controllers
                         Active = existingProductIntegration.Active,
                         ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
                         MarketplaceLink = existingTrendyolProduct == null ? "#" : existingTrendyolProduct.productUrl,
+                        ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
                     };
+
+                    var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                    {
+                        Id = m.Id,
+                        ProductId = m.Id,
+                        Gtin = m.Gtin,
+                        ManufacturerPartNumber = m.ManufacturerPartNumber,
+                        Price = m.Price,
+                        StockQuantity = m.StockQuantity,
+                        StokCode = m.StokCode,
+                        Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                    }).ToList();
+
+                    foreach (var item in productVariantAttributeCombinations)
+                    {
+                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.Attributes);
+                    }
+                    ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                    {
+                        Text = m.Name,
+                        Value = m.Id.ToString()
+                    });
 
                     if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                     {
@@ -715,6 +764,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.IntegrationCode = model.IntegrationCode;
                     createProductIntegration.Price = model.Price;
                     createProductIntegration.ProductId = model.ProductId;
+                    createProductIntegration.ProductVariantAttributeCombinationId = model.ProductVariantAttributeCombinationId;
                     createProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
                     createProductIntegration.Active = model.Active;
                     createProductIntegration.LastSyncDate = null;
@@ -729,6 +779,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IntegrationCode = model.IntegrationCode;
                     updateProductIntegration.Price = model.Price;
                     updateProductIntegration.ProductId = model.ProductId;
+                    updateProductIntegration.ProductVariantAttributeCombinationId = model.ProductVariantAttributeCombinationId;
                     updateProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
                     updateProductIntegration.Active = model.Active;
                     updateProductIntegration.LastSyncDate = null;
@@ -832,7 +883,7 @@ namespace Entegro.Web.Controllers
                 }).ToList();
                 model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductViewModel.ProductVariantAttributeCombinationViewModel()
                 {
-                    Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeViewModel>>(m.RawAttribute) ?? new List<ProductVariantAttributeViewModel>(),
+                    Attributes = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
                     Gtin = m.Gtin,
                     Id = m.Id,
                     ManufacturerPartNumber = m.ManufacturerPartNumber,

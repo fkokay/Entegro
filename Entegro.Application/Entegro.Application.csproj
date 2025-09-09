@@ -9,12 +9,15 @@
   <ItemGroup>
     <Compile Remove="Commands\**" />
     <Compile Remove="Extensions\**" />
+    <Compile Remove="Interfaces\Services\Invoice\**" />
     <Compile Remove="Queries\**" />
     <EmbeddedResource Remove="Commands\**" />
     <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="Interfaces\Services\Invoice\**" />
     <EmbeddedResource Remove="Queries\**" />
     <None Remove="Commands\**" />
     <None Remove="Extensions\**" />
+    <None Remove="Interfaces\Services\Invoice\**" />
     <None Remove="Queries\**" />
   </ItemGroup>
 
@@ -22,7 +25,6 @@
     <Folder Include="DTOs\Marketplace\CicekSepeti\" />
     <Folder Include="DTOs\Marketplace\Hepsiburada\" />
     <Folder Include="DTOs\Marketplace\Idefix\" />
-    <Folder Include="Interfaces\Services\Invoice\" />
   </ItemGroup>
 
   <ItemGroup>

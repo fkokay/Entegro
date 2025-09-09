@@ -152,17 +152,17 @@ var host = Host.CreateDefaultBuilder(args)
                     .RepeatForever())
             );
 
-            //var jobKeyErp = new JobKey("ErpDataSyncJob");
+            var jobKeyErp = new JobKey("ErpDataSyncJob");
 
-            //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+            q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
 
-            //q.AddTrigger(opts => opts
-            //    .ForJob(jobKeyErp)
-            //    .WithIdentity("ErpDataSyncJob-trigger")
-            //    .WithSimpleSchedule(x => x
-            //        .WithIntervalInMinutes(10)
-            //        .RepeatForever())
-            //);
+            q.AddTrigger(opts => opts
+                .ForJob(jobKeyErp)
+                .WithIdentity("ErpDataSyncJob-trigger")
+                .WithSimpleSchedule(x => x
+                    .WithIntervalInMinutes(10)
+                    .RepeatForever())
+            );
         });
     }).Build();
 

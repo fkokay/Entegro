@@ -1,4 +1,6 @@
-﻿using Entegro.Web.Models.Catalog.Attributes;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities.Catalog;
+using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Brands;
 
 namespace Entegro.Web.Models.Catalog.Products
@@ -52,20 +54,15 @@ namespace Entegro.Web.Models.Catalog.Products
         {
             public int Id { get; set; }
             public int ProductId { get; set; }
+            public string Name { get; set; }
             public string? StokCode { get; set; }
             public string? Gtin { get; set; }
             public string? ManufacturerPartNumber { get; set; }
             public decimal Price { get; set; } = 0;
             public int StockQuantity { get; set; } = 0;
 
-            public List<ProductVariantAttributeViewModel> Attributes { get; set; } = new List<ProductVariantAttributeViewModel>();
+            public List<ProductVariantAttributeSelection> Attributes { get; set; } = new List<ProductVariantAttributeSelection>();
 
-        }
-
-        public class ProductVariantAttributeViewModel
-        {
-            public int ProductAttributeId { get; set; }
-            public int ProductAttributeValueId { get; set; }
         }
 
         public class ProductAttributeMappingViewModel

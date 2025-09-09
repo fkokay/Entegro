@@ -4,6 +4,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
+using System.Xml.Linq;
 
 namespace Entegro.Application.Services
 {
@@ -25,9 +26,21 @@ namespace Entegro.Application.Services
             return _mapper.Map<ProductVariantAttributeValueDto>(model);
         }
 
-        public async Task<ProductVariantAttributeValueDto?> GetByNameAsync(string name)
+        public async Task<ProductVariantAttributeValueDto?> GetByIdAsync(int id)
         {
-            var productAttributeValue = await _productVariantAttributeValueRepository.GetByNameAsync(name);
+            var productAttributeValue = await _productVariantAttributeValueRepository.GetByIdAsync(id);
+            if (productAttributeValue == null)
+            {
+                return null;
+            }
+
+            var productAttributeValueDto = _mapper.Map<ProductVariantAttributeValueDto>(productAttributeValue);
+            return productAttributeValueDto;
+        }
+
+        public async Task<ProductVariantAttributeValueDto?> GetByNameAsync(int productVariantAttributeId, string name)
+        {
+            var productAttributeValue = await _productVariantAttributeValueRepository.GetByNameAsync(productVariantAttributeId, name);
             if (productAttributeValue == null)
             {
                 return null;

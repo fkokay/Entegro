@@ -4,7 +4,8 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IProductVariantAttributeValueRepository
     {
-        Task<ProductVariantAttributeValue?> GetByNameAsync(string name);
+        Task<ProductVariantAttributeValue?> GetByIdAsync(int id);
+        Task<ProductVariantAttributeValue?> GetByNameAsync(int productVariantAttributeId, string name);
         Task AddAsync(ProductVariantAttributeValue data);
     }
 }

@@ -29,16 +29,19 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductService _productService;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ILogger<TrendyolService> _logger;
         public TrendyolService(
             IHttpClientFactory httpClientFactory, 
             IProductIntegrationService productIntegrationService, 
             IProductService productService,
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             ILogger<TrendyolService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
             _productService = productService;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
             _logger = logger;
         }
 
@@ -88,19 +91,31 @@ namespace Entegro.Application.Services.Marketplace
                     product.Code = productIntegration.IntegrationCode;
                     product.Price = productIntegration.Price;
 
-                    var request = new TrendyolPriceAndStockUpdateRequest
+
+                    int stockQuantity = 0;
+                    if (productIntegration.ProductVariantAttributeCombinationId.HasValue)
                     {
-                        Items = new List<TrendyolPriceAndStockUpdateDto>
+                        var productVariantAttributeCombination = await _productVariantAttributeCombinationService.GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value);
+                        stockQuantity = productVariantAttributeCombination.StockQuantity;
+                    }
+                    else
+                    {
+                        stockQuantity = product.StockQuantity;
+                    }
+
+                        var request = new TrendyolPriceAndStockUpdateRequest
+                        {
+                            Items = new List<TrendyolPriceAndStockUpdateDto>
                         {
                             new TrendyolPriceAndStockUpdateDto
                             {
                                 Barcode = productIntegration.IntegrationCode,
                                 ListPrice = productIntegration.Price,
                                 SalePrice = productIntegration.Price,
-                                Quantity = product.StockQuantity
+                                Quantity = stockQuantity
                             }
                         }
-                    };
+                        };
 
                     await UpdatePriceAndStockAsync(apiContext,request);
                 }

@@ -24,9 +24,14 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ProductVariantAttributeValue?> GetByNameAsync(string name)
+        public async Task<ProductVariantAttributeValue?> GetByIdAsync(int id)
         {
-            return await _context.ProductVariantAttributeValues.FirstOrDefaultAsync(o => o.Name == name);
+            return await _context.ProductVariantAttributeValues.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<ProductVariantAttributeValue?> GetByNameAsync(int productVariantAttributeId, string name)
+        {
+            return await _context.ProductVariantAttributeValues.FirstOrDefaultAsync(o => o.ProductVariantAttributeId == productVariantAttributeId && o.Name == name);
         }
     }
 }
