@@ -51,6 +51,11 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
+        public async Task<List<ProductMediaFile>> GetAllAsync(int productId)
+        {
+            return await _context.ProductMediaFiles.Where(m=>m.ProductId == productId).ToListAsync();
+        }
+
         public async Task<ProductMediaFile?> GetByIdAsync(int id)
         {
             return await _context.ProductMediaFiles.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);

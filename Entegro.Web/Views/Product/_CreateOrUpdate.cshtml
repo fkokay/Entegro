@@ -17,7 +17,8 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-stock" type="button" role="tab">Stok</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-variants-btn" data-bs-toggle="tab" data-bs-target="#form-tabs-variants" data-url="@Url.Action("ProductVariantPartial", "Product", new { id = Model.Id })" type="button" role="tab">
+                    <button class="nav-link" id="tab-variants-btn" data-bs-toggle="tab" data-bs-target="#form-tabs-variants"
+                            data-url="@Url.Action("LoadTabVariants", "Product", new { productId = Model.Id })" type="button" role="tab">
                         Varyantlar
                     </button>
                 </li>
@@ -25,12 +26,14 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-seo" type="button" role="tab">Arama Motorları (SEO)</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-image" type="button" role="tab">Resimler</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-image"
+                            data-url="@Url.Action("LoadTabImages", "Product", new { productId = Model.Id })" type="button" role="tab">
+                        Resimler
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-categories"
-                            type="button" role="tab"
-                            data-url="@Url.Action("ProductCategoryList", "Product", new { productId = Model.Id })">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-categories" type="button" role="tab"
+                            data-url="@Url.Action("LoadTabCategories", "Product", new { productId = Model.Id })">
                         Kategori Eşleştirmeleri
                     </button>
                 </li>
@@ -285,8 +288,6 @@
             </div>
 
             <!-- Resimler -->
-
-
             <div class="tab-pane fade" id="form-tabs-image" role="tabpanel">
                 @if (Model.Id > 0)
                 {
@@ -302,7 +303,6 @@
                 }
 
             </div>
-
 
             <!--Kategori Eşleştirmeleri-->
             <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel" data-loaded="false">
@@ -323,8 +323,6 @@
     </div>
 </div>
 
-
-@await Html.PartialAsync("_CreateCategoryProductPartial", Model.Id)
 
 
 

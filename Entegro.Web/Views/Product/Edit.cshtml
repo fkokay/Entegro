@@ -35,6 +35,21 @@
     </div>
 </form>
 
+<div class="modal fade" id="ProductCategoryPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Ürün Kategorisi Ekle</h3>
+                </div>
+
+                <div id="ProductCategoryPopupContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script src="/assets/js/entegro.product.js" asp-append-version="true"></script>
@@ -43,14 +58,9 @@
             const productId = @Html.Raw(Model.Id);
             window.variantData = @Html.Raw(JsonSerializer.Serialize(Model.ProductVariantAttributeCombinations));
 
-            Entegro.product.initImageTab(productId);
-            Entegro.product.initFullEditor('#full-editor', '#Description');
-            Entegro.product.initFormSubmit('#product-form', '/Product/Edit', '/Product/List');
-            Entegro.product.initCategoryModal('#ProductCategoryModel', '#productCategoryTable');
-            Entegro.product.initVariantsTabLoader('#tab-variants-btn', '#form-tabs-variants');
-            Entegro.product.initTabPersistence();
-            Entegro.product.initCategoryTabLoader('button[data-bs-target="#form-tabs-categories"]','#form-tabs-categories');
-            Entegro.product.restoreActiveTab(); 
+            Entegro.product.tabInit(productId);
+            Entegro.product.textEditorInit('#full-editor', '#Description');
+            Entegro.product.formInit('#product-form', '/Product/Edit', '/Product/List');
         });
     </script>
 }

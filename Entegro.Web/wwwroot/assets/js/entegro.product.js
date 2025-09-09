@@ -1,31 +1,75 @@
 ﻿var Entegro = Entegro || {};
 Entegro.product = (function ($) {
     var fullEditor;
+    function showMessage(title, message, type = "info", redirectUrl = null, reload = null) {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: type, // success | error | warning | info | question
+            confirmButtonText: 'Tamam',
+            customClass: { confirmButton: 'btn btn-primary' },
+            buttonsStyling: false
+        }).then(() => {
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
 
-    // -------------------- IMAGE TAB --------------------
-    function initImageTab(productId) {
-        $('button[data-bs-target="#form-tabs-image"]').on('shown.bs.tab', function () {
-            if (productId > 0) {
-                $("#imageTabContent").load("/Product/ProductImagesPartial?id=" + productId, function () {
-                    initProductImageUploader();
-                });
-            } else {
-                $("#imageTabContent").html('<div class="alert alert-danger">Bu ürüne resim yüklemek için önce ürünü kaydetmeniz gerekmektedir.</div>');
+            if (reload) {
+                location.reload();
             }
         });
     }
 
-    function initProductImageUploader() {
-        $("#upload-1388498530").dropzoneWrapper({
+    function tabInit(productId) {
+        const tabButtons = document.querySelectorAll('#product-tabs button[data-bs-toggle="tab"]');
+
+        tabButtons.forEach(function (button) {
+            button.addEventListener('shown.bs.tab', function (event) {
+                if (event.target.dataset.bsTarget == "#form-tabs-image") {
+                    $("#imageTabContent").load("/Product/LoadTabImages?productId=" + productId, function () {
+                        productUploaderInit();
+                        productMainPictureClick();
+                    });
+                }
+
+                if (event.target.dataset.bsTarget == "#form-tabs-categories") {
+                    $("#form-tabs-categories").load("/Product/LoadTabCategories?productId=" + productId, function () {
+                        categoryDelete();
+                    });
+                }
+
+                if (event.target.dataset.bsTarget == "#form-tabs-variants") {
+                    $("#form-tabs-variants").load("/Product/LoadTabVariants?productId=" + productId, function () {
+                        if ($('#SelectedProductAttributeIds').length && !$('#SelectedProductAttributeIds').data('select2')) {
+                            $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
+                            $('#SelectedProductAttributeIds').select2({
+                                width: '100%',
+                                placeholder: 'Varyant seçiniz',
+                                allowClear: true,
+                                dropdownParent: $('#SelectedProductAttributeIds').parent()
+                            });
+                        };
+
+                        initVariantsRepeater(window.variantData || []);
+                    });
+                }
+            });
+        });
+    }
+
+    function productUploaderInit() {
+        $("#upload").dropzoneWrapper({
             maxFiles: 500,
             maxFilesSize: 102400,
             timeout: 300000,
-            previewContainerId: "preview-106864758",
+            previewContainerId: "preview",
             showRemoveButton: false,
             showRemoveButtonAfterUpload: true,
             downloadEnabled: false
         });
+    }
 
+    function productMainPictureClick() {
         $(document).on("click", ".set-main-picture", function (e) {
             var el = $(this).closest('.dz-image-preview');
             var previewContainer = $(this).closest(".preview-container");
@@ -35,8 +79,7 @@ Entegro.product = (function ($) {
         });
     }
 
-    // -------------------- QUILL EDITOR --------------------
-    function initFullEditor(selector, initialValueSelector) {
+    function textEditorInit(selector, initialValueSelector) {
         const fullToolbar = [
             [{ font: [] }, { size: [] }],
             ['bold', 'italic', 'underline', 'strike'],
@@ -62,100 +105,66 @@ Entegro.product = (function ($) {
         }
     }
 
-    function getFullEditorHtml() {
+    function getTextEditorValue() {
         return fullEditor ? fullEditor.root.innerHTML : '';
     }
 
-    // -------------------- FORM SUBMIT --------------------
-    function initFormSubmit(formSelector, urlSubmit, redirectUrl) {
-        const $form = $(formSelector);
+    function formInit(form, url, rediect) {
+        const $form = $(form);
         if (!$form.length) return;
 
         $form.on('submit', function (e) {
             e.preventDefault();
-            if (!fullEditor) return;
 
-            // Quill içeriğini gizli inputa aktar
-            $('#Description').val(getFullEditorHtml());
+            if (!fullEditor) {
+                console.log("Text Editör Düzgün Yüklenemedi");
+                return;
+            }
+
+            $('#Description').val(getTextEditorValue());
 
             const data = $form.serialize();
 
             $.ajax({
-                url: urlSubmit,
+                url: url,
                 type: 'POST',
                 data: data,
                 success: function (response) {
                     if (response.success) {
-                        Swal.fire({
-                            title: 'Başarılı!',
-                            text: 'Ürün başarıyla kaydedildi.',
-                            icon: 'success',
-                            confirmButtonText: 'Tamam',
-                            customClass: { confirmButton: 'btn btn-success' },
-                            buttonsStyling: false
-                        }).then(() => {
-                            if (redirectUrl) window.location.href = redirectUrl;
-                        });
+                        showMessage("Başarılı", "Ürün başarıyla kaydedildi.", "success", rediect);
                     } else {
-                        Swal.fire({
-                            title: 'Hata!',
-                            text: response.message || 'Bir hata oluştu.',
-                            icon: 'error',
-                            confirmButtonText: 'Tamam',
-                            customClass: { confirmButton: 'btn btn-danger' },
-                            buttonsStyling: false
-                        });
+                        showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
                     }
                 },
                 error: function (xhr) {
-                    Swal.fire({
-                        title: 'Hata!',
-                        text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
-                        icon: 'error',
-                        confirmButtonText: 'Tamam',
-                        customClass: { confirmButton: 'btn btn-danger' },
-                        buttonsStyling: false
-                    });
+                    howMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
                 }
             });
         });
     }
 
-    // -------------------- PRODUCT CATEGORIES --------------------
-    function initCategoryModal(modalSelector, tableSelector) {
-        const $modal = $(modalSelector);
-        if (!$modal.length) return;
-
-        $modal.appendTo('body');
-
-        $modal.on('shown.bs.modal', function () {
-            const $cat = $('#CategoryId');
-            if (!$cat.data('select2')) {
-                $cat.select2({
-                    placeholder: 'Kategori seçiniz',
-                    allowClear: true,
-                    dropdownParent: $modal,
-                    width: '100%',
-                    ajax: {
-                        url: '/Category/AllCategory',
-                        type: 'POST',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) { return { term: params.term || '', page: params.page || 1 }; },
-                        processResults: function (data, params) {
-                            params.page = params.page || 1;
-                            return { results: data.results, pagination: { more: data.pagination?.more === true } };
-                        },
-                        cache: true
-                    }
-                });
+    function ProductCategoryCreatePopup(productId) {
+        $.ajax({
+            url: '/Product/ProductCategoryCreatePopup?productId=' + productId,
+            type: 'GET',
+            dataType: 'html',
+            success: function (html) {
+                var popup = $('#ProductCategoryPopup');
+                $('#ProductCategoryPopupContent').html(html);
+                const categorySelect = $('#CategoryId');
+                selectLoad(categorySelect, popup, "/Category/AllCategory");
+                categorySave();
+                $(popup).modal('show');
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('Form yüklenemedi.');
             }
-            /* clearCategoryValidationUI();*/
         });
+    }
 
+    function categorySave() {
         $(document).on('click', '#btnSaveProductCategory', function () {
-            //if (!validateProductCategoryModal().valid) return;
-
             const payload = {
                 productId: Number($('#ProductId').val()) || 0,
                 categoryId: Number($('#CategoryId').val()) || 0,
@@ -175,22 +184,21 @@ Entegro.product = (function ($) {
                             text: 'Kategori başarıyla kaydedildi.',
                             confirmButtonText: 'Tamam'
                         }).then(() => {
-                            location.reload();
+                            refreshTab("#form-tabs-categories");
+                            var popup = $('#ProductCategoryPopup');
+                            $(popup).modal('hide');
                         });
-                        //$modal.modal('hide');
-                        //loadProductCategories($('#productId').val(), tableSelector);
-
                     } else {
-                        Swal.fire({ icon: 'error', title: 'Hata!', text: json?.errors?.join('\n') || 'Kayıt başarısız.' });
+                        showMessage("Hata!", json?.errors?.join('\n') || 'Kayıt başarısız.', "error")
                     }
                 },
                 error: function () {
-                    Swal.fire({ icon: 'error', title: 'Sunucu Hatası!', text: 'İşlem sırasında bir hata oluştu.' });
+                    showMessage("Sunucu Hatası!", "İşlem sırasında bir hata oluştu.", "error")
                 }
             });
         });
-
-        // Silme işlemi
+    }
+    function categoryDelete() {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');
             const mappingId = $tr.data('mapping-id');
@@ -221,88 +229,59 @@ Entegro.product = (function ($) {
                 });
             });
         });
-
     }
-
-    function initCategoryTabLoader(tabBtnSelector, tabPaneSelector) {
-        const tabBtn = document.querySelector(tabBtnSelector);
-        const tabPane = document.querySelector(tabPaneSelector);
-
-        if (!tabBtn || !tabPane) return;
-
-        tabBtn.addEventListener('shown.bs.tab', async function () {
-            const loaded = tabPane.getAttribute('data-loaded') === 'true';
-            if (loaded) return;
-
-            const url = tabBtn.getAttribute('data-url');
-            if (!url) return;
-
-            // İsteğe bağlı: Yükleniyor mesajı
-            tabPane.innerHTML = `<div class="m-3">Yükleniyor...</div>`;
-
-            try {
-                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                if (!res.ok) throw new Error('Yükleme başarısız: ' + res.status);
-
-                const html = await res.text();
-                tabPane.innerHTML = html;
-                tabPane.setAttribute('data-loaded', 'true');
-            } catch (err) {
-                tabPane.innerHTML = `<div class="alert alert-danger m-3">Kategori içerikleri yüklenemedi. ${err.message}</div>`;
+    function selectLoad(select,parent, url) {
+        $(select).select2({
+            placeholder: 'Kategori seçiniz',
+            allowClear: true,
+            dropdownParent: parent,
+            width: '100%',
+            ajax: {
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '', page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination?.more === true
+                        }
+                    };
+                },
+                cache: true
             }
         });
     }
+    function refreshTab(tabSelector) {
+        const tabButton = document.querySelector(`#product-tabs button[data-bs-target="${tabSelector}"]`);
+        if (!tabButton) return;
 
+        const url = tabButton.dataset.url;
+        const paneEl = document.querySelector(tabSelector);
 
-    // -------------------- REPEATER / VARIANTS --------------------
-    function initVariantsTabLoader(tabBtnSelector, tabPaneSelector) {
-        const tabBtn = document.querySelector(tabBtnSelector);
-        const tabPane = document.querySelector(tabPaneSelector);
+        if (url && paneEl) {
+            // loading animasyonu istersen
+            paneEl.innerHTML = '<div class="p-3 text-center text-muted">Yükleniyor...</div>';
 
-        if (!tabBtn || !tabPane) return;
-
-        tabBtn.addEventListener('shown.bs.tab', async function (e) {
-            const loaded = tabPane.getAttribute('data-loaded') === 'true';
-            if (loaded) return;
-
-            const url = tabBtn.getAttribute('data-url');
-            if (!url) return;
-
-            const loadingEl = document.getElementById('variants-loading');
-            if (loadingEl) loadingEl.style.display = 'block';
-
-            try {
-                const res = await fetch(url, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                if (!res.ok) throw new Error('Sunucu hatası: ' + res.status);
-                const html = await res.text();
-
-                tabPane.innerHTML = html;
-                tabPane.setAttribute('data-loaded', 'true');
-
-                // repeater ve select2 initialize
-                Entegro.product.initVariantsRepeater(window.variantData || []);
-
-                if ($('#SelectedProductAttributeIds').length && !$('#SelectedProductAttributeIds').data('select2')) {
-                    $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
-                    $('#SelectedProductAttributeIds').select2({
-                        width: '100%',
-                        placeholder: 'Varyant seçiniz',
-                        allowClear: true,
-                        dropdownParent: $('#SelectedProductAttributeIds').parent()
-                    });
-                };
-
-            } catch (err) {
-                tabPane.innerHTML = `
-                <div class="alert alert-danger m-3">
-                    Varyant içeriği yüklenemedi. Detay: ${err.message}
-                </div>`;
-            } finally {
-                if (loadingEl) loadingEl.style.display = 'none';
-            }
-        });
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    paneEl.innerHTML = html;
+                    console.log(tabSelector + ' tabı yenilendi.');
+                })
+                .catch(err => {
+                    paneEl.innerHTML = '<div class="p-3 text-danger">Yükleme hatası!</div>';
+                    console.error('Tab refresh hatası:', err);
+                });
+        }
     }
-
     function initVariantsRepeater(data) {
         const $repeater = $('#ProductVariantAttributeCombinationRepeater');
         if (!$repeater.length) return;
@@ -327,7 +306,6 @@ Entegro.product = (function ($) {
         fillRepeater(data || []);
         updateRepeaterIndexes();
     }
-
     function fillRepeater(data) {
         var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
         var $template = $list.find('[data-repeater-item]:first').clone(true, true);
@@ -358,7 +336,6 @@ Entegro.product = (function ($) {
             $list.append($row);
         });
     }
-
     function updateRepeaterIndexes() {
         var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
 
@@ -387,60 +364,11 @@ Entegro.product = (function ($) {
         });
     }
 
-    // -------------------- ACTIVE TAB --------------------
-    function activateTab(paneSelector) {
-        const triggerEl =
-            document.querySelector(`[data-bs-target="${paneSelector}"]`) ||
-            document.querySelector(`a[href="${paneSelector}"]`);
-        if (!triggerEl || !window.bootstrap?.Tab) return;
-
-        const tab = new bootstrap.Tab(triggerEl);
-        tab.show();
-
-        const pane = document.querySelector(paneSelector);
-        if (pane) pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // localStorage ile aktif tab kaydet
-        localStorage.setItem('productActiveTab', paneSelector);
-    }
-
-    function restoreActiveTab() {
-        const activeTab = localStorage.getItem('productActiveTab');
-        if (activeTab) {
-            activateTab(activeTab);
-            localStorage.removeItem('productActiveTab');
-        }
-    }
-
-    function saveActiveTab(tabSelector) {
-        if (tabSelector) localStorage.setItem('productActiveTab', tabSelector);
-    }
-
-    function initTabPersistence() {
-        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
-        tabButtons.forEach(btn => {
-            btn.addEventListener('shown.bs.tab', function (e) {
-                const target = e.target.getAttribute('data-bs-target') || e.target.getAttribute('href');
-                saveActiveTab(target);
-            });
-        });
-    }
-
-    // -------------------- PUBLIC API --------------------
     return {
-        initImageTab: initImageTab,
-        initFullEditor: initFullEditor,
-        getFullEditorHtml: getFullEditorHtml,
-        initFormSubmit: initFormSubmit,
-        initCategoryModal: initCategoryModal,
-        initVariantsTabLoader: initVariantsTabLoader,
-        initVariantsRepeater: initVariantsRepeater,
-        fillRepeater: fillRepeater,
-        updateRepeaterIndexes: updateRepeaterIndexes,
-        initCategoryTabLoader: initCategoryTabLoader,
-        activateTab: activateTab,
-        saveActiveTab: saveActiveTab,
-        restoreActiveTab: restoreActiveTab,
-        initTabPersistence: initTabPersistence
+        tabInit: tabInit,
+        textEditorInit: textEditorInit,
+        formInit: formInit,
+        ProductCategoryCreatePopup: ProductCategoryCreatePopup,
+
     };
 })(jQuery);

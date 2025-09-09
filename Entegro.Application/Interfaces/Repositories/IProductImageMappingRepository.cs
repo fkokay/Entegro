@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Repositories
     {
         Task<ProductMediaFile?> GetByIdAsync(int id);
         Task<List<ProductMediaFile>> GetAllAsync();
+        Task<List<ProductMediaFile>> GetAllAsync(int productId);
         Task AddAsync(ProductMediaFile productImage);
         Task UpdateAsync(ProductMediaFile productImage);
         Task DeleteAsync(ProductMediaFile productImage);

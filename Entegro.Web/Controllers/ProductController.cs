@@ -236,47 +236,15 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
-        #region Partial
-        public async Task<IActionResult> ProductImagesPartial(int id)
-        {
-            ProductViewModel model = new ProductViewModel();
-
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            await PrepareProductModel(model, product);
-            return PartialView("_ProductImages", model);
-        }
-        public async Task<IActionResult> ProductVariantPartial(int id)
-        {
-            ProductViewModel model = new ProductViewModel();
-
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            await PrepareProductModel(model, product);
-            return PartialView("_ProductVariantPartial", model);
-        }
-        #endregion
-
         #region Product Categories
 
         [HttpGet]
-        public async Task<IActionResult> ProductCategoryList(int productId)
+        public async Task<IActionResult> LoadTabCategories(int productId)
         {
+            ViewBag.ProductId = productId;
             var productCategories = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
 
-            var categoryTree = await _categoryService.GetCategoryTreeAsync(includeHidden: false);
-            var categories = categoryTree.Flatten(false);
-
-
-            return PartialView("_CategoryProductPartial", productCategories.Select(x => new ProductCategoryViewModel
+            return PartialView("_CreateOrUpdate.Categories", productCategories.Select(x => new ProductCategoryViewModel
             {
                 Id = x.Id,
                 CategoryId = x.CategoryId,
@@ -286,14 +254,27 @@ namespace Entegro.Web.Controllers
             }).ToList());
         }
 
+        [HttpGet]
+        public IActionResult ProductCategoryCreatePopup(int productId)
+        {
+            ProductCategoryViewModel model = new ProductCategoryViewModel();
+            model.ProductId = productId;
+
+            return PartialView("_ProductCategoryCreatePopup");
+        }
+
         [HttpPost]
-        public async Task<IActionResult> ProductCategoryInsert([FromBody] CreateProductCategoryDto createProductCategoryDto)
+        public async Task<IActionResult> ProductCategoryInsert([FromBody] ProductCategoryViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var createProductCategoryMappingModel = await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategoryDto);
-                int id = createProductCategoryMappingModel.Id;
-                return Json(new { success = true, id });
+                CreateProductCategoryDto createProductCategory = new CreateProductCategoryDto();
+                createProductCategory.ProductId = model.ProductId;
+                createProductCategory.CategoryId = model.CategoryId;
+                createProductCategory.DisplayOrder = model.DisplayOrder;
+
+                await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategory);
+                return Json(new { success = true });
             }
             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
         }
@@ -316,6 +297,47 @@ namespace Entegro.Web.Controllers
         #endregion
 
         #region Product Pictures
+        [HttpGet]
+        public async Task<IActionResult> LoadTabImages(int productId)
+        {
+            ViewBag.ProductId = productId;
+            var productMediaFiles = await _productImageMappingService.GetAllAsync(productId);
+            var model = productMediaFiles.Select(m => new ProductMediaFileViewModel()
+            {
+                Id = m.Id,
+                DisplayOrder = m.DisplayOrder,
+                MediaFileId = m.MediaFileId,
+                ProductId = m.ProductId,
+                MediaFile = new MediaFileViewModel()
+                {
+                    Alt = m.MediaFile.Alt,
+                    CreatedOn = m.MediaFile.CreatedOn,
+                    Deleted = m.MediaFile.Deleted,
+                    Extension = m.MediaFile.Extension,
+                    FolderId = m.MediaFile.FolderId,
+                    Height = m.MediaFile.Height,
+                    Id = m.MediaFile.Id,
+                    IsTransient = m.MediaFile.IsTransient,
+                    MediaType = m.MediaFile.MediaType,
+                    Metadata = m.MediaFile.Metadata,
+                    MimeType = m.MediaFile.MimeType,
+                    Name = m.MediaFile.Name,
+                    PixelSize = m.MediaFile.PixelSize,
+                    Size = m.MediaFile.Size,
+                    Title = m.MediaFile.Title,
+                    UpdatedOn = m.MediaFile.UpdatedOn,
+                    Width = m.MediaFile.Width,
+                    Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    {
+                        Id = m.MediaFile.Folder.Id,
+                        Name = m.MediaFile.Folder.Name,
+                    }
+                }
+            }).ToList();
+
+            return PartialView("_CreateOrUpdate.Pictures", model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductMediaFilesAdd(string mediaFileIds, int entityId)
         {
@@ -458,6 +480,23 @@ namespace Entegro.Web.Controllers
                 });
             }
 
+        }
+
+        #endregion
+
+        #region Product Variants
+        public async Task<IActionResult> LoadTabVariants(int productId)
+        {
+            ProductViewModel model = new ProductViewModel();
+
+            var product = await _productService.GetProductByIdAsync(productId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            await PrepareProductModel(model, product);
+            return PartialView("_CreateOrUpdate.Attributes", model);
         }
 
         #endregion
@@ -814,6 +853,7 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
+
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
         {
             if (product != null)
@@ -856,38 +896,6 @@ namespace Entegro.Web.Controllers
                         Name = x.Name,
                         ProductVariantAttributeId = x.ProductVariantAttributeId,
                     }).ToList()
-                }).ToList();
-                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileViewModel()
-                {
-                    Id = m.Id,
-                    DisplayOrder = m.DisplayOrder,
-                    MediaFileId = m.MediaFileId,
-                    ProductId = m.ProductId,
-                    MediaFile = new MediaFileViewModel()
-                    {
-                        Alt = m.MediaFile.Alt,
-                        CreatedOn = m.MediaFile.CreatedOn,
-                        Deleted = m.MediaFile.Deleted,
-                        Extension = m.MediaFile.Extension,
-                        FolderId = m.MediaFile.FolderId,
-                        Height = m.MediaFile.Height,
-                        Id = m.MediaFile.Id,
-                        IsTransient = m.MediaFile.IsTransient,
-                        MediaType = m.MediaFile.MediaType,
-                        Metadata = m.MediaFile.Metadata,
-                        MimeType = m.MediaFile.MimeType,
-                        Name = m.MediaFile.Name,
-                        PixelSize = m.MediaFile.PixelSize,
-                        Size = m.MediaFile.Size,
-                        Title = m.MediaFile.Title,
-                        UpdatedOn = m.MediaFile.UpdatedOn,
-                        Width = m.MediaFile.Width,
-                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
-                        {
-                            Id = m.MediaFile.Folder.Id,
-                            Name = m.MediaFile.Folder.Name,
-                        }
-                    }
                 }).ToList();
                 model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
                 {

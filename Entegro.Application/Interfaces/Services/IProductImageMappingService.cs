@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<ProductMediaFileDto?> GetByIdAsync(int id);
         Task<List<ProductMediaFileDto>> GetAllAsync();
+        Task<List<ProductMediaFileDto>> GetAllAsync(int productId);
         Task<ProductMediaFileDto> AddAsync(CreateProductMediaFileDto productImage);
         Task<ProductMediaFileDto> UpdateAsync(UpdateProductMediaFileDto productImage);
         Task DeleteAsync(int id);

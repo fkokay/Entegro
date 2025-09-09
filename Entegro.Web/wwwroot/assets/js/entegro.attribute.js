@@ -5,7 +5,7 @@ Entegro.Attribute = (function ($) {
     'use strict';
 
     const create = function () {
-        $($("#CreateOrderUpdateModal").find(".title")).text("Varyant Ekle");
+        $($("#CreateOrUpdateModal").find(".title")).text("Varyant Ekle");
 
         $.ajax({
             url: '/ProductAttribute/CreateOrUpdate?id=0',
