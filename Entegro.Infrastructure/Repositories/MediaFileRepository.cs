@@ -59,7 +59,7 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<MediaFile?> GetByNameAndFolderAsync(string name, int? folderId)
         {
             return await _context.MediaFiles.Include(m => m.MediaFolder).AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Name == name && x.MediaFolderId == folderId);
+                    .FirstOrDefaultAsync(x => x.Name == name && x.FolderId == folderId);
         }
 
         public async Task UpdateAsync(MediaFile mediaFile)

@@ -1,4 +1,4 @@
-﻿ using Entegro.Application.DTOs.MediaFolder;
+﻿using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Exceptions;
@@ -42,11 +42,12 @@ namespace Entegro.Web.Controllers
         [HttpGet("media/{mediaId}/{fileName}")]
         public IActionResult MediaFile(string mediaId, string? folder, string fileName)
         {
-            string filePath = string.Empty; 
+            string filePath = string.Empty;
             if (folder.IsEmpty())
             {
                 filePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage", fileName);
-            }else
+            }
+            else
             {
                 filePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage", folder, fileName);
             }

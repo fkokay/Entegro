@@ -78,7 +78,7 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"MediaFile with ID {mediaFileId} not found.");
             }
 
-            var mediaFolder = mediaFile.MediaFolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.MediaFolderId.Value) : null;
+            var mediaFolder = mediaFile.FolderId.HasValue ? await _mediaFolderRepository.GetByIdAsync(mediaFile.FolderId.Value) : null;
 
 
             string folderName = mediaFile.MediaFolder?.Name ?? ""; // default Brand olabilir

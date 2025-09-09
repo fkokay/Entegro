@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities.Content
@@ -14,7 +13,7 @@ namespace Entegro.Domain.Entities.Content
     [Table("MediaFile")]
     public class MediaFile : BaseEntity, ITransient
     {
-        public int? MediaFolderId { get; set; }
+        public int? FolderId { get; set; }
         public virtual MediaFolder? MediaFolder { get; set; }
         public string Name { get; set; }
         public string Alt { get; set; }
