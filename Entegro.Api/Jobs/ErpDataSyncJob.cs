@@ -18,7 +18,7 @@ using Polly;
 using Quartz;
 using System.Collections.Concurrent;
 
-namespace Entegro.Service.Jobs
+namespace Entegro.Api.Jobs
 {
     public class ErpDataSyncJob : IJob
     {
