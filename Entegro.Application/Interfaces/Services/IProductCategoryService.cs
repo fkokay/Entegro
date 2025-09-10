@@ -2,7 +2,7 @@
 
 namespace Entegro.Application.Interfaces.Services
 {
-    public interface IProductCategoryMappingService
+    public interface IProductCategoryService
     {
         Task<ProductCategoryDto> GetProductCategoryByIdAsync(int productCategoryId);
         Task<IEnumerable<ProductCategoryDto>> GetProductCategorysAsync();

@@ -1,0 +1,49 @@
+﻿using Entegro.Application.Interfaces.Repositories;
+using Entegro.Domain.Entities.Catalog;
+using Entegro.Infrastructure.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entegro.Infrastructure.Exceptions
+{
+    public static class RepositoryServiceCollectionExtensions
+    {
+        public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
+        {
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IMediaFolderRepository, MediaFolderRepository>();
+            services.AddScoped<IMediaFileRepository, MediaFileRepository>();
+            services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+            services.AddScoped<IProductAttributeValueRepository, ProductAttributeValueRepository>();
+            services.AddScoped<IProductVariantAttributeRepository, ProductVariantAttributeRepository>();
+            services.AddScoped<IProductVariantAttributeValueRepository, ProductVariantAttributeValueRepository>();
+            services.AddScoped<IProductVariantAttributeCombinationRepository, ProductVariantAttributeCombinationRepository>();
+            services.AddScoped<IProductImageMappingRepository, ProductImageMappingRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IIntegrationSystemRepository, IntegrationSystemRepository>();
+            services.AddScoped<IIntegrationSystemParameterRepository, IntegrationSystemParameterRepository>();
+            services.AddScoped<IIntegrationSystemLogRepository, IntegrationSystemLogRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<ITownRepository, TownRepository>();
+            services.AddScoped<IOrderNoteRepository, OrderNoteRepository>();
+            services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();
+            services.AddScoped<ISpecificationAttributeOptionRepository, SpecificationAttributeOptionRepository>();
+            services.AddScoped<ISpecificationAttributeRepository, SpecificationAttributeRepository>();
+            services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
+            return services;
+        }
+    }
+}

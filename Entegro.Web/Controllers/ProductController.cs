@@ -27,7 +27,7 @@ namespace Entegro.Web.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
-        private readonly IProductCategoryMappingService _productCategoryMappingService;
+        private readonly IProductCategoryService _productCategoryMappingService;
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductVariantAttributeService _productVariantAttributeService;
@@ -39,7 +39,7 @@ namespace Entegro.Web.Controllers
         private readonly ITrendyolService _trenyolService;
         public ProductController(
             IProductService productService,
-            IProductCategoryMappingService productCategoryMappingService,
+            IProductCategoryService productCategoryMappingService,
             IBrandService brandService,
             IProductAttributeService productAttributeService,
             IProductVariantAttributeService productVariantAttributeService,

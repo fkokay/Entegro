@@ -7,14 +7,14 @@ using MapsterMapper;
 
 namespace Entegro.Application.Services
 {
-    public class ProductCategoryMappingService : IProductCategoryMappingService
+    public class ProductCategoryService : IProductCategoryService
     {
-        private readonly IProductCategoryMappingRepository _productCategoryMappingRepository;
+        private readonly IProductCategoryRepository _productCategoryMappingRepository;
         private readonly ICategoryService _categoryService;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        public ProductCategoryMappingService(
-            IProductCategoryMappingRepository productCategoryMappingRepository,
+        public ProductCategoryService(
+            IProductCategoryRepository productCategoryMappingRepository,
             IMapper mapper,
             ICategoryService categoryService,
             ICategoryRepository categoryRepository)
