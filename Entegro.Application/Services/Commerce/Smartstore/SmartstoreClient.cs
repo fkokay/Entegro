@@ -33,7 +33,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 {
     public class SmartstoreClient
     {
-        private readonly string EntegroUrl = "https://localhost:7230";
+        private readonly string EntegroUrl = "https://localhost:4000";
 
         private readonly ILogger<SmartstoreClient> _logger;
         private readonly HttpClient _httpClient;
@@ -143,6 +143,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PutAsync($"products({product.Id})", content);
+            var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
         }
         public async Task DeleteProductAsync(string sku)
@@ -261,7 +262,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 else
                 {
                     SmartstoreFileDto smartstoreFile = new SmartstoreFileDto();
-                    smartstoreFile.File = await getFileAsync($"{EntegroUrl}{productMediaFile.MediaFile.Name}");
+                    smartstoreFile.File = await getFileAsync($"{EntegroUrl}{productMediaFile.MediaFile.Url}");
                     smartstoreFile.FileName = string.Format($"catalog/{productMediaFile.MediaFile.Name}");
                     smartstoreFile.MimeType = productMediaFile.MediaFile.MimeType;
 

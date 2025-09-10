@@ -82,9 +82,6 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.ProductTemplateId = 1;
                 smartstoreProduct.ShowOnHomePage = false;
                 smartstoreProduct.HomePageDisplayOrder = 0;
-                smartstoreProduct.MetaTitle = "";
-                smartstoreProduct.MetaDescription = "";
-                smartstoreProduct.MetaKeywords = "";
                 smartstoreProduct.AllowCustomerReviews = true;
                 smartstoreProduct.Sku = product.Code;
                 smartstoreProduct.FullDescription = product.Description;
@@ -139,7 +136,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.QuantityStep = 1;
                 smartstoreProduct.QuantityControlType = "Spinner";
                 smartstoreProduct.HideQuantityControl = false;
-                smartstoreProduct.AllowedQuantities = null;
+                smartstoreProduct.AllowedQuantities =null;
                 smartstoreProduct.DisableBuyButton = false;
                 smartstoreProduct.DisableWishlistButton = false;
                 smartstoreProduct.AvailableForPreOrder = false;
@@ -155,16 +152,16 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.MaximumCustomerEnteredPrice = 1000;
                 smartstoreProduct.HasTierPrices = false;
                 smartstoreProduct.LowestAttributeCombinationPrice = null;
-                smartstoreProduct.AttributeCombinationRequired = false;
+                smartstoreProduct.AttributeCombinationRequired = true;
                 smartstoreProduct.AttributeChoiceBehaviour = "GrayOutUnavailable";
-                smartstoreProduct.Weight = 0;
-                smartstoreProduct.Length = 0;
-                smartstoreProduct.Width = 0;
-                smartstoreProduct.Height = 0;
+                smartstoreProduct.Weight = product.Weight;
+                smartstoreProduct.Length = product.Length;
+                smartstoreProduct.Width = product.Width;
+                smartstoreProduct.Height = product.Height;
                 smartstoreProduct.AvailableStartDateTimeUtc = null;
                 smartstoreProduct.AvailableEndDateTimeUtc = null;
                 smartstoreProduct.DisplayOrder = 0;
-                smartstoreProduct.Published = true;
+                smartstoreProduct.Published = product.Published;
                 smartstoreProduct.IsSystemProduct = false;
                 smartstoreProduct.SystemName = "";
                 smartstoreProduct.CreatedOnUtc = DateTimeOffset.UtcNow;
@@ -184,69 +181,6 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.MainPictureId = null;
                 smartstoreProduct.HasPreviewPicture = false;
                 smartstoreProduct.HasDiscountsApplied = false;
-
-
-
-
-                if (product.Id > 0)
-                {
-
-                    //if (product.BrandId.HasValue && product.BrandId > 0)
-                    //{
-                    //    var productManufacturer = new SmartstoreProductManufacturerDto
-                    //    {
-                    //        ManufacturerId = product.BrandId.Value,
-                    //        ProductId = product.Id,
-                    //        DisplayOrder = 0
-                    //    };
-                    //    smartstoreProduct.ProductManufacturers.Add(productManufacturer);
-                    //}
-
-                    //smartstoreProduct.ProductCategories = product.ProductCategories.Select(m => new SmartstoreProductCategoryDto
-                    //{
-                    //    ProductId = product.Id,
-                    //    CategoryId = m.CategoryId,
-                    //    IsFeaturedProduct = false,
-                    //    IsSystemMapping = false,
-                    //    DisplayOrder = 0,
-                    //}).ToList();
-
-                    //smartstoreProduct.ProductMediaFiles = product.ProductMediaFiles.Select(m => new SmartstoreProductMediaFileDto()
-                    //{
-                    //    ProductId = product.Id,
-                    //    MediaFileId = m.MediaFileId,
-                    //    DisplayOrder = m.DisplayOrder,
-                    //}).ToList();
-
-                    //smartstoreProduct.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new SmartstoreProductVariantAttributeDto()
-                    //{
-                    //    ProductId = product.Id,
-                    //    AttributeControlTypeId = 1,
-                    //    CustomData = "",
-                    //    DisplayOrder = m.DisplayOrder,
-                    //    IsRequired = true,
-                    //    ProductAttributeId = m.ProductAttributeId,
-                    //    TextPrompt = "",
-                    //    Id = m.Id,
-                    //    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new SmartstoreProductVariantAttributeValueDto()
-                    //    {
-                    //        Name = x.Name,
-                    //        Color = "",
-                    //        DisplayOrder = 0,
-                    //        IsPreSelected = false,
-                    //        MediaFileId = 0,
-                    //        LinkedProductId = 0,
-                    //        PriceAdjustment = 0,
-                    //        ProductVariantAttributeId = m.Id,
-                    //        Quantity = 0,
-                    //        ValueTypeId = 0,
-                    //        WeightAdjustment = 0,
-                    //        Alias = "",
-                    //        Attribute = "",
-                    //        Id = x.Id
-                    //    }).ToList()
-                    //}).ToList();
-                }
 
 
                 return smartstoreProduct;
