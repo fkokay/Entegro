@@ -1,0 +1,29 @@
+﻿@model CreateSpecificationAttributeOptionViewModel
+
+<div id="specificationAttributeOptionForm" class="row g-3">
+    @Html.HiddenFor(m => m.SpecificationAttributeId)
+
+
+    <div class="col-md-12 mt-3">
+        <div class="row">
+            <label class="col-sm-3 col-form-label text-sm-start" for="Name">Adı</label>
+            <div class="col-sm-9">
+                <input asp-for="Name" id="OptionName" type="text" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 mt-3">
+        <div class="row">
+            <label class="col-sm-3 col-form-label text-sm-start" for="DisplayOrder">Sıra</label>
+            <div class="col-sm-9">
+                <input asp-for="DisplayOrder" type="number" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 text-center mt-3">
+        <button type="button" id="btnSaveSpecificationAttributeOption" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
+    </div>
+</div>

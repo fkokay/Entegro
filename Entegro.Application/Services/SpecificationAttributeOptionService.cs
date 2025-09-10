@@ -29,9 +29,16 @@ namespace Entegro.Application.Services
             return _mapper.Map<SpecificationAttributeOptionDto>(specificationAttribute);
         }
 
-        public Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var value = await _specificationAttributeOptionRepository.GetByIdAsync(id);
+
+            if (value is null)
+            {
+                throw new KeyNotFoundException($"specificationAttributeOption with ID {value} not found.");
+            }
+            await _specificationAttributeOptionRepository.DeleteAsync(value);
+            return true;
         }
 
         public async Task<bool> ExistsByIdAsync(int id)

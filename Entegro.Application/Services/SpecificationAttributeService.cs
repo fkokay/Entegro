@@ -29,9 +29,16 @@ namespace Entegro.Application.Services
             return _mapper.Map<SpecificationAttributeDto>(specificationAttribute);
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id));
+
+            var specificationAttribute = await _specificationAttributeRepository.GetByIdAsync(id);
+            if (specificationAttribute == null)
+                throw new KeyNotFoundException($"ID {id} ile SpecificationAttribute bulunamadı.");
+
+            await _specificationAttributeRepository.DeleteAsync(specificationAttribute);
         }
 
         public async Task<bool> ExistsByIdAsync(int id)
@@ -109,6 +116,18 @@ namespace Entegro.Application.Services
                 TotalCount = brands.TotalCount,
                 PageNumber = brands.PageNumber,
                 PageSize = brands.PageSize
+            };
+        }
+
+        public async Task<PagedResult<SpecificationAttributeDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var attributes = await _specificationAttributeRepository.GetPagedAsync(gridCommand);
+            return new PagedResult<SpecificationAttributeDto>
+            {
+                Items = _mapper.Map<IEnumerable<SpecificationAttributeDto>>(attributes.Items),
+                TotalCount = attributes.TotalCount,
+                PageNumber = attributes.PageNumber,
+                PageSize = attributes.PageSize
             };
         }
 

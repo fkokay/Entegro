@@ -544,6 +544,8 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SpecificationAttributeId");
+
                     b.ToTable("SpecificationAttributeOption");
                 });
 
@@ -1706,6 +1708,17 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("ProductVariantAttribute");
                 });
 
+            modelBuilder.Entity("Entegro.Domain.Entities.Catalog.SpecificationAttributeOption", b =>
+                {
+                    b.HasOne("Entegro.Domain.Entities.Catalog.SpecificationAttribute", "SpecificationAttribute")
+                        .WithMany("SpecificationAttributeOptions")
+                        .HasForeignKey("SpecificationAttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SpecificationAttribute");
+                });
+
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.Invoice", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Checkout.Order", "Order")
@@ -1925,6 +1938,11 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductVariantAttribute", b =>
                 {
                     b.Navigation("ProductVariantAttributeValues");
+                });
+
+            modelBuilder.Entity("Entegro.Domain.Entities.Catalog.SpecificationAttribute", b =>
+                {
+                    b.Navigation("SpecificationAttributeOptions");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.Customer", b =>

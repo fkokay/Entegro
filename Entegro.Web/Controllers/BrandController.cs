@@ -115,7 +115,7 @@ namespace Entegro.Web.Controllers
                     Id = model.Id,
                     Name = model.Name,
                     Description = model.Description,
-                    MediaFileId = model.MediaFileId,
+                    MediaFileId = model.MediaFileId == 0 ? null : model.MediaFileId,
                     MetaDescription = model.MetaDescription,
                     MetaTitle = model.MetaTitle,
                     DisplayOrder = model.DisplayOrder,
