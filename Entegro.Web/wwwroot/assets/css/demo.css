@@ -546,6 +546,8 @@ table .avatar img {
     inline-size:auto;
     display: block;
     margin: 0px auto;
+    height:40px;
+    max-width:40px;
 }
 
 

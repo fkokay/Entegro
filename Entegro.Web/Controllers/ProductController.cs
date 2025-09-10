@@ -374,13 +374,13 @@ namespace Entegro.Web.Controllers
                             DisplayOrder = i // Sıralamayı kaydediyoruz
                         };
 
-                        var id = await _productImageMappingService.AddAsync(productPicture);
+                        var productMediaFile = await _productImageMappingService.AddAsync(productPicture);
 
                         // İsteğe bağlı olarak frontend’e dönecek bilgi
                         var respObj = new
                         {
                             MediaFileId = mediaFileId,
-                            ProductMediaFileId = id,
+                            ProductMediaFileId = productMediaFile.Id,
                             DisplayOrder = i
                         };
 

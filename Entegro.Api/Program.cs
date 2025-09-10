@@ -123,17 +123,17 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+    var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
-    //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
+    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
 
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeySmartstore)
-    //    .WithIdentity("SmartstoreDataSyncJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(1)
-    //        .RepeatForever())
-    //    );
+    q.AddTrigger(opts => opts
+        .ForJob(jobKeySmartstore)
+        .WithIdentity("SmartstoreDataSyncJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(1)
+            .RepeatForever())
+        );
 
     //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
