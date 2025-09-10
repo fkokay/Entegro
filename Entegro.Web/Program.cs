@@ -4,7 +4,7 @@ using Entegro;
 using Entegro.Application.Mappings;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
-using Entegro.Infrastructure.Exceptions;
+using Entegro.Infrastructure.Extensions;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
@@ -112,6 +112,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(engineStarter.ConfigureContain
 #region App Services
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices();
+builder.Services.AddCommerceServices();
+builder.Services.AddErpServices();
 builder.Services.AddMarketplaceServices();
 
 MapsterConfig.RegisterMappings();

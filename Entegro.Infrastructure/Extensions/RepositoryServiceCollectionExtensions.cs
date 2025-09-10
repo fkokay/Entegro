@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Infrastructure.Exceptions
+namespace Entegro.Infrastructure.Extensions
 {
     public static class RepositoryServiceCollectionExtensions
     {

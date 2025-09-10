@@ -91,6 +91,8 @@ namespace Entegro.Application.Mappings.Erp
                     MetaDescription = "",
                     MetaTitle = "",
                     TreePath = "",
+                    Published = true,
+                    Deleted = false,
                     SubCategories = new List<DTOs.Category.CategoryDto>()
                 };
 

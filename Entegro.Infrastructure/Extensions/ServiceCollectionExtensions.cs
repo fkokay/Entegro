@@ -1,5 +1,7 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.Interfaces;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;
+using Entegro.Infrastructure.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Infrastructure.Exceptions
+namespace Entegro.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -42,6 +44,10 @@ namespace Entegro.Infrastructure.Exceptions
             services.AddScoped<ISpecificationAttributeService, SpecificationAttributeService>();
             services.AddScoped<IEmailAccountService, EmailAccountService>();
             services.AddScoped<IAddressService, AddressService>();
+
+            services.AddScoped<IEventPublisher, EventBus>();
+            services.AddHttpClient();
+
             return services;
         }
     }

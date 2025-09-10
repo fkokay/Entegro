@@ -1,6 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
+using Entegro.Api.Jobs;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
@@ -10,7 +11,7 @@ using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
-using Entegro.Infrastructure.Exceptions;
+using Entegro.Infrastructure.Extensions;
 using Entegro.Infrastructure.Repositories;
 using Entegro.Utilities;
 using Mapster;
@@ -19,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Serilog;
 using Serilog.Extensions.Logging;
 using Serilog.Sinks.Graylog;
@@ -118,9 +120,53 @@ builder.Host.ConfigureContainer<ContainerBuilder>(engineStarter.ConfigureContain
 builder.Services.AddSwaggerGen();
 #endregion
 
+#region Jobs
+builder.Services.AddQuartz(q =>
+{
+    //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+
+    //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
+
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeySmartstore)
+    //    .WithIdentity("SmartstoreDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(1)
+    //        .RepeatForever())
+    //    );
+
+    //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+
+    //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyTrendyol)
+    //    .WithIdentity("TrendyolDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //);
+
+    var jobKeyErp = new JobKey("ErpDataSyncJob");
+
+    q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKeyErp)
+        .WithIdentity("ErpDataSyncJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(10)
+            .RepeatForever())
+        );
+});
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+#endregion
+
 #region App Services
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices();
+builder.Services.AddCommerceServices();
+builder.Services.AddErpServices();
 builder.Services.AddMarketplaceServices();
 
 MapsterConfig.RegisterMappings();
