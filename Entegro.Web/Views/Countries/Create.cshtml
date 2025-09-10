@@ -25,105 +25,16 @@
 </form>
 
 @section Scripts{
+   
+
+    <script src="/assets/js/entegro.country.js" asp-append-version="true"></script>
     <script>
-        const formValidation = FormValidation.formValidation(
-            document.getElementById('country-form'),
-            {
-                locale: 'tr_TR',
-                localization: FormValidation.locales.tr_TR,
-                fields: {
-                    'Name': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Ülke adı boş bırakılamaz.'
-                            },
-                            stringLength: {
-                                min: 3,
-                                message: 'Ülke adı en az 3 karakter olmalıdır.'
-                            }
-                        }
-                    },
-                    'DisplayOrder': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Sıra boş bırakılamaz.'
-                            },
-                            numeric: {
-                                message: 'Sıra sadece sayı olmalıdır.'
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap5: new FormValidation.plugins.Bootstrap5({
-                        eleValidClass: '',
-                        rowSelector: '.mb-3'  
-                    }),
-                    submitButton: new FormValidation.plugins.SubmitButton(),
-                    autoFocus: new FormValidation.plugins.AutoFocus()
-                },
-                init: instance => {
-                    instance.on('plugins.message.placed', function (e) {
-                        if (e.element.parentElement.classList.contains('input-group')) {
-                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
-                        }
-                    });
-
-                    instance.on('core.form.valid', function () {
-                        const $form = $('#country-form');
-                        const serializedData = $form.serialize();
-
-                        $.ajax({
-                            url: '@Url.Action("Create", "Countries")',
-                            type: 'POST',
-                            data: serializedData,
-                            success: function (response) {
-                                if (response.success) {
-                                    Swal.fire({
-                                        title: 'Başarılı!',
-                                        text: 'Ülke başarıyla kaydedildi.',
-                                        icon: 'success',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: {
-                                            confirmButton: 'btn btn-success'
-                                        },
-                                        buttonsStyling: false
-                                    }).then(() => {
-                                        window.location.href = '@Url.Action("List", "Countries")';
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: 'Hata!',
-                                        text: response.message || 'Bir hata oluştu.',
-                                        icon: 'error',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: {
-                                            confirmButton: 'btn btn-danger'
-                                        },
-                                        buttonsStyling: false
-                                    });
-                                }
-                            },
-                            error: function (xhr) {
-                                Swal.fire({
-                                    title: 'Hata!',
-                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
-                                    icon: 'error',
-                                    confirmButtonText: 'Tamam',
-                                    customClass: {
-                                        confirmButton: 'btn btn-danger'
-                                    },
-                                    buttonsStyling: false
-                                });
-                            }
-                        });
-                    });
-
-                }
-            }
-        );
-
-        
+        $(function () {
+                Entegro.country.initValidation('#country-form', {
+                    url: '@Url.Action("Create", "Countries")',
+                    successRedirect: '@Url.Action("List", "Countries")',
+                    successMessage: 'Ülke başarıyla oluşturuldu.'
+                });
+        });
     </script>
 }
