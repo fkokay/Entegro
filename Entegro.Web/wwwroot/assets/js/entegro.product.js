@@ -118,7 +118,6 @@ Entegro.product = (function ($) {
 
                 ProductCategoryCreatePopupInit(popup, popupContent);
 
-                categorySave();
                 $(popup).modal('show');
             },
             error: function (xhr) {

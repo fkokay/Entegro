@@ -15,5 +15,7 @@ namespace Entegro.Domain.Entities.Catalog
     public class SpecificationAttribute : BaseEntity
     {
         public string Name { get; set; }
+
+        public virtual ICollection<SpecificationAttributeOption> SpecificationAttributeOptions { get; set; } = new HashSet<SpecificationAttributeOption>();
     }
 }

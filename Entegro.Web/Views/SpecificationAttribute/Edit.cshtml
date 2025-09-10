@@ -1,0 +1,57 @@
+﻿@model SpecificationAttributeViewModel
+
+
+<form asp-action="Edit" id="specificationattribute-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Özellik Yönetimi /</span><span class="text-muted fw-light"> Ürün Özelliği /</span> Ürün Özelliği Düzenle</h4>
+        <div class="row">
+            <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="specificationattribute-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-attribute" type="button" role="tab">Ürün Özelliği</button>
+                            </li>
+
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributeValue" type="button" role="tab">Ürün Özellik Değerleri</button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Ürün Özellikleri -->
+                        <div class="tab-pane fade show active" id="form-tabs-attribute" role="tabpanel">
+                            @await Html.PartialAsync("_SpecificationAttributeEdit", new UpdateSpecificationAttributeViewModel { Id = Model.Id, Name = Model.Name })
+                        </div>
+
+                        <div class="tab-pane fade" id="form-tabs-seo" role="tabpanel">
+                            <div class="row g-3 p-3">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" id="save-btn" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">Vazgeç</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="/assets/js/entegro.specificationattribute.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            Entegro.specificationattribute.initUpdateFormValidation();
+        });
+    </script>
+}

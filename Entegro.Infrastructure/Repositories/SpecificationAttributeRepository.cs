@@ -3,7 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq.Dynamic.Core;
 namespace Entegro.Infrastructure.Repositories
 {
     public class SpecificationAttributeRepository : ISpecificationAttributeRepository
@@ -33,7 +33,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<SpecificationAttribute>> GetAllAsync() => await _context.SpecificationAttributes.AsNoTracking().ToListAsync();
 
-        public async Task<PagedResult<SpecificationAttribute>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<Application.DTOs.Common.PagedResult<SpecificationAttribute>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.SpecificationAttributes.AsNoTracking().AsQueryable();
 
@@ -44,7 +44,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<SpecificationAttribute>
+            return new Application.DTOs.Common.PagedResult<SpecificationAttribute>
             {
                 Items = brands,
                 TotalCount = totalCount,
@@ -53,9 +53,67 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public async Task<SpecificationAttribute?> GetByIdAsync(int id) => await _context.SpecificationAttributes.FirstOrDefaultAsync(o => o.Id == id);
+        public async Task<SpecificationAttribute?> GetByIdAsync(int id)
+        {
+            return await _context.SpecificationAttributes
+            .Include(o => o.SpecificationAttributeOptions)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(o => o.Id == id);
+        }
 
         public async Task<SpecificationAttribute?> GetByNameAsync(string name) => await _context.SpecificationAttributes.FirstOrDefaultAsync(o => o.Name == name);
+
+        public async Task<Application.DTOs.Common.PagedResult<SpecificationAttribute>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var query = _context.SpecificationAttributes
+             .AsNoTracking();
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    string field = "";
+                    if (string.IsNullOrEmpty(gridCommand.Columns[item.Column].Name))
+                    {
+                        field = gridCommand.Columns[item.Column].Data;
+                    }
+                    else
+                    {
+                        field = gridCommand.Columns[item.Column].Name;
+                    }
+
+
+                    query = query.OrderBy($"{field} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var orders = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<SpecificationAttribute>
+            {
+                Items = orders,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
+        }
+
         public async Task UpdateAsync(SpecificationAttribute specificationAttribute)
         {
             _context.SpecificationAttributes.Update(specificationAttribute);

@@ -1,0 +1,18 @@
+﻿@model CreateSpecificationAttributeViewModel
+
+<div id="specificationAttributeForm" class="row g-3">
+   
+    <div class="col-md-12 mt-3">
+        <div class="row">
+            <label class="col-sm-3 col-form-label text-sm-start" for="Name">Özellik Adı</label>
+            <div class="col-sm-9">
+                <input asp-for="Name" type="text" class="form-control" required/>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 text-center mt-3">
+        <button type="button" id="btnSaveSpecificationAttribute" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
+    </div>
+</div>
