@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.SpecificationAttribute;
+using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.SpecificationAttributeOptions;
 using Entegro.Web.Models.Catalog.SpecificationAttributes;
@@ -10,9 +11,11 @@ namespace Entegro.Web.Controllers
     public class SpecificationAttributeController : Controller
     {
         private readonly ISpecificationAttributeService _specificationAttributeService;
-        public SpecificationAttributeController(ISpecificationAttributeService specificationAttributeService)
+        private readonly ISpecificationAttributeOptionService _specificationAttributeOptionService;
+        public SpecificationAttributeController(ISpecificationAttributeService specificationAttributeService, ISpecificationAttributeOptionService specificationAttributeOptionService)
         {
             _specificationAttributeService = specificationAttributeService ?? throw new ArgumentNullException(nameof(specificationAttributeService));
+            _specificationAttributeOptionService = specificationAttributeOptionService ?? throw new ArgumentNullException(nameof(specificationAttributeOptionService));
         }
         public IActionResult Index()
         {
@@ -24,6 +27,8 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+
+        #region SpecificationAttribute
         [HttpGet]
         public IActionResult SpecificationAttributeCreatePopup()
         {
@@ -82,6 +87,43 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+        #endregion
+
+        #region SpecificationAttributeOption
+        [HttpGet]
+        public IActionResult SpecificationAttributeOptionCreatePopup(int id)
+        {
+            CreateSpecificationAttributeOptionViewModel model = new CreateSpecificationAttributeOptionViewModel();
+            model.SpecificationAttributeId = id;
+            return PartialView("_SpecificationAttributeOptionCreatePopup", model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SpecificationAttributeOptionCreate([FromBody] CreateSpecificationAttributeOptionViewModel model)
+        {
+            await _specificationAttributeOptionService.CreateAsync(new CreateSpecificationAttributeOptionDto
+            {
+                DisplayOrder = model.DisplayOrder,
+                Name = model.Name,
+                SpecificationAttributeId = model.SpecificationAttributeId
+            });
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SpecificationAttributeOptionDelete(int id)
+        {
+            try
+            {
+                await _specificationAttributeOptionService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        #endregion
+
 
         [HttpPost]
         public async Task<IActionResult> SpecificationAttributeList([FromBody] GridCommand gridCommand)

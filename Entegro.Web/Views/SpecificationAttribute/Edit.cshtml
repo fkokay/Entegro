@@ -1,6 +1,5 @@
 ﻿@model SpecificationAttributeViewModel
 
-
 <form asp-action="Edit" id="specificationattribute-form">
     <div class="container-fluid flex-grow-1 container-p-y">
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Özellik Yönetimi /</span><span class="text-muted fw-light"> Ürün Özelliği /</span> Ürün Özelliği Düzenle</h4>
@@ -14,20 +13,28 @@
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributeValue" type="button" role="tab">Ürün Özellik Değerleri</button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributeOption" type="button" role="tab">Ürün Özellik Değerleri</button>
                             </li>
                         </ul>
                     </div>
 
                     <div class="tab-content">
-                        <!-- Ürün Özellikleri -->
+
                         <div class="tab-pane fade show active" id="form-tabs-attribute" role="tabpanel">
                             @await Html.PartialAsync("_SpecificationAttributeEdit", new UpdateSpecificationAttributeViewModel { Id = Model.Id, Name = Model.Name })
                         </div>
 
-                        <div class="tab-pane fade" id="form-tabs-seo" role="tabpanel">
-                            <div class="row g-3 p-3">
-                            </div>
+                        <div class="tab-pane fade" id="form-tabs-attributeOption" role="tabpanel">
+                            @if (Model.Id > 0)
+                            {
+                                @await Html.PartialAsync("_SpecificationAttributeOptionList", Model)
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger">
+                                    Bu ürün özelliğe değer eklemek için önce özelliği kaydetmeniz gerekmektedir.
+                                </div>
+                            }
                         </div>
 
                     </div>
@@ -47,11 +54,26 @@
     </div>
 </form>
 
+<div class="modal fade" id="SpecificationAttributeOptionPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Ürün Özellik Değeri Ekle</h3>
+                </div>
+                <div id="SpecificationAttributeOptionPopupContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="/assets/js/entegro.specificationattribute.js" asp-append-version="true"></script>
     <script>
         $(function () {
-            Entegro.specificationattribute.initUpdateFormValidation();
+            Entegro.specificationattribute.init();
+            Entegro.specificationattribute.SpecificationAttributeUpdateFormValidationInit();
         });
     </script>
 }

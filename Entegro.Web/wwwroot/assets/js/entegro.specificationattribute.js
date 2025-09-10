@@ -131,7 +131,7 @@ Entegro.specificationattribute = (function ($) {
         );
     }
 
-    function initUpdateFormValidation() {
+    function SpecificationAttributeUpdateFormValidationInit() {
         const form = document.getElementById('specificationattribute-form');
 
         const fv = FormValidation.formValidation(
@@ -190,21 +190,128 @@ Entegro.specificationattribute = (function ($) {
             }
         );
     }
-    function bindEvents() {
-        $(document).on('click', '.btn-edit-specificationAttribute', function () {
-            const id = $(this).data('id');
-            SpecificationAttributeCreatePopup(id);
+   
+    function SpecificationAttributeOptionCreatePopup(id) {
+        var popup = $('#SpecificationAttributeOptionPopup');
+        var popupContent = $("#SpecificationAttributeOptionPopupContent");
+        $.ajax({
+            url: '/SpecificationAttribute/SpecificationAttributeOptionCreatePopup?id=' + id,
+            type: 'GET',
+            dataType: 'html',
+            success: function (html) {
+                $(popupContent).html(html);
+
+                SpecificationAttributeOptionCreatePopupInit(popup, popupContent);
+
+                $(popup).modal('show');
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('Form yüklenemedi.');
+            }
         });
     }
 
+    function SpecificationAttributeOptionCreatePopupInit(popup, popupContent) {
+       
+        $(document).on('click', '#btnSaveSpecificationAttributeOption', function () {
+            const payload = {
+                SpecificationAttributeId: Number($('#SpecificationAttributeId').val()) || 0,
+                Name: $('#OptionName').val() || '',
+                DisplayOrder: Number($('#DisplayOrder').val()) || 0
+            };
+
+            $.ajax({
+                url: '/SpecificationAttribute/SpecificationAttributeOptionCreate',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (json) {
+                    if (json?.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı!',
+                            text: 'Özellik başarıyla kaydedildi.',
+                            confirmButtonText: 'Tamam'
+                        }).then(() => {
+                            location.reload();
+                            $(popup).modal('hide');
+                        });
+                    } else {
+                        showMessage("Hata!", json?.errors?.join('\n') || 'Kayıt başarısız.', "error")
+                    }
+                },
+                error: function () {
+                    showMessage("Sunucu Hatası!", "İşlem sırasında bir hata oluştu.", "error")
+                }
+            });
+        });
+    }
     function init() {
-        bindEvents();
+        $(document).on('click', '.btn-deleteOption', function () {
+            const id = $(this).data('mapping-id');
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu özellik silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/SpecificationAttribute/SpecificationAttributeOptionDelete',
+                        type: 'POST',
+                        data: { id },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'Özellik başarıyla silindi.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: { confirmButton: 'btn btn-success' },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: { confirmButton: 'btn btn-danger' },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Sunucu Hatası!',
+                                text: 'İstek gönderilirken bir hata oluştu.',
+                                confirmButtonText: 'Tamam',
+                                customClass: { confirmButton: 'btn btn-danger' },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
+        });
     }
 
     return {
-        init,
+        init: init,
         SpecificationAttributeCreatePopup: SpecificationAttributeCreatePopup,
+        SpecificationAttributeOptionCreatePopup: SpecificationAttributeOptionCreatePopup,
         Validation: Validation,
-        initUpdateFormValidation: initUpdateFormValidation
+        SpecificationAttributeUpdateFormValidationInit: SpecificationAttributeUpdateFormValidationInit
     };
 })(jQuery);

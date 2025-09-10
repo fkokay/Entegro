@@ -13,6 +13,6 @@ namespace Entegro.Application.Interfaces.Services
         Task<PagedResult<SpecificationAttributeOptionDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
         Task<SpecificationAttributeOptionDto> CreateAsync(CreateSpecificationAttributeOptionDto model);
         Task<SpecificationAttributeOptionDto> UpdateAsync(UpdateSpecificationAttributeOptionDto model);
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }
