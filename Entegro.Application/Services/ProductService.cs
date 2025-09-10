@@ -39,61 +39,10 @@ namespace Entegro.Application.Services
             if (createProduct == null)
                 throw new ArgumentNullException(nameof(createProduct));
 
-            #region Marka
-            if ((createProduct.BrandId == null || createProduct.BrandId == 0) && createProduct.Brand != null)
-            {
-                if (await _brandService.ExistsByNameAsync(createProduct.Brand.Name))
-                {
-                    var brand = await _brandService.GetByNameAsync(createProduct.Brand.Name);
-                    createProduct.BrandId = brand.Id;
-                    createProduct.Brand = null;
-                }
-                else
-                {
-                    var createBrand = _mapper.Map<CreateBrandDto>(createProduct.Brand);
-
-                    var brandResult = await _brandService.CreateAsync(createBrand);
-                    createProduct.BrandId = brandResult.Id;
-                    createProduct.Brand = null;
-                }
-            }
-            #endregion
-
-            #region Kategori
-            foreach (var productCategory in createProduct.ProductCategories)
-            {
-                if (productCategory.Category != null)
-                {
-                    productCategory.CategoryId = await CreateCategoryWithChildrenAsync(productCategory.Category);
-                    productCategory.Category = null;
-                }
-            }
-            #endregion
-
             var product = _mapper.Map<Product>(createProduct);
             await _productRepository.AddAsync(product);
 
             return _mapper.Map<ProductDto>(product);
-        }
-
-        private async Task<int> CreateCategoryWithChildrenAsync(CategoryDto categoryDto)
-        {
-            if (await _categoryService.ExistsByNameAsync(categoryDto.Name))
-            {
-                var existing = await _categoryService.GetCategoryByNameAsync(categoryDto.Name);
-                return existing.Id;
-            }
-
-            var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
-            var createCategoryModel = await _categoryService.CreateCategoryAsync(createCategory);
-
-            foreach (var subCategoryDto in categoryDto.SubCategories)
-            {
-                subCategoryDto.ParentCategoryId = createCategoryModel.Id;
-                createCategoryModel.Id = await CreateCategoryWithChildrenAsync(subCategoryDto);
-            }
-
-            return createCategoryModel.Id;
         }
 
         public async Task DeleteProductAsync(int productId)

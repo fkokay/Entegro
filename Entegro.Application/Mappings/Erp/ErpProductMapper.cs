@@ -73,10 +73,10 @@ namespace Entegro.Application.Mappings.Erp
             return product;
         }
 
-        private static DTOs.Category.CategoryDto BuildCategoryHierarchy(params string[] categories)
+        private static DTOs.Category.CategoryDto? BuildCategoryHierarchy(params string[] categories)
         {
-            DTOs.Category.CategoryDto root = null;
-            DTOs.Category.CategoryDto current = null;
+            DTOs.Category.CategoryDto? root = null;
+            DTOs.Category.CategoryDto? current = null;
 
             foreach (var categoryName in categories.Where(c => !string.IsNullOrEmpty(c)))
             {

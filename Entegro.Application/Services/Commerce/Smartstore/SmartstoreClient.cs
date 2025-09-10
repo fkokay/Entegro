@@ -235,7 +235,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             if (category.Parent != null)
             {
                 category.Parent.Id = await EnsureCategoryHierarchyAsync(category.Parent);
-                category.ParentCategoryId = category.Parent.Id;
+                category.ParentId = category.Parent.Id;
             }
 
             var existing = await CategoryExistsAsync(category.Name);

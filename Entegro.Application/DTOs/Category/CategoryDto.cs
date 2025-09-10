@@ -5,7 +5,7 @@ namespace Entegro.Application.DTOs.Category
     public class CategoryDto
     {
         public int Id { get; set; }
-        public int? ParentCategoryId { get; set; }
+        public int? ParentId { get; set; }
         public CategoryDto? Parent { get; set; }
         public int? MediaFileId { get; set; }
         public string TreePath { get; set; } = string.Empty;

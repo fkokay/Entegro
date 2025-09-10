@@ -1,4 +1,6 @@
 ﻿
+using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Erp;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
@@ -9,6 +11,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Mappings.Erp;
+using Entegro.Application.Services;
 using MapsterMapper;
 using Newtonsoft.Json;
 using Polly;
@@ -24,6 +27,7 @@ namespace Entegro.Service.Jobs
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
+        private readonly ICategoryService _categoryService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeValueService _productAttributeValueService;
         private readonly IProductVariantAttributeService _productVariantAttributeService;
@@ -41,6 +45,7 @@ namespace Entegro.Service.Jobs
             IOrderService orderService,
             ICustomerService customerService,
             IBrandService brandService,
+            ICategoryService categoryService,
             IProductAttributeService productAttributeService,
             IProductAttributeValueService productAttributeValueService,
             IProductVariantAttributeService productVariantAttributeService,
@@ -54,6 +59,7 @@ namespace Entegro.Service.Jobs
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
+            _categoryService = categoryService;
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _productAttributeValueService = productAttributeValueService ?? throw new ArgumentNullException(nameof(productAttributeValueService));
             _productVariantAttributeService = productVariantAttributeService ?? throw new ArgumentNullException(nameof(productVariantAttributeService));
@@ -118,6 +124,33 @@ namespace Entegro.Service.Jobs
                     await retryPolicy.ExecuteAsync(async () =>
                     {
                         if (await _productService.ExistsByCodeAsync(product.Code)) return;
+
+                        if ((product.BrandId == null || product.BrandId == 0) && product.Brand != null)
+                        {
+                            if (await _brandService.ExistsByNameAsync(product.Brand.Name))
+                            {
+                                var brand = await _brandService.GetByNameAsync(product.Brand.Name);
+                                product.BrandId = brand.Id;
+                                product.Brand = null;
+                            }
+                            else
+                            {
+                                var createBrand = _mapper.Map<CreateBrandDto>(product.Brand);
+
+                                var brandResult = await _brandService.CreateAsync(createBrand);
+                                product.BrandId = brandResult.Id;
+                                product.Brand = null;
+                            }
+                        }
+
+                        foreach (var productCategory in product.ProductCategories)
+                        {
+                            if (productCategory.Category != null)
+                            {
+                                productCategory.CategoryId = await CreateCategoryWithChildrenAsync(productCategory.Category);
+                                productCategory.Category = null;
+                            }
+                        }
 
                         var createProduct = _mapper.Map<CreateProductDto>(product);
                         var productDTO = await _productService.CreateProductAsync(createProduct);
@@ -229,6 +262,30 @@ namespace Entegro.Service.Jobs
                 _attributeValueCache.TryAdd((val.ProductAttributeId, val.Name), val.Id);
 
             _logger.LogInformation("Cache yükleme tamamlandı. Attribute: {AttrCount}, Value: {ValueCount}", _attributeCache.Count, _attributeValueCache.Count);
+        }
+
+        private async Task<int> CreateCategoryWithChildrenAsync(CategoryDto categoryDto)
+        {
+            if (await _categoryService.ExistsByNameAsync(categoryDto.Name))
+            {
+                var existing = await _categoryService.GetCategoryByNameAsync(categoryDto.Name);
+                var updatedCategory = _mapper.Map<UpdateCategoryDto>(existing);
+
+                await _categoryService.UpdateCategoryAsync(updatedCategory);
+
+                return existing.Id;
+            }
+
+            var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
+            var createCategoryModel = await _categoryService.CreateCategoryAsync(createCategory);
+
+            foreach (var subCategoryDto in categoryDto.SubCategories)
+            {
+                subCategoryDto.ParentId = createCategoryModel.Id;
+                createCategoryModel.Id = await CreateCategoryWithChildrenAsync(subCategoryDto);
+            }
+
+            return createCategoryModel.Id;
         }
     }
 

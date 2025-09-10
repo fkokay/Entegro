@@ -9,6 +9,7 @@ using Entegro.Engine.Builders;
 using Entegro.Engine.Initialization;
 using Entegro.Engine.Modularity;
 using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.Hosting;
 
 namespace Entegro.Engine
 {
@@ -177,6 +178,11 @@ namespace Entegro.Engine
                     starter.BuildPipeline(pipelineBuilder);
                 }
                 pipelineBuilder.Build(app);
+
+                if (app.GetType().Name == "WorkerApplicationBuilder")
+                {
+                    return;
+                }
 
                 // Map all modular endpoints
                 app.UseEndpoints(endpoints =>

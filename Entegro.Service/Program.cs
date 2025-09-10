@@ -25,12 +25,14 @@ using Entegro.Service.Jobs;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Quartz;
 using Serilog;
 using Serilog.Extensions.Logging;
+using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -44,6 +46,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
+SmartApplicationContext appContext = null;
+IEngine engine = null;
+IEngineStarter engineStarter = null;
 
 var host = Host.CreateDefaultBuilder(args)
     .UseServiceProviderFactory(new AutofacServiceProviderFactory())
@@ -54,9 +59,9 @@ var host = Host.CreateDefaultBuilder(args)
         var environment = hostContext.HostingEnvironment;
 
         var startupLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("File");
-        var appContext = new SmartApplicationContext(environment, configuration, startupLogger);
-        var engine = EngineFactory.Create(appContext.AppConfiguration);
-        var engineStarter = engine.Start(appContext);
+        appContext = new SmartApplicationContext(environment, configuration, startupLogger);
+        engine = EngineFactory.Create(appContext.AppConfiguration);
+        engineStarter = engine.Start(appContext);
 
         engineStarter.ConfigureContainer(containerBuilder);
     })
@@ -66,14 +71,19 @@ var host = Host.CreateDefaultBuilder(args)
         var environment = hostContext.HostingEnvironment;
 
         var startupLogger = new SerilogLoggerFactory(Log.Logger).CreateLogger("File");
-        var appContext = new SmartApplicationContext(environment, configuration, startupLogger);
-        var engine = EngineFactory.Create(appContext.AppConfiguration);
-        var engineStarter = engine.Start(appContext);
+        appContext = new SmartApplicationContext(environment, configuration, startupLogger);
+        engine = EngineFactory.Create(appContext.AppConfiguration);
+        engineStarter = engine.Start(appContext);
 
         AddPathToEnv(appContext.RuntimeInfo.NativeLibraryDirectory);
 
         engineStarter.ConfigureServices(services);
 
+        services.AddDbContext<EntegroDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            options.UseLazyLoadingProxies();
+        });
 
         services.AddDbContext<EntegroDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
@@ -124,10 +134,13 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, N11Service>();
         services.AddScoped<IErpService, ErpService>();
 
+        services.AddSingleton(engineStarter);
+        services.AddHostedService<EngineWorker>();
+
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
         services.AddQuartz(q =>
         {
-
+            q.UseMicrosoftDependencyInjectionJobFactory();
             //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
             //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
@@ -140,17 +153,17 @@ var host = Host.CreateDefaultBuilder(args)
             //        .RepeatForever())
             //    );
 
-            var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
+            //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
-            q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
+            //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
 
-            q.AddTrigger(opts => opts
-                .ForJob(jobKeyTrendyol)
-                .WithIdentity("TrendyolDataSyncJob-trigger")
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInMinutes(10)
-                    .RepeatForever())
-            );
+            //q.AddTrigger(opts => opts
+            //    .ForJob(jobKeyTrendyol)
+            //    .WithIdentity("TrendyolDataSyncJob-trigger")
+            //    .WithSimpleSchedule(x => x
+            //        .WithIntervalInMinutes(10)
+            //        .RepeatForever())
+            //);
 
             var jobKeyErp = new JobKey("ErpDataSyncJob");
 
@@ -165,6 +178,27 @@ var host = Host.CreateDefaultBuilder(args)
             );
         });
     }).Build();
+
+
+var providerContainer = host.Services.GetService<SmartApplicationContext>() as IServiceProviderContainer;
+if (providerContainer != null)
+{
+    providerContainer.ApplicationServices = host.Services;
+}
+
+engine.Scope = new ScopedServiceContainer(
+    host.Services.GetRequiredService<ILifetimeScopeAccessor>(),
+    host.Services.GetRequiredService<IHttpContextAccessor>(),
+    host.Services.AsLifetimeScope());
+
+var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+lifetime.ApplicationStarted.Register(() =>
+{
+    appContext.Freeze();
+    engineStarter.Dispose();
+    engineStarter = null;
+});
+
 
 host.Run();
 
