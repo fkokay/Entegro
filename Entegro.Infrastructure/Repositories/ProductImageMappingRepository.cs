@@ -53,7 +53,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductMediaFile>> GetAllAsync(int productId)
         {
-            return await _context.ProductMediaFiles.Where(m => m.ProductId == productId).ToListAsync();
+            return await _context.ProductMediaFiles.Where(m => m.ProductId == productId).AsNoTracking().ToListAsync();
         }
 
         public async Task<ProductMediaFile?> GetByIdAsync(int id)
@@ -62,6 +62,13 @@ namespace Entegro.Infrastructure.Repositories
         }
 
         public async Task<ProductMediaFile?> GetByPictureIdProductIdAsync(int pictureId, int productId)
+        {
+            var result = await _context.ProductMediaFiles.AsNoTracking()
+                 .FirstOrDefaultAsync(o => o.MediaFileId == pictureId && o.ProductId == productId);
+            return result ?? null;
+        }
+
+        public async Task<ProductMediaFile?> GetByPictureIdSortAsync(int pictureId, int productId)
         {
             var result = await _context.ProductMediaFiles.AsNoTracking()
                  .FirstOrDefaultAsync(o => o.Id == pictureId && o.ProductId == productId);

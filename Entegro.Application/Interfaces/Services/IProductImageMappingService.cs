@@ -13,5 +13,6 @@ namespace Entegro.Application.Interfaces.Services
         Task DeleteAsync(int id);
         Task<PagedResult<ProductMediaFileDto>> GetPagedAsync(int pageNumber, int pageSize);
         Task<ProductMediaFileDto> GetByPictureIdProductIdAsync(int pictureId, int productId);
+        Task<ProductMediaFileDto> GetByPictureIdSortAsync(int pictureId, int productId);
     }
 }

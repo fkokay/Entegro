@@ -475,7 +475,7 @@ namespace Entegro.Web.Controllers
                     {
                         int pictureId = pictureIds[i];
 
-                        var productPicture = await _productImageMappingService.GetByPictureIdProductIdAsync(pictureId, entityId);
+                        var productPicture = await _productImageMappingService.GetByPictureIdSortAsync(pictureId, entityId);
 
                         if (productPicture != null)
                         {

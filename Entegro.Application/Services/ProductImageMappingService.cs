@@ -23,7 +23,8 @@ namespace Entegro.Application.Services
             var existingProductImage = await _productImageMappingRepository.GetByPictureIdProductIdAsync(productImage.MediaFileId, productImage.ProductId);
             if (existingProductImage is not null)
             {
-                await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(productImage));
+                _mapper.Map(productImage, existingProductImage);
+                await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(existingProductImage));
                 return _mapper.Map<ProductMediaFileDto>(productImage);
             }
             var createProductImage = _mapper.Map<ProductMediaFile>(productImage);
@@ -77,7 +78,9 @@ namespace Entegro.Application.Services
 
         public async Task<ProductMediaFileDto> UpdateAsync(UpdateProductMediaFileDto productImage)
         {
-            await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(productImage));
+            var existingProductImage = await _productImageMappingRepository.GetByIdAsync(productImage.Id);
+            _mapper.Map(productImage, existingProductImage);
+            await _productImageMappingRepository.UpdateAsync(existingProductImage);
             return _mapper.Map<ProductMediaFileDto>(productImage);
         }
 
@@ -86,6 +89,13 @@ namespace Entegro.Application.Services
             var productImages = await _productImageMappingRepository.GetAllAsync(productId);
             var productImageDtos = _mapper.Map<IEnumerable<ProductMediaFileDto>>(productImages);
             return productImageDtos.ToList();
+        }
+
+        public async Task<ProductMediaFileDto> GetByPictureIdSortAsync(int pictureId, int productId)
+        {
+            var productImages = await _productImageMappingRepository.GetByPictureIdSortAsync(pictureId, productId);
+            var productImageMappingDtos = _mapper.Map<ProductMediaFileDto>(productImages);
+            return productImageMappingDtos;
         }
     }
 }
