@@ -28,6 +28,10 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 }
 
                 ProductMediaFileDto productMediaFile = new ProductMediaFileDto();
+                productMediaFile.ProductId= smartstoreProductMediaFile.ProductId;
+                productMediaFile.Id = smartstoreProductMediaFile.Id;
+                productMediaFile.MediaFileId = smartstoreProductMediaFile.MediaFileId;
+                productMediaFile.DisplayOrder = smartstoreProductMediaFile.DisplayOrder;
 
 
 

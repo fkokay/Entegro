@@ -13,6 +13,8 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Mappings.Commerce.Smartstore;
 using Entegro.Domain.Entities;
+using Entegro.Domain.Entities.Catalog;
+using Humanizer;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -91,7 +93,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             else
             {
                 request.Product.Id = 0;
-                productId = await CreateProductAsync(request.Product,request.CustomData as SmartstoreProductIntegrationCustomDto) ?? 0;
+                productId = await CreateProductAsync(request.Product, request.CustomData as SmartstoreProductIntegrationCustomDto) ?? 0;
             }
 
             // 2. Kategoriler
@@ -262,7 +264,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 else
                 {
                     SmartstoreFileDto smartstoreFile = new SmartstoreFileDto();
-                    smartstoreFile.File = await getFileAsync($"{EntegroUrl}{productMediaFile.MediaFile.Url}");
+                    smartstoreFile.File = await GetFileAsync($"{EntegroUrl}{productMediaFile.MediaFile.Url}");
                     smartstoreFile.FileName = string.Format($"catalog/{productMediaFile.MediaFile.Name}");
                     smartstoreFile.MimeType = productMediaFile.MediaFile.MimeType;
 
@@ -280,6 +282,18 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 {
                     productMediaFile.Id = existingProductMediaFile.Id;
                     await UpdateProductMediaFileAsync(productMediaFile);
+                }
+            }
+
+            var deletedProductMediaFiles = await GetProductMediaFiles(productId);
+            if (deletedProductMediaFiles != null)
+            {
+                foreach (var item in deletedProductMediaFiles)
+                {
+                    if (!product.ProductMediaFiles.Any(m => m.MediaFileId == item.MediaFileId))
+                    {
+                        await DeleteProductMediaFileAsync(item.Id);
+                    }
                 }
             }
         }
@@ -621,6 +635,25 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             }
         }
 
+        public async Task<List<ProductMediaFileDto>?> GetProductMediaFiles(int productId)
+        {
+            try
+            {
+                var url = $"productmediafiles?$filter=ProductId eq {productId}";
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreProductMediaFileDto>>(json, _jsonOptions);
+
+                return SmartstoreProductMediaFileMapper.ToDtoList(data.Value).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "");
+                return null;
+            }
+        }
         public async Task<ProductMediaFileDto?> GetProductMediaFile(int productId, int mediaFileId)
         {
             try
@@ -661,6 +694,11 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PatchAsync("productmediafiles", content);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task DeleteProductMediaFileAsync(int id)
+        {
+            var response = await _httpClient.DeleteAsync("productmediafiles({id})");
             response.EnsureSuccessStatusCode();
         }
         #endregion
@@ -821,17 +859,20 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         #endregion
 
         #region Other
-        private async Task<byte[]> getFileAsync(string url)
+        private async Task<byte[]> GetFileAsync(string url)
         {
-            using (var client = new HttpClient())
-            {
-                using (var response = await client.GetAsync(url))
-                {
-                    byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+            using var client = new HttpClient();
+            using var response = await client.GetAsync(url);
 
-                    return imageBytes;
-                }
+            response.EnsureSuccessStatusCode(); // 404/500 varsa exception atar
+
+            var contentType = response.Content.Headers.ContentType?.MediaType;
+            if (contentType == null || !contentType.StartsWith("image", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Resim bekleniyordu ama {contentType} geldi.");
             }
+
+            return await response.Content.ReadAsByteArrayAsync();
         }
 
         private int GetHashCode(RawAttribute rawAttribute)
