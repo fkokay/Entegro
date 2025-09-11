@@ -10,6 +10,8 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Products;
+using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
+using Entegro.Web.Models.Catalog.SpecificationAttributeOptions;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Common;
@@ -37,6 +39,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly ICategoryService _categoryService;
         private readonly ITrendyolService _trenyolService;
+        private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
         public ProductController(
             IProductService productService,
             IProductCategoryService productCategoryMappingService,
@@ -48,7 +51,8 @@ namespace Entegro.Web.Controllers
             IProductIntegrationService productIntegrationService,
             IProductAttributeFormatter productAttributeFormatter,
             ICategoryService categoryService,
-            ITrendyolService trendyolService)
+            ITrendyolService trendyolService,
+            IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -61,6 +65,7 @@ namespace Entegro.Web.Controllers
             _productAttributeFormatter = productAttributeFormatter;
             _trenyolService = trendyolService;
             _categoryService = categoryService;
+            _productSpecificationAttributeMappingService = productSpecificationAttributeMappingService;
         }
 
         #region Product list / create / edit / delete
@@ -183,7 +188,7 @@ namespace Entegro.Web.Controllers
 
                 var productVariantAttributes = await _productVariantAttributeService.GetAllAsync(model.Id);
 
-                var deletedProductVariantAttributes = productVariantAttributes.Where(m=> !model.SelectedProductAttributeIds.Contains(m.ProductAttributeId)).ToList();
+                var deletedProductVariantAttributes = productVariantAttributes.Where(m => !model.SelectedProductAttributeIds.Contains(m.ProductAttributeId)).ToList();
                 foreach (var item in deletedProductVariantAttributes)
                 {
                     await _productVariantAttributeService.DeleteAsync(item.Id);
@@ -302,6 +307,31 @@ namespace Entegro.Web.Controllers
 
         }
 
+        #endregion
+
+
+        #region Product SpecificationAttribute
+
+        [HttpGet]
+        public async Task<IActionResult> LoadTabSpecificationAttribute(int productId)
+        {
+            ViewBag.ProductId = productId;
+            var productSpecificationAttribute = await _productSpecificationAttributeMappingService.GetSpecificationAttributeByProductId(productId);
+
+            return PartialView("_CreateOrUpdate.SpecificationAttributes", productSpecificationAttribute.Select(x => new ProductSpecificationAttributeViewModel
+            {
+                Id = x.Id,
+                DisplayOrder = x.DisplayOrder,
+                ProductId = x.ProductId,
+                SpecificationAttributeOption = new SpecificationAttributeOptionViewModel
+                {
+                    Id = x.SpecificationAttributeOption.Id,
+                    Name = x.SpecificationAttributeOption.Name,
+                    SpecificationAttributeId = x.SpecificationAttributeOption.SpecificationAttributeId,
+                    DisplayOrder = x.SpecificationAttributeOption.DisplayOrder,
+                }
+            }).ToList());
+        }
         #endregion
 
         #region Product Pictures

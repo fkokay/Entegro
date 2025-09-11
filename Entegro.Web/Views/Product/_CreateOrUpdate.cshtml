@@ -31,6 +31,9 @@
                         Kategori Eşleştirmeleri
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" type="button" role="tab" data-url="@(Model.Id > 0 ? Url.Action("LoadTabSpecificationAttribute", "Product", new { productId = Model.Id }) : "")">Ürün Özellikleri</button>
+                </li>
             </ul>
         </div>
 
@@ -310,6 +313,13 @@
                         Bu ürüne kategori eklemek için önce ürünü kaydetmeniz gerekmektedir.
                     </div>
                 }
+            </div>
+
+            <!--Ürün Özellikleri-->
+            <div class="tab-pane fade" id="form-tabs-attributes" role="tabpanel">
+                <div class="row g-3 p-3">
+                    <h3>Ürün Özellikler Listesi Gelecek</h3>
+                </div>
             </div>
         </div>
     </div>
