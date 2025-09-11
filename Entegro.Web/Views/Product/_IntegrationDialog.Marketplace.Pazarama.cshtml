@@ -1,0 +1,70 @@
+﻿@model PazaramaProductIntegrationViewModel
+
+<div class="row">
+    <div class="d-flex justify-content-start align-items-center product-name">
+        <div class="avatar-wrapper">
+            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                <img src="@Model.ProductMainPicture" alt="" />
+            </div>
+        </div>
+        <div class="d-flex flex-column">
+            <h6 class="text-nowrap mb-0">@Model.ProductName</h6>
+            <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
+        </div>
+    </div>
+    <div class="col-12 col-md-12">
+        <hr />
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
+        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly" })
+    </div>
+    <div class="col-6 col-md-6">
+        <label class="form-label" for="CommerceType">Pazaryeri</label>
+        <label class="form-label" for="CommerceType">E-Ticaret</label>
+        <div class="d-flex justify-content-between align-items-center">
+            @Html.TextBoxFor(m => m.MarketplaceType, new { @class = "form-control", @readonly = "readonly" })
+            <a href="@Model.MarketplaceLink" target="_blank" class="fw-medium btn btn-icon btn-label-primary ms-4 waves-effect">
+                <i class="icon-base ti ti-link icon-md"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationPazarama" asp-controller="Product" class="row g-3 mt-3">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ProductId" />
+    <input type="hidden" asp-for="IntegrationSystemId" />
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="ProductVariantAttributeCombinationId">Varyant</label>
+        <select asp-for="ProductVariantAttributeCombinationId" asp-items="ViewBag.ProductVariantAttributeCombinations" class="form-select"></select>
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+        <input type="text" asp-for="IntegrationCode" class="form-control" required />
+    </div>
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="price">Fiyat</label>
+        <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
+    </div>
+    <div class="col-12 col-md-12">
+        <div class="form-check form-switch mb-2 mt-2">
+            <input class="form-check-input" type="checkbox" asp-for="Active" />
+            <label class="form-check-label" for="Active">Aktif</label>
+        </div>
+    </div>
+    <div class="col-12 col-md-12">
+        <hr />
+    </div>
+    <div class="col-md-12">
+    </div>
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
+        <button type="reset" class="btn btn-label-secondary @(Model.Id == 0 ? "" : "me-sm-3 me-1")" data-bs-dismiss="modal">İptal</button>
+        @if (Model.Id > 0)
+        {
+            <button type="button" class="btn btn-danger" onclick="Entegro.product.list.deleteIntegration(@Model.Id)">Sil</button>
+        }
+    </div>
+</form>

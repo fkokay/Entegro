@@ -9,6 +9,7 @@ Entegro.product.list = (function ($) {
             case "Pazarama": return "https://pazarama.zendesk.com/hc/theming_assets/01HZM66YT318FSGD6MQKD8N1W2";
             case "Idefix": return "https://images.idefix.com/mpstatics/banner/test-67bdca5fb68de.svg";
             case "CicekSepeti": return "https://cdn03.ciceksepeti.com/Themes/Ciceksepeti/Assets/images/ciceksepeti-logo-146.png";
+            case "HepsiBurada": return "https://images.seeklogo.com/logo-png/44/1/hepsiburada-logo-png_seeklogo-442312.png";
             default: return "/assets/img/icons/brands/default.png";
         }
     }
