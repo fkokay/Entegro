@@ -34,17 +34,17 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductSpecificationAttribute>> GetAllAsync()
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).ThenInclude(m => m.SpecificationAttribute).AsNoTracking().ToListAsync();
+            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().ToListAsync();
         }
 
         public async Task<ProductSpecificationAttribute?> GetByIdAsync(int id)
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).ThenInclude(m => m.SpecificationAttribute).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<List<ProductSpecificationAttribute>> GetSpecificationAttributeByProductId(int productId)
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).ThenInclude(m => m.SpecificationAttribute).AsNoTracking().Where(x => x.ProductId == productId).ToListAsync();
+            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().Where(x => x.ProductId == productId).ToListAsync();
         }
 
         public async Task UpdateAsync(ProductSpecificationAttribute productSpecificationAttribute)

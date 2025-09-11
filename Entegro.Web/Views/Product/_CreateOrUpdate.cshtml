@@ -32,7 +32,7 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" type="button" role="tab">Ürün Özellikleri</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" type="button" role="tab" data-url="@(Model.Id > 0 ? Url.Action("LoadTabSpecificationAttribute", "Product", new { productId = Model.Id }) : "")">Ürün Özellikleri</button>
                 </li>
             </ul>
         </div>

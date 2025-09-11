@@ -1,10 +1,17 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
+using Entegro.Application.Interfaces.Repositories;
+using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings;
+using Entegro.Application.Services;
+using Entegro.Application.Services.Commerce;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Engine;
+using Entegro.Events;
 using Entegro.Infrastructure.Data;
-using Entegro.Infrastructure.Extensions;
+using Entegro.Infrastructure.Repositories;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
@@ -114,7 +121,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 
 builder.Services.AddScoped<IProductVariantAttributeCombinationService, ProductVariantAttributeCombinationService>();
 builder.Services.AddScoped<IProductVariantAttributeCombinationRepository, ProductVariantAttributeCombinationRepository>();
@@ -146,6 +153,13 @@ builder.Services.AddScoped<IOrderNoteService, OrderNoteService>();
 builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();
 builder.Services.AddScoped<IProductIntegrationService, ProductIntegrationService>();
 
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 
 builder.Services.AddScoped<ISpecificationAttributeOptionRepository, SpecificationAttributeOptionRepository>();
 builder.Services.AddScoped<ISpecificationAttributeOptionService, SpecificationAttributeOptionService>();
@@ -169,7 +183,7 @@ builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
 MapsterConfig.RegisterMappings();
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
-#endregion
+
 
 #region Build App
 var app = builder.Build();
