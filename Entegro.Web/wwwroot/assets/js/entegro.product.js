@@ -231,10 +231,19 @@ Entegro.product = (function ($) {
         $repeater.repeater({
             initEmpty: false,
             show: function () {
-                $(this).slideDown();
+                var $idInput = $(this).find('[name$="[Id]"]');
+                $idInput.val(0);
                 var repeterItem = $(this).find("[data-repeater-item]");
+                var productVariantAttributeId = $(repeterItem).attr("data-product-variant-attribute-id");
+                var $idProductVariantAttributeInput = find("input[name*='ProductVariantAttributeId']");
+                $idProductVariantAttributeInput.val(productVariantAttributeId);
+
+                $(this).slideDown();
             },
             hide: function (deleteElement) {
+                var $idInput = $(deleteElement).find('[name$="[Id]"]');
+                var id = $idInput.val();
+
                 if (confirm('Varyant silinecek emin misiniz?')) {
                     $(this).slideUp(deleteElement);
                 };
