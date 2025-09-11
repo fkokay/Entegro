@@ -54,6 +54,14 @@ Entegro.product = (function ($) {
                         });
                     }
                 }
+
+                if (event.target.dataset.bsTarget == "#form-tabs-attributes") {
+                    if (event.target.dataset.url.length > 0) {
+                        $("#form-tabs-attributes").load(event.target.dataset.url, function () {
+                           
+                        });
+                    }
+                }
             });
         });
     }
