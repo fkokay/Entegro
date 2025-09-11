@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.Interfaces.Repositories;
+using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +44,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
+            services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();
             return services;
         }
     }
