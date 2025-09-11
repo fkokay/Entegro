@@ -230,7 +230,10 @@ Entegro.product = (function ($) {
 
         $repeater.repeater({
             initEmpty: false,
-            show: function () { $(this).slideDown(); },
+            show: function () {
+                $(this).slideDown();
+                var repeterItem = $(this).find("[data-repeater-item]");
+            },
             hide: function (deleteElement) {
                 if (confirm('Varyant silinecek emin misiniz?')) {
                     $(this).slideUp(deleteElement);
@@ -239,7 +242,10 @@ Entegro.product = (function ($) {
             repeaters: [{
                 selector: '.ProductVariantAttributeSelectionRepeater',
                 initEmpty: false,
-                show: function () { $(this).slideDown(); },
+                show: function () {
+                    $(this).slideDown();
+                   
+                },
                 hide: function (deleteElement) {
                     if (confirm('Attribute silinecek emin misiniz?')) {
                         $(this).slideUp(deleteElement); 

@@ -23,7 +23,7 @@
                             <div data-repeater-list="ProductVariantAttributeSelections">
                                 @foreach (var productVariantAttribute in Model.ProductVariantAttributes)
                                 {
-                                    <div data-repeater-item class="repeater-wrapper row mb-2">
+                                    <div data-repeater-item class="repeater-wrapper row mb-2" data-product-variant-attribute-id="@productVariantAttribute.Id">
                                         <input type="hidden" name="ProductVariantAttributeId" value="@productVariantAttribute.Id" />
                                         <div class="col-md-2 col-12 mb-md-0 mb-3">
                                             <p class="mb-2 repeater-title">@productVariantAttribute.ProductAttribute</p>
@@ -34,7 +34,6 @@
                                                 }
                                             </select>
                                         </div>
-
                                     </div>
                                 }
                             </div>
