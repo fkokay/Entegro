@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class TrendyolMarketplaceSettingsViewModel
+    public class PazaramaMarketplaceSettingsViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -12,4 +12,6 @@
         public string ApiPassword { get; set; }
         public string SupplierId { get; set; }
     }
+    
+
 }
