@@ -1008,7 +1008,6 @@ namespace Entegro.Web.Controllers
             {
                 case "Trendyol":
                     return TrendyolMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
-
                 case "N11":
                     return N11MarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
                 case "Pazarama":
