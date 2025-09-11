@@ -24,7 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Entegro.Service.Jobs
+namespace Entegro.Api.Jobs
 {
     public class SmartstoreDataSyncJob : IJob
     {

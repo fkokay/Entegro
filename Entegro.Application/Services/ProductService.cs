@@ -3,6 +3,8 @@ using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.Events;
+using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Catalog;
@@ -13,25 +15,31 @@ namespace Entegro.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductIntegrationRepository _productIntegrationRepository;
         private readonly IProductVariantAttributeCombinationRepository _productVariantAttributeCombinationRepository;
         private readonly IBrandService _brandService;
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
+        private readonly IEventPublisher _eventPublisher;
         public ProductService(
             IProductRepository productRepository,
+            IProductIntegrationService productIntegrationService,
             IProductIntegrationRepository productIntegrationRepository,
             IProductVariantAttributeCombinationRepository productVariantAttributeCombinationRepository,
             IBrandService brandService,
             ICategoryService categoryService,
-            IMapper mapper)
+            IMapper mapper,
+            IEventPublisher eventPublisher)
         {
             _productRepository = productRepository;
+            _productIntegrationService = productIntegrationService;
             _productIntegrationRepository = productIntegrationRepository;
             _productVariantAttributeCombinationRepository = productVariantAttributeCombinationRepository;
             _brandService = brandService;
             _categoryService = categoryService;
             _mapper = mapper;
+            _eventPublisher = eventPublisher;
         }
         public async Task<ProductDto> CreateProductAsync(CreateProductDto createProduct)
         {
@@ -39,61 +47,18 @@ namespace Entegro.Application.Services
             if (createProduct == null)
                 throw new ArgumentNullException(nameof(createProduct));
 
-            #region Marka
-            if ((createProduct.BrandId == null || createProduct.BrandId == 0) && createProduct.Brand != null)
-            {
-                if (await _brandService.ExistsByNameAsync(createProduct.Brand.Name))
-                {
-                    var brand = await _brandService.GetByNameAsync(createProduct.Brand.Name);
-                    createProduct.BrandId = brand.Id;
-                    createProduct.Brand = null;
-                }
-                else
-                {
-                    var createBrand = _mapper.Map<CreateBrandDto>(createProduct.Brand);
-
-                    var brandResult = await _brandService.CreateAsync(createBrand);
-                    createProduct.BrandId = brandResult.Id;
-                    createProduct.Brand = null;
-                }
-            }
-            #endregion
-
-            #region Kategori
-            foreach (var productCategory in createProduct.ProductCategories)
-            {
-                if (productCategory.Category != null)
-                {
-                    productCategory.CategoryId = await CreateCategoryWithChildrenAsync(productCategory.Category);
-                    productCategory.Category = null;
-                }
-            }
-            #endregion
-
             var product = _mapper.Map<Product>(createProduct);
             await _productRepository.AddAsync(product);
 
+            var productIntegrations = await _productIntegrationService.GetProductIntegrationAllWithProductIdAsync(product.Id);
+            foreach (var productIntegration in productIntegrations)
+            {
+                var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
+                _eventPublisher.Publish(recordUpdatedEvent);
+            }
+
+
             return _mapper.Map<ProductDto>(product);
-        }
-
-        private async Task<int> CreateCategoryWithChildrenAsync(CategoryDto categoryDto)
-        {
-            if (await _categoryService.ExistsByNameAsync(categoryDto.Name))
-            {
-                var existing = await _categoryService.GetCategoryByNameAsync(categoryDto.Name);
-                return existing.Id;
-            }
-
-            var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
-            var createCategoryModel = await _categoryService.CreateCategoryAsync(createCategory);
-
-            foreach (var subCategoryDto in categoryDto.SubCategories)
-            {
-                subCategoryDto.ParentCategoryId = createCategoryModel.Id;
-                createCategoryModel.Id = await CreateCategoryWithChildrenAsync(subCategoryDto);
-            }
-
-            return createCategoryModel.Id;
         }
 
         public async Task DeleteProductAsync(int productId)
@@ -176,6 +141,13 @@ namespace Entegro.Application.Services
                 {
                     await _productVariantAttributeCombinationRepository.UpdateAsync(item);
                 }
+            }
+
+            var productIntegrations = await _productIntegrationService.GetProductIntegrationAllWithProductIdAsync(existingProduct.Id);
+            foreach (var productIntegration in productIntegrations)
+            {
+                var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
+                _eventPublisher.Publish(recordUpdatedEvent);
             }
 
             return _mapper.Map<ProductDto>(existingProduct);

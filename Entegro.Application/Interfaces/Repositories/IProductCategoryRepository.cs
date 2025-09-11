@@ -2,7 +2,7 @@
 
 namespace Entegro.Application.Interfaces.Repositories
 {
-    public interface IProductCategoryMappingRepository
+    public interface IProductCategoryRepository
     {
         Task<ProductCategory?> GetByIdAsync(int id);
         Task<List<ProductCategory>> GetAllAsync();

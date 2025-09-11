@@ -77,7 +77,7 @@ namespace Entegro.Web.Controllers
                 MetaKeywords = category.MetaKeywords,
                 MetaTitle = category.MetaTitle,
                 Name = category.Name,
-                ParentCategoryId = category.ParentCategoryId,
+                ParentCategoryId = category.ParentId,
                 Parent = category.Parent == null ? null : new CategoryViewModel()
                 {
                     Id = category.Parent.Id,
@@ -89,7 +89,7 @@ namespace Entegro.Web.Controllers
                     MetaKeywords = category.Parent.MetaKeywords,
                     MetaTitle = category.Parent.MetaTitle,
                     Name = category.Parent.Name,
-                    ParentCategoryId = category.Parent.ParentCategoryId,
+                    ParentCategoryId = category.Parent.ParentId,
                     Published = category.Parent.Published,
                 },
                 Published = category.Published,

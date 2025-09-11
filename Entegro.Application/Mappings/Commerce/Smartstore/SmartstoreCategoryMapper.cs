@@ -30,7 +30,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
 
                 CategoryDto categoryDto = new CategoryDto();
                 categoryDto.Id = smartstoreCategory.Id;
-                categoryDto.ParentCategoryId = null;
+                categoryDto.ParentId = null;
                 categoryDto.Name = smartstoreCategory.Name;
                 categoryDto.DisplayOrder = smartstoreCategory.DisplayOrder;
                 categoryDto.MetaTitle = smartstoreCategory.MetaTitle;
@@ -74,7 +74,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreCategory.SubjectToAcl = false;
                 smartstoreCategory.ShowOnHomePage = false;
                 smartstoreCategory.Published = true;
-                smartstoreCategory.ParentId = category.ParentCategoryId > 0 ? category.ParentCategoryId : null;
+                smartstoreCategory.ParentId = category.ParentId > 0 ? category.ParentId : null;
                 smartstoreCategory.PageSizeOptions = "10,20,50";
                 smartstoreCategory.PageSize = 20;
                 smartstoreCategory.Name = category.Name;

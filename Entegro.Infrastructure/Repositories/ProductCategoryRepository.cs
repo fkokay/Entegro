@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Repositories
 {
-    public class ProductCategoryMappingRepository : IProductCategoryMappingRepository
+    public class ProductCategoryRepository : IProductCategoryRepository
     {
         private readonly EntegroDbContext _context;
 
-        public ProductCategoryMappingRepository(EntegroDbContext context)
+        public ProductCategoryRepository(EntegroDbContext context)
         {
             _context = context;
         }

@@ -14,6 +14,7 @@ namespace Entegro.Application.DTOs.Category
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
+        public bool Deleted { get; set; }
         public bool Published { get; set; }
 
         public List<CategoryDto> SubCategories { get; set; } = new List<CategoryDto>();

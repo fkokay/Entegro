@@ -5,7 +5,7 @@ namespace Entegro.Application.DTOs.Category
     public class CategoryDto
     {
         public int Id { get; set; }
-        public int? ParentCategoryId { get; set; }
+        public int? ParentId { get; set; }
         public CategoryDto? Parent { get; set; }
         public int? MediaFileId { get; set; }
         public string TreePath { get; set; } = string.Empty;
@@ -16,6 +16,7 @@ namespace Entegro.Application.DTOs.Category
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
+        public bool Deleted { get; set; }
         public bool Published { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }

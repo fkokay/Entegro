@@ -28,7 +28,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             CategoryDto category = new CategoryDto();
             category.Id = trendyolCategory.Id;
             category.Name = trendyolCategory.Name;
-            category.ParentCategoryId = trendyolCategory.ParentId ?? 0;
+            category.ParentId = trendyolCategory.ParentId ?? 0;
             category.SubCategories = new List<CategoryDto>();
             if (trendyolCategory.SubCategories != null && trendyolCategory.SubCategories.Any())
             {

@@ -10,7 +10,7 @@ using MapsterMapper;
 using Polly;
 using Quartz;
 
-namespace Entegro.Service.Jobs
+namespace Entegro.Api.Jobs
 {
     public class TrendyolDataSyncJob : IJob
     {
