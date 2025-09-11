@@ -275,12 +275,12 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 var existingProductMediaFile = await GetProductMediaFile(productId, productMediaFile.MediaFileId);
                 if (existingProductMediaFile == null)
                 {
-                    productMediaFile.Id = 0;
-                    await CreateProductMediaFileAsync(productMediaFile);
+                    var productMediaFileId =await CreateProductMediaFileAsync(productMediaFile);
+                    productMediaFile.IntegrationId = productMediaFileId;
                 }
                 else
                 {
-                    productMediaFile.Id = existingProductMediaFile.Id;
+                    productMediaFile.IntegrationId = existingProductMediaFile.Id;
                     await UpdateProductMediaFileAsync(productMediaFile);
                 }
             }
@@ -343,6 +343,9 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             foreach (var combination in product.ProductVariantAttributeCombinations)
             {
                 combination.ProductId = productId;
+                combination.AssignedPictureIds = product.ProductMediaFiles.Where(m=> combination.AssignedPictureIds.Contains(m.Id)).Select(m=>m.MediaFileId).ToArray();
+
+
                 List<KeyValuePair<int, ICollection<object>>> attributes = new List<KeyValuePair<int, ICollection<object>>>();
 
                 var rawAttributes = JsonSerializer.Deserialize<List<ProductVariantAttributeModel>>(combination.RawAttribute);

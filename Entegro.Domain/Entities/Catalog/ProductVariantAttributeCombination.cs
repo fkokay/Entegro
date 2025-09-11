@@ -49,7 +49,7 @@ namespace Entegro.Domain.Entities.Catalog
         /// </summary>
         public void SetAssignedMediaIds(int[] ids)
         {
-            AssignedMediaFileIds = ids?.Length > 0 ? string.Join(',', ids) : null;
+            AssignedMediaFileIds = ids?.Length > 0 ? string.Join(',', ids) : "";
         }
     }
 }

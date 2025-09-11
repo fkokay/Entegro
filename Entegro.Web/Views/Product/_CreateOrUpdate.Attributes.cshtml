@@ -38,7 +38,22 @@
                                 }
                             </div>
                         </div>
-
+                        <div class="col-md-12">
+                            <p>Resimler</p>
+                            <ul class="choice-box-group choice-box-group-xl mb-2" id="assigned-pictures">
+                                @foreach (var item in Model.ProductMediaFiles)
+                                {
+                                    <li class="choice-box choice-box-mediafile">
+                                        <label class="choice-box-label">
+                                            <input type="checkbox" class="choice-box-control-native" name="AssignedPictureIds" value="@item.Id">
+                                            <span class="choice-box-content">
+                                                <img class="choice-box-element file-img" src="@item.MediaFile.Url">
+                                            </span>
+                                        </label>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                         <!-- Variant Fields -->
                         <div class="col-md-2">
                             <p>Stok Kodu</p>

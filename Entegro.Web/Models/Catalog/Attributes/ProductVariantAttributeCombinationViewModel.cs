@@ -12,6 +12,7 @@ namespace Entegro.Web.Models.Catalog.Attributes
         public string? ManufacturerPartNumber { get; set; }
         public decimal Price { get; set; } = 0;
         public int StockQuantity { get; set; } = 0;
+        public int[] AssignedPictureIds { get; set; } = [];
 
         public List<ProductVariantAttributeSelection> ProductVariantAttributeSelections { get; set; } = new List<ProductVariantAttributeSelection>();
     }

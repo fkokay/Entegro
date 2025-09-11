@@ -185,6 +185,7 @@ namespace Entegro.Web.Controllers
                     StockQuantity = m.StockQuantity,
                     ProductId = model.Id,
                     StokCode = m.StokCode,
+                    AssignedPictureIds = m.AssignedPictureIds,
                 }).ToList();
 
                 await _productService.UpdateProductAsync(updateDto);
@@ -952,7 +953,40 @@ namespace Entegro.Web.Controllers
                     Price = m.Price,
                     ProductId = m.ProductId,
                     StockQuantity = m.StockQuantity,
-                    StokCode = m.StokCode
+                    StokCode = m.StokCode,
+                    AssignedPictureIds = m.AssignedPictureIds
+                }).ToList();
+                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileViewModel()
+                {
+                    Id = m.Id,
+                    DisplayOrder = m.DisplayOrder,
+                    MediaFileId = m.MediaFileId,
+                    ProductId = m.ProductId,
+                    MediaFile = new MediaFileViewModel()
+                    {
+                        Alt = m.MediaFile.Alt,
+                        CreatedOn = m.MediaFile.CreatedOn,
+                        Deleted = m.MediaFile.Deleted,
+                        Extension = m.MediaFile.Extension,
+                        FolderId = m.MediaFile.FolderId,
+                        Height = m.MediaFile.Height,
+                        Id = m.MediaFile.Id,
+                        IsTransient = m.MediaFile.IsTransient,
+                        MediaType = m.MediaFile.MediaType,
+                        Metadata = m.MediaFile.Metadata,
+                        MimeType = m.MediaFile.MimeType,
+                        Name = m.MediaFile.Name,
+                        PixelSize = m.MediaFile.PixelSize,
+                        Size = m.MediaFile.Size,
+                        Title = m.MediaFile.Title,
+                        UpdatedOn = m.MediaFile.UpdatedOn,
+                        Width = m.MediaFile.Width,
+                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                        {
+                            Id = m.MediaFile.Folder.Id,
+                            Name = m.MediaFile.Folder.Name,
+                        }
+                    }
                 }).ToList();
 
                 var productAttributes = await _productAttributeService.GetAllAsync();

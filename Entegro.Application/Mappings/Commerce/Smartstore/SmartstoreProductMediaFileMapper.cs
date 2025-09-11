@@ -56,7 +56,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProductMediaFile.ProductId = productMediaFile.ProductId;
                 smartstoreProductMediaFile.MediaFileId = productMediaFile.MediaFileId;
                 smartstoreProductMediaFile.DisplayOrder = productMediaFile.DisplayOrder;
-                smartstoreProductMediaFile.Id = productMediaFile.Id;
+                smartstoreProductMediaFile.Id = productMediaFile.IntegrationId;
                 
 
                 return smartstoreProductMediaFile;

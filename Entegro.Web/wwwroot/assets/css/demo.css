@@ -1,4 +1,4 @@
-/*
+﻿/*
 * demo.css
 * File include item demo only specific css only
 ******************************************************************************/
@@ -562,3 +562,209 @@ table .avatar img {
     .product-integration:hover {
         background-color: #f1f5ff;
     }
+
+.choice {
+    margin-bottom: 1rem
+}
+
+label.required, .col-form-label.required, .choice-label.required {
+    font-weight: 600
+}
+
+    label.required:after, .col-form-label.required:after, .choice-label.required:after {
+        content: ' *'
+    }
+
+.choice-item {
+    --choice-item-line-height: 1.5715;
+    --choice-item-size: max(1rem, 1em);
+    display: inline-flex !important;
+    align-items: center
+}
+
+.choice-item-unavailable {
+    color: #aab5bf
+}
+
+.choice-item-color, .choice-item-img {
+    display: inline-block;
+    min-width: var(--choice-item-size);
+    height: var(--choice-item-size);
+    max-height: var(--choice-item-size);
+    padding: 0;
+    border-radius: 0.2em;
+    border: 1px solid rgba(0,0,0,0.125);
+    -webkit-margin-end: 0.5rem;
+    margin-inline-end: 0.5rem;
+    margin-top: calc((var(--choice-item-line-height) * 1em - var(--choice-item-size)) * 0.5);
+    align-self: flex-start;
+    text-decoration: none !important;
+    overflow: hidden
+}
+
+    .choice-item-img > img {
+        max-width: 100%;
+        height: auto;
+        display: inherit
+    }
+
+.choice-description {
+    color: #aab5bf;
+    font-size: .8125rem;
+    margin-bottom: 0.5rem
+}
+
+    .choice-description > *:first-child {
+        margin-top: 0
+    }
+
+    .choice-description > *:last-child {
+        margin-bottom: 0
+    }
+
+.choice-box-group {
+    --choice-box-size: 46px;
+    --choice-box-strike-color: rgba(0, 0, 0, 0.75);
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px
+}
+
+    .choice-box-group::after {
+        display: block;
+        clear: both;
+        content: ""
+    }
+
+    .choice-box-group.choice-box-group-sm {
+        --choice-box-size: 36px
+    }
+
+    .choice-box-group.choice-box-group-lg {
+        --choice-box-size: 64px
+    }
+
+    .choice-box-group.choice-box-group-xl {
+        --choice-box-size: 96px
+    }
+
+.choice-box {
+    position: relative;
+    display: block
+}
+
+    .choice-box.dark {
+        --choice-box-strike-color: #fff
+    }
+
+.choice-box-label {
+    margin: 0
+}
+
+.choice-box-content {
+    position: relative;
+    display: block;
+    cursor: pointer
+}
+
+    .choice-box-content:after {
+        box-sizing: content-box;
+        position: absolute;
+        display: block;
+        inset-inline-end: -6px;
+        top: -6px;
+        background-color: #ee9B00;
+        border-radius: 50%;
+        border: 1px solid #fff;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: 900;
+        font-family: "Font Awesome 6 Free";
+        content: "";
+        color: #fff;
+        font-size: 10px;
+        opacity: 0;
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        transition: all 0.1s ease-in
+    }
+
+.choice-box-element {
+    position: relative;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.125);
+    border-radius: .375rem;
+    background-color: #fff;
+    height: var(--choice-box-size);
+    line-height: var(--choice-box-size);
+    min-width: var(--choice-box-size);
+    vertical-align: middle;
+    text-align: center;
+    overflow: hidden;
+    font-weight: 600;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-clip: padding-box
+}
+
+    .choice-box-element .choice-box-text {
+        padding: 0 0.4rem
+    }
+
+.choice-box.unavailable .choice-box-element {
+    border: 1px dashed rgba(0,0,0,0.3)
+}
+
+    .choice-box.unavailable .choice-box-element:not(.choice-box-color) {
+        opacity: .5
+    }
+
+    .choice-box.unavailable .choice-box-element:after {
+        position: absolute;
+        content: '';
+        background-color: var(--choice-box-strike-color);
+        height: 1px;
+        left: 0;
+        right: 0;
+        top: calc(50% - 1px);
+        margin-inline: -8px;
+        -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg)
+    }
+
+.choice-box.disabled .choice-box-element {
+    opacity: .5
+}
+
+.choice-box-mediafile .choice-box-content {
+    max-width: 96px !important
+}
+
+    .choice-box-mediafile .choice-box-content .file-img {
+        -o-object-fit: contain;
+        object-fit: contain;
+        max-width: 100%
+    }
+
+.choice-box-control-native:checked + .choice-box-content .choice-box-element {
+    border-color: #596167;
+    box-shadow: inset 0 0 0 2px #fff
+}
+
+.choice-box-control-native:checked + .choice-box-content:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1)
+}
+
+.choice-box-control-native {
+    display: none !important
+}

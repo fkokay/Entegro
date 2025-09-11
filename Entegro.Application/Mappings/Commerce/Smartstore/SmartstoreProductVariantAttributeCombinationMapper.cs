@@ -67,7 +67,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProductVariantAttributeCombination.QuantityUnitId = null;
                 smartstoreProductVariantAttributeCombination.DeliveryTimeId = null;
                 smartstoreProductVariantAttributeCombination.IsActive = true;
-                smartstoreProductVariantAttributeCombination.AssignedMediaFileIds = "";
+                smartstoreProductVariantAttributeCombination.AssignedMediaFileIds = string.Join(",",productVariantAttributeCombination.AssignedPictureIds);
                 smartstoreProductVariantAttributeCombination.BasePriceBaseAmount = 0;
                 smartstoreProductVariantAttributeCombination.BasePriceAmount = 0;
                 smartstoreProductVariantAttributeCombination.Length = 0;

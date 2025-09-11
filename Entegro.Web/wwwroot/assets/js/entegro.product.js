@@ -355,6 +355,14 @@ Entegro.product = (function ($) {
         $.each(data, function (i, item) {
             var $row = $template.clone(); i
             $row.find('[name$="[Id]"]').val(item.Id);
+            $row.find('[name$="[AssignedPictureIds][]"]').each(function () {
+                let val = parseInt($(this).val(), 10);
+                if (item.AssignedPictureIds.includes(val)) {
+                    $(this).prop("checked", true);
+                } else {
+                    $(this).prop("checked", false);
+                }
+            });
             $row.find('[name$="[StokCode]"]').val(item.StokCode);
             $row.find('[name$="[ManufacturerPartNumber]"]').val(item.ManufacturerPartNumber);
             $row.find('[name$="[Gtin]"]').val(item.Gtin);

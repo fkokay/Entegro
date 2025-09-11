@@ -3,11 +3,14 @@ using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
+using Entegro.ComponentModel;
 using Entegro.Domain.Entities.Catalog;
+using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 
 namespace Entegro.Application.Services
@@ -61,69 +64,12 @@ namespace Entegro.Application.Services
             return _mapper.Map<ProductDto>(product);
         }
 
-        public async Task DeleteProductAsync(int productId)
-        {
-
-            if (productId <= 0)
-                throw new ArgumentOutOfRangeException(nameof(productId));
-
-            var product = await _productRepository.GetByAsync(m=>m.Id == productId);
-
-            if (product == null)
-            {
-                throw new KeyNotFoundException($"Product with ID {productId} not found.");
-            }
-
-            await _productRepository.DeleteAsync(product);
-        }
-
-        public async Task<bool> ExistsByCodeAsync(string productCode)
-        {
-            return await _productRepository.ExistsAsync(m=>m.Code == productCode);
-        }
-
-        public async Task<bool> ExistsByNameAsync(string productName)
-        {
-            return await _productRepository.ExistsAsync(m=>m.Name == productName);
-        }
-
-        public async Task<ProductDto?> GetProductByCodeAsync(string productCode)
-        {
-            var product = await _productRepository.GetByAsync(m=>m.Code == productCode);
-            if (product == null)
-            {
-                throw new KeyNotFoundException($"Product with ID {productCode} not found.");
-            }
-
-            var productDto = _mapper.Map<ProductDto>(product);
-            return productDto;
-        }
-
-        public async Task<ProductDto?> GetProductByIdAsync(int productId)
-        {
-            var product = await _productRepository.GetByAsync(m=>m.Id == productId);
-            if (product == null)
-            {
-                throw new KeyNotFoundException($"Product with ID {productId} not found.");
-            }
-
-            var productDto = _mapper.Map<ProductDto>(product);
-            return productDto;
-        }
-
-        public async Task<IEnumerable<ProductDto>> GetProductsAsync()
-        {
-            var products = await _productRepository.GetAllAsync();
-            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
-            return productDtos;
-        }
-
         public async Task<ProductDto> UpdateProductAsync(UpdateProductDto updateProduct)
         {
             if (updateProduct == null)
                 throw new ArgumentNullException(nameof(updateProduct));
 
-            var existingProduct = await _productRepository.GetByAsync(m=>m.Id == updateProduct.Id);
+            var existingProduct = await _productRepository.GetByAsync(m => m.Id == updateProduct.Id);
             if (existingProduct == null)
                 throw new KeyNotFoundException($"ID {updateProduct.Id} ile Product bulunamadı.");
 
@@ -131,15 +77,18 @@ namespace Entegro.Application.Services
             _mapper.Map(updateProduct, existingProduct);
             await _productRepository.UpdateAsync(existingProduct);
 
-            foreach (var item in existingProduct.ProductVariantAttributeCombinations)
+            foreach (var item in updateProduct.ProductVariantAttributeCombinations)
             {
+                var combination = await MapperFactory.MapAsync<ProductVariantAttributeCombinationDto, ProductVariantAttributeCombination>(item);
+                combination.SetAssignedMediaIds(item.AssignedPictureIds);
+
                 if (item.Id == 0)
                 {
-                    await _productVariantAttributeCombinationRepository.AddAsync(item);
+                    await _productVariantAttributeCombinationRepository.AddAsync(combination);
                 }
                 else
                 {
-                    await _productVariantAttributeCombinationRepository.UpdateAsync(item);
+                    await _productVariantAttributeCombinationRepository.UpdateAsync(combination);
                 }
             }
 
@@ -153,6 +102,76 @@ namespace Entegro.Application.Services
             return _mapper.Map<ProductDto>(existingProduct);
         }
 
+        public async Task DeleteProductAsync(int productId)
+        {
+
+            if (productId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(productId));
+
+            var product = await _productRepository.GetByAsync(m => m.Id == productId);
+
+            if (product == null)
+            {
+                throw new KeyNotFoundException($"Product with ID {productId} not found.");
+            }
+
+            await _productRepository.DeleteAsync(product);
+        }
+
+        public async Task<bool> ExistsByCodeAsync(string productCode)
+        {
+            return await _productRepository.ExistsAsync(m => m.Code == productCode);
+        }
+
+        public async Task<bool> ExistsByNameAsync(string productName)
+        {
+            return await _productRepository.ExistsAsync(m => m.Name == productName);
+        }
+
+        public async Task<ProductDto?> GetProductByCodeAsync(string productCode)
+        {
+            var product = await _productRepository.GetByAsync(m => m.Code == productCode);
+            if (product == null)
+            {
+                throw new KeyNotFoundException($"Product with ID {productCode} not found.");
+            }
+
+            var productDto = _mapper.Map<ProductDto>(product);
+            return productDto;
+        }
+
+        public async Task<ProductDto?> GetProductByIdAsync(int productId)
+        {
+            var product = await _productRepository.GetByAsync(m => m.Id == productId);
+            if (product == null)
+            {
+                throw new KeyNotFoundException($"Product with ID {productId} not found.");
+            }
+
+            var productVariantAttributeCombinations = await product.ProductVariantAttributeCombinations.SelectAwait(async x =>
+            {
+                var productVariantAttributeCombination = _mapper.Map<ProductVariantAttributeCombinationDto>(x);
+
+                productVariantAttributeCombination.AssignedPictureIds = x.GetAssignedMediaIds();
+                return productVariantAttributeCombination;
+            }).AsyncToList();
+
+            var productDto = _mapper.Map<ProductDto>(product);
+            productDto.ProductVariantAttributeCombinations = productVariantAttributeCombinations;
+
+
+            return productDto;
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetProductsAsync()
+        {
+            var products = await _productRepository.GetAllAsync();
+            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
+            return productDtos;
+        }
+
+       
+
         public async Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId)
         {
             await _productRepository.UpdateMainPictureIdAsync(productId, mainPictureId);
@@ -161,7 +180,7 @@ namespace Entegro.Application.Services
 
         public async Task<bool> ExistsByBarcodeAsync(string productBarcode)
         {
-            return await _productRepository.ExistsAsync(m=>m.Barcode == productBarcode);
+            return await _productRepository.ExistsAsync(m => m.Barcode == productBarcode);
         }
 
         public async Task<PagedResult<ProductDto>> GetPagedAsync(GridCommand gridCommand)
@@ -173,7 +192,7 @@ namespace Entegro.Application.Services
 
         public async Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode)
         {
-            var product = await _productRepository.GetByAsync(m=>m.Barcode == productBarcode);
+            var product = await _productRepository.GetByAsync(m => m.Barcode == productBarcode);
             var productDto = product == null ? null : _mapper.Map<ProductDto>(product);
             return productDto;
         }

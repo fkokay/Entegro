@@ -11,6 +11,7 @@ namespace Entegro.Application.DTOs.ProductVariantAttributeCombination
         public string? ManufacturerPartNumber { get; set; }
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
+        public int[] AssignedPictureIds { get; set; } = [];
         public string RawAttribute { get; set; }
         public int HashCode { get; set; }
     }
