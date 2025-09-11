@@ -1,17 +1,10 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
-using Entegro.Application.Interfaces.Repositories;
-using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings;
-using Entegro.Application.Services;
-using Entegro.Application.Services.Commerce;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Engine;
-using Entegro.Events;
 using Entegro.Infrastructure.Data;
-using Entegro.Infrastructure.Repositories;
+using Entegro.Infrastructure.Extensions;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
@@ -116,74 +109,17 @@ engineStarter.ConfigureServices(builder.Services);
 builder.Host.ConfigureContainer<ContainerBuilder>(engineStarter.ConfigureContainer);
 #endregion
 
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<ICustomerService, CustomerService>();
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IEventPublisher, EventPublisher>();
-
-builder.Services.AddScoped<IProductVariantAttributeCombinationService, ProductVariantAttributeCombinationService>();
-builder.Services.AddScoped<IProductVariantAttributeCombinationRepository, ProductVariantAttributeCombinationRepository>();
-
-builder.Services.AddScoped<IIntegrationSystemRepository, IntegrationSystemRepository>();
-builder.Services.AddScoped<IIntegrationSystemService, IntegrationSystemService>();
-
-builder.Services.AddScoped<IIntegrationSystemParameterRepository, IntegrationSystemParameterRepository>();
-builder.Services.AddScoped<IIntegrationSystemParameterService, IntegrationSystemParameterService>();
-
-builder.Services.AddScoped<IIntegrationSystemLogRepository, IntegrationSystemLogRepository>();
-builder.Services.AddScoped<IIntegrationSystemLogService, IntegrationSystemLogService>();
-
-
-builder.Services.AddScoped<ICountryRepository, CountryRepository>();
-builder.Services.AddScoped<ICountryService, CountryService>();
-
-
-builder.Services.AddScoped<ICityRepository, CityRepository>();
-builder.Services.AddScoped<ICityService, CityService>();
-
-builder.Services.AddScoped<ITownRepository, TownRepository>();
-builder.Services.AddScoped<ITownService, TownService>();
-
-builder.Services.AddScoped<IOrderNoteRepository, OrderNoteRepository>();
-builder.Services.AddScoped<IOrderNoteService, OrderNoteService>();
-
-
-builder.Services.AddScoped<IProductIntegrationRepository, ProductIntegrationRepository>();
-builder.Services.AddScoped<IProductIntegrationService, ProductIntegrationService>();
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IBrandRepository, BrandRepository>();
-builder.Services.AddScoped<IBrandService, BrandService>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-
-
-builder.Services.AddScoped<ISpecificationAttributeOptionRepository, SpecificationAttributeOptionRepository>();
-builder.Services.AddScoped<ISpecificationAttributeOptionService, SpecificationAttributeOptionService>();
-
-
-builder.Services.AddScoped<ISpecificationAttributeRepository, SpecificationAttributeRepository>();
-builder.Services.AddScoped<ISpecificationAttributeService, SpecificationAttributeService>();
-
-
-builder.Services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
-builder.Services.AddScoped<IEmailAccountService, EmailAccountService>();
-
-builder.Services.AddScoped<IAddressRepository, AddressRepository>();
-builder.Services.AddScoped<IAddressService, AddressService>();
-
-builder.Services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
-
-
-builder.Services.AddScoped<ISmartstoreService, SmartstoreService>();
+#region App Services
+builder.Services.AddApplicationServices();
+builder.Services.AddRepositoryServices();
+builder.Services.AddCommerceServices();
+builder.Services.AddErpServices();
+builder.Services.AddMarketplaceServices();
 
 MapsterConfig.RegisterMappings();
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
-
+#endregion
 
 #region Build App
 var app = builder.Build();
