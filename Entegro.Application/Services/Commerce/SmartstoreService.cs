@@ -62,6 +62,7 @@ namespace Entegro.Application.Services.Commerce
 
             return allProducts;
         }
+
         public async Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync()
         {
             var response = await _httpClient.GetAsync("categories?$count=true");
@@ -76,6 +77,7 @@ namespace Entegro.Application.Services.Commerce
 
             return categoryResponse?.Value ?? Enumerable.Empty<SmartstoreCategoryDto>();
         }
+
         public async Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync()
         {
             var response = await _httpClient.GetAsync("manufacturers?$count=true");
@@ -90,6 +92,7 @@ namespace Entegro.Application.Services.Commerce
 
             return manufacturers?.Value ?? Enumerable.Empty<SmartstoreManufacturerDto>();
         }
+
         public async Task<SmartstoreManufacturerDto?> GetManufacturerAsync(int id)
         {
             var response = await _httpClient.GetAsync($"manufacturers({id})");
@@ -104,6 +107,7 @@ namespace Entegro.Application.Services.Commerce
 
             return manufacturer;
         }
+
         public async Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50)
         {
             var allOrders = new List<SmartstoreOrderDto>();

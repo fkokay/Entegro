@@ -29,11 +29,11 @@ namespace Entegro.Application.DTOs.MediaFile
             {
                 if (this.Folder == null)
                 {
-                    return $"/media/{Id}/{Name}";
+                    return $"/media/{Id}/{Uri.EscapeDataString(Name)}";
                 }
                 else
                 {
-                    return $"/media/{Id}/{Folder.Name}/{Name}";
+                    return $"/media/{Id}/{Folder.Name}/{Uri.EscapeDataString(Name)}";
                 }
 
             }

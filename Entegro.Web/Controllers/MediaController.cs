@@ -4,11 +4,11 @@ using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using System.Dynamic;
 
 namespace Entegro.Web.Controllers
 {
-    [Authorize]
     public class MediaController : Controller
     {
         private readonly static IDictionary<string, string[]> _defaultExtensionsMap = new Dictionary<string, string[]>
@@ -38,40 +38,38 @@ namespace Entegro.Web.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpGet("media/{mediaId}/{folder}/{fileName}")]
         [HttpGet("media/{mediaId}/{fileName}")]
+        [HttpGet("media/{mediaId}/{folder}/{fileName}")]
         public IActionResult MediaFile(string mediaId, string? folder, string fileName)
         {
-            string filePath = string.Empty;
-            if (folder.IsEmpty())
-            {
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage", fileName);
-            }
-            else
-            {
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage", folder, fileName);
-            }
+            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage");
 
+            // URL decode, Türkçe karakterleri düzelt
+            fileName = Uri.UnescapeDataString(fileName);
+            if (folder != null)
+                folder = Uri.UnescapeDataString(folder);
+
+            // Dosya yolunu oluştur
+            string filePath = string.IsNullOrWhiteSpace(folder)
+                ? Path.Combine(basePath, fileName)
+                : Path.Combine(basePath, folder, fileName);
 
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound();
+                return NotFound($"Dosya bulunamadı: {filePath}");
             }
 
-            // İçerik tipini belirle
-            var extension = Path.GetExtension(filePath).ToLowerInvariant();
-            var contentType = extension switch
+            // ContentType belirle
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out var contentType))
             {
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                ".gif" => "image/gif",
-                ".bmp" => "image/bmp",
-                ".webp" => "image/webp",
-                _ => "application/octet-stream"
-            };
+                contentType = "application/octet-stream";
+            }
 
-            var fileBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(fileBytes, contentType);
+            var stream = System.IO.File.OpenRead(filePath);
+
+            // File() metodu ile doğru contentType ve dosya adı ile döndür
+            return File(stream, contentType, fileName);
         }
 
         [HttpPost]
