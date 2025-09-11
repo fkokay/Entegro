@@ -34,4 +34,8 @@
     <ProjectReference Include="..\Entegro.Infrastructure\Entegro.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="App_Data\Media\Storage\catalog\" />
+  </ItemGroup>
+
 </Project>

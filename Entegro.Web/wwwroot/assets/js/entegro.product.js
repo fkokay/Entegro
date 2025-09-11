@@ -239,6 +239,8 @@ Entegro.product = (function ($) {
         $repeater.repeater({
             initEmpty: false,
             show: function () {
+                $(this).slideDown();
+
                 var $idInput = $(this).find('[name$="[Id]"]');
                 $idInput.val(0);
                 var repeterItem = $(this).find("[data-repeater-item]");
@@ -246,15 +248,85 @@ Entegro.product = (function ($) {
                 var $idProductVariantAttributeInput = find("input[name*='ProductVariantAttributeId']");
                 $idProductVariantAttributeInput.val(productVariantAttributeId);
 
-                $(this).slideDown();
+               
             },
             hide: function (deleteElement) {
                 var $idInput = $(deleteElement).find('[name$="[Id]"]');
                 var id = $idInput.val();
+             
 
-                if (confirm('Varyant silinecek emin misiniz?')) {
-                    $(this).slideUp(deleteElement);
-                };
+                // Eğer id boşsa (yeni eklenmiş, henüz kaydedilmemiş varyant)
+                if (!id || parseInt(id) === 0) {
+                    Swal.fire({
+                        title: 'Emin misiniz?',
+                        text: "Bu varyant formdan silinecek.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Evet, sil!',
+                        cancelButtonText: 'İptal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $(deleteElement).slideUp('fast', function () {
+                                $(this).remove();
+                            });
+
+                            Swal.fire(
+                                'Silindi!',
+                                'Varyant formdan kaldırıldı.',
+                                'success'
+                            );
+                        }
+                    });
+                    return;
+                }
+
+                // id varsa (veritabanında kayıtlı varyant)
+                Swal.fire({
+                    title: 'Emin misiniz?',
+                    text: "Bu varyant silinecek. Bu işlemi geri alamazsınız!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Evet, sil!',
+                    cancelButtonText: 'İptal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Product/ProductVariantAttributeDelete',
+                            type: 'POST',
+                            data: { id: id },
+                            success: function (response) {
+                                if (response.success) {
+                                    $(deleteElement).slideUp('fast', function () {
+                                        $(this).remove();
+                                    });
+
+                                    Swal.fire(
+                                        'Silindi!',
+                                        'Varyant başarıyla silindi.',
+                                        'success'
+                                    );
+                                } else {
+                                    Swal.fire(
+                                        'Hata!',
+                                        response.message || 'Bir hata oluştu.',
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function () {
+                                Swal.fire(
+                                    'Hata!',
+                                    'Sunucuya ulaşılamadı.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
             },
             repeaters: [{
                 selector: '.ProductVariantAttributeSelectionRepeater',

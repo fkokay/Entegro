@@ -37,6 +37,7 @@ namespace Entegro.Web.Controllers
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ICategoryService _categoryService;
         private readonly ITrendyolService _trenyolService;
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
@@ -52,7 +53,8 @@ namespace Entegro.Web.Controllers
             IProductAttributeFormatter productAttributeFormatter,
             ICategoryService categoryService,
             ITrendyolService trendyolService,
-            IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService)
+            IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService,
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -66,6 +68,7 @@ namespace Entegro.Web.Controllers
             _trenyolService = trendyolService;
             _categoryService = categoryService;
             _productSpecificationAttributeMappingService = productSpecificationAttributeMappingService;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
         }
 
         #region Product list / create / edit / delete
@@ -309,7 +312,6 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
-
         #region Product SpecificationAttribute
 
         [HttpGet]
@@ -396,12 +398,12 @@ namespace Entegro.Web.Controllers
                     {
                         int mediaFileId = mediaIdList[i];
 
-                        // Yeni ProductMediaFile nesnesi oluştur
+
                         var productPicture = new CreateProductMediaFileDto
                         {
                             MediaFileId = mediaFileId,
                             ProductId = entityId,
-                            DisplayOrder = i // Sıralamayı kaydediyoruz
+                            DisplayOrder = i
                         };
 
                         var productMediaFile = await _productImageMappingService.AddAsync(productPicture);
@@ -473,7 +475,7 @@ namespace Entegro.Web.Controllers
                     {
                         int pictureId = pictureIds[i];
 
-                        var productPicture = await _productImageMappingService.GetByPictureIdProductIdAsync(pictureId, entityId);
+                        var productPicture = await _productImageMappingService.GetByPictureIdSortAsync(pictureId, entityId);
 
                         if (productPicture != null)
                         {
@@ -874,7 +876,30 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
+        #region ProductVariantAttributeCombination
+        [HttpPost]
+        public async Task<IActionResult> ProductVariantAttributeDelete(int id)
+        {
+            try
+            {
+                var isExisting = await _productVariantAttributeCombinationService.GetByIdAsync(id);
+                if (isExisting is not null)
+                {
+                    await _productVariantAttributeCombinationService.DeleteAsync(id);
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Varyant bulunamadı." });
+                }
 
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        #endregion
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
         {
             if (product != null)
