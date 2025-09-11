@@ -32,7 +32,10 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" type="button" role="tab" data-url="@(Model.Id > 0 ? Url.Action("LoadTabSpecificationAttribute", "Product", new { productId = Model.Id }) : "")">Ürün Özellikleri</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" type="button" role="tab"
+                            data-url="@(Model.Id > 0 ? Url.Action("LoadTabSpecificationAttribute", "Product", new { productId = Model.Id }) : "")">
+                        Ürün Özellikleri
+                    </button>
                 </li>
             </ul>
         </div>
@@ -317,9 +320,18 @@
 
             <!--Ürün Özellikleri-->
             <div class="tab-pane fade" id="form-tabs-attributes" role="tabpanel">
-                <div class="row g-3 p-3">
-                    <h3>Ürün Özellikler Listesi Gelecek</h3>
-                </div>
+                @if (Model.Id > 0)
+                {
+                    <div class="p-4 text-center text-muted" id="productattributes-loading" style="display:none">
+                        Yükleniyor...
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ürüne özellik eklemek için önce ürünü kaydetmeniz gerekmektedir.
+                    </div>
+                }
             </div>
         </div>
     </div>
