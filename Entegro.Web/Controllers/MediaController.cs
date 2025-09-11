@@ -44,12 +44,10 @@ namespace Entegro.Web.Controllers
         {
             string basePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage");
 
-            // URL decode, Türkçe karakterleri düzelt
             fileName = Uri.UnescapeDataString(fileName);
             if (folder != null)
                 folder = Uri.UnescapeDataString(folder);
 
-            // Dosya yolunu oluştur
             string filePath = string.IsNullOrWhiteSpace(folder)
                 ? Path.Combine(basePath, fileName)
                 : Path.Combine(basePath, folder, fileName);
@@ -68,7 +66,6 @@ namespace Entegro.Web.Controllers
 
             var stream = System.IO.File.OpenRead(filePath);
 
-            // File() metodu ile doğru contentType ve dosya adı ile döndür
             return File(stream, contentType, fileName);
         }
 
