@@ -21,6 +21,7 @@ using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.SpecificationAttribute;
@@ -62,6 +63,12 @@ namespace Entegro.Application.Mappings
             config.NewConfig<ProductCategory, ProductCategoryDto>().TwoWays();
             config.NewConfig<ProductCategory, CreateProductCategoryDto>().TwoWays();
             config.NewConfig<ProductCategory, UpdateProductCategoryDto>().TwoWays();
+
+
+            // ----------------  ProductSpecificationAttribute ----------------
+            config.NewConfig<ProductSpecificationAttribute, ProductSpecificationAttributeDto>().TwoWays();
+            config.NewConfig<ProductSpecificationAttribute, CreateProductSpecificationAttributeDto>().TwoWays();
+            config.NewConfig<ProductSpecificationAttribute, UpdateProductSpecificationAttributeDto>().TwoWays();
 
             // ---------------- Brand ----------------
             config.NewConfig<Brand, BrandDto>().TwoWays();

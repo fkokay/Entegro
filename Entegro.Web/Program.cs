@@ -220,6 +220,10 @@ builder.Services.AddScoped<ISpecificationAttributeRepository, SpecificationAttri
 builder.Services.AddScoped<ISpecificationAttributeService, SpecificationAttributeService>();
 
 
+builder.Services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();
+builder.Services.AddScoped<IProductSpecificationAttributeMappingService, ProductSpecificationAttributeMappingService>();
+
+
 builder.Services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
 builder.Services.AddScoped<IEmailAccountService, EmailAccountService>();
 
