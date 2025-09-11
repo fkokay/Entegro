@@ -396,12 +396,12 @@ namespace Entegro.Web.Controllers
                     {
                         int mediaFileId = mediaIdList[i];
 
-                        // Yeni ProductMediaFile nesnesi oluştur
+
                         var productPicture = new CreateProductMediaFileDto
                         {
                             MediaFileId = mediaFileId,
                             ProductId = entityId,
-                            DisplayOrder = i // Sıralamayı kaydediyoruz
+                            DisplayOrder = i
                         };
 
                         var productMediaFile = await _productImageMappingService.AddAsync(productPicture);

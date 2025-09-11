@@ -20,6 +20,12 @@ namespace Entegro.Application.Services
         }
         public async Task<ProductMediaFileDto> AddAsync(CreateProductMediaFileDto productImage)
         {
+            var existingProductImage = await _productImageMappingRepository.GetByPictureIdProductIdAsync(productImage.MediaFileId, productImage.ProductId);
+            if (existingProductImage is not null)
+            {
+                await _productImageMappingRepository.UpdateAsync(_mapper.Map<ProductMediaFile>(productImage));
+                return _mapper.Map<ProductMediaFileDto>(productImage);
+            }
             var createProductImage = _mapper.Map<ProductMediaFile>(productImage);
             await _productImageMappingRepository.AddAsync(createProductImage);
             return _mapper.Map<ProductMediaFileDto>(createProductImage);

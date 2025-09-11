@@ -53,7 +53,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductMediaFile>> GetAllAsync(int productId)
         {
-            return await _context.ProductMediaFiles.Where(m=>m.ProductId == productId).ToListAsync();
+            return await _context.ProductMediaFiles.Where(m => m.ProductId == productId).ToListAsync();
         }
 
         public async Task<ProductMediaFile?> GetByIdAsync(int id)
@@ -61,11 +61,11 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.ProductMediaFiles.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<ProductMediaFile> GetByPictureIdProductIdAsync(int pictureId, int productId)
+        public async Task<ProductMediaFile?> GetByPictureIdProductIdAsync(int pictureId, int productId)
         {
             var result = await _context.ProductMediaFiles.AsNoTracking()
                  .FirstOrDefaultAsync(o => o.Id == pictureId && o.ProductId == productId);
-            return result ?? throw new KeyNotFoundException($"ProductImage with PictureId {pictureId} and ProductId {productId} not found.");
+            return result ?? null;
         }
 
         public async Task UpdateAsync(ProductMediaFile productImage)
