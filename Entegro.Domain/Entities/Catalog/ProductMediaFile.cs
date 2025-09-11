@@ -13,7 +13,7 @@ namespace Entegro.Domain.Entities.Catalog
 
         }
     }
-    [Table("ProductMediaFile")]
+    [Table("Product_MediaFile_Mapping")]
     public class ProductMediaFile : BaseEntity, IDisplayOrder
     {
         public int ProductId { get; set; }
