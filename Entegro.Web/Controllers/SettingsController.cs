@@ -999,7 +999,6 @@ namespace Entegro.Web.Controllers
                 return View();
             }
 
-
             var marketPlaceType = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
             if (marketPlaceType == null)
             {
@@ -1008,27 +1007,145 @@ namespace Entegro.Web.Controllers
             switch (marketPlaceType.Value)
             {
                 case "Trendyol":
-                    var id = integrationSystemMarketplace.Id;
-                    var name = integrationSystemMarketplace.Name;
-                    var description = integrationSystemMarketplace.Description;
-                    var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-
-                    TrendyolMarketplaceSettingsViewModel model = new TrendyolMarketplaceSettingsViewModel();
-                    model.Id = id;
-                    model.Name = name;
-                    model.Description = description;
-                    model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
-                    model.IntegrationSystemId = integrationSystemId;
-                    model.MarketplaceType = marketPlaceType.Value;
-                    model.ApiUser = apiUser?.Value;
-                    model.ApiPassword = apiPassword?.Value;
-                    model.SupplierId = supplierId?.Value;
-
-                    return View($"Marketplace.Trendyol", model);
+                    return TrendyolMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
+                case "N11":
+                    return N11MarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
+                case "Pazarama":
+                    return PazaramaMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
+                case "Idefix":
+                    return IdefixMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
+                case "CicekSepeti":
+                    return CicekSepetiMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
+                case "HepsiBurada":
+                    return HepsiBuradaMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
             }
             return NotFound();
+        }
+
+        private IActionResult TrendyolMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        {
+            var id = integrationSystemMarketplace.Id;
+            var name = integrationSystemMarketplace.Name;
+            var description = integrationSystemMarketplace.Description;
+            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+
+            TrendyolMarketplaceSettingsViewModel model = new TrendyolMarketplaceSettingsViewModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemMarketplace.Id;
+            model.MarketplaceType = marketPlaceType;
+            model.ApiUser = apiUser?.Value;
+            model.ApiPassword = apiPassword?.Value;
+            model.SupplierId = supplierId?.Value;
+
+            return View($"Marketplace.{marketPlaceType}", model);
+        }
+        private IActionResult N11MarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        {
+            var id = integrationSystemMarketplace.Id;
+            var name = integrationSystemMarketplace.Name;
+            var description = integrationSystemMarketplace.Description;
+            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+
+            N11MarketplaceSettingsViewModel model = new N11MarketplaceSettingsViewModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemMarketplace.Id;
+            model.MarketplaceType = marketPlaceType;
+            model.ApiUser = apiUser?.Value;
+            model.ApiPassword = apiPassword?.Value;
+            return View($"Marketplace.{marketPlaceType}", model);
+        }
+        private IActionResult PazaramaMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        {
+            var id = integrationSystemMarketplace.Id;
+            var name = integrationSystemMarketplace.Name;
+            var description = integrationSystemMarketplace.Description;
+            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+
+            PazaramaMarketplaceSettingsViewModel model = new PazaramaMarketplaceSettingsViewModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemMarketplace.Id;
+            model.MarketplaceType = marketPlaceType;
+            model.ApiUser = apiUser?.Value;
+            model.ApiPassword = apiPassword?.Value;
+            model.SupplierId = supplierId?.Value;
+
+            return View($"Marketplace.{marketPlaceType}", model);
+        }
+        private IActionResult IdefixMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        {
+            var id = integrationSystemMarketplace.Id;
+            var name = integrationSystemMarketplace.Name;
+            var description = integrationSystemMarketplace.Description;
+            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+
+            IdefixMarketplaceSettingsViewModel model = new IdefixMarketplaceSettingsViewModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemMarketplace.Id;
+            model.MarketplaceType = marketPlaceType;
+            model.ApiUser = apiUser?.Value;
+            model.SupplierId = supplierId?.Value;
+
+            return View($"Marketplace.{marketPlaceType}", model);
+        }
+        private IActionResult CicekSepetiMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        {
+            var id = integrationSystemMarketplace.Id;
+            var name = integrationSystemMarketplace.Name;
+            var description = integrationSystemMarketplace.Description;
+            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+
+            CicekSepetiMarketplaceSettingsViewModel model = new CicekSepetiMarketplaceSettingsViewModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemMarketplace.Id;
+            model.MarketplaceType = marketPlaceType;
+            model.ApiUser = apiUser?.Value;
+            model.SupplierId = supplierId?.Value;
+
+            return View($"Marketplace.{marketPlaceType}", model);
+        }
+        private IActionResult HepsiBuradaMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        {
+            var id = integrationSystemMarketplace.Id;
+            var name = integrationSystemMarketplace.Name;
+            var description = integrationSystemMarketplace.Description;
+            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+
+            HepsiBuradaMarketplaceSettingsViewModel model = new HepsiBuradaMarketplaceSettingsViewModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemMarketplace.Id;
+            model.MarketplaceType = marketPlaceType;
+            model.ApiUser = apiUser?.Value;
+            model.ApiPassword = apiPassword?.Value;
+            model.SupplierId = supplierId?.Value;
+
+            return View($"Marketplace.{marketPlaceType}", model);
         }
 
         [HttpPost]
@@ -1109,6 +1226,319 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("marketplace");
         }
+        [HttpPost]
+        public async Task<IActionResult> MarketplaceParameterN11(N11MarketplaceSettingsViewModel model)
+        {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            return RedirectToAction("marketplace");
+        }
+        [HttpPost]
+        public async Task<IActionResult> MarketplaceParameterPazarama(PazaramaMarketplaceSettingsViewModel model)
+        {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
+            if (supplierId == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "SupplierId";
+                createIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "SupplierId";
+                updateIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            return RedirectToAction("marketplace");
+        }
+        [HttpPost]
+        public async Task<IActionResult> MarketplaceParameterIdefix(IdefixMarketplaceSettingsViewModel model)
+        {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
+            if (supplierId == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "SupplierId";
+                createIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "SupplierId";
+                updateIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            return RedirectToAction("marketplace");
+        }
+        [HttpPost]
+        public async Task<IActionResult> MarketplaceParameterCicekSepeti(CicekSepetiMarketplaceSettingsViewModel model)
+        {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
+            if (supplierId == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "SupplierId";
+                createIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "SupplierId";
+                updateIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            return RedirectToAction("marketplace");
+        }
+        [HttpPost]
+        public async Task<IActionResult> MarketplaceParameterHepsiBurada(HepsiBuradaMarketplaceSettingsViewModel model)
+        {
+            //mağaza bilgileri güncelle
+            await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
+            {
+                Id = model.Id,
+                Description = model.Description,
+                IntegrationSystemTypeId = model.IntegrationSystemTypeId,
+                Name = model.Name
+            });
+
+            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
+            if (apiUser == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiUser";
+                createIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiUser";
+                updateIntegrationSystemParameter.Value = model.ApiUser;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
+            if (apiPassword == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "ApiPassword";
+                createIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "ApiPassword";
+                updateIntegrationSystemParameter.Value = model.ApiPassword;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
+            if (supplierId == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "SupplierId";
+                createIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "SupplierId";
+                updateIntegrationSystemParameter.Value = model.SupplierId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            return RedirectToAction("marketplace");
+        }
 
         [HttpPost]
         public async Task<IActionResult> MarketplaceDelete([FromBody] int integrationSystemId)
@@ -1120,6 +1550,9 @@ namespace Entegro.Web.Controllers
             }
             return Json(new { success = false, message = "Silinecek Pazaryeri Bulunamadı" });
         }
+
+
+
         #endregion
 
         #region E-Fatura Entegrasyonları
