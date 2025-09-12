@@ -123,17 +123,29 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+    var jobKeyCommerce = new JobKey("CommerceJobs");
 
-    q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
+    q.AddJob<CommerceJobs>(opts => opts.WithIdentity(jobKeyCommerce));
 
     q.AddTrigger(opts => opts
-        .ForJob(jobKeySmartstore)
-        .WithIdentity("SmartstoreDataSyncJob-trigger")
+        .ForJob(jobKeyCommerce)
+        .WithIdentity("CommerceJobs-trigger")
         .WithSimpleSchedule(x => x
             .WithIntervalInMinutes(1)
             .RepeatForever())
         );
+
+    //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
+
+    //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
+
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeySmartstore)
+    //    .WithIdentity("SmartstoreDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(1)
+    //        .RepeatForever())
+    //    );
 
     //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
 
@@ -147,17 +159,17 @@ builder.Services.AddQuartz(q =>
     //        .RepeatForever())
     //);
 
-    var jobKeyErp = new JobKey("ErpDataSyncJob");
+    //var jobKeyErp = new JobKey("ErpDataSyncJob");
 
-    q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+    //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeyErp)
-        .WithIdentity("ErpDataSyncJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-        );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyErp)
+    //    .WithIdentity("ErpDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //    );
 });
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 #endregion

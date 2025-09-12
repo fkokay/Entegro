@@ -8,20 +8,37 @@ using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Domain.Enums;
+using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Entegro.Application.Services.Marketplace
 {
     public class N11Service : IN11Service, IEventHandler<ProductIntegrationRecordUpdatedEvent>
     {
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProductIntegrationService _productIntegrationService;
-        public N11Service(IProductIntegrationService productIntegrationService)
+        public N11Service(IHttpClientFactory httpClientFactory,IProductIntegrationService productIntegrationService)
         {
+            _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
+        }
+
+        private HttpClient CreateHttpClient(N11ApiContext context)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(context.BaseUrl);
+
+            client.DefaultRequestHeaders.Add("appKey", context.AppKey);
+            client.DefaultRequestHeaders.Add("appSecret", context.AppSecret);
+
+            return client;
         }
 
         public async Task HandleAsync(ProductIntegrationRecordUpdatedEvent recordUpdatedEvent)
@@ -38,7 +55,11 @@ namespace Entegro.Application.Services.Marketplace
 
                 if (marketplaceType == "N11")
                 {
-
+                    var apiContext = new N11ApiContext
+                    {
+                        AppSecret = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "AppSecret").Value,
+                        AppKey = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "AppKey").Value
+                    };
                 }
             }
         }
@@ -59,24 +80,83 @@ namespace Entegro.Application.Services.Marketplace
             throw new NotImplementedException();
         }
 
-        public Task UpdatePriceAndStockAsync(N11ApiContext context,N11PriceAndStockUpdatePayload payload)
+        public async Task UpdatePriceAndStockAsync(N11ApiContext context,N11PriceAndStockUpdatePayload payload)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context);
+            var url = $"product/tasks/price-stock-update";
+            var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url, content);
+
+            var result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task<N11ProductDto?> GetProductWithN11CodeAsync(N11ApiContext context,string n11Code)
+        public async Task<N11ProductDto?> GetProductWithN11CodeAsync(N11ApiContext context,string n11Code)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context);
+            var url = $"product-query?id={n11Code}";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<N11Response<N11ProductDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.Content.FirstOrDefault();
         }
 
-        public Task<N11ProductDto?> GetProductWithStockCodeAsync(N11ApiContext context,string stockCode)
+        public async Task<N11ProductDto?> GetProductWithStockCodeAsync(N11ApiContext context,string stockCode)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context);
+            var url = $"product-query?stockCode={stockCode}";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<N11Response<N11ProductDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.Content.FirstOrDefault();
         }
 
-        public Task<IEnumerable<N11ProductDto>> GetProductsAsync(N11ApiContext context,int pageSize = 50)
+        public async Task<IEnumerable<N11ProductDto>> GetProductsAsync(N11ApiContext context,int pageSize = 50)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context);
+            var url = $"product-query";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<N11Response<N11ProductDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.Content.ToList();
         }
 
         public Task<IEnumerable<N11ShipmentPackageDto>> GetShipmentPackagesAsync(N11ApiContext context,int pageSize = 50)

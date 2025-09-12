@@ -1000,6 +1000,7 @@ namespace Entegro.Web.Controllers
 
 
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationTrendyol(TrendyolProductIntegrationViewModel model)
         {
@@ -1081,6 +1082,7 @@ namespace Entegro.Web.Controllers
 
 
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationCicekSepeti(CicekSepetiProductIntegrationViewModel model)
         {
@@ -1161,6 +1163,7 @@ namespace Entegro.Web.Controllers
 
 
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationIdefix(IdefixProductIntegrationViewModel model)
         {
@@ -1241,6 +1244,7 @@ namespace Entegro.Web.Controllers
 
 
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationN11(N11ProductIntegrationViewModel model)
         {
@@ -1321,6 +1325,7 @@ namespace Entegro.Web.Controllers
 
 
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationPazarama(PazaramaProductIntegrationViewModel model)
         {
@@ -1401,6 +1406,7 @@ namespace Entegro.Web.Controllers
 
 
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationHepsiBurada(HepsiBuradaProductIntegrationViewModel model)
         {
