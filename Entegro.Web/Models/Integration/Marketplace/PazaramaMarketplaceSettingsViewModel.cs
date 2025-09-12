@@ -8,10 +8,9 @@
         public int IntegrationSystemTypeId { get; set; }
         public int IntegrationSystemId { get; set; }
         public string MarketplaceType { get; set; }
-        public string ApiUser { get; set; }
-        public string ApiPassword { get; set; }
-        public string SupplierId { get; set; }
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
     }
-    
+
 
 }

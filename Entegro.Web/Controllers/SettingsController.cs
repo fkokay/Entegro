@@ -1084,9 +1084,8 @@ namespace Entegro.Web.Controllers
             var id = integrationSystemMarketplace.Id;
             var name = integrationSystemMarketplace.Name;
             var description = integrationSystemMarketplace.Description;
-            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
-            var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
-            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var clientId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ClientId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var clientSecret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
             PazaramaMarketplaceSettingsViewModel model = new PazaramaMarketplaceSettingsViewModel();
             model.Id = id;
@@ -1095,9 +1094,8 @@ namespace Entegro.Web.Controllers
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
-            model.ApiUser = apiUser?.Value;
-            model.ApiPassword = apiPassword?.Value;
-            model.SupplierId = supplierId?.Value;
+            model.ClientId = clientId?.Value;
+            model.ClientSecret = clientSecret?.Value;
 
             return View($"Marketplace.{marketPlaceType}", model);
         }
@@ -1310,64 +1308,44 @@ namespace Entegro.Web.Controllers
                 Name = model.Name
             });
 
-            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
-            if (apiUser == null)
+            var clientId = await _integrationSystemParameterService.GetByKeyAsync("ClientId", model.IntegrationSystemId);
+            if (clientId == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "ApiUser";
-                createIntegrationSystemParameter.Value = model.ApiUser;
+                createIntegrationSystemParameter.Key = "ClientId";
+                createIntegrationSystemParameter.Value = model.ClientId;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.Id = clientId.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "ApiUser";
-                updateIntegrationSystemParameter.Value = model.ApiUser;
+                updateIntegrationSystemParameter.Key = "ClientId";
+                updateIntegrationSystemParameter.Value = model.ClientId;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
-            if (apiPassword == null)
+            var clientSecret = await _integrationSystemParameterService.GetByKeyAsync("ClientSecret", model.IntegrationSystemId);
+            if (clientSecret == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "ApiPassword";
-                createIntegrationSystemParameter.Value = model.ApiPassword;
+                createIntegrationSystemParameter.Key = "ClientSecret";
+                createIntegrationSystemParameter.Value = model.ClientSecret;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.Id = clientSecret.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "ApiPassword";
-                updateIntegrationSystemParameter.Value = model.ApiPassword;
-
-                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
-            }
-            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
-            if (supplierId == null)
-            {
-                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
-                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "SupplierId";
-                createIntegrationSystemParameter.Value = model.SupplierId;
-
-                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
-            }
-            else
-            {
-                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = supplierId.Id;
-                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "SupplierId";
-                updateIntegrationSystemParameter.Value = model.SupplierId;
+                updateIntegrationSystemParameter.Key = "ClientSecret";
+                updateIntegrationSystemParameter.Value = model.ClientSecret;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
