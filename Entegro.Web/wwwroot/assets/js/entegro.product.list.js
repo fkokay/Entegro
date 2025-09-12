@@ -3,13 +3,13 @@ Entegro.product = Entegro.product || {};
 Entegro.product.list = (function ($) {
     function getIntegrationLogo(value) {
         switch (value) {
-            case "Smartstore": return "https://smartstore.com/Themes/HP/images/smartstore-icon.svg";
-            case "Trendyol": return "/assets/img/icons/brands/trendyol.png";
-            case "N11": return "https://n11scdn.akamaized.net/a1/org/25/03/18/89/65/01/31/94/13/25/13/93/66889250221518075393.svg";
-            case "Pazarama": return "https://pazarama.zendesk.com/hc/theming_assets/01HZM66YT318FSGD6MQKD8N1W2";
-            case "Idefix": return "https://images.idefix.com/mpstatics/banner/test-67bdca5fb68de.svg";
-            case "CicekSepeti": return "https://cdn03.ciceksepeti.com/Themes/Ciceksepeti/Assets/images/ciceksepeti-logo-146.png";
-            case "HepsiBurada": return "https://images.seeklogo.com/logo-png/44/1/hepsiburada-logo-png_seeklogo-442312.png";
+            case "Smartstore": return "/assets/img/brandicons/smartstore.png";
+            case "Trendyol": return "/assets/img/brandicons/trendyol.png";
+            case "N11": return "/assets/img/brandicons/n11.png";
+            case "Pazarama": return "/assets/img/brandicons/pazarama.png";
+            case "Idefix": return "/assets/img/brandicons/idefix.png";
+            case "CicekSepeti": return "/assets/img/brandicons/ciceksepeti.png";
+            case "HepsiBurada": return "/assets/img/brandicons/hepsiburada.png";
             default: return "/assets/img/icons/brands/default.png";
         }
     }
