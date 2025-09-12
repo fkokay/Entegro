@@ -1709,15 +1709,13 @@ namespace Entegro.Web.Controllers
                 {
                     ClientId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientId")?.Value ?? "",
                     ClientSecret = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientSecret")?.Value ?? "",
-
                 };
 
 
-                var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, existingProductIntegration.IntegrationCode);
-
+                var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, model.IntegrationCode);
                 if (existingPazaramaProduct == null)
                 {
-                    return Json(new { success = false, message = $"Trendyol üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
+                    return Json(new { success = false, message = $"Pazarama üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
                 }
 
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
