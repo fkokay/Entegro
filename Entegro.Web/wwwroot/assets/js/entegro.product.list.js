@@ -4,8 +4,8 @@ Entegro.product.list = (function ($) {
     function getIntegrationLogo(value) {
         switch (value) {
             case "Smartstore": return "/assets/img/brandicons/smartstore.png";
-            case "Trendyol": return "/assets/img/brandicons/trendyol.png";
-            case "N11": return "/assets/img/brandicons/n11.png";
+            case "Trendyol": return "/assets/img/brandicons/trendyol.webp";
+            case "N11": return "/assets/img/brandicons/n11.jpeg";
             case "Pazarama": return "/assets/img/brandicons/pazarama.png";
             case "Idefix": return "/assets/img/brandicons/idefix.png";
             case "CicekSepeti": return "/assets/img/brandicons/ciceksepeti.png";
