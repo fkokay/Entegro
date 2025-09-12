@@ -1146,7 +1146,8 @@ namespace Entegro.Web.Controllers
             var description = integrationSystemMarketplace.Description;
             var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
-            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var merchantId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "MerchantId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var userAgent = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "UserAgent" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
             HepsiBuradaMarketplaceSettingsViewModel model = new HepsiBuradaMarketplaceSettingsViewModel();
             model.Id = id;
@@ -1157,7 +1158,8 @@ namespace Entegro.Web.Controllers
             model.MarketplaceType = marketPlaceType;
             model.ApiUser = apiUser?.Value;
             model.ApiPassword = apiPassword?.Value;
-            model.SupplierId = supplierId?.Value;
+            model.MerchantId = merchantId?.Value;
+            model.UserAgent = userAgent?.Value;
 
             return View($"Marketplace.{marketPlaceType}", model);
         }
@@ -1511,23 +1513,43 @@ namespace Entegro.Web.Controllers
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
-            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
-            if (supplierId == null)
+            var merchantId = await _integrationSystemParameterService.GetByKeyAsync("MerchantId", model.IntegrationSystemId);
+            if (merchantId == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "SupplierId";
-                createIntegrationSystemParameter.Value = model.SupplierId;
+                createIntegrationSystemParameter.Key = "MerchantId";
+                createIntegrationSystemParameter.Value = model.MerchantId;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.Id = merchantId.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "SupplierId";
-                updateIntegrationSystemParameter.Value = model.SupplierId;
+                updateIntegrationSystemParameter.Key = "MerchantId";
+                updateIntegrationSystemParameter.Value = model.MerchantId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+            var userAgent = await _integrationSystemParameterService.GetByKeyAsync("UserAgent", model.IntegrationSystemId);
+            if (userAgent == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "UserAgent";
+                createIntegrationSystemParameter.Value = model.UserAgent;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = userAgent.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "UserAgent";
+                updateIntegrationSystemParameter.Value = model.MerchantId;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }

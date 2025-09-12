@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
@@ -45,6 +46,7 @@ namespace Entegro.Web.Controllers
         private readonly ITrendyolService _trenyolService;
         private readonly IN11Service _n11Service;
         private readonly IPazaramaService _pazaramaService;
+        private readonly IHepsiburadaService _hepsiburadaService;
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
         public ProductController(
             IProductService productService,
@@ -61,7 +63,8 @@ namespace Entegro.Web.Controllers
             IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IN11Service n11Service,
-            IPazaramaService pazaramaService)
+            IPazaramaService pazaramaService,
+            IHepsiburadaService hepsiburadaService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -78,6 +81,7 @@ namespace Entegro.Web.Controllers
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
             _n11Service = n11Service;
             _pazaramaService = pazaramaService;
+            _hepsiburadaService = hepsiburadaService;
         }
 
         #region Product list / create / edit / delete
@@ -651,10 +655,17 @@ namespace Entegro.Web.Controllers
             }
             else
             {
+                HepsiburadaApiContext context = new HepsiburadaApiContext
+                {
+                    ApiUser = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiUser")?.Value ?? "",
+                    ApiPassword = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiPassword")?.Value ?? "",
+                    MerchantId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "MerchantId")?.Value ?? "",
+                    UserAgent = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "UserAgent")?.Value ?? "",
+                };
 
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                var existingHepsiBuradaProduct = "";
+                var existingHepsiBuradaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, existingProductIntegration.IntegrationCode);
 
                 var createModel = new HepsiBuradaProductIntegrationViewModel
                 {
@@ -669,7 +680,7 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
-                    MarketplaceLink = "existingTrendyolProduct?.productUrl ?? #,",
+                    MarketplaceLink = "#",
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
                 };
 
@@ -1786,18 +1797,19 @@ namespace Entegro.Web.Controllers
 
                 }
 
-                //TrendyolApiContext context = new TrendyolApiContext
-                //{
-                //    SupplierId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault() ?? "",
-                //    ApiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "",
-                //    ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "",
-                //};
 
-                //var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, model.IntegrationCode);
-                //if (existingTrendyolProduct == null)
-                //{
-                //    return Json(new { success = false, message = $"Trendyol üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
-                //}
+
+                HepsiburadaApiContext context = new HepsiburadaApiContext
+                {
+                    ApiUser = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiUser")?.Value ?? "",
+                    ApiPassword = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiPassword")?.Value ?? "",
+                    MerchantId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "MerchantId")?.Value ?? "",
+                    UserAgent = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "UserAgent")?.Value ?? "",
+                };
+
+
+                var existingHepsiburadaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, model.IntegrationCode);
+
 
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
                 if (productIntegration == null || model.Id == 0)

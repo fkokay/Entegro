@@ -10,6 +10,7 @@
         public string MarketplaceType { get; set; }
         public string ApiUser { get; set; }
         public string ApiPassword { get; set; }
-        public string SupplierId { get; set; }
+        public string MerchantId { get; set; }
+        public string UserAgent { get; set; }
     }
 }
