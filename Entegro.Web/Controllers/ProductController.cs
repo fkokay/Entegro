@@ -1358,7 +1358,6 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationTrendyol(TrendyolProductIntegrationViewModel model)
         {
-
             try
             {
                 var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
