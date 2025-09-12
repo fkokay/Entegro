@@ -597,7 +597,7 @@ namespace Entegro.Web.Controllers
                     "N11" => await ProductIntegrationN11Dialog(model, product, integrationSystem),
                     "CicekSepeti" => await ProductIntegrationCicekSepetiDialog(model, product, integrationSystem),
                     "Pazarama" => await ProductIntegrationPazaramaDialog(model, product, integrationSystem),
-                    "HepsiBurada" => await ProductIntegrationHepsiBuradaDialog(model, product, integrationSystem),
+                    "Hepsiburada" => await ProductIntegrationHepsiBuradaDialog(model, product, integrationSystem),
                     _ => NotFound()
                 };
             }
