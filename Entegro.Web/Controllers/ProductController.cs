@@ -1705,18 +1705,20 @@ namespace Entegro.Web.Controllers
 
                 }
 
-                //TrendyolApiContext context = new TrendyolApiContext
-                //{
-                //    SupplierId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault() ?? "",
-                //    ApiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "",
-                //    ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "",
-                //};
+                PazaramaApiContext context = new PazaramaApiContext
+                {
+                    ClientId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientId")?.Value ?? "",
+                    ClientSecret = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientSecret")?.Value ?? "",
 
-                //var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, model.IntegrationCode);
-                //if (existingTrendyolProduct == null)
-                //{
-                //    return Json(new { success = false, message = $"Trendyol üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
-                //}
+                };
+
+
+                var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, existingProductIntegration.IntegrationCode);
+
+                if (existingPazaramaProduct == null)
+                {
+                    return Json(new { success = false, message = $"Trendyol üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
+                }
 
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
                 if (productIntegration == null || model.Id == 0)
