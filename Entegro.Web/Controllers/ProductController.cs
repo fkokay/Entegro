@@ -568,9 +568,15 @@ namespace Entegro.Web.Controllers
 
             if (integrationSystem.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce)
             {
-                await ProductIntegrationCommerceSettings(integrationSystem, model, product);
-            }
+                var commerceType = integrationSystem.IntegrationSystemParameters
+                    .FirstOrDefault(m => m.Key == "CommerceType")?.Value;
 
+                return commerceType switch
+                {
+                    "Smartstore" => await ProductIntegrationSmartstoreDialog(model, product, integrationSystem),
+                    _ => NotFound()
+                };
+            }
             if (integrationSystem.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Marketplace)
             {
                 var marketplaceType = integrationSystem.IntegrationSystemParameters
@@ -591,6 +597,7 @@ namespace Entegro.Web.Controllers
             return NotFound();
         }
 
+        #region Marketplace Dialogs
         private async Task<IActionResult> ProductIntegrationHepsiBuradaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "HepsiBurada";
@@ -1219,15 +1226,16 @@ namespace Entegro.Web.Controllers
             }
         }
 
+        #endregion
 
 
-        public async Task<IActionResult> ProductIntegrationCommerceSettings(IntegrationSystemDto integrationSystem, ProductIntegrationDialogViewModel model, ProductDto product)
+        #region Commerce Dialogs
+        private async Task<IActionResult> ProductIntegrationSmartstoreDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto? integrationSystem)
         {
-            var commerceType = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
-
+            var commerceType = "Smartstore";
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new SmartstoreProductIntegrationViewModel()
+                var createModel = new SmartstoreProductIntegrationViewModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -1236,7 +1244,7 @@ namespace Entegro.Web.Controllers
                     ProductName = product.Name,
                     ProductCode = product.Code,
                     CommerceType = commerceType,
-                    ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
                     Price = product.Price,
                     IntegrationCode = product.Code,
                     Active = true,
@@ -1247,6 +1255,7 @@ namespace Entegro.Web.Controllers
             else
             {
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+
                 var createModel = new SmartstoreProductIntegrationViewModel
                 {
                     Id = existingProductIntegration.Id,
@@ -1259,17 +1268,21 @@ namespace Entegro.Web.Controllers
                     ProductName = product.Name,
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
-                    ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url
                 };
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomViewModel>(existingProductIntegration.Custom) ?? new SmartstoreProductIntegrationCustomViewModel();
+                    createModel.Custom = JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomViewModel>(existingProductIntegration.Custom)
+                        ?? new SmartstoreProductIntegrationCustomViewModel();
                 }
 
                 return PartialView($"_IntegrationDialog.Commerce.{commerceType}", createModel);
             }
         }
+
+        #endregion
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationSmartstore(SmartstoreProductIntegrationViewModel model)
         {
