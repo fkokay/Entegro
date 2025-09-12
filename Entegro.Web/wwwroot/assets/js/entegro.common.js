@@ -51,4 +51,46 @@
             notify(message);
         }
     };
+
+    window.connectionTest = function () {
+        const integrationSystemId = $('#IntegrationSystemId').val();
+        const marketplaceType = $('#MarketplaceType').val();
+
+       
+        const data = {
+            IntegrationSystemId: integrationSystemId,
+            MarketplaceType: marketplaceType.trim()
+        };
+
+        $.ajax({
+            url: '/settings/MarketplaceTest',
+            type: 'POST',
+            data: data,
+            success: function (res) {
+                if (res && res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Bağlantı Başarılı',
+                        text: 'Pazaryeri bağlantısı başarıyla sağlandı.',
+                        confirmButtonText: 'Tamam'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Bağlantı Başarısız',
+                        text: res?.message || 'Bağlantı sırasında bir hata oluştu.'
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Hatası:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sunucu Hatası',
+                    text: 'Sunucuya bağlanırken bir hata oluştu.'
+                });
+            }
+        });
+    };
+
 })(jQuery, this, document);
