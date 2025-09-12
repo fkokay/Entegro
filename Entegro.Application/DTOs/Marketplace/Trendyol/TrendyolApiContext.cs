@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entegro.Application.DTOs.Marketplace.Trendyol
+﻿namespace Entegro.Application.DTOs.Marketplace.Trendyol
 {
     public class TrendyolApiContext
     {
@@ -13,4 +7,5 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
         public string ApiUser { get; set; } = default!;
         public string ApiPassword { get; set; } = default!;
     }
+
 }

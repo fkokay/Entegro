@@ -1049,8 +1049,8 @@ namespace Entegro.Web.Controllers
             var id = integrationSystemMarketplace.Id;
             var name = integrationSystemMarketplace.Name;
             var description = integrationSystemMarketplace.Description;
-            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
-            var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var appSecret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "AppSecret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var appKey = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "AppKey" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
             N11MarketplaceSettingsViewModel model = new N11MarketplaceSettingsViewModel();
             model.Id = id;
@@ -1059,8 +1059,8 @@ namespace Entegro.Web.Controllers
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
-            model.ApiUser = apiUser?.Value;
-            model.ApiPassword = apiPassword?.Value;
+            model.AppSecret = appSecret?.Value;
+            model.AppKey = appKey?.Value;
             return View($"Marketplace.{marketPlaceType}", model);
         }
         private IActionResult PazaramaMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
@@ -1238,44 +1238,44 @@ namespace Entegro.Web.Controllers
                 Name = model.Name
             });
 
-            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
-            if (apiUser == null)
+            var appSecret = await _integrationSystemParameterService.GetByKeyAsync("AppSecret", model.IntegrationSystemId);
+            if (appSecret == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "ApiUser";
-                createIntegrationSystemParameter.Value = model.ApiUser;
+                createIntegrationSystemParameter.Key = "AppSecret";
+                createIntegrationSystemParameter.Value = model.AppSecret;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.Id = appSecret.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "ApiUser";
-                updateIntegrationSystemParameter.Value = model.ApiUser;
+                updateIntegrationSystemParameter.Key = "AppSecret";
+                updateIntegrationSystemParameter.Value = model.AppSecret;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
 
-            var apiPassword = await _integrationSystemParameterService.GetByKeyAsync("ApiPassword", model.IntegrationSystemId);
-            if (apiPassword == null)
+            var appKey = await _integrationSystemParameterService.GetByKeyAsync("AppKey", model.IntegrationSystemId);
+            if (appKey == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "ApiPassword";
-                createIntegrationSystemParameter.Value = model.ApiPassword;
+                createIntegrationSystemParameter.Key = "AppKey";
+                createIntegrationSystemParameter.Value = model.AppKey;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = apiPassword.Id;
+                updateIntegrationSystemParameter.Id = appKey.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "ApiPassword";
-                updateIntegrationSystemParameter.Value = model.ApiPassword;
+                updateIntegrationSystemParameter.Key = "AppKey";
+                updateIntegrationSystemParameter.Value = model.AppKey;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
