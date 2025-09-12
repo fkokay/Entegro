@@ -110,7 +110,7 @@ namespace Entegro.Application.Services.Marketplace
                             new HepsiburadaStockUpdateDto()
                             {
                                 HepsiburadaSku = product.Code,
-                                AvailableStock = stockQuantity
+                                AvailableStock = stockQuantity,
                             }
                         };
 
