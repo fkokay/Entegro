@@ -19,6 +19,9 @@ namespace Entegro.Infrastructure.Extensions
 
             services.AddScoped<IN11Service, N11Service>();
             services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, N11Service>();
+
+            services.AddScoped<IPazaramaService, PazaramaService>();
+            services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, PazaramaService>();
             return services;
         }
     }

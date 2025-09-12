@@ -964,7 +964,7 @@ namespace Entegro.Web.Controllers
                 };
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                var existingN11Product = await _n11Service.GetProductWithN11CodeAsync(context, existingProductIntegration.IntegrationCode);
+                //var existingN11Product = await _n11Service.GetProductWithN11CodeAsync(context, existingProductIntegration.IntegrationCode);
 
 
                 var createModel = new N11ProductIntegrationViewModel

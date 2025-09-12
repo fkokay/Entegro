@@ -92,7 +92,7 @@ namespace Entegro.Application.Services.Marketplace
                     {
                         Payload = new N11PriceAndStockUpdateRequest()
                         {
-                            Integrator = "",
+                            Integrator = "ÖZGÜR TEKNOLOJİ",
                              Skus = new List<N11PriceAndStockUpdateDto>()
                              {
                                  new N11PriceAndStockUpdateDto()

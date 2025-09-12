@@ -22,6 +22,6 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
     public class TrendyolPriceAndStockUpdateRequest
     {
         [JsonPropertyName("items")]
-        public List<TrendyolPriceAndStockUpdateDto> Items { get; set; }
+        public List<TrendyolPriceAndStockUpdateDto> Items { get; set; } = new List<TrendyolPriceAndStockUpdateDto>();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Marketplace.N11;
+using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Quartz;
@@ -9,19 +10,21 @@ namespace Entegro.Api.Jobs
     {
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IN11Service _n11Service;
-        public CommerceJobs(IN11Service n11Service,IProductIntegrationService productIntegrationService)
+        private readonly IPazaramaService _pazaramaService;
+        public CommerceJobs(IN11Service n11Service,IPazaramaService pazaramaService,IProductIntegrationService productIntegrationService)
         {
             _productIntegrationService = productIntegrationService;
             _n11Service = n11Service;   
+            _pazaramaService = pazaramaService;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            N11ApiContext n11ApiContext = new N11ApiContext();
-            n11ApiContext.AppKey = "2bdb87dd-4b7b-4942-8119-43769b4f4dee";
-            n11ApiContext.AppSecret = "NuKAxv0lroMfnSgP";
+            PazaramaApiContext pazaramaApiContext = new PazaramaApiContext();
+            pazaramaApiContext.ClientId = "f1b613316b0948d29ec81c8e64b1e595";
+            pazaramaApiContext.ClientSecret = "d47b5a87351341d9a4abad85b98f7077";
 
-           var products = await _n11Service.GetProductsAsync(n11ApiContext);
+           var products = await _pazaramaService.GetProductsAsync(pazaramaApiContext);
         }
     }
 }
