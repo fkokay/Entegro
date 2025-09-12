@@ -969,6 +969,28 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
+        public IActionResult MarketplaceTest(int? IntegrationSystemId, string? MarketplaceType)
+        {
+            if (!IntegrationSystemId.HasValue || string.IsNullOrWhiteSpace(MarketplaceType))
+            {
+                return Json(new { success = false, message = "Eksik veya geçersiz parametre." });
+            }
+
+            // Örnek bağlantı testi simülasyonu
+            var result = true;
+
+            if (result)
+            {
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Bağlantı başarısız." });
+            }
+        }
+
+
+        [HttpPost]
         public async Task<IActionResult> Marketplace(MarketplaceIntegrationSystemViewModel model)
         {
             var createIntegrationSystem = new CreateIntegrationSystemDto();

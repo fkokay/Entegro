@@ -72,10 +72,12 @@ Entegro.marketplace = (function ($) {
         });
     }
 
+
+
     return {
         SelectMarketplace,
         initFormSubmit,
-        iptalEt
+        iptalEt,
     };
 
 })(jQuery);
