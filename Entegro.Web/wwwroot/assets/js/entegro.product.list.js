@@ -9,7 +9,7 @@ Entegro.product.list = (function ($) {
             case "Pazarama": return "/assets/img/brandicons/pazarama.png";
             case "Idefix": return "/assets/img/brandicons/idefix.png";
             case "CicekSepeti": return "/assets/img/brandicons/ciceksepeti.png";
-            case "HepsiBurada": return "/assets/img/brandicons/hepsiburada.png";
+            case "Hepsiburada": return "/assets/img/brandicons/hepsiburada.png";
             default: return "/assets/img/icons/brands/default.png";
         }
     }

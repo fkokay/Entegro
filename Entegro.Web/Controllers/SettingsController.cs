@@ -1032,8 +1032,8 @@ namespace Entegro.Web.Controllers
                     return IdefixMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
                 case "CicekSepeti":
                     return CicekSepetiMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
-                case "HepsiBurada":
-                    return HepsiBuradaMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
+                case "Hepsiburada":
+                    return HepsiburadaMarketplaceSettings(integrationSystemMarketplace, marketPlaceType.Value);
             }
             return NotFound();
         }
@@ -1139,7 +1139,7 @@ namespace Entegro.Web.Controllers
 
             return View($"Marketplace.{marketPlaceType}", model);
         }
-        private IActionResult HepsiBuradaMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
+        private IActionResult HepsiburadaMarketplaceSettings(IntegrationSystemDto integrationSystemMarketplace, string marketPlaceType)
         {
             var id = integrationSystemMarketplace.Id;
             var name = integrationSystemMarketplace.Name;
@@ -1149,7 +1149,7 @@ namespace Entegro.Web.Controllers
             var merchantId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "MerchantId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var userAgent = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "UserAgent" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            HepsiBuradaMarketplaceSettingsViewModel model = new HepsiBuradaMarketplaceSettingsViewModel();
+            HepsiburadaMarketplaceSettingsViewModel model = new HepsiburadaMarketplaceSettingsViewModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1462,7 +1462,7 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("marketplace");
         }
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterHepsiBurada(HepsiBuradaMarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterHepsiburada(HepsiburadaMarketplaceSettingsViewModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto

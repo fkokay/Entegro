@@ -1,9 +1,9 @@
-﻿@model HepsiBuradaMarketplaceSettingsViewModel
+﻿@model HepsiburadaMarketplaceSettingsViewModel
 @{
-    ViewData["Title"] = "HepsiBurada Pazaryeri Entegrasyonu Ayarları";
+    ViewData["Title"] = "Hepsiburada Pazaryeri Entegrasyonu Ayarları";
 }
 
-<form asp-action="MarketplaceParameterHepsiBurada" id="marketplace-setting-hepsiburada-form">
+<form asp-action="MarketplaceParameterHepsiburada" id="marketplace-setting-hepsiburada-form">
     @Html.HiddenFor(m => m.IntegrationSystemId)
     @Html.HiddenFor(m => m.MarketplaceType)
     @Html.HiddenFor(m => m.IntegrationSystemTypeId)

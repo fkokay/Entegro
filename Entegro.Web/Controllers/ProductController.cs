@@ -597,7 +597,7 @@ namespace Entegro.Web.Controllers
                     "N11" => await ProductIntegrationN11Dialog(model, product, integrationSystem),
                     "CicekSepeti" => await ProductIntegrationCicekSepetiDialog(model, product, integrationSystem),
                     "Pazarama" => await ProductIntegrationPazaramaDialog(model, product, integrationSystem),
-                    "Hepsiburada" => await ProductIntegrationHepsiBuradaDialog(model, product, integrationSystem),
+                    "Hepsiburada" => await ProductIntegrationHepsiburadaDialog(model, product, integrationSystem),
                     _ => NotFound()
                 };
             }
@@ -606,13 +606,13 @@ namespace Entegro.Web.Controllers
         }
 
         #region Marketplace Dialogs
-        private async Task<IActionResult> ProductIntegrationHepsiBuradaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationHepsiburadaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
-            var marketplaceType = "HepsiBurada";
+            var marketplaceType = "Hepsiburada";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new HepsiBuradaProductIntegrationViewModel
+                var createModel = new HepsiburadaProductIntegrationViewModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -665,9 +665,9 @@ namespace Entegro.Web.Controllers
 
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                var existingHepsiBuradaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, existingProductIntegration.IntegrationCode);
+                var existingHepsiburadaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, existingProductIntegration.IntegrationCode);
 
-                var createModel = new HepsiBuradaProductIntegrationViewModel
+                var createModel = new HepsiburadaProductIntegrationViewModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -686,7 +686,7 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<HepsiBuradaProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<HepsiburadaProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
                 }
 
                 var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
@@ -1772,7 +1772,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationHepsiBurada(HepsiBuradaProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationHepsiburada(HepsiburadaProductIntegrationViewModel model)
         {
             try
             {
@@ -1814,7 +1814,7 @@ namespace Entegro.Web.Controllers
                 var existingHepsiburadaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, model.IntegrationCode);
                 if (existingHepsiburadaProduct == null)
                 {
-                    return Json(new { success = false, message = $"HepsiBurada üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
+                    return Json(new { success = false, message = $"Hepsiburada üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
                 }
 
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);

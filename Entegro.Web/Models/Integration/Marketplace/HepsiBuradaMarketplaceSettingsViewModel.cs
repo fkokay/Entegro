@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class HepsiBuradaMarketplaceSettingsViewModel
+    public class HepsiburadaMarketplaceSettingsViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

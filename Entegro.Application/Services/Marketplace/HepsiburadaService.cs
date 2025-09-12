@@ -67,8 +67,8 @@ namespace Entegro.Application.Services.Marketplace
                     var apiContext = new HepsiburadaApiContext
                     {
                         MerchantId = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "MerchantId").Value,
-                        ApiUser = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "ClientId").Value,
-                        ApiPassword = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "ClientSecret").Value,
+                        ApiUser = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "ApiUser").Value,
+                        ApiPassword = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "ApiPassword").Value,
                         UserAgent = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "UserAgent").Value
                     };
 
