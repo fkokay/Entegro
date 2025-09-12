@@ -3,13 +3,13 @@
     ViewData["Title"] = "Pazaryeri Entegrasyonları";
     var logoUrls = new Dictionary<string, string>
     {
-        { "Smartstore", "https://smartstore.com/Themes/HP/images/smartstore-logo-black.svg" },
-        { "Trendyol", "https://cdn.dsmcdn.com/web/logo/ty-web.svg" },
-        { "N11", "https://n11scdn.akamaized.net/a1/org/25/03/18/89/65/01/31/94/13/25/13/93/66889250221518075393.svg" },
-        { "Pazarama", "https://pazarama.zendesk.com/hc/theming_assets/01HZM66YT318FSGD6MQKD8N1W2" },
-        { "Idefix", "https://images.idefix.com/mpstatics/banner/test-67bdca5fb68de.svg" },
-        { "CicekSepeti", "https://cdn03.ciceksepeti.com/Themes/Ciceksepeti/Assets/images/ciceksepeti-logo-146.png" },
-        { "HepsiBurada", "https://images.seeklogo.com/logo-png/44/1/hepsiburada-logo-png_seeklogo-442312.png" },
+        { "Smartstore", "/assets/img/logo/smartstore.png" },
+        { "Trendyol", "/assets/img/logo/trendyol.png" },
+        { "N11", "/assets/img/logo/n11.png" },
+        { "Pazarama", "/assets/img/logo/pazarama.png" },
+        { "Idefix", "/assets/img/logo/idefix.png" },
+        { "CicekSepeti", "/assets/img/logo/ciceksepeti.png" },
+        { "HepsiBurada", "/assets/img/logo/hepsiburada.png" },
     };
 }
 
@@ -20,7 +20,7 @@
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://cdn.dsmcdn.com/web/logo/ty-web.svg" alt="Card image">
+                        <img class="card-img card-img-left w-75" src="@logoUrls["Trendyol"]" alt="Card image">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -45,7 +45,7 @@
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://pazarama.zendesk.com/hc/theming_assets/01HZM66YT318FSGD6MQKD8N1W2" alt="Card image">
+                        <img class="card-img card-img-left w-75" src="@logoUrls["Pazarama"]" alt="Card image">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -70,7 +70,7 @@
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://n11scdn.akamaized.net/a1/org/25/03/18/89/65/01/31/94/13/25/13/93/66889250221518075393.svg" alt="Card image">
+                        <img class="card-img card-img-left w-75" src="@logoUrls["N11"]" alt="Card image">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -95,7 +95,7 @@
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://images.idefix.com/mpstatics/banner/test-67bdca5fb68de.svg" alt="Card image">
+                        <img class="card-img card-img-left w-75" src="@logoUrls["Idefix"]" alt="Card image">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -120,7 +120,7 @@
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://cdn03.ciceksepeti.com/Themes/Ciceksepeti/Assets/images/ciceksepeti-logo-146.png" alt="Card image">
+                        <img class="card-img card-img-left w-75" src="@logoUrls["CicekSepeti"]" alt="Card image">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -145,7 +145,7 @@
             <div class="card mb-3">
                 <div class="row g-0">
                     <div class="col-md-4 d-flex align-items-center justify-content-center">
-                        <img class="card-img card-img-left w-75" src="https://images.seeklogo.com/logo-png/32/2/hepsiburada-com-logo-png_seeklogo-326595.png" alt="Card image">
+                        <img class="card-img card-img-left w-75" src="@logoUrls["HepsiBurada"]" alt="Card image">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">

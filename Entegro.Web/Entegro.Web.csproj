@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="App_Data\Media\Storage\catalog\" />
+    <Folder Include="wwwroot\assets\img\brandicons\" />
   </ItemGroup>
 
 </Project>
