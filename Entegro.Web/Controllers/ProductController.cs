@@ -569,325 +569,648 @@ namespace Entegro.Web.Controllers
 
             if (integrationSystem.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Marketplace)
             {
-                var commerceType = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
-                var marketplaceType = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
+                var marketplaceType = integrationSystem.IntegrationSystemParameters
+            .FirstOrDefault(p => p.Key == "MarketplaceType")?.Value;
 
-                if (model.ProductIntegrationId == 0)
+                return marketplaceType switch
                 {
-                    if (marketplaceType == "Trendyol")
-                    {
-                        var createModel = new TrendyolProductIntegrationViewModel()
-                        {
-                            Id = 0,
-                            ProductId = product.Id,
-                            IntegrationSystemId = model.IntegrationSystemId,
-                            IntegrationSystemName = integrationSystem.Name,
-                            MarketplaceType = marketplaceType,
-                            ProductName = product.Name,
-                            ProductCode = product.Code,
-                            ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                            ProductVariantAttributeCombinationId = null,
-                            Price = product.Price,
-                            IntegrationCode = product.Code,
-                            Active = true,
-                        };
-
-                        var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                        {
-                            Id = m.Id,
-                            ProductId = m.Id,
-                            Gtin = m.Gtin,
-                            ManufacturerPartNumber = m.ManufacturerPartNumber,
-                            Price = m.Price,
-                            StockQuantity = m.StockQuantity,
-                            StokCode = m.StokCode,
-                            ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                        }).ToList();
-
-                        foreach (var item in productVariantAttributeCombinations)
-                        {
-                            item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                        }
-                        ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                        {
-                            Text = m.Name,
-                            Value = m.Id.ToString()
-                        });
-
-                        return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                    }
-                    if (marketplaceType == "N11")
-                    {
-                        var createModel = new N11ProductIntegrationViewModel()
-                        {
-                            Id = 0,
-                            ProductId = product.Id,
-                            IntegrationSystemId = model.IntegrationSystemId,
-                            IntegrationSystemName = integrationSystem.Name,
-                            MarketplaceType = marketplaceType,
-                            ProductName = product.Name,
-                            ProductCode = product.Code,
-                            ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                            ProductVariantAttributeCombinationId = null,
-                            Price = product.Price,
-                            IntegrationCode = product.Code,
-                            Active = true,
-                        };
-
-                        var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                        {
-                            Id = m.Id,
-                            ProductId = m.Id,
-                            Gtin = m.Gtin,
-                            ManufacturerPartNumber = m.ManufacturerPartNumber,
-                            Price = m.Price,
-                            StockQuantity = m.StockQuantity,
-                            StokCode = m.StokCode,
-                            ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                        }).ToList();
-
-                        foreach (var item in productVariantAttributeCombinations)
-                        {
-                            item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                        }
-                        ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                        {
-                            Text = m.Name,
-                            Value = m.Id.ToString()
-                        });
-
-                        return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                    }
-                    if (marketplaceType == "Idefix")
-                    {
-                        var createModel = new IdefixProductIntegrationViewModel()
-                        {
-                            Id = 0,
-                            ProductId = product.Id,
-                            IntegrationSystemId = model.IntegrationSystemId,
-                            IntegrationSystemName = integrationSystem.Name,
-                            MarketplaceType = marketplaceType,
-                            ProductName = product.Name,
-                            ProductCode = product.Code,
-                            ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                            ProductVariantAttributeCombinationId = null,
-                            Price = product.Price,
-                            IntegrationCode = product.Code,
-                            Active = true,
-                        };
-
-                        var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                        {
-                            Id = m.Id,
-                            ProductId = m.Id,
-                            Gtin = m.Gtin,
-                            ManufacturerPartNumber = m.ManufacturerPartNumber,
-                            Price = m.Price,
-                            StockQuantity = m.StockQuantity,
-                            StokCode = m.StokCode,
-                            ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                        }).ToList();
-
-                        foreach (var item in productVariantAttributeCombinations)
-                        {
-                            item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                        }
-                        ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                        {
-                            Text = m.Name,
-                            Value = m.Id.ToString()
-                        });
-
-                        return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                    }
-                    if (marketplaceType == "CicekSepeti")
-                    {
-                        var createModel = new CicekSepetiProductIntegrationViewModel()
-                        {
-                            Id = 0,
-                            ProductId = product.Id,
-                            IntegrationSystemId = model.IntegrationSystemId,
-                            IntegrationSystemName = integrationSystem.Name,
-                            MarketplaceType = marketplaceType,
-                            ProductName = product.Name,
-                            ProductCode = product.Code,
-                            ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                            ProductVariantAttributeCombinationId = null,
-                            Price = product.Price,
-                            IntegrationCode = product.Code,
-                            Active = true,
-                        };
-
-                        var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                        {
-                            Id = m.Id,
-                            ProductId = m.Id,
-                            Gtin = m.Gtin,
-                            ManufacturerPartNumber = m.ManufacturerPartNumber,
-                            Price = m.Price,
-                            StockQuantity = m.StockQuantity,
-                            StokCode = m.StokCode,
-                            ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                        }).ToList();
-
-                        foreach (var item in productVariantAttributeCombinations)
-                        {
-                            item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                        }
-                        ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                        {
-                            Text = m.Name,
-                            Value = m.Id.ToString()
-                        });
-
-                        return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                    }
-                    if (marketplaceType == "Pazarama")
-                    {
-                        var createModel = new PazaramaProductIntegrationViewModel()
-                        {
-                            Id = 0,
-                            ProductId = product.Id,
-                            IntegrationSystemId = model.IntegrationSystemId,
-                            IntegrationSystemName = integrationSystem.Name,
-                            MarketplaceType = marketplaceType,
-                            ProductName = product.Name,
-                            ProductCode = product.Code,
-                            ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                            ProductVariantAttributeCombinationId = null,
-                            Price = product.Price,
-                            IntegrationCode = product.Code,
-                            Active = true,
-                        };
-
-                        var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                        {
-                            Id = m.Id,
-                            ProductId = m.Id,
-                            Gtin = m.Gtin,
-                            ManufacturerPartNumber = m.ManufacturerPartNumber,
-                            Price = m.Price,
-                            StockQuantity = m.StockQuantity,
-                            StokCode = m.StokCode,
-                            ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                        }).ToList();
-
-                        foreach (var item in productVariantAttributeCombinations)
-                        {
-                            item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                        }
-                        ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                        {
-                            Text = m.Name,
-                            Value = m.Id.ToString()
-                        });
-
-                        return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                    }
-                    if (marketplaceType == "HepsiBurada")
-                    {
-                        var createModel = new HepsiBuradaProductIntegrationViewModel()
-                        {
-                            Id = 0,
-                            ProductId = product.Id,
-                            IntegrationSystemId = model.IntegrationSystemId,
-                            IntegrationSystemName = integrationSystem.Name,
-                            MarketplaceType = marketplaceType,
-                            ProductName = product.Name,
-                            ProductCode = product.Code,
-                            ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                            ProductVariantAttributeCombinationId = null,
-                            Price = product.Price,
-                            IntegrationCode = product.Code,
-                            Active = true,
-                        };
-
-                        var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                        {
-                            Id = m.Id,
-                            ProductId = m.Id,
-                            Gtin = m.Gtin,
-                            ManufacturerPartNumber = m.ManufacturerPartNumber,
-                            Price = m.Price,
-                            StockQuantity = m.StockQuantity,
-                            StokCode = m.StokCode,
-                            ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                        }).ToList();
-
-                        foreach (var item in productVariantAttributeCombinations)
-                        {
-                            item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                        }
-                        ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                        {
-                            Text = m.Name,
-                            Value = m.Id.ToString()
-                        });
-
-                        return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                    }
-                }
-                else
-                {
-                    TrendyolApiContext context = new TrendyolApiContext
-                    {
-                        SupplierId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault() ?? "",
-                        ApiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "",
-                        ApiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "",
-                    };
-                    var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                    var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, existingProductIntegration.IntegrationCode);
-
-                    var createModel = new TrendyolProductIntegrationViewModel
-                    {
-                        Id = existingProductIntegration.Id,
-                        ProductId = existingProductIntegration.ProductId,
-                        IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
-                        IntegrationSystemName = integrationSystem.Name,
-                        MarketplaceType = marketplaceType,
-                        IntegrationCode = existingProductIntegration?.IntegrationCode,
-                        Price = existingProductIntegration?.Price ?? 0m,
-                        ProductName = product.Name,
-                        ProductCode = product.Code,
-                        Active = existingProductIntegration.Active,
-                        ProductMainPicture = product.ProductMediaFiles.Where(x => x.MediaFileId == product.MainPictureId).Select(m => m.MediaFile).FirstOrDefault()?.Url,
-                        MarketplaceLink = existingTrendyolProduct == null ? "#" : existingTrendyolProduct.productUrl,
-                        ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
-                    };
-
-                    var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
-                    {
-                        Id = m.Id,
-                        ProductId = m.Id,
-                        Gtin = m.Gtin,
-                        ManufacturerPartNumber = m.ManufacturerPartNumber,
-                        Price = m.Price,
-                        StockQuantity = m.StockQuantity,
-                        StokCode = m.StokCode,
-                        ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
-                    }).ToList();
-
-                    foreach (var item in productVariantAttributeCombinations)
-                    {
-                        item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
-                    }
-                    ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
-                    {
-                        Text = m.Name,
-                        Value = m.Id.ToString()
-                    });
-
-                    if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
-                    {
-                        createModel.Custom = JsonConvert.DeserializeObject<TrednyolProductIntegrationCustomViewModel>(existingProductIntegration.Custom) ?? new TrednyolProductIntegrationCustomViewModel();
-                    }
-
-                    return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
-                }
+                    "Trendyol" => await ProductIntegrationTrendyolDialog(model, product, integrationSystem),
+                    "Idefix" => await ProductIntegrationIdefixDialog(model, product, integrationSystem),
+                    "N11" => await ProductIntegrationN11Dialog(model, product, integrationSystem),
+                    "CicekSepeti" => await ProductIntegrationCicekSepetiDialog(model, product, integrationSystem),
+                    "Pazarama" => await ProductIntegrationPazaramaDialog(model, product, integrationSystem),
+                    "HepsiBurada" => await ProductIntegrationHepsiBuradaDialog(model, product, integrationSystem),
+                    _ => NotFound()
+                };
             }
 
             return NotFound();
         }
+
+        private async Task<IActionResult> ProductIntegrationHepsiBuradaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        {
+            var marketplaceType = "HepsiBurada";
+
+            if (model.ProductIntegrationId == 0)
+            {
+                var createModel = new HepsiBuradaProductIntegrationViewModel
+                {
+                    Id = 0,
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ProductVariantAttributeCombinationId = null,
+                    Price = product.Price,
+                    IntegrationCode = product.Code,
+                    Active = true,
+                };
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+            else
+            {
+
+
+                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingHepsiBuradaProduct = "";
+
+                var createModel = new HepsiBuradaProductIntegrationViewModel
+                {
+                    Id = existingProductIntegration.Id,
+                    ProductId = existingProductIntegration.ProductId,
+                    IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    IntegrationCode = existingProductIntegration?.IntegrationCode,
+                    Price = existingProductIntegration?.Price ?? 0m,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    Active = existingProductIntegration.Active,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    MarketplaceLink = "existingTrendyolProduct?.productUrl ?? #,",
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                };
+
+                if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                {
+                    createModel.Custom = JsonConvert.DeserializeObject<HepsiBuradaProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                }
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+        }
+
+        private async Task<IActionResult> ProductIntegrationPazaramaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        {
+            var marketplaceType = "Pazarama";
+
+            if (model.ProductIntegrationId == 0)
+            {
+                var createModel = new PazaramaProductIntegrationViewModel
+                {
+                    Id = 0,
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ProductVariantAttributeCombinationId = null,
+                    Price = product.Price,
+                    IntegrationCode = product.Code,
+                    Active = true,
+                };
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+            else
+            {
+
+
+                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingPazaramaProduct = "";
+
+                var createModel = new PazaramaProductIntegrationViewModel
+                {
+                    Id = existingProductIntegration.Id,
+                    ProductId = existingProductIntegration.ProductId,
+                    IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    IntegrationCode = existingProductIntegration?.IntegrationCode,
+                    Price = existingProductIntegration?.Price ?? 0m,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    Active = existingProductIntegration.Active,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    MarketplaceLink = "existingPazaramaProduct?.productUrl ?? #,",
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                };
+
+                if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                {
+                    createModel.Custom = JsonConvert.DeserializeObject<PazaramaProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                }
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+        }
+
+        private async Task<IActionResult> ProductIntegrationCicekSepetiDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        {
+            var marketplaceType = "CicekSepeti";
+
+            if (model.ProductIntegrationId == 0)
+            {
+                var createModel = new CicekSepetiProductIntegrationViewModel
+                {
+                    Id = 0,
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ProductVariantAttributeCombinationId = null,
+                    Price = product.Price,
+                    IntegrationCode = product.Code,
+                    Active = true,
+                };
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+            else
+            {
+
+
+                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingCicekSepetiProduct = "";
+
+                var createModel = new CicekSepetiProductIntegrationViewModel
+                {
+                    Id = existingProductIntegration.Id,
+                    ProductId = existingProductIntegration.ProductId,
+                    IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    IntegrationCode = existingProductIntegration?.IntegrationCode,
+                    Price = existingProductIntegration?.Price ?? 0m,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    Active = existingProductIntegration.Active,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    MarketplaceLink = "existingCicekSepetiProduct?.productUrl ?? #,",
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                };
+
+                if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                {
+                    createModel.Custom = JsonConvert.DeserializeObject<CicekSepetiProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                }
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+        }
+
+        private async Task<IActionResult> ProductIntegrationN11Dialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        {
+            var marketplaceType = "N11";
+
+            if (model.ProductIntegrationId == 0)
+            {
+                var createModel = new N11ProductIntegrationViewModel
+                {
+                    Id = 0,
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ProductVariantAttributeCombinationId = null,
+                    Price = product.Price,
+                    IntegrationCode = product.Code,
+                    Active = true,
+                };
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+            else
+            {
+
+
+                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingN11Product = "";
+
+                var createModel = new N11ProductIntegrationViewModel
+                {
+                    Id = existingProductIntegration.Id,
+                    ProductId = existingProductIntegration.ProductId,
+                    IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    IntegrationCode = existingProductIntegration?.IntegrationCode,
+                    Price = existingProductIntegration?.Price ?? 0m,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    Active = existingProductIntegration.Active,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    MarketplaceLink = "existingN11Product?.productUrl ?? #,",
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                };
+
+                if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                {
+                    createModel.Custom = JsonConvert.DeserializeObject<N11ProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                }
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+        }
+
+        private async Task<IActionResult> ProductIntegrationIdefixDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        {
+            var marketplaceType = "Idefix";
+
+            if (model.ProductIntegrationId == 0)
+            {
+                var createModel = new IdefixProductIntegrationViewModel
+                {
+                    Id = 0,
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ProductVariantAttributeCombinationId = null,
+                    Price = product.Price,
+                    IntegrationCode = product.Code,
+                    Active = true,
+                };
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+            else
+            {
+
+
+                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingIdefixProduct = "";
+
+                var createModel = new IdefixProductIntegrationViewModel
+                {
+                    Id = existingProductIntegration.Id,
+                    ProductId = existingProductIntegration.ProductId,
+                    IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    IntegrationCode = existingProductIntegration?.IntegrationCode,
+                    Price = existingProductIntegration?.Price ?? 0m,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    Active = existingProductIntegration.Active,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    MarketplaceLink = "existingIdefixProduct?.productUrl ?? #,",
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                };
+
+                if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                {
+                    createModel.Custom = JsonConvert.DeserializeObject<IdefixProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                }
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+        }
+
+        private async Task<IActionResult> ProductIntegrationTrendyolDialog(ProductIntegrationDialogViewModel model, ProductDto product, IntegrationSystemDto integrationSystem)
+        {
+            var marketplaceType = "Trendyol";
+
+            if (model.ProductIntegrationId == 0)
+            {
+                var createModel = new TrendyolProductIntegrationViewModel
+                {
+                    Id = 0,
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ProductVariantAttributeCombinationId = null,
+                    Price = product.Price,
+                    IntegrationCode = product.Code,
+                    Active = true,
+                };
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+            else
+            {
+                TrendyolApiContext context = new TrendyolApiContext
+                {
+                    SupplierId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "SupplierId")?.Value ?? "",
+                    ApiUser = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiUser")?.Value ?? "",
+                    ApiPassword = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiPassword")?.Value ?? "",
+                };
+
+                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, existingProductIntegration.IntegrationCode);
+
+                var createModel = new TrendyolProductIntegrationViewModel
+                {
+                    Id = existingProductIntegration.Id,
+                    ProductId = existingProductIntegration.ProductId,
+                    IntegrationSystemId = existingProductIntegration.IntegrationSystemId,
+                    IntegrationSystemName = integrationSystem.Name,
+                    MarketplaceType = marketplaceType,
+                    IntegrationCode = existingProductIntegration?.IntegrationCode,
+                    Price = existingProductIntegration?.Price ?? 0m,
+                    ProductName = product.Name,
+                    ProductCode = product.Code,
+                    Active = existingProductIntegration.Active,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    MarketplaceLink = existingTrendyolProduct?.productUrl ?? "#",
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                };
+
+                if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
+                {
+                    createModel.Custom = JsonConvert.DeserializeObject<TrednyolProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                }
+
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                {
+                    Id = m.Id,
+                    ProductId = m.Id,
+                    Gtin = m.Gtin,
+                    ManufacturerPartNumber = m.ManufacturerPartNumber,
+                    Price = m.Price,
+                    StockQuantity = m.StockQuantity,
+                    StokCode = m.StokCode,
+                    ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                }).ToList();
+
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+                }
+
+                ViewBag.ProductVariantAttributeCombinations = productVariantAttributeCombinations.Select(m => new SelectListItem()
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                });
+
+                return PartialView($"_IntegrationDialog.Marketplace.{marketplaceType}", createModel);
+            }
+        }
+
+
 
         public async Task<IActionResult> ProductIntegrationCommerceSettings(IntegrationSystemDto integrationSystem, ProductIntegrationDialogViewModel model, ProductDto product)
         {
@@ -938,7 +1261,6 @@ namespace Entegro.Web.Controllers
                 return PartialView($"_IntegrationDialog.Commerce.{commerceType}", createModel);
             }
         }
-
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateProductIntegrationSmartstore(SmartstoreProductIntegrationViewModel model)
         {
