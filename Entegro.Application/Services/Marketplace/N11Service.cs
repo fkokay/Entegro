@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.CategoryAttribute;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.Events;
@@ -24,10 +25,14 @@ namespace Entegro.Application.Services.Marketplace
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProductIntegrationService _productIntegrationService;
-        public N11Service(IHttpClientFactory httpClientFactory,IProductIntegrationService productIntegrationService)
+        private readonly IProductService _productService;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        public N11Service(IHttpClientFactory httpClientFactory,IProductIntegrationService productIntegrationService, IProductService productService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
+            _productService = productService;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
         }
 
         private HttpClient CreateHttpClient(N11ApiContext context)
@@ -60,6 +65,49 @@ namespace Entegro.Application.Services.Marketplace
                         AppSecret = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "AppSecret").Value,
                         AppKey = productIntegration.IntegrationSystem.IntegrationSystemParameters.First(p => p.Key == "AppKey").Value
                     };
+
+                    object? customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonSerializer.Deserialize<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
+                    var product = await _productService.GetProductByIdAsync(productIntegration.ProductId);
+                    if (product == null)
+                    {
+                        return;
+                    }
+
+                    product.Code = productIntegration.IntegrationCode;
+                    product.Price = productIntegration.Price;
+
+
+                    int stockQuantity = 0;
+                    if (productIntegration.ProductVariantAttributeCombinationId.HasValue)
+                    {
+                        var productVariantAttributeCombination = await _productVariantAttributeCombinationService.GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value);
+                        stockQuantity = productVariantAttributeCombination.StockQuantity;
+                    }
+                    else
+                    {
+                        stockQuantity = product.StockQuantity;
+                    }
+
+                    var request = new N11PriceAndStockUpdatePayload
+                    {
+                        Payload = new N11PriceAndStockUpdateRequest()
+                        {
+                            Integrator = "",
+                             Skus = new List<N11PriceAndStockUpdateDto>()
+                             {
+                                 new N11PriceAndStockUpdateDto()
+                                 {
+                                     StockCode = productIntegration.IntegrationCode,
+                                     CurrencyType = "TL",
+                                     ListPrice = product.Price,
+                                     Quantity = stockQuantity,
+                                     SalePrice = product.Price,
+                                 }
+                             }
+                        }
+                    };
+
+                    await UpdatePriceAndStockAsync(apiContext, request);
                 }
             }
         }
