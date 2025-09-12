@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Marketplace.N11;
+﻿using Entegro.Application.DTOs.Marketplace.Hepsiburada;
+using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
@@ -11,20 +12,24 @@ namespace Entegro.Api.Jobs
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IN11Service _n11Service;
         private readonly IPazaramaService _pazaramaService;
-        public CommerceJobs(IN11Service n11Service,IPazaramaService pazaramaService,IProductIntegrationService productIntegrationService)
+        private readonly IHepsiburadaService _hepsiburadaService;
+        public CommerceJobs(IN11Service n11Service,IPazaramaService pazaramaService,IHepsiburadaService hepsiburadaService,IProductIntegrationService productIntegrationService)
         {
             _productIntegrationService = productIntegrationService;
             _n11Service = n11Service;   
             _pazaramaService = pazaramaService;
+            _hepsiburadaService = hepsiburadaService;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            PazaramaApiContext pazaramaApiContext = new PazaramaApiContext();
-            pazaramaApiContext.ClientId = "f1b613316b0948d29ec81c8e64b1e595";
-            pazaramaApiContext.ClientSecret = "d47b5a87351341d9a4abad85b98f7077";
+            HepsiburadaApiContext hepsiburadaApiContext = new HepsiburadaApiContext();
+            hepsiburadaApiContext.MerchantId = "885a0ad1-8935-4521-b6b4-b251333881fc";
+            hepsiburadaApiContext.ApiUser = "885a0ad1-8935-4521-b6b4-b251333881fc";
+            hepsiburadaApiContext.ApiPassword = "UksXKFhbtDK3";
+            hepsiburadaApiContext.UserAgent = "mevamagaza_dev";
 
-           var products = await _pazaramaService.GetProductsAsync(pazaramaApiContext);
+           var products = await _hepsiburadaService.GetProductsAsync(hepsiburadaApiContext);
         }
     }
 }

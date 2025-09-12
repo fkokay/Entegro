@@ -22,6 +22,9 @@ namespace Entegro.Infrastructure.Extensions
 
             services.AddScoped<IPazaramaService, PazaramaService>();
             services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, PazaramaService>();
+
+            services.AddScoped<IHepsiburadaService, HepsiburadaService>();
+            services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, HepsiburadaService>();
             return services;
         }
     }
