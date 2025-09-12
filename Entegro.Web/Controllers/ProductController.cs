@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Marketplace.N11;
+using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
@@ -43,6 +44,7 @@ namespace Entegro.Web.Controllers
         private readonly ICategoryService _categoryService;
         private readonly ITrendyolService _trenyolService;
         private readonly IN11Service _n11Service;
+        private readonly IPazaramaService _pazaramaService;
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
         public ProductController(
             IProductService productService,
@@ -58,7 +60,8 @@ namespace Entegro.Web.Controllers
             ITrendyolService trendyolService,
             IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
-            IN11Service n11Service)
+            IN11Service n11Service,
+            IPazaramaService pazaramaService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -74,6 +77,7 @@ namespace Entegro.Web.Controllers
             _productSpecificationAttributeMappingService = productSpecificationAttributeMappingService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
             _n11Service = n11Service;
+            _pazaramaService = pazaramaService;
         }
 
         #region Product list / create / edit / delete
@@ -750,10 +754,15 @@ namespace Entegro.Web.Controllers
             }
             else
             {
+                PazaramaApiContext context = new PazaramaApiContext
+                {
+                    ClientId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientId")?.Value ?? "",
+                    ClientSecret = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientSecret")?.Value ?? "",
 
+                };
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                var existingPazaramaProduct = "";
+                var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, existingProductIntegration.IntegrationCode);
 
                 var createModel = new PazaramaProductIntegrationViewModel
                 {
@@ -768,7 +777,7 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
-                    MarketplaceLink = "existingPazaramaProduct?.productUrl ?? #,",
+                    MarketplaceLink = "#",
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
                 };
 
