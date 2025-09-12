@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
@@ -41,6 +42,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ICategoryService _categoryService;
         private readonly ITrendyolService _trenyolService;
+        private readonly IN11Service _n11Service;
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
         public ProductController(
             IProductService productService,
@@ -55,7 +57,8 @@ namespace Entegro.Web.Controllers
             ICategoryService categoryService,
             ITrendyolService trendyolService,
             IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService,
-            IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            IN11Service n11Service)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -70,6 +73,7 @@ namespace Entegro.Web.Controllers
             _categoryService = categoryService;
             _productSpecificationAttributeMappingService = productSpecificationAttributeMappingService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _n11Service = n11Service;
         }
 
         #region Product list / create / edit / delete
@@ -946,9 +950,14 @@ namespace Entegro.Web.Controllers
             else
             {
 
+                N11ApiContext context = new N11ApiContext
+                {
+
+                };
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
-                var existingN11Product = "";
+                var existingN11Product = await _n11Service.GetProductWithN11CodeAsync(context, existingProductIntegration.IntegrationCode);
+
 
                 var createModel = new N11ProductIntegrationViewModel
                 {
@@ -963,7 +972,7 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
-                    MarketplaceLink = "existingN11Product?.productUrl ?? #,",
+                    MarketplaceLink = "existingN11Product?.productUrl ?? #",
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
                 };
 
