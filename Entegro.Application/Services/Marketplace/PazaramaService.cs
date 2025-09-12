@@ -102,7 +102,8 @@ namespace Entegro.Application.Services.Marketplace
                             new PazaramaPriceUpdateDto()
                             {
                                 Code = product.Code,
-                                StockCount = stockQuantity,
+                                ListPrice = product.Price,
+                                SalePrice = product.Price
                             }
                         }
                     };
@@ -116,8 +117,7 @@ namespace Entegro.Application.Services.Marketplace
                             new PazaramaStockUpdateDto()
                             {
                                 Code = product.Code,
-                                ListPrice = product.Price,
-                                SalePrice = product.Price
+                                StockCount = stockQuantity,
                             }
                         }
                     };

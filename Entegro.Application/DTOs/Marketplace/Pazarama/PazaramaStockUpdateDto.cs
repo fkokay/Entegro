@@ -10,12 +10,11 @@ namespace Entegro.Application.DTOs.Marketplace.Pazarama
 {
     public class PazaramaStockUpdateDto
     {
+
         [JsonPropertyName("code")]
         public string Code { get; set; }
-        [JsonPropertyName("listPrice")]
-        public decimal ListPrice { get; set; }
-        [JsonPropertyName("salePrice")]
-        public decimal SalePrice { get; set; }
+        [JsonPropertyName("stockCount")]
+        public int StockCount { get; set; }
     }
 
     public class PazaramaStockUpdateRequest
