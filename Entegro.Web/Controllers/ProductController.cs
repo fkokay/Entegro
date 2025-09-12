@@ -959,7 +959,8 @@ namespace Entegro.Web.Controllers
 
                 N11ApiContext context = new N11ApiContext
                 {
-
+                    AppKey = integrationSystem.IntegrationSystemParameters.FirstOrDefault(p => p.Key == "AppKey")?.Value,
+                    AppSecret = integrationSystem.IntegrationSystemParameters.FirstOrDefault(p => p.Key == "AppSecret")?.Value,
                 };
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
@@ -979,7 +980,7 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
-                    MarketplaceLink = "existingN11Product?.productUrl ?? #",
+                    MarketplaceLink = "#",
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
                 };
 
