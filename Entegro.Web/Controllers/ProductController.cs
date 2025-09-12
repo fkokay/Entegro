@@ -1808,8 +1808,15 @@ namespace Entegro.Web.Controllers
                 };
 
 
-                var existingHepsiburadaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, model.IntegrationCode);
 
+
+
+
+                var existingHepsiburadaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, model.IntegrationCode);
+                if (existingHepsiburadaProduct == null)
+                {
+                    return Json(new { success = false, message = $"HepsiBurada üzerinde bu barkoda sahip bir ürün bulunamadı. Barkod: {model.IntegrationCode}" });
+                }
 
                 var productIntegration = await _productIntegrationService.GetByIdAsync(model.Id);
                 if (productIntegration == null || model.Id == 0)
