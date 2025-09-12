@@ -971,12 +971,6 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public IActionResult MarketplaceTest(int? IntegrationSystemId, string? MarketplaceType)
         {
-            if (!IntegrationSystemId.HasValue || string.IsNullOrWhiteSpace(MarketplaceType))
-            {
-                return Json(new { success = false, message = "Eksik veya geçersiz parametre." });
-            }
-
-            // Örnek bağlantı testi simülasyonu
             var result = true;
 
             if (result)
