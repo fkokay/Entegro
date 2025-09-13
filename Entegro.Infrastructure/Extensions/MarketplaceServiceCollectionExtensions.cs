@@ -25,6 +25,9 @@ namespace Entegro.Infrastructure.Extensions
 
             services.AddScoped<IHepsiburadaService, HepsiburadaService>();
             services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, HepsiburadaService>();
+
+            services.AddScoped<ICicekSepetiService, CicekSepetiService>();
+            services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, CicekSepetiService>();
             return services;
         }
     }

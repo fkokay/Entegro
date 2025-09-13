@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Marketplace.Hepsiburada;
+﻿using Entegro.Application.DTOs.Marketplace.CicekSepeti;
+using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
@@ -16,23 +17,24 @@ namespace Entegro.Api.Jobs
         private readonly IPazaramaService _pazaramaService;
         private readonly IHepsiburadaService _hepsiburadaService;
         private readonly ITrendyolService _trendyolService;
-        public CommerceJobs(IN11Service n11Service,IPazaramaService pazaramaService,IHepsiburadaService hepsiburadaService,ITrendyolService trendyolService,IProductIntegrationService productIntegrationService)
+        private readonly ICicekSepetiService _cicekSepetiService;
+        public CommerceJobs(IN11Service n11Service,IPazaramaService pazaramaService,IHepsiburadaService hepsiburadaService,ITrendyolService trendyolService,ICicekSepetiService cicekSepetiService,IProductIntegrationService productIntegrationService)
         {
             _productIntegrationService = productIntegrationService;
             _n11Service = n11Service;   
             _pazaramaService = pazaramaService;
             _hepsiburadaService = hepsiburadaService;
             _trendyolService = trendyolService;
+            _cicekSepetiService = cicekSepetiService;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            TrendyolApiContext trendyolApiContext = new TrendyolApiContext();
-            trendyolApiContext.ApiUser = "9tjWr2F7zHJKnMDMbcqb";
-            trendyolApiContext.ApiPassword = "09WZjNvN6ZJU4Tg2z53r";
-            trendyolApiContext.SupplierId = "474352";
+            CicekSepetiApiContext cicekSepetiApiContext = new CicekSepetiApiContext();
+            cicekSepetiApiContext.ApiUser = "0gCXnE95x4SNj6wLPhB6piCM5ApqQ1Lk3JYgiEWj";
+            cicekSepetiApiContext.SupplierId = "1500056600";
 
-            var products = await _trendyolService.GetProductsAsync(trendyolApiContext);
+            var products = await _cicekSepetiService.GetProductsAsync(cicekSepetiApiContext);
         }
 
     
