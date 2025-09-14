@@ -239,12 +239,12 @@ namespace Entegro.Api.Jobs
         {
             PazaramaApiContext context = new PazaramaApiContext();
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Pazarama ClientId Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Pazarama ClientSecret Ayarlanmamış");
             }
@@ -366,12 +366,12 @@ namespace Entegro.Api.Jobs
         {
             CicekSepetiApiContext context = new CicekSepetiApiContext();
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("ÇicekSepeti SupplierId Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("ÇicekSepeti ApiUser Ayarlanmamış");
             }
@@ -494,17 +494,17 @@ namespace Entegro.Api.Jobs
         {
             TrendyolApiContext context = new TrendyolApiContext();
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Trendyol SupplierId Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Trendyol ApiUser Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Trendyol ApiPassword Ayarlanmamış");
             }
@@ -627,22 +627,22 @@ namespace Entegro.Api.Jobs
         {
             HepsiburadaApiContext context = new HepsiburadaApiContext();
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "MerchantId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "MerchantId").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "MerchantId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "MerchantId").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Hepsiburada MerchantId Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Hepsiburada ApiUser Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Hepsiburada ApiPassword Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "UserAgent").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "UserAgent").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "UserAgent").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "UserAgent").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Hepsiburada UserAgent Ayarlanmamış");
             }
@@ -765,12 +765,12 @@ namespace Entegro.Api.Jobs
         {
             N11ApiContext context = new N11ApiContext();
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "AppKey").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "AppKey").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "AppKey").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "AppKey").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("N11 AppKey Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "AppSecret").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "AppSecret").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "AppSecret").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "AppSecret").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("N11 AppSecret Ayarlanmamış");
             }
@@ -908,17 +908,17 @@ namespace Entegro.Api.Jobs
         {
             SmartstoreApiContext context = new SmartstoreApiContext();
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Smartstore ApiUrl Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Smartstore ApiUser Ayarlanmamış");
             }
 
-            if (item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
             {
                 _logger.Error("Smartstore ApiPassword Ayarlanmamış");
             }
