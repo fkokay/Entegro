@@ -17,7 +17,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<IEnumerable<CustomerDto>> GetCustomersAsync();
         Task<PagedResult<CustomerDto>> GetCustomersAsync(int pageNumber, int pageSize);
         Task<PagedResult<CustomerDto>> GetPagedAsync(GridCommand gridCommand);
-        Task<int> CreateCustomerAsync(CreateCustomerDto createCustomer);
+        Task<CustomerDto> CreateCustomerAsync(CreateCustomerDto createCustomer);
         Task<bool> UpdateCustomerAsync(UpdateCustomerDto updateCustomer);
         Task<bool> DeleteCustomerAsync(int customerId);
         Task<bool> ExistsByEmailAsync(string email);

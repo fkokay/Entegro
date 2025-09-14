@@ -15,8 +15,6 @@ namespace Entegro.Domain.Enums
         [Display(Name = "Kargo Entegrasyonu")]
         Cargo = 4,
         [Display(Name = "E-Fatura Entegrasyonu")]
-        EInvoice = 5,
-        [Display(Name = "Mail Entegrasyonu")]
-        EMail = 6,
+        EInvoice = 5
     }
 }

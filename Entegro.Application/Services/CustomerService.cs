@@ -23,12 +23,12 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<int> CreateCustomerAsync(CreateCustomerDto createCustomer)
+        public async Task<CustomerDto> CreateCustomerAsync(CreateCustomerDto createCustomer)
         {
             var customer = _mapper.Map<Customer>(createCustomer);
             await _customerRepository.AddAsync(customer);
 
-            return customer.Id;
+            return _mapper.Map<CustomerDto>(customer);
         }
 
         public async Task<bool> DeleteCustomerAsync(int customerId)

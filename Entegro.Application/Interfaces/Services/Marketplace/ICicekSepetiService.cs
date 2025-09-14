@@ -13,5 +13,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
         Task<IEnumerable<CicekSepetiProductDto>> GetProductsAsync(CicekSepetiApiContext context, int pageSize = 50);
         Task<CicekSepetiProductDto?> GetProductWithStockCodeAsync(CicekSepetiApiContext context, string stockCode);
         Task UpdatePriceAndStockAsync(CicekSepetiApiContext context, CicekSepetiPriceAndStockUpdateRequest priceAndStockUpdateRequest);
+        Task<IEnumerable<CicekSepetiOrderDto>> GetOrdersAsync(CicekSepetiApiContext context);
     }
 }

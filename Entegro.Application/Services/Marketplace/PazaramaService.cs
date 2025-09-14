@@ -248,5 +248,10 @@ namespace Entegro.Application.Services.Marketplace
             var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
         }
+
+        public Task<IEnumerable<PazaramaOrderDto>> GetOrdersAsync(PazaramaApiContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -72,7 +72,7 @@ namespace Entegro.Api.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             //await ProductSync();
-            await OrderSync();
+            //await OrderSync();
             //await ProductWriter();
         }
 
@@ -120,193 +120,78 @@ namespace Entegro.Api.Jobs
             return null;
         }
 
-        private async Task OrderSync()
-        {
-            _logger.LogInformation("Smartstore sipariş senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
-            IEnumerable<SmartstoreOrderDto> smartstoreOrders;
-            try
-            {
-                smartstoreOrders = await _smartstoreService.GetOrdersAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Smartstore'dan siparişler alınırken bir hata oluştu.");
-                return;
-            }
+        //private async Task ProductSync()
+        //{
+        //    _logger.LogInformation("Smartstore ürün senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
 
-            if (smartstoreOrders == null || !smartstoreOrders.Any())
-            {
-                _logger.LogWarning("Smartstore'dan hiç sipariş alınamadı.");
-                return;
-            }
+        //    IEnumerable<SmartstoreProductDto> smartstoreProducts;
 
-            SmartstoreOrderMapper.ConfigureLogger(_logger);
-            var orders = SmartstoreOrderMapper.ToDtoList(smartstoreOrders);
+        //    try
+        //    {
+        //        smartstoreProducts = await _smartstoreService.GetProductsAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Smartstore'dan ürünler alınırken bir hata oluştu.");
+        //        return;
+        //    }
 
-            var retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(
-                    retryCount: 3,
-                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
-                    onRetry: (exception, timeSpan, retryCount, context) =>
-                    {
-                        _logger.LogWarning(exception, "{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
-                    });
+        //    if (smartstoreProducts == null || !smartstoreProducts.Any())
+        //    {
+        //        _logger.LogWarning("Smartstore'dan hiç ürün alınamadı.");
+        //        return;
+        //    }
 
-            foreach (var order in orders)
-            {
-                if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
-                {
-                    _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
-                    continue;
-                }
+        //    foreach (var item in smartstoreProducts)
+        //    {
+        //        foreach (var productManufacturer in item.ProductManufacturers)
+        //        {
+        //            productManufacturer.Manufacturer = await _smartstoreService.GetManufacturerAsync(productManufacturer.ManufacturerId);
+        //        }
+        //    }
 
-                var customer = await _customerService.GetCustomerByEmailAsync(order.Customer.Email);
-                if (customer == null)
-                {
-                    var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
-                    createCustomer.Address = order.Customer.Address;
-                    createCustomer.City = order.Customer.City;
-                    createCustomer.Town = order.Customer.Town;
-                    createCustomer.Street = order.Customer.Street;
-                    createCustomer.PhoneNumber = order.Customer.PhoneNumber;
-                    createCustomer.Name = order.Customer.Name;
-                    createCustomer.CustomerType = 1;
-                    createCustomer.Email = order.Customer.Email;
-                    createCustomer.CreatedOn = DateTime.Now;
-                    createCustomer.UpdatedOn = DateTime.Now;
+        //    SmartstoreProductMapper.ConfigureLogger(_logger);
+        //    var products = SmartstoreProductMapper.ToDtoList(smartstoreProducts);
 
-                    var customerId = await _customerService.CreateCustomerAsync(createCustomer);
-                    order.CustomerId = customerId;
-                    order.Customer = null;
-                }
-                else
-                {
-                    order.CustomerId = customer.Id;
-                    order.Customer = null;
-                }
+        //    var retryPolicy = Policy
+        //        .Handle<Exception>()
+        //        .WaitAndRetryAsync(
+        //            retryCount: 3,
+        //            sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
+        //            onRetry: (exception, timeSpan, retryCount, context) =>
+        //            {
+        //                _logger.LogWarning(exception, "{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
+        //            });
 
-                if (order.ShippingAddress != null)
-                {
-                    var address = await _addressService.AddAsync(_mapper.Map<CreateAddressDto>(order.ShippingAddress));
-                    order.ShippingAddressId = address.Id;
-                    order.ShippingAddress = null;
-                }
+        //    foreach (var product in products)
+        //    {
+        //        if (string.IsNullOrEmpty(product.Code))
+        //        {
+        //            _logger.LogWarning("Ürün kodu boş veya null, '{Name}' adlı ürün atlanıyor.", product.Name);
+        //            continue;
+        //        }
+        //        if (await _productService.ExistsByCodeAsync(product.Code))
+        //        {
+        //            _logger.LogInformation("'{Name}' adlı ürün zaten kayıtlı", product.Name);
+        //            continue;
+        //        }
 
-                if (order.BillingAddress != null)
-                {
-                    var address = await _addressService.AddAsync(_mapper.Map<CreateAddressDto>(order.BillingAddress));
-                    order.BillingAddressId = address.Id;
-                    order.BillingAddress = null;
-                }
+        //        try
+        //        {
+        //            await retryPolicy.ExecuteAsync(async () =>
+        //            {
+        //                var createProduct = _mapper.Map<CreateProductDto>(product);
+        //                await _productService.CreateProductAsync(createProduct);
+        //                _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
+        //            });
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _logger.LogError(ex, "'{Name}' adlı ürün için tüm denemeler başarısız oldu.", product.Name);
+        //        }
+        //    }
 
-
-                foreach (var item in order.OrderItems)
-                {
-                    if (item.Product != null)
-                    {
-                        var product = await _productService.GetProductByCodeAsync(item.Product.Code);
-
-                        if (product == null)
-                        {
-                            throw new Exception($"{item.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
-                        }
-
-                        item.Product = null;
-                        item.ProductId = product.Id;
-                    }
-                }
-
-                try
-                {
-                    await retryPolicy.ExecuteAsync(async () =>
-                    {
-                        var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
-                        _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "'{OrderNo}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNumber);
-                }
-            }
-
-            _logger.LogInformation("Smartstore sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
-        }
-
-        private async Task ProductSync()
-        {
-            _logger.LogInformation("Smartstore ürün senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
-
-            IEnumerable<SmartstoreProductDto> smartstoreProducts;
-
-            try
-            {
-                smartstoreProducts = await _smartstoreService.GetProductsAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Smartstore'dan ürünler alınırken bir hata oluştu.");
-                return;
-            }
-
-            if (smartstoreProducts == null || !smartstoreProducts.Any())
-            {
-                _logger.LogWarning("Smartstore'dan hiç ürün alınamadı.");
-                return;
-            }
-
-            foreach (var item in smartstoreProducts)
-            {
-                foreach (var productManufacturer in item.ProductManufacturers)
-                {
-                    productManufacturer.Manufacturer = await _smartstoreService.GetManufacturerAsync(productManufacturer.ManufacturerId);
-                }
-            }
-
-            SmartstoreProductMapper.ConfigureLogger(_logger);
-            var products = SmartstoreProductMapper.ToDtoList(smartstoreProducts);
-
-            var retryPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(
-                    retryCount: 3,
-                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
-                    onRetry: (exception, timeSpan, retryCount, context) =>
-                    {
-                        _logger.LogWarning(exception, "{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
-                    });
-
-            foreach (var product in products)
-            {
-                if (string.IsNullOrEmpty(product.Code))
-                {
-                    _logger.LogWarning("Ürün kodu boş veya null, '{Name}' adlı ürün atlanıyor.", product.Name);
-                    continue;
-                }
-                if (await _productService.ExistsByCodeAsync(product.Code))
-                {
-                    _logger.LogInformation("'{Name}' adlı ürün zaten kayıtlı", product.Name);
-                    continue;
-                }
-
-                try
-                {
-                    await retryPolicy.ExecuteAsync(async () =>
-                    {
-                        var createProduct = _mapper.Map<CreateProductDto>(product);
-                        await _productService.CreateProductAsync(createProduct);
-                        _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "'{Name}' adlı ürün için tüm denemeler başarısız oldu.", product.Name);
-                }
-            }
-
-            _logger.LogInformation("Smartstore ürün senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
-        }
+        //    _logger.LogInformation("Smartstore ürün senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+        //}
     }
 }

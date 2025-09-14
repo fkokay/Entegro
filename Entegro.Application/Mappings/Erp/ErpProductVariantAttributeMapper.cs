@@ -69,8 +69,6 @@ namespace Entegro.Application.Mappings.Erp
                 }
             }
 
-
-
             return result;
         }
     }

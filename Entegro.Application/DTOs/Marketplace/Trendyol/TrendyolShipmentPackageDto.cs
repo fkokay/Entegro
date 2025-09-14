@@ -9,6 +9,7 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
 {
     public class TrendyolShipmentPackageDto
     {
+        public long Id { get; set; }
         public TrendyolAddressDto ShipmentAddress { get; set; }
         public string OrderNumber { get; set; }
         public decimal GrossAmount { get; set; }
@@ -20,7 +21,6 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
         public string CustomerEmail { get; set; }
         public long CustomerId { get; set; }
         public string CustomerLastName { get; set; }
-        public long Id { get; set; } // shipmentPackageId
         public long CargoTrackingNumber { get; set; }
         public string CargoTrackingLink { get; set; }
         public string CargoSenderNumber { get; set; }

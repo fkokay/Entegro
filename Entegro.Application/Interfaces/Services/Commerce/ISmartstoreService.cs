@@ -11,10 +11,10 @@ namespace Entegro.Application.Interfaces.Services.Commerce
 {
     public interface ISmartstoreService
     {
-        Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(int pageSize = 50);
-        Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync();
-        Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync();
-        Task<SmartstoreManufacturerDto?> GetManufacturerAsync(int id);
-        Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50);
+        Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(SmartstoreApiContext context,int pageSize = 50);
+        Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync(SmartstoreApiContext context);
+        Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync(SmartstoreApiContext context);
+        Task<SmartstoreManufacturerDto?> GetManufacturerAsync(SmartstoreApiContext context, int id);
+        Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(SmartstoreApiContext context, int pageSize = 50);
     }
 }

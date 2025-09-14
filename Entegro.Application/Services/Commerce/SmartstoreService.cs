@@ -1,10 +1,12 @@
 ﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.Marketplace.CicekSepeti;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services.Commerce;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -14,21 +16,32 @@ namespace Entegro.Application.Services.Commerce
 {
     public class SmartstoreService : ISmartstoreService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public SmartstoreService(HttpClient httpClient)
+        public SmartstoreService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri("https://eticaret.ozgurteknolojiyazilim.com/odata/v1/");
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var authToken = Encoding.ASCII.GetBytes("c9a68396a00e4e58ccdda2fd2b653b51:6569aa8eb0afb17f37d0f63fdd98bf3a");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+            _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(int pageSize = 50)
+        private HttpClient CreateHttpClient(SmartstoreApiContext context)
         {
+            var client = _httpClientFactory.CreateClient();
+
+            client.BaseAddress = new Uri(context.BaseUrl);
+
+            var authToken = Encoding.ASCII.GetBytes($"{context.ApiUser}:{context.ApiPassword}");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+
+            return client;
+        }
+
+        public async Task<IEnumerable<SmartstoreProductDto>> GetProductsAsync(SmartstoreApiContext context, int pageSize = 50)
+        {
+            var httpClient = CreateHttpClient(context);
+
             var allProducts = new List<SmartstoreProductDto>();
             int skip = 0;
             bool moreData = true;
@@ -36,7 +49,7 @@ namespace Entegro.Application.Services.Commerce
             while (moreData)
             {
                 var url = $"products?$top={pageSize}&$skip={skip}&$count=true&expand=ProductManufacturers";
-                var response = await _httpClient.GetAsync(url);
+                var response = await httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
@@ -63,9 +76,11 @@ namespace Entegro.Application.Services.Commerce
             return allProducts;
         }
 
-        public async Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync()
+        public async Task<IEnumerable<SmartstoreCategoryDto>> GetCategoriesAsync(SmartstoreApiContext context)
         {
-            var response = await _httpClient.GetAsync("categories?$count=true");
+            var httpClient = CreateHttpClient(context);
+
+            var response = await httpClient.GetAsync("categories?$count=true");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -78,9 +93,11 @@ namespace Entegro.Application.Services.Commerce
             return categoryResponse?.Value ?? Enumerable.Empty<SmartstoreCategoryDto>();
         }
 
-        public async Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync()
+        public async Task<IEnumerable<SmartstoreManufacturerDto>> GetManufacturersAsync(SmartstoreApiContext context)
         {
-            var response = await _httpClient.GetAsync("manufacturers?$count=true");
+            var httpClient = CreateHttpClient(context);
+
+            var response = await httpClient.GetAsync("manufacturers?$count=true");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -93,9 +110,11 @@ namespace Entegro.Application.Services.Commerce
             return manufacturers?.Value ?? Enumerable.Empty<SmartstoreManufacturerDto>();
         }
 
-        public async Task<SmartstoreManufacturerDto?> GetManufacturerAsync(int id)
+        public async Task<SmartstoreManufacturerDto?> GetManufacturerAsync(SmartstoreApiContext context, int id)
         {
-            var response = await _httpClient.GetAsync($"manufacturers({id})");
+            var httpClient = CreateHttpClient(context);
+
+            var response = await httpClient.GetAsync($"manufacturers({id})");
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -108,8 +127,10 @@ namespace Entegro.Application.Services.Commerce
             return manufacturer;
         }
 
-        public async Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(int pageSize = 50)
+        public async Task<IEnumerable<SmartstoreOrderDto>> GetOrdersAsync(SmartstoreApiContext context, int pageSize = 50)
         {
+            var httpClient = CreateHttpClient(context);
+
             var allOrders = new List<SmartstoreOrderDto>();
             int skip = 0;
             bool moreData = true;
@@ -117,7 +138,7 @@ namespace Entegro.Application.Services.Commerce
             while (moreData)
             {
                 var url = $"orders?$top={pageSize}&$skip={skip}&$count=true&expand=Customer,OrderItems($expand=Product),ShippingAddress,OrderNotes";
-                var response = await _httpClient.GetAsync(url);
+                var response = await httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();

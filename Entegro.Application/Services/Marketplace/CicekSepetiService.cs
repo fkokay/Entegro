@@ -176,5 +176,10 @@ namespace Entegro.Application.Services.Marketplace
             var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
         }
+
+        public Task<IEnumerable<CicekSepetiOrderDto>> GetOrdersAsync(CicekSepetiApiContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

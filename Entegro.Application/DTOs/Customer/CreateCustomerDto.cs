@@ -19,7 +19,5 @@ namespace Entegro.Application.DTOs.Customer
         public int CustomerType { get; set; } // 0: Individual, 1: Corporate
         public string TaxOffice { get; set; }
         public string TaxNumber { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
     }
 }
