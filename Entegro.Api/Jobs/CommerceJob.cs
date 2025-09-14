@@ -10,7 +10,7 @@ using Quartz;
 
 namespace Entegro.Api.Jobs
 {
-    public class CommerceJobs : IJob
+    public class CommerceJob : IJob
     {
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IN11Service _n11Service;
@@ -18,7 +18,7 @@ namespace Entegro.Api.Jobs
         private readonly IHepsiburadaService _hepsiburadaService;
         private readonly ITrendyolService _trendyolService;
         private readonly ICicekSepetiService _cicekSepetiService;
-        public CommerceJobs(IN11Service n11Service,IPazaramaService pazaramaService,IHepsiburadaService hepsiburadaService,ITrendyolService trendyolService,ICicekSepetiService cicekSepetiService,IProductIntegrationService productIntegrationService)
+        public CommerceJob(IN11Service n11Service,IPazaramaService pazaramaService,IHepsiburadaService hepsiburadaService,ITrendyolService trendyolService,ICicekSepetiService cicekSepetiService,IProductIntegrationService productIntegrationService)
         {
             _productIntegrationService = productIntegrationService;
             _n11Service = n11Service;   

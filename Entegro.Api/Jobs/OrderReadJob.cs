@@ -26,13 +26,14 @@ using Quartz;
 
 namespace Entegro.Api.Jobs
 {
-    public class OrderJob : IJob
+    public class OrderReadJob : IJob
     {
         private readonly IN11Service _n11;
         private readonly IPazaramaService _pazarama;
         private readonly IHepsiburadaService _hepsiburada;
         private readonly ITrendyolService _trendyol;
         private readonly ICicekSepetiService _cicekSepeti;
+     
         private readonly ISmartstoreService _smartstore;
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
@@ -40,8 +41,8 @@ namespace Entegro.Api.Jobs
         private readonly IProductService _productService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IMapper _mapper;
-        private readonly ILogger<OrderJob> _logger;
-        public OrderJob(
+        private readonly ILogger<OrderReadJob> _logger;
+        public OrderReadJob(
             IN11Service n11,
             IPazaramaService pazarama,
             IHepsiburadaService hepsiburada,
@@ -54,7 +55,7 @@ namespace Entegro.Api.Jobs
             IProductService productService,
             IIntegrationSystemService integrationSystemService,
             IMapper mapper,
-            ILogger<OrderJob> logger)
+            ILogger<OrderReadJob> logger)
         {
             _n11 = n11;
             _pazarama = pazarama;

@@ -123,13 +123,13 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    var jobKeyCommerce = new JobKey("OrderJob");
+    var orderReadJob = new JobKey("OrderReadJob");
 
-    q.AddJob<OrderJob>(opts => opts.WithIdentity(jobKeyCommerce));
+    q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
 
     q.AddTrigger(opts => opts
-        .ForJob(jobKeyCommerce)
-        .WithIdentity("OrderJob-trigger")
+        .ForJob(orderReadJob)
+        .WithIdentity("OrderReadJob-trigger")
         .WithSimpleSchedule(x => x
             .WithIntervalInMinutes(1)
             .RepeatForever())
