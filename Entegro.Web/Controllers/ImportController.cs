@@ -67,13 +67,9 @@ namespace Entegro.Web.Controllers
                     }
                 }
             }
-            finally
+            catch (Exception ex)
             {
-
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
+                Console.WriteLine($"Hata oluştu: {ex.Message}");
             }
 
             return View("ImportResult", selectedColumns);
