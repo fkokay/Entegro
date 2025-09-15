@@ -26,6 +26,7 @@ namespace Entegro.Application.DTOs.Order
                 {
                     OrderSource.Smartstore => "Smartstore",
                     OrderSource.Trendyol => "Trendyol",
+                    OrderSource.Hepsiburada => "Hepsiburada",
                     _ => throw new NotImplementedException(),
                 };
             }

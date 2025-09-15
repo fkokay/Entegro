@@ -13,6 +13,8 @@ namespace Entegro.Domain.Enums
         Smartstore = 1,
         [Description("Trendyol")]
         Trendyol = 2,
+        [Description("Hepsiburada")]
+        Hepsiburada = 3,
     }
     public enum OrderStatus
     {

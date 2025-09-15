@@ -40,6 +40,7 @@ namespace Entegro.Api.Jobs
         private readonly IAddressService _addressService;
         private readonly IProductService _productService;
         private readonly IIntegrationSystemService _integrationSystemService;
+        private readonly IProductIntegrationService _productIntegrationService;
         private readonly IMapper _mapper;
         private readonly ILogger<OrderReadJob> _logger;
         public OrderReadJob(
@@ -54,6 +55,7 @@ namespace Entegro.Api.Jobs
             IAddressService addressService,
             IProductService productService,
             IIntegrationSystemService integrationSystemService,
+            IProductIntegrationService productIntegrationService,
             IMapper mapper,
             ILogger<OrderReadJob> logger)
         {
@@ -68,6 +70,7 @@ namespace Entegro.Api.Jobs
             _addressService = addressService;
             _productService = productService;
             _integrationSystemService = integrationSystemService;
+            _productIntegrationService = productIntegrationService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -100,22 +103,22 @@ namespace Entegro.Api.Jobs
             switch (marketPlaceType)
             {
                 case "N11":
-                    await N11OrderSync(item);
+                    //await N11OrderSync(item);
                     break;
                 case "Hepsiburada":
                     await HepsiburadaOrderSync(item);
                     break;
                 case "Trendyol":
-                    await TrendyolOrderSync(item);
+                    //await TrendyolOrderSync(item);
                     break;
                 case "CicekSepeti":
-                    await CicekSepetiOrderSync(item);
+                    //await CicekSepetiOrderSync(item);
                     break;
                 case "Pazarama":
-                    await PazaramaOrderSync(item);
+                    //await PazaramaOrderSync(item);
                     break;
                 case "Idefix":
-                    await IdefixOrderSync(item);
+                    // IdefixOrderSync(item);
                     break;
                 default:
                     _logger.LogError("{0} pazaryerine ait sipariş çekme işlemi bulunamadı", marketPlaceType);
@@ -588,16 +591,16 @@ namespace Entegro.Api.Jobs
                         {
                             if (orderItem.Product != null)
                             {
-                                var product = await _productService.GetProductByCodeAsync(orderItem.Product.Code);
+                                var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.Product.Code);
 
-                                if (product == null)
+                                if (productIntegration == null)
                                 {
-                                    _logger.Error($"{orderItem.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
+                                    _logger.Error($"{orderItem.Product.Code} kodlu ürün eşleştirlmemiştir.");
                                     continue;
                                 }
 
                                 orderItem.Product = null;
-                                orderItem.ProductId = product.Id;
+                                orderItem.ProductId = productIntegration.ProductId;
                             }
                         }
                         #endregion

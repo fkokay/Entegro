@@ -36,10 +36,21 @@ namespace Entegro.Application.Services.Marketplace
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
         }
 
-        private HttpClient CreateHttpClient(HepsiburadaApiContext context)
+        private HttpClient CreateHttpClient(HepsiburadaApiContext context,string clientType)
         {
             var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(context.BaseUrl);
+            switch (clientType)
+            {
+                case "Listing":
+                    client.BaseAddress = new Uri(context.ListingBaseUrl);
+                    break;
+                case "Order":
+                    client.BaseAddress = new Uri(context.OrderBaseUrl);
+                    break;
+                default:
+                    break;
+            }
+
 
             var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{context.ApiUser}:{context.ApiPassword}"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
@@ -136,7 +147,7 @@ namespace Entegro.Application.Services.Marketplace
 
         public async Task<IEnumerable<HepsiburadaProductDto>> GetProductsAsync(HepsiburadaApiContext context, int pageSize = 50)
         {
-            using var client = CreateHttpClient(context);
+            using var client = CreateHttpClient(context, "Listing");
             var response = await client.GetAsync($"listings/merchantid/{context.MerchantId}?offset=0&limit=10");
             response.EnsureSuccessStatusCode();
 
@@ -156,7 +167,7 @@ namespace Entegro.Application.Services.Marketplace
 
         public async Task<HepsiburadaProductDto?> GetProductWitHbSkuAsync(HepsiburadaApiContext context, string hbSku)
         {
-            using var client = CreateHttpClient(context);
+            using var client = CreateHttpClient(context, "Listing");
             var response = await client.GetAsync($"listings/merchantid/{context.MerchantId}?offset=0&limit=10&hbSkuList={hbSku}");
             response.EnsureSuccessStatusCode();
 
@@ -176,7 +187,7 @@ namespace Entegro.Application.Services.Marketplace
 
         public async Task<HepsiburadaProductDto?> GetProductWithMerchantSkuAsync(HepsiburadaApiContext context, string merchantSku)
         {
-            using var client = CreateHttpClient(context);
+            using var client = CreateHttpClient(context, "Listing");
             var response = await client.GetAsync($"listings/merchantid/{context.MerchantId}?offset=0&limit=10&merchantSkuList={merchantSku}");
             response.EnsureSuccessStatusCode();
 
@@ -194,15 +205,30 @@ namespace Entegro.Application.Services.Marketplace
             return data.Listings.FirstOrDefault();
         }
 
-        public Task<IEnumerable<HepsiburadaShipmentPackageDto>> GetShipmentPackagesAsync(HepsiburadaApiContext context, int pageSize = 50)
+        public async Task<IEnumerable<HepsiburadaShipmentPackageDto>> GetShipmentPackagesAsync(HepsiburadaApiContext context, int pageSize = 50)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context, "Order");
+            var response = await client.GetAsync($"packages/merchantid/{context.MerchantId}?offset=0&limit=10");
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<IEnumerable<HepsiburadaShipmentPackageDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.ToList();
         }
 
         public async Task UpdatePriceAsync(HepsiburadaApiContext context, List<HepsiburadaPriceUpdateDto> hepsiburadaPriceUpdates)
         {
 
-            using var client = CreateHttpClient(context);
+            using var client = CreateHttpClient(context, "Listing");
             var url = $"listings/merchantid/{context.MerchantId}/price-uploads";
             var json = JsonSerializer.Serialize(hepsiburadaPriceUpdates, new JsonSerializerOptions
             {
@@ -218,7 +244,7 @@ namespace Entegro.Application.Services.Marketplace
 
         public async Task UpdateStockAsync(HepsiburadaApiContext context, List<HepsiburadaStockUpdateDto> hepsiburadaStockUpdates)
         {
-            using var client = CreateHttpClient(context);
+            using var client = CreateHttpClient(context, "Listing");
             var url = $"listings/merchantid/{context.MerchantId}/stock-uploads";
             var json = JsonSerializer.Serialize(hepsiburadaStockUpdates, new JsonSerializerOptions
             {
