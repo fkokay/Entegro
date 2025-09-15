@@ -10,6 +10,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Entegro.Application.Notifications;
 using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -31,6 +32,7 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductService _productService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ILogger<TrendyolService> _logger;
+
         public TrendyolService(
             IHttpClientFactory httpClientFactory, 
             IProductIntegrationService productIntegrationService, 
@@ -106,18 +108,22 @@ namespace Entegro.Application.Services.Marketplace
                         var request = new TrendyolPriceAndStockUpdateRequest
                         {
                             Items = new List<TrendyolPriceAndStockUpdateDto>
-                        {
-                            new TrendyolPriceAndStockUpdateDto
                             {
-                                Barcode = productIntegration.IntegrationCode,
-                                ListPrice = productIntegration.Price,
-                                SalePrice = productIntegration.Price,
-                                Quantity = stockQuantity
+                                new TrendyolPriceAndStockUpdateDto
+                                {
+                                    Barcode = productIntegration.IntegrationCode,
+                                    ListPrice = productIntegration.Price,
+                                    SalePrice = productIntegration.Price,
+                                    Quantity = stockQuantity
+                                }
                             }
-                        }
                         };
 
                     await UpdatePriceAndStockAsync(apiContext,request);
+
+
+                    await EntegroNotification.SendNotification($"Trendyol {product.Name} stok ve fiyat güncellendi");
+
                 }
             }
         }

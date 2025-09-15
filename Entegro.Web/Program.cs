@@ -6,6 +6,7 @@ using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Extensions;
 using Entegro.Utilities;
+using Entegro.Web.Hubs;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -119,6 +120,8 @@ builder.Services.AddMarketplaceServices();
 MapsterConfig.RegisterMappings();
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
+
+builder.Services.AddSignalR();
 #endregion
 
 #region Build App
@@ -167,6 +170,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 engineStarter.ConfigureApplication(app);
+
+app.MapHub<NotificationHub>("/notificationHub");
 app.Run();
 #endregion
 

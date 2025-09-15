@@ -35,6 +35,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
