@@ -45,4 +45,8 @@
     <ProjectReference Include="..\Entegro.Domain\Entegro.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Shipment\" />
+  </ItemGroup>
+
 </Project>

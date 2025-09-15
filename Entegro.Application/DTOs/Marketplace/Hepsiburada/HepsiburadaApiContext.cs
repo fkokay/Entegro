@@ -8,7 +8,8 @@ namespace Entegro.Application.DTOs.Marketplace.Hepsiburada
 {
     public class HepsiburadaApiContext
     {
-        public string BaseUrl = "https://listing-external-sit.hepsiburada.com/";
+        public string ListingBaseUrl = "https://listing-external-sit.hepsiburada.com/";
+        public string OrderBaseUrl = "https://oms-external-sit.hepsiburada.com/";
         public string MerchantId { get; set; }
         public string ApiUser { get; set; }
         public string ApiPassword { get; set; }

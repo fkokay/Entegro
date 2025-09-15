@@ -120,6 +120,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Skip(gridCommand.Start)
                 .Take(gridCommand.Length)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<Product>
