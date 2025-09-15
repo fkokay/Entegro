@@ -1,12 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Entegro.Domain.Entities.Checkout
+﻿namespace Entegro.Application.DTOs.Shipment
 {
-    [Table("Shipment")]
-    public class Shipment : BaseEntity
+    public class CreateShipmentDto
     {
+        public int Id { get; set; }
         public int OrderId { get; set; }
-        public virtual Order Order { get; set; }
         public string Carrier { get; set; } = string.Empty;
         public string? TrackingNumber { get; set; }
         public string? TrackingUrl { get; set; }
@@ -14,6 +11,5 @@ namespace Entegro.Domain.Entities.Checkout
         public DateTime? ShippedDateUtc { get; set; }
         public DateTime? DeliveryDateUtc { get; set; }
         public DateTime CreatedOnUtc { get; set; }
-        public virtual ICollection<ShipmentItem> ShipmentItems { get; set; } = new HashSet<ShipmentItem>();
     }
 }

@@ -25,6 +25,8 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.Shipment;
+using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.DTOs.Town;
@@ -153,6 +155,18 @@ namespace Entegro.Application.Mappings
             config.NewConfig<ImportProfile, ImportProfileDto>().TwoWays();
             config.NewConfig<ImportProfile, CreateImportProfileDto>().TwoWays();
             config.NewConfig<ImportProfile, UpdateImportProfileDto>().TwoWays();
+
+
+            // ---------------- Shipment ----------------
+            config.NewConfig<Shipment, ShipmentDto>().TwoWays();
+            config.NewConfig<Shipment, CreateShipmentDto>().TwoWays();
+            config.NewConfig<Shipment, UpdateShipmentDto>().TwoWays();
+
+
+            // ---------------- ShipmentItem ----------------
+            config.NewConfig<ShipmentItem, ShipmentItemDto>().TwoWays();
+            config.NewConfig<ShipmentItem, CreateShipmentItemDto>().TwoWays();
+            config.NewConfig<ShipmentItem, UpdateShipmentItemDto>().TwoWays();
 
 
         }
