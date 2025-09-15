@@ -1,13 +1,7 @@
 ﻿using Entegro.Application.Interfaces.Repositories;
-using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Extensions
 {
@@ -43,6 +37,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<ISpecificationAttributeRepository, SpecificationAttributeRepository>();
             services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<IImportProfileRepository, ImportProfileRepository>();
             services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
             services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();
             return services;

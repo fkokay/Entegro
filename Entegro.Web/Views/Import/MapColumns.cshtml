@@ -1,4 +1,4 @@
-﻿@model List<ColumnMapping>
+﻿@model ImportProfileViewModel
 @{
     ViewData["Title"] = "İçe Aktar";
 }
@@ -7,42 +7,54 @@
     <div class="row">
 
         <form asp-action="ImportData" asp-controller="Import" method="post" id="importForm">
-            <table class="table table-bordered">
+            <input asp-for="MediaFileId" type="hidden" class="form-control" />
+            <div class="col-md-12 mt-3">
+                <div class="row">
+                    <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
+                    <div class="col-sm-9">
+                        <input asp-for="ProfileName" type="text" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-bordered mt-3">
                 <thead>
                     <tr>
                         <th>Excel Kolonu</th>
                         <th>İçe Aktarılsın mı?</th>
                         <th>Veritabanı Kolonu</th>
+                        <th>Varsayılan(Default Değer)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < Model.Count; i++)
+                    @for (int i = 0; i < Model.ColumnMappings.Count; i++)
                     {
                         <tr>
                             <td>
-                                <input type="text" name="[@i].ExcelHeader" value="@Model[i].ExcelHeader" readonly class="form-control" />
+                                <input type="text" name="ColumnMappings[@i].ExcelHeader" value="@Model.ColumnMappings[i].ExcelHeader" readonly class="form-control" />
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" name="[@i].IsImport" value="true" />
+                                <input type="checkbox" name="ColumnMappings[@i].IsImport" value="true" />
+                                <input type="hidden" name="ColumnMappings[@i].IsImport" value="false" />
                             </td>
                             <td>
-                                <select name="[@i].DbColumn" class="form-control">
+                                <select name="ColumnMappings[@i].DbColumn" class="form-control" asp-items="ViewBag.DbColumns">
                                     <option value="">-- Seçiniz --</option>
-                                    <option value="Name">Name</option>
-                                    <option value="Stock">Stock</option>
-                                    <option value="Barcode">Barcode</option>
-                                    <option value="StockQuantity">StockQuantity</option>
-                                    <option value="Status">Status</option>
                                 </select>
+                            </td>
+                            <td>
+                                <input type="text" name="ColumnMappings[@i].DefaultValue" value="@Model.ColumnMappings[i].DefaultValue" class="form-control" />
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-            <button type="submit" class="btn btn-success">İçe Aktar</button>
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">İçe Aktar</button>
+            </div>
         </form>
 
-        
+
         <div id="loadingModal" style="display:none; position:fixed; top:0; left:0;
     width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;
     text-align:center; padding-top:200px;">
@@ -54,40 +66,55 @@
 
 @section Scripts {
     <script>
-        document.getElementById("importForm").addEventListener("submit", function (e) {
-            let isValid = true;
-            let hasAnyChecked = false;
-            const rows = document.querySelectorAll("tbody tr");
+      document.getElementById("importForm").addEventListener("submit", function (e) {
+    let isValid = true;
+    let hasAnyChecked = false;
+    const rows = document.querySelectorAll("tbody tr");
 
-            rows.forEach((row, index) => {
-                const checkbox = row.querySelector(`input[name="[${index}].IsImport"]`);
-                const select = row.querySelector(`select[name="[${index}].DbColumn"]`);
+    rows.forEach((row, index) => {
+        const checkbox = row.querySelector(`input[name="ColumnMappings[${index}].IsImport"]`);
+        const select = row.querySelector(`select[name="ColumnMappings[${index}].DbColumn"]`);
 
-                if (checkbox.checked) {
-                    hasAnyChecked = true;
-                    if (select.value === "") {
-                        isValid = false;
-                        select.classList.add("is-invalid");
-                    } else {
-                        select.classList.remove("is-invalid");
-                    }
-                } else {
-                    select.classList.remove("is-invalid");
-                }
-            });
-
-            if (!hasAnyChecked) {
-                e.preventDefault();
-                alert("Lütfen en az bir satır için 'İçe Aktarılsın mı?' kutucuğunu işaretleyin.");
-                return;
+        if (checkbox && checkbox.checked) {
+            hasAnyChecked = true;
+            if (select && select.value === "") {
+                isValid = false;
+                select.classList.add("is-invalid");
+            } else if (select) {
+                select.classList.remove("is-invalid");
             }
+        } else if (select) {
+            select.classList.remove("is-invalid");
+        }
+    });
 
-            if (!isValid) {
-                e.preventDefault();
-                alert("İşaretlenen satırların veritabanı kolonu boş bırakılamaz.");
-                return;
-            }
-            document.getElementById("loadingModal").style.display = "block";
-        });
+    const profileNameInput = document.querySelector('input[name="ProfileName"]');
+    if (!profileNameInput || !profileNameInput.value.trim()) {
+        e.preventDefault();
+        alert("Lütfen profil adı giriniz.");
+        if (profileNameInput) {
+            profileNameInput.classList.add("is-invalid");
+            profileNameInput.focus();
+        }
+        return;
+    } else {
+        profileNameInput.classList.remove("is-invalid");
+    }
+
+    if (!hasAnyChecked) {
+        e.preventDefault();
+        alert("Lütfen en az bir satır için 'İçe Aktarılsın mı?' kutucuğunu işaretleyin.");
+        return;
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+        alert("İşaretlenen satırların veritabanı kolonu boş bırakılamaz.");
+        return;
+    }
+
+    document.getElementById("loadingModal").style.display = "block";
+});
+
     </script>
 }

@@ -3,11 +3,6 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;
 using Entegro.Infrastructure.Messaging;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Extensions
 {
@@ -44,6 +39,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<ISpecificationAttributeService, SpecificationAttributeService>();
             services.AddScoped<IEmailAccountService, EmailAccountService>();
             services.AddScoped<IAddressService, AddressService>();
+            services.AddScoped<IImportProfileService, ImportProfileService>();
             services.AddScoped<IProductSpecificationAttributeMappingService, ProductSpecificationAttributeMappingService>();
 
             services.AddScoped<IEventPublisher, EventBus>();
