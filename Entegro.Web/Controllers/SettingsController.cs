@@ -1104,8 +1104,9 @@ namespace Entegro.Web.Controllers
             var id = integrationSystemMarketplace.Id;
             var name = integrationSystemMarketplace.Name;
             var description = integrationSystemMarketplace.Description;
-            var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
-            var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var token = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "Token" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var secret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "Secret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
+            var sellerId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SellerId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
             IdefixMarketplaceSettingsViewModel model = new IdefixMarketplaceSettingsViewModel();
             model.Id = id;
@@ -1114,8 +1115,9 @@ namespace Entegro.Web.Controllers
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
-            model.ApiUser = apiUser?.Value;
-            model.SupplierId = supplierId?.Value;
+            model.Token = token?.Value;
+            model.Secret = secret?.Value;
+            model.SellerId = sellerId?.Value;
 
             return View($"Marketplace.{marketPlaceType}", model);
         }
@@ -1365,46 +1367,69 @@ namespace Entegro.Web.Controllers
                 Name = model.Name
             });
 
-            var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
-            if (apiUser == null)
+            var token = await _integrationSystemParameterService.GetByKeyAsync("Token", model.IntegrationSystemId);
+            if (token == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "ApiUser";
-                createIntegrationSystemParameter.Value = model.ApiUser;
+                createIntegrationSystemParameter.Key = "Token";
+                createIntegrationSystemParameter.Value = model.Token;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = apiUser.Id;
+                updateIntegrationSystemParameter.Id = token.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "ApiUser";
-                updateIntegrationSystemParameter.Value = model.ApiUser;
+                updateIntegrationSystemParameter.Key = "Token";
+                updateIntegrationSystemParameter.Value = model.Token;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
-            var supplierId = await _integrationSystemParameterService.GetByKeyAsync("SupplierId", model.IntegrationSystemId);
-            if (supplierId == null)
+
+            var secret = await _integrationSystemParameterService.GetByKeyAsync("Secret", model.IntegrationSystemId);
+            if (secret == null)
             {
                 CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
                 createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                createIntegrationSystemParameter.Key = "SupplierId";
-                createIntegrationSystemParameter.Value = model.SupplierId;
+                createIntegrationSystemParameter.Key = "Secret";
+                createIntegrationSystemParameter.Value = model.Secret;
 
                 await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
             }
             else
             {
                 UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
-                updateIntegrationSystemParameter.Id = supplierId.Id;
+                updateIntegrationSystemParameter.Id = secret.Id;
                 updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
-                updateIntegrationSystemParameter.Key = "SupplierId";
-                updateIntegrationSystemParameter.Value = model.SupplierId;
+                updateIntegrationSystemParameter.Key = "Secret";
+                updateIntegrationSystemParameter.Value = model.Secret;
 
                 await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
             }
+
+            var sellerId = await _integrationSystemParameterService.GetByKeyAsync("SellerId", model.IntegrationSystemId);
+            if (sellerId == null)
+            {
+                CreateIntegrationSystemParameterDto createIntegrationSystemParameter = new CreateIntegrationSystemParameterDto();
+                createIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                createIntegrationSystemParameter.Key = "SellerId";
+                createIntegrationSystemParameter.Value = model.SellerId;
+
+                await _integrationSystemParameterService.AddAsync(createIntegrationSystemParameter);
+            }
+            else
+            {
+                UpdateIntegrationSystemParameterDto updateIntegrationSystemParameter = new UpdateIntegrationSystemParameterDto();
+                updateIntegrationSystemParameter.Id = sellerId.Id;
+                updateIntegrationSystemParameter.IntegrationSystemId = model.IntegrationSystemId;
+                updateIntegrationSystemParameter.Key = "SellerId";
+                updateIntegrationSystemParameter.Value = model.SellerId;
+
+                await _integrationSystemParameterService.UpdateAsync(updateIntegrationSystemParameter);
+            }
+
             return RedirectToAction("marketplace");
         }
         [HttpPost]
