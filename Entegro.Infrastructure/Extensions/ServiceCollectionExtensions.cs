@@ -40,6 +40,8 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IEmailAccountService, EmailAccountService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IImportProfileService, ImportProfileService>();
+            services.AddScoped<IShipmentService, ShipmentService>();
+            services.AddScoped<IShipmentItemService, ShipmentItemService>();
             services.AddScoped<IProductSpecificationAttributeMappingService, ProductSpecificationAttributeMappingService>();
 
             services.AddScoped<IEventPublisher, EventBus>();
