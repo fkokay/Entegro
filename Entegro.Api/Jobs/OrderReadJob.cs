@@ -227,7 +227,7 @@ namespace Entegro.Api.Jobs
                     }
                 }
 
-                _logger.LogInformation("ÇicekSepeti sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+                _logger.LogInformation("Pazarama sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
             }
             catch (Exception ex)
             {
@@ -615,7 +615,7 @@ namespace Entegro.Api.Jobs
                     }
                 }
 
-                _logger.LogInformation("N11 sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+                _logger.LogInformation("Hepsiburada sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
             }
             catch (Exception ex)
             {
