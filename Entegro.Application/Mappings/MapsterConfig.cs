@@ -7,6 +7,7 @@ using Entegro.Application.DTOs.Country;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.District;
 using Entegro.Application.DTOs.EmailAccount;
+using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemLog;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
@@ -32,6 +33,7 @@ using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Domain.Entities.Common;
 using Entegro.Domain.Entities.Content;
+using Entegro.Domain.Entities.Import;
 using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform.Identity;
 using Entegro.Domain.Entities.Platform.Messaging;
@@ -145,6 +147,12 @@ namespace Entegro.Application.Mappings
             config.NewConfig<Order, OrderDto>().TwoWays();
             config.NewConfig<Order, CreateOrderDto>().TwoWays();
             config.NewConfig<Order, UpdateOrderDto>().TwoWays();
+
+
+            // ---------------- ImportProfile ----------------
+            config.NewConfig<ImportProfile, ImportProfileDto>().TwoWays();
+            config.NewConfig<ImportProfile, CreateImportProfileDto>().TwoWays();
+            config.NewConfig<ImportProfile, UpdateImportProfileDto>().TwoWays();
 
 
         }

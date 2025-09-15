@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250915114657_add-importprofile_add_mediafileextension")]
+    partial class addimportprofile_add_mediafileextension
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -720,9 +723,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("DueDateUtc")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsTransient")
                         .HasColumnType("bit");
 
@@ -961,10 +961,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Carrier")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("datetime2");
 
@@ -981,9 +977,11 @@ namespace Entegro.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TrackingNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TrackingUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1368,11 +1366,11 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<bool>("Enable")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MediaFileExtension")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("MediaFileId")
                         .HasColumnType("int");
-
-                    b.Property<string>("MediaFileType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfileName")
                         .IsRequired()

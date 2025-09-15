@@ -6,41 +6,20 @@
 
 <div class="container-fluid flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">İçe Aktarılanlar</span></h4>
+
     <div class="row">
         <div class="col-xl-9 col-lg-7 col-md-7 order-1 order-md-0">
-            <div class="card mb-4">
-                <h5 class="card-header">Seçilen Kolonlar ve Veriler</h5>
-                <div class="table-responsive text-nowrap">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead>
-                            <tr>
-                                @foreach (var col in Model)
-                                {
-                                    <th>@col.DbColumn (@col.ExcelHeader)</th>
-                                }
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-
-                                var rowCount = Model.Max(m => m.Values.Count);
-                            }
-
-                            @for (int i = 0; i < rowCount; i++)
-                            {
-                                <tr>
-                                    @foreach (var col in Model)
-                                    {
-                                        <td>@(i<col.Values.Count? col.Values[i] : "")</td>
-                                    }
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+            <div class="card">
+                <h5 class="card-header">JSON Formatı</h5>
+                <div class="card-body">
+                    <pre class="bg-light p-3 border rounded" style="white-space: pre-wrap; word-break: break-word;">
+@Html.Raw(ViewBag.MappedJson)
+                    </pre>
                 </div>
-              
             </div>
+
         </div>
     </div>
 </div>
+
 

@@ -22,10 +22,8 @@
                                 <input type="hidden" id="upload-file" name="upload-file" />
                                 <div class="fu-buttons"></div>
                             </div>
-
                         </div>
                     </div>
-
                     <div class="file-preview-template d-none">
                         <div class="fu-file-preview dz-file-preview shadow-sm">
                             <figure class="file-figure d-flex m-0 align-items-center justify-content-center file-thumb show loaded">
@@ -85,9 +83,14 @@
                 showRemoveButton: false,
                 showRemoveButtonAfterUpload: true,
                 downloadEnabled: false,
-                success: function (file, response) {
-                    if (response && response.redirectUrl) {
-                        window.location.href = response.redirectUrl;
+                success: function (response) {
+                    if (response) {
+                            if (response.media && response.media.id) {
+                                 var mediaId = response.media.id;
+                                 console.log(mediaId);
+                                 window.location.href = '/import/MapColumns?mediaFileId=' + mediaId;
+                            }
+                            
                     }
                 }
             });

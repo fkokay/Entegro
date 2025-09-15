@@ -1,13 +1,10 @@
-﻿using ClosedXML.Excel;
-using Entegro.Application.DTOs.MediaFolder;
+﻿using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Exceptions;
-using Entegro.Web.Models.Import;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Dynamic;
-using System.Text.Json;
 
 namespace Entegro.Web.Controllers
 {
@@ -271,48 +268,6 @@ namespace Entegro.Web.Controllers
                 catch (Exception)
                 {
                     throw;
-                }
-            }
-
-            if (result.Count == 1)
-            {
-                dynamic uploadedFileInfo = result[0];
-                string uploadedFileName = uploadedFileInfo.name;
-                string folderName = uploadedFileInfo.dir;
-                string uploadedFilePath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "App_Data",
-                    "Media",
-                    "Storage",
-                    folderName,
-                    uploadedFileName
-                );
-
-                string extension = Path.GetExtension(uploadedFilePath).ToLowerInvariant();
-
-                if (extension == ".xlsx" || extension == ".xls")
-                {
-                    TempData["UploadedFilePath"] = uploadedFilePath;
-
-                    var headers = new List<ColumnMapping>();
-                    using var stream = new FileStream(uploadedFilePath, FileMode.Open, FileAccess.Read);
-                    using var workbook = new XLWorkbook(stream);
-                    var worksheet = workbook.Worksheet(1);
-
-                    foreach (var cell in worksheet.Row(1).CellsUsed())
-                    {
-                        headers.Add(new ColumnMapping
-                        {
-                            ExcelHeader = cell.Value.ToString()
-                        });
-                    }
-                    TempData["Headers"] = JsonSerializer.Serialize(headers);
-                    TempData["UploadedFilePath"] = uploadedFilePath;
-                    return Json(new
-                    {
-                        success = true,
-                        redirectUrl = Url.Action("MapColumns", "Import")
-                    });
                 }
             }
 

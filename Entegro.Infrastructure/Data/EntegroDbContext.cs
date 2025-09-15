@@ -4,6 +4,7 @@ using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Domain.Entities.Common;
 using Entegro.Domain.Entities.Content;
+using Entegro.Domain.Entities.Import;
 using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform;
 using Entegro.Domain.Entities.Platform.Identity;
@@ -65,6 +66,7 @@ namespace Entegro.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new SpecificationAttributeOptionMap());
             modelBuilder.ApplyConfiguration(new TownMap());
             modelBuilder.ApplyConfiguration(new UserMap());
+            modelBuilder.ApplyConfiguration(new ImportProfileMap());
 
         }
 
@@ -105,5 +107,6 @@ namespace Entegro.Infrastructure.Data
         public DbSet<ProductSpecificationAttribute> ProductSpecificationAttributes { get; set; }
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<ImportProfile> ImportProfiles { get; set; }
     }
 }
