@@ -33,7 +33,7 @@ namespace Entegro.Api.Jobs
         private readonly IHepsiburadaService _hepsiburada;
         private readonly ITrendyolService _trendyol;
         private readonly ICicekSepetiService _cicekSepeti;
-     
+
         private readonly ISmartstoreService _smartstore;
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
@@ -607,7 +607,9 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        var createdOrder = await _orderService.CreateOrderAsync(createOrder);
+
+             
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
