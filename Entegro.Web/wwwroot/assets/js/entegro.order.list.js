@@ -40,6 +40,9 @@ Entegro.order.OrderList = (function ($) {
                     data: 'OrderTotal',
                     render: $.fn.dataTable.render.number(".", ",", 2)
                 },
+                { data: 'OrderStatusLabelHint' },
+                { data: 'PaymentStatusLabelHint' },
+                { data: 'ShippingStatusLabelHint' },
                 { data: 'Id' } // İşlemler
             ],
             columnDefs: [

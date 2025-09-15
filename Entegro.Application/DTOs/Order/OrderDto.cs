@@ -72,6 +72,22 @@ namespace Entegro.Application.DTOs.Order
             set => OrderStatusId = (int)value;
         }
 
+        [NotMapped]
+        public string OrderStatusLabelHint
+        {
+            get
+            {
+                return OrderStatus switch
+                {
+                    OrderStatus.Pending => "Beklemede",
+                    OrderStatus.Processing => "Hazırlanıyor",
+                    OrderStatus.Complete => "Tamamlandı",
+                    OrderStatus.Cancelled => "İptal edildi",
+                    _ => throw new NotImplementedException(),
+                };
+            }
+        }
+
         public int PaymentStatusId { get; set; }
 
         [NotMapped]
@@ -81,6 +97,24 @@ namespace Entegro.Application.DTOs.Order
             set => PaymentStatusId = (int)value;
         }
 
+        [NotMapped]
+        public string PaymentStatusLabelHint
+        {
+            get
+            {
+                return PaymentStatus switch
+                {
+                    PaymentStatus.Pending => "Beklemede",
+                    PaymentStatus.Authorized => "Onaylandı",
+                    PaymentStatus.Paid => "Ödendi",
+                    PaymentStatus.PartiallyRefunded => "Kısmen İade Edildi",
+                    PaymentStatus.Refunded => "İade Edildi",
+                    PaymentStatus.Voided => "Geçersiz",
+                    _ => throw new NotImplementedException(),
+                };
+            }
+        }
+
         public int ShippingStatusId { get; set; }
 
         [NotMapped]
@@ -88,6 +122,23 @@ namespace Entegro.Application.DTOs.Order
         {
             get => (ShippingStatus)ShippingStatusId;
             set => ShippingStatusId = (int)value;
+        }
+
+        [NotMapped]
+        public string ShippingStatusLabelHint
+        {
+            get
+            {
+                return ShippingStatus switch
+                {
+                    ShippingStatus.ShippingNotRequired => "Nakliye gerekli değil",
+                    ShippingStatus.NotYetShipped => "Henüz teslim edilmedi",
+                    ShippingStatus.PartiallyShipped => "Kısmen teslim edildi",
+                    ShippingStatus.Shipped => "Gönderildi",
+                    ShippingStatus.Delivered => "Teslim edildi",
+                    _ => throw new NotImplementedException(),
+                };
+            }
         }
 
         public decimal CalculateTotalAmount()
