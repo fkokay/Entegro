@@ -90,6 +90,7 @@ namespace Entegro.Domain.Entities.Checkout
         public bool IsTransient { get; set; }
         public string TaxRates { get; set; }
         public DateTime? PaidDateUtc { get; set; }
+        public DateTime? DueDateUtc { get; set; }
         public string ShippingMethod { get; set; }
         public int OrderStatusId { get; set; }
 
