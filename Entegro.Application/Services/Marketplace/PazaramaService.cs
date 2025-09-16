@@ -8,6 +8,7 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Notifications;
 using Entegro.Domain.Enums;
 using Entegro.Imaging.Barcodes;
 using System;
@@ -123,6 +124,8 @@ namespace Entegro.Application.Services.Marketplace
                     };
 
                     await UpdateStockAsync(apiContext, stockRequest);
+
+                    await EntegroNotification.SendNotification($"Pazarama {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

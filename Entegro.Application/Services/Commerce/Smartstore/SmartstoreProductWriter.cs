@@ -5,6 +5,7 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
+using Entegro.Application.Notifications;
 using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -68,6 +69,8 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     };
 
                     await _smartstoreClient.UpsertProductAsync(request);
+
+                    await EntegroNotification.SendNotification($"Smartstore {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

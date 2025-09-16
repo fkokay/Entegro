@@ -8,7 +8,8 @@
         public int IntegrationSystemTypeId { get; set; }
         public int IntegrationSystemId { get; set; }
         public string MarketplaceType { get; set; }
-        public string ApiUser { get; set; }
-        public string SupplierId { get; set; }
+        public string Token { get; set; }
+        public string Secret { get; set; }
+        public string SellerId { get; set; }
     }
 }
