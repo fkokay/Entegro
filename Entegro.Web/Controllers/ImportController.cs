@@ -223,7 +223,7 @@ namespace Entegro.Web.Controllers
         {
             model.Images = SelectedImagePaths;
 
-            // 1. ViewModel'deki string property'lerden headerMaps oluştur
+
             var headerMaps = model.GetType().GetProperties()
                 .Where(p => p.PropertyType == typeof(string) && p.Name != nameof(model.MediaFileUrl))
                 .Where(p => p.PropertyType == typeof(string))
@@ -235,13 +235,13 @@ namespace Entegro.Web.Controllers
                 .Where(h => !string.IsNullOrWhiteSpace(h.XmlHeader)) // boş olmayanlar
                 .ToList();
 
-            // 2. HeaderMap listesini JSON olarak göster
+
             var json = System.Text.Json.JsonSerializer.Serialize(headerMaps, new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true
             });
 
-            // 3. XML dosyasını indir
+
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36");
             string xmlContent = await httpClient.GetStringAsync(model.MediaFileUrl.Trim());
@@ -249,10 +249,10 @@ namespace Entegro.Web.Controllers
             Console.WriteLine("📄 Header Map JSON:");
             Console.WriteLine(json);
 
-            // 4. XML içeriğini parse et
+
             var xmlDoc = XDocument.Parse(xmlContent);
 
-            // 5. Root içindeki kayıtları al (örneğin <Products> -> <Product> kayıtları)
+
             var dataElements = xmlDoc.Root?.Elements();
 
             if (dataElements != null)
