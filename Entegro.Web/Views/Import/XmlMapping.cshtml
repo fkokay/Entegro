@@ -1,0 +1,428 @@
+﻿@model XmlImportProfileViewModel
+@{
+    ViewData["Title"] = "XmlMapping";
+}
+<div class="container-fluid flex-grow-1 container-p-y">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold py-3 mb-0">
+            <span class="text-muted fw-light">XML Kaynağı Oluştur</span>
+        </h4>
+
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#xmlStructureModal">
+            XML Kaynağını İncele
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-7 col-md-7 order-1 order-md-0">
+
+            <form asp-action="XmlMappingAdd" asp-controller="Import" method="post" onsubmit="return validateForm();">
+
+                <input type="hidden" id="SelectedImagePaths" name="SelectedImagePaths" />
+                <input type="hidden" asp-for="MediaFileUrl" />
+                <div class="card">
+                    <h5 class="card-header">Genel Bilgiler</h5>
+                    <div class="card-body" id="genelBilgiler">
+
+                        <div class="row">
+                            <div class="col-md-6 mt-1">
+                                <label for="Name" class="form-label">Ürün Adı *</label>
+                                <select asp-for="Name" class="form-select select2" required>
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Brand" class="form-label">Marka</label>
+                                <select asp-for="Brand" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Barcode" class="form-label">Barkod *</label>
+                                <select asp-for="Barcode" class="form-select select2" required>
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="ManufacturerPartNumber" class="form-label">Üretici Numarası</label>
+                                <select asp-for="ManufacturerPartNumber" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Gtin" class="form-label">Gtin </label>
+                                <select asp-for="Gtin" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Height" class="form-label">Ağırlık </label>
+                                <select asp-for="Height" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Unit" class="form-label">Birim </label>
+                                <select asp-for="Unit" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Description" class="form-label">Açıklama </label>
+                                <select asp-for=Description class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <hr />
+                    <h5 class="card-header">Stok Bilgiler</h5>
+                    <div class="card-body" id="stokBilgileri">
+                        <div class="row">
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Code" class="form-label">Stok Kodu *</label>
+                                <select asp-for="Code" class="form-select select2" required>
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="StockQuantity" class="form-label">Stok Adedi *</label>
+                                <select asp-for="StockQuantity" class="form-select select2" required>
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <hr />
+                    <h5 class="card-header">Fiyat Bilgileri</h5>
+                    <div class="card-body" id="fiyatBilgileri">
+                        <div class="row">
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Price" class="form-label">Mağaza Satış Fiyatı *</label>
+                                <select asp-for="Price" class="form-select select2" required>
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mt-1">
+                                <label for="piyasaFiyat" class="form-label">Piyasa Satış Fiyatı *</label>
+                                <select id="piyasaFiyat" class="form-select select2" required>
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Currency" class="form-label">Para Birimi</label>
+                                <select asp-for="Currency" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="VatInc" class="form-label">KDV Dahil</label>
+                                <select asp-for="VatInc" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    <option value="0">Hayır</option>
+                                    <option value="1">Evet</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="VatRate" class="form-label">KDV Oranı</label>
+                                <select asp-for="VatRate" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+
+
+                            <!-- Fiyat Artışı Alanları -->
+                            <div class="col-md-12 mt-3">
+                                <label class="form-label">Fiyat Artışı</label>
+
+                                <!-- Başta SEÇİLİ olmayan -->
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="fiyatArtisi" id="fiyatArtisiUygula" value="uygula">
+                                    <label class="form-check-label" for="fiyatArtisiUygula">
+                                        Fiyat Artışı Uygula
+                                    </label>
+                                </div>
+
+                                <!-- Başta SEÇİLİ olan -->
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="radio" name="fiyatArtisi" id="fiyatArtisiUygulama" value="devam" checked>
+                                    <label class="form-check-label" for="fiyatArtisiUygulama">
+                                        Fiyat Artışı Uygulamadan Devam Et
+                                    </label>
+                                </div>
+
+                                <!-- Başlangıçta GİZLİ işlem türü alanları -->
+                                <div id="islemTuruAlanlari" class="row mt-3" style="display: none;">
+                                    <div class="col-md-6">
+                                        <label for="islemTuru" class="form-label">İşlem Türü *</label>
+                                        <select id="islemTuru" class="form-select">
+                                            <option value="">Seçiniz</option>
+                                            <option value="yuzde">Yüzde</option>
+                                            <option value="sabit">Sabit</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="islemTutari" class="form-label">İşlem Tutarı *</label>
+                                        <input type="number" id="islemTutari" class="form-control" placeholder="Örn. 30" />
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <label for="opsiyonelEkTutar" class="form-label">Opsiyonel Ek Tutar</label>
+                                        <input type="number" id="opsiyonelEkTutar" class="form-control" placeholder="Örn. 30" />
+                                        <small class="form-text text-muted">Para birimi XML kaynağındaki para birimi ile aynıdır.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Bitiş -->
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h5 class="card-header">Ürün Görselleri</h5>
+                    <div class="card-body" id="urunGorselleri">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label asp-for="Images" class="form-label">Ürün Görselleri (birden fazla seçilebilir)</label>
+                                <select asp-for="Images" class="form-select select2" multiple="multiple">
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h5 class="card-header">Kategoriler</h5>
+                    <div class="card-body" id="categories">
+                        <div class="row">
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="Categories" class="form-label">Kategoriler</label>
+                                <select asp-for="Categories" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h5 class="card-header">Varyantlar</h5>
+                    <div class="card-body" id="variantBody">
+                        <div class="row">
+                            <div class="col-md-6 mt-1">
+                                <label for="variants" class="form-label">Varyantlar</label>
+                                <select id="variants" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h5 class="card-header">Arama Motorları</h5>
+                    <div class="card-body" id="searchEngine">
+                        <div class="row">
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="MetaTitle" class="form-label">Meta Başlık</label>
+                                <select asp-for="MetaTitle" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="MetaKeywords" class="form-label">Anahtar Kelimeler</label>
+                                <select asp-for="MetaKeywords" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="MetaDescription" class="form-label">Meta Açıklama</label>
+                                <select asp-for="MetaDescription" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in Model.Paths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="text-center mb-3">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="xmlStructureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">XML</h3>
+                    <p class="text-muted">XML kaynağındaki ürün konumundaki ürünlerden yalnızca biri gösterilir.</p>
+                </div>
+                <pre>@Html.Raw(System.Net.WebUtility.HtmlEncode(Model.PreviewXml))</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: "Bir seçenek seçin",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
+        function validateForm() {
+            let isValid = true;
+
+            // Genel Bilgiler kontrolü
+            if (!$('#Barcode').val()) {
+                alert("Lütfen Genel Bilgiler bölümündeki alanları doldurun.");
+                isValid = false;
+            }
+            // Stok Bilgileri kontrolü
+            else if (!$('#Code').val() || !$('#StockQuantity').val()) {
+                alert("Lütfen Stok Bilgileri bölümündeki alanları doldurun.");
+                isValid = false;
+            }
+            // Fiyat Bilgileri kontrolü
+            else if (!$('#Price').val()) {
+                alert("Lütfen Fiyat Bilgileri bölümündeki alanları doldurun.");
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return false;
+            }
+
+        var selectedImages = $('#Images').val(); // multiple select
+             if (selectedImages && selectedImages.length > 0) {
+                 $('#SelectedImagePaths').val(selectedImages.join(','));
+             } else {
+                 $('#SelectedImagePaths').val('');
+             }
+
+            return true;
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fiyatArtisiUygula = document.getElementById("fiyatArtisiUygula");
+            const fiyatArtisiUygulama = document.getElementById("fiyatArtisiUygulama");
+            const islemTuruAlanlari = document.getElementById("islemTuruAlanlari");
+
+            function toggleIslemTuru() {
+                if (fiyatArtisiUygula.checked) {
+                    islemTuruAlanlari.style.display = "flex"; // Göster
+                } else {
+                    islemTuruAlanlari.style.display = "none"; // Gizle
+                }
+            }
+
+
+            toggleIslemTuru();
+
+
+            fiyatArtisiUygula.addEventListener("change", toggleIslemTuru);
+            fiyatArtisiUygulama.addEventListener("change", toggleIslemTuru);
+        });
+    </script>
+
+}

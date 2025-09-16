@@ -1,58 +1,66 @@
-﻿@model ImportProfileViewModel
+﻿@model ExcelImportProfileViewModel
 @{
     ViewData["Title"] = "İçe Aktar";
 }
 <div class="container-fluid flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Eşleştirme Yap</span></h4>
     <div class="row">
+        <div class="col-xl-12 col-lg-7 col-md-7 order-1 order-md-0">
+            <div class="card">
+                <h5 class="card-header">Eşleştirme Yap</h5>
+                <div class="card-body">
+                    <form asp-action="ImportData" asp-controller="Import" method="post" id="importForm">
+                        <input asp-for="MediaFileId" type="hidden" class="form-control" />
+                        <div class="col-md-12 mt-3">
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="ProfileName" type="text" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
 
-        <form asp-action="ImportData" asp-controller="Import" method="post" id="importForm">
-            <input asp-for="MediaFileId" type="hidden" class="form-control" />
-            <div class="col-md-12 mt-3">
-                <div class="row">
-                    <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
-                    <div class="col-sm-9">
-                        <input asp-for="ProfileName" type="text" class="form-control" />
-                    </div>
+                        <table class="table table-bordered mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Excel Kolonu</th>
+                                    <th>İçe Aktarılsın mı?</th>
+                                    <th>Veritabanı Kolonu</th>
+                                    <th>Varsayılan(Default Değer)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.ColumnMappings.Count; i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="ColumnMappings[@i].ExcelHeader" value="@Model.ColumnMappings[i].ExcelHeader" readonly class="form-control" />
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="checkbox" name="ColumnMappings[@i].IsImport" value="true" />
+                                            <input type="hidden" name="ColumnMappings[@i].IsImport" value="false" />
+                                        </td>
+                                        <td>
+                                            <select name="ColumnMappings[@i].DbColumn" class="form-control" asp-items="ViewBag.DbColumns">
+                                                <option value="">-- Seçiniz --</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="ColumnMappings[@i].DefaultValue" value="@Model.ColumnMappings[i].DefaultValue" class="form-control" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">İçe Aktar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <table class="table table-bordered mt-3">
-                <thead>
-                    <tr>
-                        <th>Excel Kolonu</th>
-                        <th>İçe Aktarılsın mı?</th>
-                        <th>Veritabanı Kolonu</th>
-                        <th>Varsayılan(Default Değer)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (int i = 0; i < Model.ColumnMappings.Count; i++)
-                    {
-                        <tr>
-                            <td>
-                                <input type="text" name="ColumnMappings[@i].ExcelHeader" value="@Model.ColumnMappings[i].ExcelHeader" readonly class="form-control" />
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox" name="ColumnMappings[@i].IsImport" value="true" />
-                                <input type="hidden" name="ColumnMappings[@i].IsImport" value="false" />
-                            </td>
-                            <td>
-                                <select name="ColumnMappings[@i].DbColumn" class="form-control" asp-items="ViewBag.DbColumns">
-                                    <option value="">-- Seçiniz --</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="text" name="ColumnMappings[@i].DefaultValue" value="@Model.ColumnMappings[i].DefaultValue" class="form-control" />
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <div class="text-end">
-                <button type="submit" class="btn btn-success">İçe Aktar</button>
-            </div>
-        </form>
+        </div>
+        
 
 
         <div id="loadingModal" style="display:none; position:fixed; top:0; left:0;

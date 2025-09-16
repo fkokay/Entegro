@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250915152918_add-importprofile_mediafileurl")]
+    partial class addimportprofile_mediafileurl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1012,8 +1015,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderItemId");
-
                     b.HasIndex("ShipmentId");
 
                     b.ToTable("ShipmentItem");
@@ -1866,19 +1867,11 @@ namespace Entegro.Infrastructure.Migrations
 
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.ShipmentItem", b =>
                 {
-                    b.HasOne("Entegro.Domain.Entities.Checkout.OrderItem", "OrderItem")
-                        .WithMany()
-                        .HasForeignKey("OrderItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Entegro.Domain.Entities.Checkout.Shipment", "Shipment")
                         .WithMany("ShipmentItems")
                         .HasForeignKey("ShipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("OrderItem");
 
                     b.Navigation("Shipment");
                 });
