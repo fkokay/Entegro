@@ -766,5 +766,22 @@ label.required, .col-form-label.required, .choice-label.required {
 }
 
 .choice-box-control-native {
-    display: none !important
+    display: none !important;
+}
+
+.order-actions .split{
+    width:1px;
+    background-color:#8d9ba9;
+}
+.order-actions .btn {
+    border-radius: 0 !important;
+    margin:0px 10px;
+    border-bottom:3px solid transparent;
+}
+.order-actions .btn:hover {
+    border-bottom:3px solid #009e74;
+}
+
+.table > thead {
+    background-color: #f5f5f5;
 }
