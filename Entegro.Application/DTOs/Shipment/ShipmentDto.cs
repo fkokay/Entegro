@@ -7,7 +7,6 @@ namespace Entegro.Application.DTOs.Shipment
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public virtual OrderDto Order { get; set; }
         public string Carrier { get; set; } = string.Empty;
         public string? TrackingNumber { get; set; }
         public string? TrackingUrl { get; set; }

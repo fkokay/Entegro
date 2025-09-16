@@ -9,6 +9,8 @@ using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.Shipment;
+using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Interfaces.Services.Marketplace;
@@ -41,6 +43,8 @@ namespace Entegro.Api.Jobs
         private readonly IProductService _productService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
+        private readonly IShipmentService _shipmentService;
+        private readonly IShipmentItemService _shipmentItemService;
         private readonly IMapper _mapper;
         private readonly ILogger<OrderReadJob> _logger;
         public OrderReadJob(
@@ -56,6 +60,8 @@ namespace Entegro.Api.Jobs
             IProductService productService,
             IIntegrationSystemService integrationSystemService,
             IProductIntegrationService productIntegrationService,
+            IShipmentService shipmentService,
+            IShipmentItemService shipmentItemService,
             IMapper mapper,
             ILogger<OrderReadJob> logger)
         {
@@ -71,6 +77,8 @@ namespace Entegro.Api.Jobs
             _productService = productService;
             _integrationSystemService = integrationSystemService;
             _productIntegrationService = productIntegrationService;
+            _shipmentService = shipmentService;
+            _shipmentItemService = shipmentItemService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -609,9 +617,26 @@ namespace Entegro.Api.Jobs
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
                         var createdOrder = await _orderService.CreateOrderAsync(createOrder);
 
-             
-
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
+                        #endregion
+
+                        #region Shipment
+                        foreach (var shipment in order.Shipments)
+                        {
+                            shipment.OrderId = createdOrder.Id;
+
+                            foreach (var orderItem in createdOrder.OrderItems)
+                            {
+                                ShipmentItemDto createShipmentItem = new ShipmentItemDto();
+                                createShipmentItem.OrderItemId = orderItem.Id;
+                                createShipmentItem.Quantity = orderItem.Quantity;
+
+                                shipment.ShipmentItems.Add(createShipmentItem);
+                            }
+
+                            var createShipment = _mapper.Map<CreateShipmentDto>(shipment);
+                            var createdShipment = await _shipmentService.AddAsync(createShipment);
+                        }
                         #endregion
                     }
                     catch (Exception ex)

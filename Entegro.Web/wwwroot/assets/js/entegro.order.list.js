@@ -1,7 +1,21 @@
 ﻿var Entegro = Entegro || {};
 Entegro.order = Entegro.order || {};
 
+
 Entegro.order.OrderList = (function ($) {
+    function getIntegrationLogo(value) {
+        switch (value) {
+            case "Smartstore": return "/assets/img/logo/smartstore.png";
+            case "Trendyol": return "/assets/img/logo/trendyol.webp";
+            case "N11": return "/assets/img/logo/n11.jpeg";
+            case "Pazarama": return "/assets/img/logo/pazarama.png";
+            case "Idefix": return "/assets/img/logo/idefix.png";
+            case "CicekSepeti": return "/assets/img/logo/ciceksepeti.jpeg";
+            case "Hepsiburada": return "/assets/img/logo/hepsiburada.png";
+            default: return "/assets/img/icons/logo/default.png";
+        }
+    }
+
     const init = function () {
         const table = $('#OrderTable').DataTable({
             language: {
@@ -27,22 +41,12 @@ Entegro.order.OrderList = (function ($) {
                 { data: 'Id', orderable: false }, // checkbox
                 { data: 'Id', visible: false }, // hidden ID
                 { data: 'OrderSourceLabelHint',name:'OrderSourceId' },
-                { data: 'OrderNumber' },
+                { data: 'Id' },
                 { data: 'Customer.Name' },
-                {
-                    data: 'OrderDate',
-                    render: function (data, type) {
-                        if (type === "sort" || type === "type") return data;
-                        return moment(data).format("DD.MM.yyyy HH:mm");
-                    }
-                },
-                {
-                    data: 'OrderTotal',
-                    render: $.fn.dataTable.render.number(".", ",", 2)
-                },
-                { data: 'OrderStatusLabelHint' },
+                { data: 'Id' },
+                { data: 'Id' },
+                { data: 'Id' },
                 { data: 'PaymentStatusLabelHint' },
-                { data: 'ShippingStatusLabelHint' },
                 { data: 'Id' } // İşlemler
             ],
             columnDefs: [
@@ -55,6 +59,137 @@ Entegro.order.OrderList = (function ($) {
                         selectAllRender: '<input type="checkbox" class="form-check-input">'
                     },
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                },
+                {
+                    targets: 2,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <img src="${getIntegrationLogo(row.OrderSourceLabelHint)}" style="max-width:115px;"/>
+                        </div>`;
+                    }
+                },
+                {
+                    targets: 3,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
+                            <div>Sipariş Tarihi : <b>${moment(row.OrderDate).format("DD.MM.yyyy HH:mm")}</b></div>
+                            <div class="mb-3">Paket No : <b>3250544</b></div>
+                            <div class="text-primary">
+                                <div>Kalan Süre:</div>
+                                <div>1 gün 07 saat 37 dakika</div>
+                            </div>
+                        </div>`;
+                    }
+                },
+                {
+                    targets: 4,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div><i class="menu-icon tf-icons ti ti-star"></i><b>${row.Customer.Name}</b></div>
+                            <div>1. sipariş</div>
+                        </div>`;
+                    }
+                },
+                {
+                    targets: 5,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        var items = "";
+                        for (var i = 0; i < row.OrderItems.length; i++) {
+                            items +=
+                                `<div class="d-flex mb-5">
+                                    <div class="me-5 position-relative">
+                                        <img src="${row.OrderItems[i].Product.MainPicture.Url}" width="40" height="60"/>
+                                        <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">${row.OrderItems[i].Quantity}</span>
+                                    </div>
+                                    <div>
+                                        <div><b>${row.OrderItems[i].Product.Name}</b></div>
+                                        <div>Stok Kodu: ${row.OrderItems[i].Product.Code}</div>
+                                        <div>Birim Fiyat: ${row.OrderItems[i].UnitPrice} TL</div>
+                                    </div>
+                                </div>`;
+                        }
+
+
+                        return `
+                        <div>
+                            ${items}
+                        </div>`;
+                    }
+                },
+                {
+                    targets: 6,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div><img src="https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg" width="100px" style="margin:0px auto;display:block;"/></div>
+                            <div class="text-center">7330026152879643</div>
+                        </div>`;
+                       
+                    }
+                },
+                {
+                    targets: 7,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div>Tutar  :${row.OrderSubtotalInclTax} TL</div>
+                            <div>İndirim:${row.OrderDiscount} TL</div>
+                            <div>Faturalanacak Tutar</div>
+                            <div class="mb-4"><b>${row.OrderTotal} TL</b></div>
+                            <div class="text-warning mb-1">Fatura Bekleniyor</div>
+                            <div class="btn-group">
+                              <button type="button" class="btn btn-outline-secondary dropdown-toggle waves-effect" data-bs-toggle="dropdown" aria-expanded="false">Fatura İşlemleri</button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Action</a></li>
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Another action</a></li>
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Something else here</a></li>
+                                <li>
+                                  <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Separated link</a></li>
+                              </ul>
+                            </div>
+                        </div>`;
+
+                    }
+                },
+                {
+                    targets: 8,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div>Ödeme Yöntemi  :</div>
+                            <div><b>${row.PaymentMethodSystemName}</b></div>
+                            <div>Ödeme Durumu   :</div>
+                            <div><b>${row.PaymentStatusLabelHint}</b></div>
+                        </div>`;
+
+                    }
                 },
                 {
                     targets: -1,

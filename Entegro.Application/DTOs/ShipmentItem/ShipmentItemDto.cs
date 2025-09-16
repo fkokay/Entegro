@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Shipment;
+﻿using Entegro.Application.DTOs.OrderItem;
+using Entegro.Application.DTOs.Shipment;
 
 namespace Entegro.Application.DTOs.ShipmentItem
 {
@@ -6,7 +7,6 @@ namespace Entegro.Application.DTOs.ShipmentItem
     {
         public int Id { get; set; }
         public int ShipmentId { get; set; }
-        public virtual ShipmentDto Shipment { get; set; }
         public int OrderItemId { get; set; }
         public int Quantity { get; set; }
     }

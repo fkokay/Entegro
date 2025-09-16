@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.Shipment;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -124,6 +125,18 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
                  TaxRate = m.Vat,
                  DiscountAmount = m.TotalMerchantDiscount.Amount, 
             }).ToList();
+
+            ShipmentDto shipmentDto = new ShipmentDto();
+            shipmentDto.OrderId = 0;
+            shipmentDto.Carrier = hepsiburadaShipmentPackage.CargoCompany;
+            shipmentDto.TrackingNumber = hepsiburadaShipmentPackage.Barcode;
+            shipmentDto.TrackingUrl = "";
+            shipmentDto.TotalWeight = 0;
+            shipmentDto.ShippedDateUtc = null;
+            shipmentDto.DeliveryDateUtc = null;
+            shipmentDto.CreatedOnUtc = DateTime.UtcNow;
+
+            order.Shipments.Add(shipmentDto);   
 
 
 

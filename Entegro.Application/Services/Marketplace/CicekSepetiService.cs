@@ -9,6 +9,7 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Notifications;
 using Entegro.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -101,6 +102,8 @@ namespace Entegro.Application.Services.Marketplace
                     };
 
                     await UpdatePriceAndStockAsync(apiContext, request);
+
+                    await EntegroNotification.SendNotification($"ÇiçekSepeti {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

@@ -28,6 +28,9 @@ namespace Entegro.Infrastructure.Extensions
 
             services.AddScoped<ICicekSepetiService, CicekSepetiService>();
             services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, CicekSepetiService>();
+
+            services.AddScoped<IIdefixService, IdefixService>();
+            services.AddScoped<IEventHandler<ProductIntegrationRecordUpdatedEvent>, IdefixService>();
             return services;
         }
     }

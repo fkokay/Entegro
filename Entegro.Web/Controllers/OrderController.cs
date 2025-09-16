@@ -165,7 +165,6 @@ namespace Entegro.Web.Controllers
                         Name = oi.Product.Name,
                     }
                 }).ToList(),
-                CalculateTotalAmount = orderDetail.CalculateTotalAmount(),
                 OrderNotes = orderDetail.OrderNotes.Select(on => new OrderNoteViewModel
                 {
                     Id = on.OrderId,

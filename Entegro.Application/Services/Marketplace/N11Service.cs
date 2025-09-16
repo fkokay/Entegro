@@ -8,6 +8,7 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Notifications;
 using Entegro.Domain.Enums;
 using Mapster;
 using System;
@@ -108,6 +109,8 @@ namespace Entegro.Application.Services.Marketplace
                     };
 
                     await UpdatePriceAndStockAsync(apiContext, request);
+
+                    await EntegroNotification.SendNotification($"N11 {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

@@ -1,7 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Domain.Entities.Checkout
 {
+    public class ShipmentMap : IEntityTypeConfiguration<Shipment>
+    {
+        public void Configure(EntityTypeBuilder<Shipment> builder)
+        {
+            builder.HasMany(p => p.ShipmentItems)
+                  .WithOne(pc => pc.Shipment)
+                  .HasForeignKey(pc => pc.ShipmentId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
     [Table("Shipment")]
     public class Shipment : BaseEntity
     {

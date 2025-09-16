@@ -47,7 +47,6 @@ namespace Entegro.Web.Models.Checkout.Orders
         public PaymentStatus PaymentStatus { get; set; }
         public int ShippingStatusId { get; set; }
         public ShippingStatus ShippingStatus { get; set; }
-        public decimal CalculateTotalAmount { get; set; }
         public virtual List<OrderItemViewModel> OrderItems { get; set; } = new List<OrderItemViewModel>();
         public virtual List<OrderNoteViewModel> OrderNotes { get; set; } = new List<OrderNoteViewModel>();
     }
