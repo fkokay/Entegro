@@ -257,11 +257,11 @@ namespace Entegro.Web.Controllers
 
             if (dataElements != null)
             {
-                Console.WriteLine("🔍 XML İçeriği:");
+                Console.WriteLine("XML İçeriği:");
 
                 foreach (var item in dataElements)
                 {
-                    Console.WriteLine("🟢 Yeni Kayıt -----------------------");
+                    Console.WriteLine("Yeni Kayıt -----------------------");
 
                     foreach (var map in headerMaps)
                     {
@@ -284,7 +284,7 @@ namespace Entegro.Web.Controllers
             }
             else
             {
-                Console.WriteLine("❌ XML'de veri bulunamadı.");
+                Console.WriteLine("XML'de veri bulunamadı.");
             }
 
             return View(model);
