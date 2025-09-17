@@ -206,6 +206,8 @@ namespace Entegro.Web.Controllers
                     .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
                     .ToList();
 
+
+                Console.WriteLine(model.Paths);
                 return RedirectToAction("XmlMapping", model);
             }
             catch (Exception ex)

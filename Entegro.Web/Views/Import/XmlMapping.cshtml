@@ -21,6 +21,8 @@
                 <input type="hidden" id="SelectedImagePaths" name="SelectedImagePaths" />
                 <input type="hidden" asp-for="MediaFileUrl" />
                 <div class="card">
+
+                    <!--Genel Bilgiler-->
                     <h5 class="card-header">Genel Bilgiler</h5>
                     <div class="card-body" id="genelBilgiler">
 
@@ -110,6 +112,7 @@
                     </div>
 
 
+                    <!--Stok Bilgileri-->
                     <hr />
                     <h5 class="card-header">Stok Bilgiler</h5>
                     <div class="card-body" id="stokBilgileri">
@@ -139,6 +142,7 @@
                     </div>
 
 
+                    <!--Fiyat Bilgileri-->
                     <hr />
                     <h5 class="card-header">Fiyat Bilgileri</h5>
                     <div class="card-body" id="fiyatBilgileri">
@@ -201,47 +205,59 @@
                             <div class="col-md-12 mt-3">
                                 <label class="form-label">Fiyat Artışı</label>
 
-                                <!-- Başta SEÇİLİ olmayan -->
+                                <!-- Fiyat Artışı Uygula -->
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="fiyatArtisi" id="fiyatArtisiUygula" value="uygula">
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           asp-for="ApplyPriceAdjustment"
+                                           value="uygula"
+                                           id="fiyatArtisiUygula" />
                                     <label class="form-check-label" for="fiyatArtisiUygula">
                                         Fiyat Artışı Uygula
                                     </label>
                                 </div>
 
-                                <!-- Başta SEÇİLİ olan -->
+                                <!-- Fiyat Artışı Uygulanmadan Devam Et -->
                                 <div class="form-check mt-2">
-                                    <input class="form-check-input" type="radio" name="fiyatArtisi" id="fiyatArtisiUygulama" value="devam" checked>
+                                    <input class="form-check-input"
+                                           type="radio"
+                                           asp-for="ApplyPriceAdjustment"
+                                           value="devam"
+                                           id="fiyatArtisiUygulama" checked/>
                                     <label class="form-check-label" for="fiyatArtisiUygulama">
                                         Fiyat Artışı Uygulamadan Devam Et
                                     </label>
                                 </div>
 
-                                <!-- Başlangıçta GİZLİ işlem türü alanları -->
+                                <!-- İşlem Türü Alanları -->
                                 <div id="islemTuruAlanlari" class="row mt-3" style="display: none;">
                                     <div class="col-md-6">
-                                        <label for="islemTuru" class="form-label">İşlem Türü *</label>
-                                        <select id="islemTuru" class="form-select">
+                                        <label asp-for="PriceAdjustmentType" class="form-label">İşlem Türü *</label>
+                                        <select asp-for="PriceAdjustmentType" class="form-select">
                                             <option value="">Seçiniz</option>
                                             <option value="yuzde">Yüzde</option>
                                             <option value="sabit">Sabit</option>
                                         </select>
                                     </div>
+
                                     <div class="col-md-6">
-                                        <label for="islemTutari" class="form-label">İşlem Tutarı *</label>
-                                        <input type="number" id="islemTutari" class="form-control" placeholder="Örn. 30" />
+                                        <label asp-for="PriceAdjustmentAmount" class="form-label">İşlem Tutarı *</label>
+                                        <input asp-for="PriceAdjustmentAmount" class="form-control" placeholder="Örn. 30" />
                                     </div>
+
                                     <div class="col-md-12 mt-2">
-                                        <label for="opsiyonelEkTutar" class="form-label">Opsiyonel Ek Tutar</label>
-                                        <input type="number" id="opsiyonelEkTutar" class="form-control" placeholder="Örn. 30" />
+                                        <label asp-for="OptionalExtraAmount" class="form-label">Opsiyonel Ek Tutar</label>
+                                        <input asp-for="OptionalExtraAmount" class="form-control" placeholder="Örn. 30" />
                                         <small class="form-text text-muted">Para birimi XML kaynağındaki para birimi ile aynıdır.</small>
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Bitiş -->
                         </div>
                     </div>
 
+                    <!--Ürün Görselleri-->
                     <hr />
                     <h5 class="card-header">Ürün Görselleri</h5>
                     <div class="card-body" id="urunGorselleri">
@@ -258,6 +274,7 @@
                         </div>
                     </div>
 
+                    <!--Kategoriler-->
                     <hr />
                     <h5 class="card-header">Kategoriler</h5>
                     <div class="card-body" id="categories">
@@ -275,6 +292,9 @@
                         </div>
                     </div>
 
+
+
+                    <!--Varyantlar-->
                     <hr />
                     <h5 class="card-header">Varyantlar</h5>
                     <div class="card-body" id="variantBody">
@@ -292,6 +312,9 @@
                         </div>
                     </div>
 
+
+
+                    <!--Arama Motorları-->
                     <hr />
                     <h5 class="card-header">Arama Motorları</h5>
                     <div class="card-body" id="searchEngine">
@@ -368,61 +391,73 @@
             });
         });
 
-        function validateForm() {
+     function validateForm() {
             let isValid = true;
 
-            // Genel Bilgiler kontrolü
             if (!$('#Barcode').val()) {
                 alert("Lütfen Genel Bilgiler bölümündeki alanları doldurun.");
-                isValid = false;
-            }
-            // Stok Bilgileri kontrolü
-            else if (!$('#Code').val() || !$('#StockQuantity').val()) {
-                alert("Lütfen Stok Bilgileri bölümündeki alanları doldurun.");
-                isValid = false;
-            }
-            // Fiyat Bilgileri kontrolü
-            else if (!$('#Price').val()) {
-                alert("Lütfen Fiyat Bilgileri bölümündeki alanları doldurun.");
-                isValid = false;
-            }
-
-            if (!isValid) {
                 return false;
             }
 
-        var selectedImages = $('#Images').val(); // multiple select
-             if (selectedImages && selectedImages.length > 0) {
-                 $('#SelectedImagePaths').val(selectedImages.join(','));
-             } else {
-                 $('#SelectedImagePaths').val('');
+            if (!$('#Code').val() || !$('#StockQuantity').val()) {
+                alert("Lütfen Stok Bilgileri bölümündeki alanları doldurun.");
+                return false;
+            }
+
+            if (!$('#Price').val()) {
+                alert("Lütfen Fiyat Bilgileri bölümündeki alanları doldurun.");
+                return false;
+            }
+
+            // Eğer fiyat artışı uygulanıyorsa işlem türü ve işlem tutarı kontrolü yap
+                const applyPriceAdjustment = $('input[name="ApplyPriceAdjustment"]:checked').val();
+
+             if (applyPriceAdjustment === "uygula") {
+                 if (!$('[name="PriceAdjustmentType"]').val() || !$('[name="PriceAdjustmentAmount"]').val()) {
+                     alert("Lütfen işlem türü ve işlem tutarı alanlarını doldurun.");
+                     return false;
+                 }
              }
+
+            // Seçilen görselleri işle
+            var selectedImages = $('#Images').val();
+            $('#SelectedImagePaths').val(selectedImages && selectedImages.length > 0 ? selectedImages.join(',') : '');
 
             return true;
         }
+
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const fiyatArtisiUygula = document.getElementById("fiyatArtisiUygula");
-            const fiyatArtisiUygulama = document.getElementById("fiyatArtisiUygulama");
-            const islemTuruAlanlari = document.getElementById("islemTuruAlanlari");
-
-            function toggleIslemTuru() {
-                if (fiyatArtisiUygula.checked) {
-                    islemTuruAlanlari.style.display = "flex"; // Göster
-                } else {
-                    islemTuruAlanlari.style.display = "none"; // Gizle
-                }
+     document.addEventListener("DOMContentLoaded", function () {
+        const islemTuruAlanlari = document.getElementById("islemTuruAlanlari");
+        const islemTuru = document.querySelector('[name="PriceAdjustmentType"]');
+        const islemTutari = document.querySelector('[name="PriceAdjustmentAmount"]');
+    
+        const fiyatArtisiRadioButtons = document.querySelectorAll('input[name="ApplyPriceAdjustment"]');
+    
+        function toggleIslemTuru() {
+            const selectedValue = document.querySelector('input[name="ApplyPriceAdjustment"]:checked')?.value;
+    
+            if (selectedValue === "uygula") {
+                islemTuruAlanlari.style.display = "flex";
+                islemTuru?.setAttribute("required", "required");
+                islemTutari?.setAttribute("required", "required");
+            } else {
+                islemTuruAlanlari.style.display = "none";
+                islemTuru?.removeAttribute("required");
+                islemTutari?.removeAttribute("required");
             }
-
-
-            toggleIslemTuru();
-
-
-            fiyatArtisiUygula.addEventListener("change", toggleIslemTuru);
-            fiyatArtisiUygulama.addEventListener("change", toggleIslemTuru);
+        }
+    
+        toggleIslemTuru();
+    
+        fiyatArtisiRadioButtons.forEach(radio => {
+            radio.addEventListener("change", toggleIslemTuru);
         });
+    });
+
     </script>
+
 
 }

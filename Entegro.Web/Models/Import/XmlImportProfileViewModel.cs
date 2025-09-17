@@ -34,8 +34,10 @@
         public string? Description { get; set; }
         public string? Images { get; set; }
         public string? Categories { get; set; }
-
-
+        public bool? PriceAdjustmentType { get; set; }
+        public decimal? PriceAdjustmentAmount { get; set; }
+        public decimal? OptionalExtraAmount { get; set; }
+        public bool? ApplyPriceAdjustment { get; set; }
 
     }
     public class HeaderMap
