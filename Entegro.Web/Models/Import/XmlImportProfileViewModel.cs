@@ -39,6 +39,16 @@
         public decimal? OptionalExtraAmount { get; set; }
         public bool? ApplyPriceAdjustment { get; set; }
 
+
+        public string? AttributeStockCode { get; set; }
+        public string? AttributePrice { get; set; }
+        public string? AttributeGtin { get; set; }
+        public string? AttributeManufacturerPartNumber { get; set; }
+        public string? AttributeStockQuantity { get; set; }
+        public string? AttributeSpecifications { get; set; }
+        public string? RowAttribute { get; set; }
+        public string? AssignedMediaFileIds { get; set; } = "string";
+
     }
     public class HeaderMap
     {

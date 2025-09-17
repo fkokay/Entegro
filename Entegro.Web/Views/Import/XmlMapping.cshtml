@@ -1,6 +1,21 @@
 ﻿@model XmlImportProfileViewModel
 @{
     ViewData["Title"] = "XmlMapping";
+
+    var variantPaths = Model.Paths.Where(x => x.StartsWith("variants->variant->0->")).ToList();
+    var variantCount = Model.Paths.Where(p => p.StartsWith("variants->variant->")).Select(p =>
+    {
+        var parts = p.Split("->", StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 3 && int.TryParse(parts[2], out int index))
+        {
+            return index;
+        }
+        return -1;
+    })
+    .Where(index => index >= 0)
+    .Distinct()
+    .Count();
+
 }
 <div class="container-fluid flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -19,6 +34,8 @@
             <form asp-action="XmlMappingAdd" asp-controller="Import" method="post" onsubmit="return validateForm();">
 
                 <input type="hidden" id="SelectedImagePaths" name="SelectedImagePaths" />
+                <input type="hidden" id="SelectedAttributeSpecifications" name="SelectedAttributeSpecifications" />
+                <input type="hidden" name="VariantCount" value="@variantCount"/>
                 <input type="hidden" asp-for="MediaFileUrl" />
                 <div class="card">
 
@@ -299,9 +316,55 @@
                     <h5 class="card-header">Varyantlar</h5>
                     <div class="card-body" id="variantBody">
                         <div class="row">
+                            <!-- Varyantlı Ürün mü? seçeneği -->
                             <div class="col-md-6 mt-1">
-                                <label for="variants" class="form-label">Varyantlar</label>
-                                <select id="variants" class="form-select select2">
+                                <label class="form-label">Varyantlı Ürün mü?</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="IsVariantProduct" id="variantYes" value="yes">
+                                    <label class="form-check-label" for="variantYes">Evet</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="IsVariantProduct" id="variantNo" value="no" checked>
+                                    <label class="form-check-label" for="variantNo">Hayır</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Diğer varyant alanlarını kapsayan row -->
+                        <div class="row" id="variantFieldsRow" style="display: none;">
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="AttributeStockCode" class="form-label">Varyant Ürün Kodu</label>
+                                <select asp-for="AttributeStockCode" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in variantPaths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="AttributeManufacturerPartNumber" class="form-label">Varyant Üretici Numarası</label>
+                                <select asp-for="AttributeManufacturerPartNumber" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in variantPaths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="AttributeGtin" class="form-label">Varyant Gtin </label>
+                                <select asp-for="AttributeGtin" class="form-select select2">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in variantPaths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="AttributePrice" class="form-label">Varyant Fiyat </label>
+                                <select asp-for="AttributePrice" class="form-select select2" id="variantPrice">
                                     <option value="">Seçiniz</option>
                                     @foreach (var item in Model.Paths)
                                     {
@@ -309,8 +372,28 @@
                                     }
                                 </select>
                             </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="AttributeStockQuantity" class="form-label">Varyant Stok Miktarı </label>
+                                <select asp-for="AttributeStockQuantity" class="form-select select2" id="variantStockQuantity">
+                                    <option value="">Seçiniz</option>
+                                    @foreach (var item in variantPaths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 mt-1">
+                                <label asp-for="AttributeSpecifications" class="form-label">Varyant Stok Özellikler (birden fazla seçilebilir)</label>
+                                <select asp-for="AttributeSpecifications" class="form-select select2" multiple="multiple">
+                                    @foreach (var item in variantPaths)
+                                    {
+                                        <option value="@item">@item</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
+
 
 
 
@@ -418,10 +501,26 @@
                      return false;
                  }
              }
+                const isVariantProduct = $('input[name="IsVariantProduct"]:checked').val();
+                if (isVariantProduct === "yes") {
+                    const variantPrice = $('[name="AttributePrice"]').val();
+                    const variantStockQty = $('[name="AttributeStockQuantity"]').val();
+
+                    if (!variantPrice || !variantStockQty) {
+                        alert("Lütfen Varyant Fiyat ve Varyant Stok Miktarı alanlarını doldurun.");
+                        return false;
+                    }
+                }
+
 
             // Seçilen görselleri işle
             var selectedImages = $('#Images').val();
             $('#SelectedImagePaths').val(selectedImages && selectedImages.length > 0 ? selectedImages.join(',') : '');
+            
+            
+            // Seçilen özellikleri işle
+            var selectedAttributeSpecifications = $('#AttributeSpecifications').val();
+            $('#SelectedAttributeSpecifications').val(selectedAttributeSpecifications && selectedAttributeSpecifications.length > 0 ? selectedAttributeSpecifications.join(',') : '');
 
             return true;
         }
@@ -457,6 +556,35 @@
         });
     });
 
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const variantFieldsRow = document.getElementById("variantFieldsRow");
+            const variantRadios = document.querySelectorAll('input[name="IsVariantProduct"]');
+            const attrStockQuantity = document.getElementById("variantStockQuantity");
+            const attrPrice = document.getElementById("variantPrice");
+
+            function toggleVariantFields() {
+                const selected = document.querySelector('input[name="IsVariantProduct"]:checked').value;
+
+                if (selected === "yes") {
+                    variantFieldsRow.style.display = "flex";
+                    attrStockQuantity?.setAttribute("required", "required");
+                    attrPrice?.setAttribute("required", "required");
+                } else {
+                    variantFieldsRow.style.display = "none";
+                    attrStockQuantity?.removeAttribute("required");
+                    attrPrice?.removeAttribute("required");
+                }
+            }
+
+            // Sayfa yüklendiğinde başlat
+            toggleVariantFields();
+
+            variantRadios.forEach(radio => {
+                radio.addEventListener("change", toggleVariantFields);
+            });
+        });
     </script>
 
 

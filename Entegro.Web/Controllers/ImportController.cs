@@ -6,6 +6,7 @@ using Entegro.Web.Models.Import;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Entegro.Web.Controllers
 {
@@ -207,7 +208,7 @@ namespace Entegro.Web.Controllers
                     .ToList();
 
 
-                Console.WriteLine(model.Paths);
+
                 return RedirectToAction("XmlMapping", model);
             }
             catch (Exception ex)
@@ -221,9 +222,69 @@ namespace Entegro.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> XmlMappingAdd(XmlImportProfileViewModel model, string SelectedImagePaths)
+        public async Task<IActionResult> XmlMappingAdd(XmlImportProfileViewModel model, string SelectedImagePaths, string SelectedAttributeSpecifications, int VariantCount)
         {
             model.Images = SelectedImagePaths;
+            model.AttributeSpecifications = SelectedAttributeSpecifications;
+
+            var variantMappedProps = new[]
+            {
+                nameof(model.AttributePrice),
+                nameof(model.AttributeStockQuantity),
+                nameof(model.AttributeStockCode),
+                nameof(model.AttributeGtin),
+                nameof(model.AttributeManufacturerPartNumber),
+
+            };
+
+            foreach (var propName in variantMappedProps)
+            {
+                var propInfo = model.GetType().GetProperty(propName);
+                if (propInfo == null || propInfo.PropertyType != typeof(string)) continue;
+
+                var originalValue = propInfo.GetValue(model) as string;
+
+                if (!string.IsNullOrWhiteSpace(originalValue) && originalValue.Contains("variants->variant->0"))
+                {
+                    var updatedPaths = new List<string>();
+
+                    for (int i = 0; i < VariantCount; i++)
+                    {
+                        updatedPaths.Add(originalValue.Replace("variants->variant->0", $"variants->variant->{i}"));
+                    }
+
+                    var newValue = string.Join(",", updatedPaths.Distinct());
+                    propInfo.SetValue(model, newValue);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(SelectedAttributeSpecifications) && VariantCount > 0)
+            {
+                var updatedSpecifications = new List<string>();
+
+                // Spec yollarını parçala
+                var originalSpecs = SelectedAttributeSpecifications
+                    .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .ToList();
+
+                foreach (var specPath in originalSpecs)
+                {
+                    var parts = specPath.Split("->", StringSplitOptions.RemoveEmptyEntries);
+
+                    // Sondaki spec indexini tut
+                    var specIndexPart = parts.Last(); // Örn. "1"
+
+                    // Şablon spec kısmını al: "spec->1"
+                    var specPart = $"spec->{specIndexPart}";
+
+                    // Her varyant için yeniden yol oluştur
+                    for (int i = 0; i < VariantCount; i++)
+                    {
+                        updatedSpecifications.Add($"variants->variant->{i}->{specPart}");
+                    }
+                }
+                model.AttributeSpecifications = string.Join(",", updatedSpecifications.Distinct());
+            }
 
 
             var headerMaps = model.GetType().GetProperties()
@@ -232,7 +293,7 @@ namespace Entegro.Web.Controllers
                 .Select(p => new HeaderMap
                 {
                     MappedName = p.Name,
-                    XmlHeader = p.GetValue(model)?.ToString() ?? ""
+                    XmlHeader = p.GetValue(model)?.ToString().Replace("->", "/") ?? ""
                 })
                 .Where(h => !string.IsNullOrWhiteSpace(h.XmlHeader)) // boş olmayanlar
                 .ToList();
@@ -254,12 +315,12 @@ namespace Entegro.Web.Controllers
 
             var xmlDoc = XDocument.Parse(xmlContent);
 
-
             var dataElements = xmlDoc.Root?.Elements();
 
             if (dataElements != null)
             {
                 Console.WriteLine("XML İçeriği:");
+
 
                 foreach (var item in dataElements)
                 {
@@ -267,22 +328,49 @@ namespace Entegro.Web.Controllers
 
                     foreach (var map in headerMaps)
                     {
-                        var element = item.Element(map.XmlHeader);
+                        bool foundAny = false;
 
-                        if (element != null)
+
+                        var headers = map.XmlHeader.Split(',').Select(h => h.Trim()).ToList();
+
+                        foreach (var header in headers)
                         {
-                            Console.WriteLine($"Başlık: {map.XmlHeader}");
-                            Console.WriteLine($"İçerik: {element.Value}");
+
+                            var parts = header.Split("/");
+
+                            var xpathParts = new List<string>();
+
+                            foreach (var part in parts)
+                            {
+                                if (int.TryParse(part, out int index))
+                                {
+                                    if (xpathParts.Count > 0)
+                                    {
+                                        var last = xpathParts[xpathParts.Count - 1];
+                                        xpathParts[xpathParts.Count - 1] = $"{last}[{index + 1}]";
+                                    }
+                                }
+                                else
+                                {
+                                    xpathParts.Add(part);
+                                }
+                            }
+
+                            var xpath = string.Join("/", xpathParts);
+                            var element = item.XPathSelectElement(xpath);
+
+                            if (element != null)
+                            {
+                                Console.WriteLine($"- {header}: {element.Value}");
+                                foundAny = true;
+                            }
                         }
-                        else
-                        {
-                            Console.WriteLine($"Başlık: {map.XmlHeader}");
-                            Console.WriteLine("İçerik: (Bulunamadı)");
-                        }
+
 
                         Console.WriteLine("-----------------------------");
                     }
                 }
+
             }
             else
             {
