@@ -1,0 +1,41 @@
+﻿
+@{
+    ViewData["Title"] = "List";
+}
+
+<div class="flex-grow-1 container-p-y container-fluid">
+    <div class="card">
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">İçe Aktarılanlar</h5>
+            <div class="d-flex justify-content-between align-items-center row pt-4 gap-6 gap-md-0 g-md-6">
+                <div class="col-md-4 importFilterParent"></div>
+            </div>
+        </div>
+
+        <div class="card-datatable">
+            <table id="ImportTable" class="table">
+                <thead class="border-top">
+                    <tr>
+                        <th></th>             
+                        <th></th>             
+                        <th>Profil Adı</th>  
+                        <th>Medya Türü</th>   
+                        <th>Detay Gör</th> 
+                        <th></th>            
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/assets/js/entegro.import.list.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            Entegro.import.list.init();
+        });
+    </script>
+
+    
+}
