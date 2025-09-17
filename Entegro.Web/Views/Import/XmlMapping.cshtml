@@ -1,9 +1,9 @@
-﻿@model XmlImportProfileViewModel
+﻿@model CreateXmlImportProfileViewModel
 @{
     ViewData["Title"] = "XmlMapping";
-
-    var variantPaths = Model.Paths.Where(x => x.StartsWith("variants->variant->0->")).ToList();
-    var variantCount = Model.Paths.Where(p => p.StartsWith("variants->variant->")).Select(p =>
+    var paths = ViewBag.XmlPaths as List<string>;
+    var variantPaths = paths.Where(x => x.StartsWith("variants->variant->0->")).ToList();
+    var variantCount = paths.Where(p => p.StartsWith("variants->variant->")).Select(p =>
     {
         var parts = p.Split("->", StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length >= 3 && int.TryParse(parts[2], out int index))
@@ -31,11 +31,12 @@
     <div class="row">
         <div class="col-xl-12 col-lg-7 col-md-7 order-1 order-md-0">
 
-            <form asp-action="XmlMappingAdd" asp-controller="Import" method="post" onsubmit="return validateForm();">
+            <form asp-action="XmlMapping" asp-controller="Import" method="post" onsubmit="return validateForm();">
 
                 <input type="hidden" id="SelectedImagePaths" name="SelectedImagePaths" />
                 <input type="hidden" id="SelectedAttributeSpecifications" name="SelectedAttributeSpecifications" />
-                <input type="hidden" name="VariantCount" value="@variantCount"/>
+                <input type="hidden" name="VariantCount" value="@variantCount" />
+                <input type="hidden" asp-for="ProfileName"  />
                 <input type="hidden" asp-for="MediaFileUrl" />
                 <div class="card">
 
@@ -45,80 +46,80 @@
 
                         <div class="row">
                             <div class="col-md-6 mt-1">
-                                <label for="Name" class="form-label">Ürün Adı *</label>
-                                <select asp-for="Name" class="form-select select2" required>
+                                <label asp-for="CreateXmlProduct.Name" class="form-label">Ürün Adı *</label>
+                                <select asp-for="CreateXmlProduct.Name" class="form-select select2" required>
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Brand" class="form-label">Marka</label>
-                                <select asp-for="Brand" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Brand" class="form-label">Marka</label>
+                                <select asp-for="CreateXmlProduct.Brand" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Barcode" class="form-label">Barkod *</label>
-                                <select asp-for="Barcode" class="form-select select2" required>
+                                <label asp-for="CreateXmlProduct.Barcode" class="form-label">Barkod *</label>
+                                <select asp-for="CreateXmlProduct.Barcode" class="form-select select2" required>
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="ManufacturerPartNumber" class="form-label">Üretici Numarası</label>
-                                <select asp-for="ManufacturerPartNumber" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.ManufacturerPartNumber" class="form-label">Üretici Numarası</label>
+                                <select asp-for="CreateXmlProduct.ManufacturerPartNumber" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Gtin" class="form-label">Gtin </label>
-                                <select asp-for="Gtin" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Gtin" class="form-label">Gtin </label>
+                                <select asp-for="CreateXmlProduct.Gtin" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Height" class="form-label">Ağırlık </label>
-                                <select asp-for="Height" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Height" class="form-label">Ağırlık </label>
+                                <select asp-for="CreateXmlProduct.Height" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Unit" class="form-label">Birim </label>
-                                <select asp-for="Unit" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Unit" class="form-label">Birim </label>
+                                <select asp-for="CreateXmlProduct.Unit" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Description" class="form-label">Açıklama </label>
-                                <select asp-for=Description class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Description" class="form-label">Açıklama </label>
+                                <select asp-for=CreateXmlProduct.Description class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -135,20 +136,20 @@
                     <div class="card-body" id="stokBilgileri">
                         <div class="row">
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Code" class="form-label">Stok Kodu *</label>
-                                <select asp-for="Code" class="form-select select2" required>
+                                <label asp-for="CreateXmlProduct.Code" class="form-label">Stok Kodu *</label>
+                                <select asp-for="CreateXmlProduct.Code" class="form-select select2" required>
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="StockQuantity" class="form-label">Stok Adedi *</label>
-                                <select asp-for="StockQuantity" class="form-select select2" required>
+                                <label asp-for="CreateXmlProduct.StockQuantity" class="form-label">Stok Adedi *</label>
+                                <select asp-for="CreateXmlProduct.StockQuantity" class="form-select select2" required>
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -165,10 +166,10 @@
                     <div class="card-body" id="fiyatBilgileri">
                         <div class="row">
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Price" class="form-label">Mağaza Satış Fiyatı *</label>
-                                <select asp-for="Price" class="form-select select2" required>
+                                <label asp-for="CreateXmlProduct.Price" class="form-label">Mağaza Satış Fiyatı *</label>
+                                <select asp-for="CreateXmlProduct.Price" class="form-select select2" required>
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -179,7 +180,7 @@
                                 <label for="piyasaFiyat" class="form-label">Piyasa Satış Fiyatı *</label>
                                 <select id="piyasaFiyat" class="form-select select2" required>
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -187,10 +188,10 @@
                             </div>
 
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Currency" class="form-label">Para Birimi</label>
-                                <select asp-for="Currency" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Currency" class="form-label">Para Birimi</label>
+                                <select asp-for="CreateXmlProduct.Currency" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -198,8 +199,8 @@
                             </div>
 
                             <div class="col-md-6 mt-1">
-                                <label asp-for="VatInc" class="form-label">KDV Dahil</label>
-                                <select asp-for="VatInc" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.VatInc" class="form-label">KDV Dahil</label>
+                                <select asp-for="CreateXmlProduct.VatInc" class="form-select select2">
                                     <option value="">Seçiniz</option>
                                     <option value="0">Hayır</option>
                                     <option value="1">Evet</option>
@@ -207,10 +208,10 @@
                             </div>
 
                             <div class="col-md-6 mt-1">
-                                <label asp-for="VatRate" class="form-label">KDV Oranı</label>
-                                <select asp-for="VatRate" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.VatRate" class="form-label">KDV Oranı</label>
+                                <select asp-for="CreateXmlProduct.VatRate" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -226,7 +227,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input"
                                            type="radio"
-                                           asp-for="ApplyPriceAdjustment"
+                                           asp-for="CreateXmlProduct.ApplyPriceAdjustment"
                                            value="uygula"
                                            id="fiyatArtisiUygula" />
                                     <label class="form-check-label" for="fiyatArtisiUygula">
@@ -238,9 +239,9 @@
                                 <div class="form-check mt-2">
                                     <input class="form-check-input"
                                            type="radio"
-                                           asp-for="ApplyPriceAdjustment"
+                                           asp-for="CreateXmlProduct.ApplyPriceAdjustment"
                                            value="devam"
-                                           id="fiyatArtisiUygulama" checked/>
+                                           id="fiyatArtisiUygulama" checked />
                                     <label class="form-check-label" for="fiyatArtisiUygulama">
                                         Fiyat Artışı Uygulamadan Devam Et
                                     </label>
@@ -249,8 +250,8 @@
                                 <!-- İşlem Türü Alanları -->
                                 <div id="islemTuruAlanlari" class="row mt-3" style="display: none;">
                                     <div class="col-md-6">
-                                        <label asp-for="PriceAdjustmentType" class="form-label">İşlem Türü *</label>
-                                        <select asp-for="PriceAdjustmentType" class="form-select">
+                                        <label asp-for="CreateXmlProduct.PriceAdjustmentType" class="form-label">İşlem Türü *</label>
+                                        <select asp-for="CreateXmlProduct.PriceAdjustmentType" class="form-select">
                                             <option value="">Seçiniz</option>
                                             <option value="yuzde">Yüzde</option>
                                             <option value="sabit">Sabit</option>
@@ -258,13 +259,13 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label asp-for="PriceAdjustmentAmount" class="form-label">İşlem Tutarı *</label>
-                                        <input asp-for="PriceAdjustmentAmount" class="form-control" placeholder="Örn. 30" />
+                                        <label asp-for="CreateXmlProduct.PriceAdjustmentAmount" class="form-label">İşlem Tutarı *</label>
+                                        <input asp-for="CreateXmlProduct.PriceAdjustmentAmount" class="form-control" placeholder="Örn. 30" />
                                     </div>
 
                                     <div class="col-md-12 mt-2">
-                                        <label asp-for="OptionalExtraAmount" class="form-label">Opsiyonel Ek Tutar</label>
-                                        <input asp-for="OptionalExtraAmount" class="form-control" placeholder="Örn. 30" />
+                                        <label asp-for="CreateXmlProduct.OptionalExtraAmount" class="form-label">Opsiyonel Ek Tutar</label>
+                                        <input asp-for="CreateXmlProduct.OptionalExtraAmount" class="form-control" placeholder="Örn. 30" />
                                         <small class="form-text text-muted">Para birimi XML kaynağındaki para birimi ile aynıdır.</small>
                                     </div>
                                 </div>
@@ -280,9 +281,9 @@
                     <div class="card-body" id="urunGorselleri">
                         <div class="row">
                             <div class="col-md-6">
-                                <label asp-for="Images" class="form-label">Ürün Görselleri (birden fazla seçilebilir)</label>
-                                <select asp-for="Images" class="form-select select2" multiple="multiple">
-                                    @foreach (var item in Model.Paths)
+                                <label asp-for="CreateXmlProduct.Images" class="form-label">Ürün Görselleri (birden fazla seçilebilir)</label>
+                                <select asp-for="CreateXmlProduct.Images" class="form-select select2" multiple="multiple">
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -297,10 +298,10 @@
                     <div class="card-body" id="categories">
                         <div class="row">
                             <div class="col-md-6 mt-1">
-                                <label asp-for="Categories" class="form-label">Kategoriler</label>
-                                <select asp-for="Categories" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.Categories" class="form-label">Kategoriler</label>
+                                <select asp-for="CreateXmlProduct.Categories" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -320,11 +321,11 @@
                             <div class="col-md-6 mt-1">
                                 <label class="form-label">Varyantlı Ürün mü?</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="IsVariantProduct" id="variantYes" value="yes">
+                                    <input class="form-check-input" type="radio" asp-for="CreateXmlProduct.IsVariantProduct" id="variantYes" value="yes">
                                     <label class="form-check-label" for="variantYes">Evet</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="IsVariantProduct" id="variantNo" value="no" checked>
+                                    <input class="form-check-input" type="radio" asp-for="CreateXmlProduct.IsVariantProduct" id="variantNo" value="no" checked>
                                     <label class="form-check-label" for="variantNo">Hayır</label>
                                 </div>
                             </div>
@@ -333,8 +334,8 @@
                         <!-- Diğer varyant alanlarını kapsayan row -->
                         <div class="row" id="variantFieldsRow" style="display: none;">
                             <div class="col-md-6 mt-1">
-                                <label asp-for="AttributeStockCode" class="form-label">Varyant Ürün Kodu</label>
-                                <select asp-for="AttributeStockCode" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.AttributeStockCode" class="form-label">Varyant Ürün Kodu</label>
+                                <select asp-for="CreateXmlProduct.AttributeStockCode" class="form-select select2">
                                     <option value="">Seçiniz</option>
                                     @foreach (var item in variantPaths)
                                     {
@@ -343,8 +344,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="AttributeManufacturerPartNumber" class="form-label">Varyant Üretici Numarası</label>
-                                <select asp-for="AttributeManufacturerPartNumber" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.AttributeManufacturerPartNumber" class="form-label">Varyant Üretici Numarası</label>
+                                <select asp-for="CreateXmlProduct.AttributeManufacturerPartNumber" class="form-select select2">
                                     <option value="">Seçiniz</option>
                                     @foreach (var item in variantPaths)
                                     {
@@ -353,8 +354,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="AttributeGtin" class="form-label">Varyant Gtin </label>
-                                <select asp-for="AttributeGtin" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.AttributeGtin" class="form-label">Varyant Gtin </label>
+                                <select asp-for="CreateXmlProduct.AttributeGtin" class="form-select select2">
                                     <option value="">Seçiniz</option>
                                     @foreach (var item in variantPaths)
                                     {
@@ -363,18 +364,18 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="AttributePrice" class="form-label">Varyant Fiyat </label>
-                                <select asp-for="AttributePrice" class="form-select select2" id="variantPrice">
+                                <label asp-for="CreateXmlProduct.AttributePrice" class="form-label">Varyant Fiyat </label>
+                                <select asp-for="CreateXmlProduct.AttributePrice" class="form-select select2" id="variantPrice">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="AttributeStockQuantity" class="form-label">Varyant Stok Miktarı </label>
-                                <select asp-for="AttributeStockQuantity" class="form-select select2" id="variantStockQuantity">
+                                <label asp-for="CreateXmlProduct.AttributeStockQuantity" class="form-label">Varyant Stok Miktarı </label>
+                                <select asp-for="CreateXmlProduct.AttributeStockQuantity" class="form-select select2" id="variantStockQuantity">
                                     <option value="">Seçiniz</option>
                                     @foreach (var item in variantPaths)
                                     {
@@ -383,8 +384,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="AttributeSpecifications" class="form-label">Varyant Stok Özellikler (birden fazla seçilebilir)</label>
-                                <select asp-for="AttributeSpecifications" class="form-select select2" multiple="multiple">
+                                <label asp-for="CreateXmlProduct.AttributeSpecifications" class="form-label">Varyant Stok Özellikler (birden fazla seçilebilir)</label>
+                                <select asp-for="CreateXmlProduct.AttributeSpecifications" class="form-select select2" multiple="multiple">
                                     @foreach (var item in variantPaths)
                                     {
                                         <option value="@item">@item</option>
@@ -394,39 +395,36 @@
                         </div>
                     </div>
 
-
-
-
                     <!--Arama Motorları-->
                     <hr />
                     <h5 class="card-header">Arama Motorları</h5>
                     <div class="card-body" id="searchEngine">
                         <div class="row">
                             <div class="col-md-6 mt-1">
-                                <label asp-for="MetaTitle" class="form-label">Meta Başlık</label>
-                                <select asp-for="MetaTitle" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.MetaTitle" class="form-label">Meta Başlık</label>
+                                <select asp-for="CreateXmlProduct.MetaTitle" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="MetaKeywords" class="form-label">Anahtar Kelimeler</label>
-                                <select asp-for="MetaKeywords" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.MetaKeywords" class="form-label">Anahtar Kelimeler</label>
+                                <select asp-for="CreateXmlProduct.MetaKeywords" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
                                 </select>
                             </div>
                             <div class="col-md-6 mt-1">
-                                <label asp-for="MetaDescription" class="form-label">Meta Açıklama</label>
-                                <select asp-for="MetaDescription" class="form-select select2">
+                                <label asp-for="CreateXmlProduct.MetaDescription" class="form-label">Meta Açıklama</label>
+                                <select asp-for="CreateXmlProduct.MetaDescription" class="form-select select2">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in Model.Paths)
+                                    @foreach (var item in paths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -456,7 +454,7 @@
                     <h3 class="mb-2">XML</h3>
                     <p class="text-muted">XML kaynağındaki ürün konumundaki ürünlerden yalnızca biri gösterilir.</p>
                 </div>
-                <pre>@Html.Raw(System.Net.WebUtility.HtmlEncode(Model.PreviewXml))</pre>
+                <pre>@Html.Raw(System.Net.WebUtility.HtmlEncode(ViewBag.PreviewXml))</pre>
             </div>
         </div>
     </div>
@@ -466,106 +464,130 @@
 
 
     <script>
-        $(document).ready(function () {
-            $('.select2').select2({
-                placeholder: "Bir seçenek seçin",
-                allowClear: true,
-                width: '100%'
-            });
-        });
+          $(document).ready(function () {
+              $('.select2').select2({
+                  placeholder: "Bir seçenek seçin",
+                  allowClear: true,
+                  width: '100%'
+              });
+          });
 
-     function validateForm() {
-            let isValid = true;
+            function validateForm() {
+            // Genel Bilgiler
+            const barcode = $('[name="CreateXmlProduct.Barcode"]').val();
+            const productName = $('[name="CreateXmlProduct.Name"]').val();
 
-            if (!$('#Barcode').val()) {
-                alert("Lütfen Genel Bilgiler bölümündeki alanları doldurun.");
+            if (!barcode) {
+                alert("Lütfen Genel Bilgiler bölümündeki Barkod alanını doldurun.");
                 return false;
             }
 
-            if (!$('#Code').val() || !$('#StockQuantity').val()) {
-                alert("Lütfen Stok Bilgileri bölümündeki alanları doldurun.");
+            if (!productName) {
+                alert("Lütfen Genel Bilgiler bölümündeki Ürün Adı alanını doldurun.");
                 return false;
             }
 
-            if (!$('#Price').val()) {
-                alert("Lütfen Fiyat Bilgileri bölümündeki alanları doldurun.");
+            // Stok Bilgileri
+            const stockCode = $('[name="CreateXmlProduct.Code"]').val();
+            const stockQuantity = $('[name="CreateXmlProduct.StockQuantity"]').val();
+
+            if (!stockCode || !stockQuantity) {
+                alert("Lütfen Stok Bilgileri bölümündeki Stok Kodu ve Stok Adedi alanlarını doldurun.");
                 return false;
             }
 
-            // Eğer fiyat artışı uygulanıyorsa işlem türü ve işlem tutarı kontrolü yap
-                const applyPriceAdjustment = $('input[name="ApplyPriceAdjustment"]:checked').val();
+            // Fiyat Bilgileri
+            const price = $('[name="CreateXmlProduct.Price"]').val();
+            const marketPrice = $('#piyasaFiyat').val();
 
-             if (applyPriceAdjustment === "uygula") {
-                 if (!$('[name="PriceAdjustmentType"]').val() || !$('[name="PriceAdjustmentAmount"]').val()) {
-                     alert("Lütfen işlem türü ve işlem tutarı alanlarını doldurun.");
-                     return false;
-                 }
-             }
-                const isVariantProduct = $('input[name="IsVariantProduct"]:checked').val();
-                if (isVariantProduct === "yes") {
-                    const variantPrice = $('[name="AttributePrice"]').val();
-                    const variantStockQty = $('[name="AttributeStockQuantity"]').val();
+            if (!price) {
+                alert("Lütfen Fiyat Bilgileri bölümündeki Mağaza Satış Fiyatı alanını doldurun.");
+                return false;
+            }
 
-                    if (!variantPrice || !variantStockQty) {
-                        alert("Lütfen Varyant Fiyat ve Varyant Stok Miktarı alanlarını doldurun.");
-                        return false;
-                    }
+            if (!marketPrice) {
+                alert("Lütfen Fiyat Bilgileri bölümündeki Piyasa Satış Fiyatı alanını doldurun.");
+                return false;
+            }
+
+            // Fiyat Artışı Kontrolü
+            const applyPriceAdjustment = $('[name="CreateXmlProduct.ApplyPriceAdjustment"]:checked').val();
+            if (applyPriceAdjustment === "uygula") {
+                const priceAdjustmentType = $('[name="CreateXmlProduct.PriceAdjustmentType"]').val();
+                const priceAdjustmentAmount = $('[name="CreateXmlProduct.PriceAdjustmentAmount"]').val();
+
+                if (!priceAdjustmentType || !priceAdjustmentAmount) {
+                    alert("Lütfen Fiyat Artışı işlem türü ve işlem tutarı alanlarını doldurun.");
+                    return false;
                 }
+            }
 
+            // Varyantlı Ürün Kontrolü
+            const isVariantProduct = $('input[name="CreateXmlProduct.IsVariantProduct"]:checked').val();
+            if (isVariantProduct === "yes") {
+                const variantPrice = $('[name="CreateXmlProduct.AttributePrice"]').val();
+                const variantStockQty = $('[name="CreateXmlProduct.AttributeStockQuantity"]').val();
 
-            // Seçilen görselleri işle
-            var selectedImages = $('#Images').val();
-            $('#SelectedImagePaths').val(selectedImages && selectedImages.length > 0 ? selectedImages.join(',') : '');
-            
-            
-            // Seçilen özellikleri işle
-            var selectedAttributeSpecifications = $('#AttributeSpecifications').val();
-            $('#SelectedAttributeSpecifications').val(selectedAttributeSpecifications && selectedAttributeSpecifications.length > 0 ? selectedAttributeSpecifications.join(',') : '');
+                if (!variantPrice || !variantStockQty) {
+                    alert("Lütfen Varyant Fiyat ve Varyant Stok Miktarı alanlarını doldurun.");
+                    return false;
+                }
+            }
+
+            // Ürün Görselleri
+            const selectedImages = $('[name="CreateXmlProduct.Images"]').val();
+            $('[name="SelectedImagePaths"]').val(selectedImages && selectedImages.length > 0 ? selectedImages.join(',') : '');
+
+            // Varyant Özellikleri (birden fazla seçilebilir)
+            const selectedAttributeSpecifications = $('[name="CreateXmlProduct.AttributeSpecifications"]').val();
+            $('[name="SelectedAttributeSpecifications"]').val(selectedAttributeSpecifications && selectedAttributeSpecifications.length > 0 ? selectedAttributeSpecifications.join(',') : '');
 
             return true;
         }
 
+
     </script>
 
     <script>
-     document.addEventListener("DOMContentLoaded", function () {
-        const islemTuruAlanlari = document.getElementById("islemTuruAlanlari");
-        const islemTuru = document.querySelector('[name="PriceAdjustmentType"]');
-        const islemTutari = document.querySelector('[name="PriceAdjustmentAmount"]');
-    
-        const fiyatArtisiRadioButtons = document.querySelectorAll('input[name="ApplyPriceAdjustment"]');
-    
-        function toggleIslemTuru() {
-            const selectedValue = document.querySelector('input[name="ApplyPriceAdjustment"]:checked')?.value;
-    
-            if (selectedValue === "uygula") {
-                islemTuruAlanlari.style.display = "flex";
-                islemTuru?.setAttribute("required", "required");
-                islemTutari?.setAttribute("required", "required");
-            } else {
-                islemTuruAlanlari.style.display = "none";
-                islemTuru?.removeAttribute("required");
-                islemTutari?.removeAttribute("required");
+         document.addEventListener("DOMContentLoaded", function () {
+            const islemTuruAlanlari = document.getElementById("islemTuruAlanlari");
+            const islemTuru = document.querySelector('[name="CreateXmlProduct.PriceAdjustmentType"]');
+            const islemTutari = document.querySelector('[name="CreateXmlProduct.PriceAdjustmentAmount"]');
+
+            const fiyatArtisiRadioButtons = document.querySelectorAll('input[name="CreateXmlProduct.ApplyPriceAdjustment"]');
+
+            function toggleIslemTuru() {
+                const selectedValue = document.querySelector('input[name="CreateXmlProduct.ApplyPriceAdjustment"]:checked')?.value;
+
+                if (selectedValue === "uygula") {
+                    islemTuruAlanlari.style.display = "flex";
+                    islemTuru?.setAttribute("required", "required");
+                    islemTutari?.setAttribute("required", "required");
+                } else {
+                    islemTuruAlanlari.style.display = "none";
+                    islemTuru?.removeAttribute("required");
+                    islemTutari?.removeAttribute("required");
+                }
             }
-        }
-    
-        toggleIslemTuru();
-    
-        fiyatArtisiRadioButtons.forEach(radio => {
-            radio.addEventListener("change", toggleIslemTuru);
+
+            toggleIslemTuru();
+
+            fiyatArtisiRadioButtons.forEach(radio => {
+                radio.addEventListener("change", toggleIslemTuru);
+            });
         });
-    });
+
 
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const variantFieldsRow = document.getElementById("variantFieldsRow");
-            const variantRadios = document.querySelectorAll('input[name="IsVariantProduct"]');
+            const variantRadios = document.querySelectorAll('input[name="CreateXmlProduct.IsVariantProduct"]');
             const attrStockQuantity = document.getElementById("variantStockQuantity");
             const attrPrice = document.getElementById("variantPrice");
 
             function toggleVariantFields() {
-                const selected = document.querySelector('input[name="IsVariantProduct"]:checked').value;
+                const selected = document.querySelector('input[name="CreateXmlProduct.IsVariantProduct"]:checked').value;
 
                 if (selected === "yes") {
                     variantFieldsRow.style.display = "flex";
@@ -585,6 +607,7 @@
                 radio.addEventListener("change", toggleVariantFields);
             });
         });
+
     </script>
 
 

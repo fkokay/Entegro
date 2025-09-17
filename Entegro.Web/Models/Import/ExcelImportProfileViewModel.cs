@@ -2,7 +2,7 @@
 {
     public class ExcelImportProfileViewModel
     {
-        public List<ColumnMapping> ColumnMappings { get; set; } = new List<ColumnMapping>();
+        public List<ExcelColumnMapping> ColumnMappings { get; set; } = new List<ExcelColumnMapping>();
         public int MediaFileId { get; set; }
         public string ProfileName { get; set; }
         public string? MediaFileType { get; set; }
