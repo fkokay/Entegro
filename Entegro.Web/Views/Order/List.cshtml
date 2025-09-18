@@ -3,23 +3,23 @@
 }
 
 <div class="flex-grow-1 container-p-y container-fluid">
-   <div class="card">
+    <div class="card">
         <div class="order-actions border-bottom p-4 d-flex">
-            <button class="btn">Paketlenecek</button>
+            <button class="btn active" data-order-status="1">Paketlenecek</button>
             <div class="split"></div>
-            <button class="btn">Gönderime Hazır</button>
+            <button class="btn" data-order-status="2">Gönderime Hazır</button>
             <div class="split"></div>
-            <button class="btn">Kargoda</button>
+            <button class="btn" data-order-status="3">Kargoda</button>
             <div class="split"></div>
-            <button class="btn">Teslim Edildi</button>
+            <button class="btn" data-order-status="4">Teslim Edildi</button>
             <div class="split"></div>
-            <button class="btn">Teslim Edilemedi</button>
+            <button class="btn" data-order-status="5">Teslim Edilemedi</button>
             <div class="split"></div>
-            <button class="btn">Ödemesi Bekleniyor</button>
+            <button class="btn" data-order-status="6">Ödemesi Bekleniyor</button>
             <div class="split"></div>
-            <button class="btn">İptal Edildi</button>
-       </div>
-       <div class="p-5">
+            <button class="btn" data-order-status="7">İptal Edildi</button>
+        </div>
+        <div class="p-5">
             <div class="row">
                 <div class="col-2 mb-2">
                     <input type="text" class="form-control" placeholder="Müşteri Adı" />
@@ -46,27 +46,14 @@
                     <input type="text" class="form-control" placeholder="Ürün Adı/Model Kodu" />
                 </div>
             </div>
-       </div>
-   </div>
-</div>
-
-<div class="flex-grow-1 container-p-y container-fluid">
-    <div class="card">
-        <div class="row card-header flex-column flex-md-row border-bottom mx-0 px-3">
-            <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0">
-                <h5 class="card-title mb-0 text-md-start text-center pb-md-0 pb-6">Siparişler</h5>
-            </div>
-            <div class="d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0">
-               
-            </div>
         </div>
 
-        <div class="card-datatable table-responsive">
+        <div class="card-datatable table-responsive border-top">
             <table id="OrderTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
                 <thead>
                     <tr>
-                        <th></th> 
-                        <th>Id</th> 
+                        <th></th>
+                        <th>Id</th>
                         <th>Sipariş Kaynağı</th>
                         <th>Sipariş Bilgileri</th>
                         <th>Alıcı</th>
@@ -74,7 +61,7 @@
                         <th>Kargo Bilgileri</th>
                         <th>Fatura Bilgileri</th>
                         <th>Ödeme Bilgileri</th>
-                        <th></th> 
+                        <th></th>
                     </tr>
                 </thead>
             </table>
@@ -82,12 +69,64 @@
     </div>
 </div>
 
+<div class="modal fade" id="OrderPackageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-header">
+                <h5 class="modal-title" id="OrderPackageModalLabel">Paket Hazırlama</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                <button type="button" class="btn btn-warning orderpackage-save">Paketi Onayla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ProudctIntegrationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ProudctIntegrationModalLabel">Ürün Eşleştirme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 mb-5">
+                    <!-- Kategori Seçimi -->
+                    <div class="col-md-12">
+                        <label class="form-label text-sm-start" for="ProductIntegrationName">Trendyol Ürün Adı</label>
+                        <input type="text" id="ProductIntegrationName" name="ProductIntegrationName" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label text-sm-start" for="ProductIntegrationSku">Trendyol Ürün Kodu</label>
+                        <input type="text" id="ProductIntegrationSku" name="ProductIntegrationSku" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label text-sm-start" for="ProductId">Trendyol Ürün Kodu</label>
+                        <select id="ProductId" name="ProductId" class="select2 form-select form-select-lg">
+
+                       </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                <button type="button" class="btn btn-warning proudctintegration-save">Eşleştir</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="/assets/js/entegro.order.list.js" asp-append-version="true"></script>
     <script>
         $(function () {
-            Entegro.order.OrderList.init();
+            Entegro.order.OrderList.initTable(1);
+            Entegro.order.OrderList.initTab();
         });
 
     </script>

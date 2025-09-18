@@ -6,6 +6,8 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Content;
 using MapsterMapper;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Entegro.Application.Services
 {
@@ -156,6 +158,24 @@ namespace Entegro.Application.Services
             var mediaFileDto = _mapper.Map<MediaFile>(mediaFile);
             await _mediaFileRepository.UpdateAsync(mediaFileDto);
             return _mapper.Map<MediaFileDto>(mediaFileDto);
+        }
+
+        public async Task<string> GetUrl(int id)
+        {
+            var mediaFile = await _mediaFileRepository.GetByIdAsync(id);
+            if (mediaFile is null)
+            {
+                return "";
+            }
+
+            if (mediaFile.Folder is null)
+            {
+                return $"/media/{mediaFile.Id}/{Uri.EscapeDataString(mediaFile.Name)}";
+            }
+            else
+            {
+                return $"/media/{mediaFile.Id}/{mediaFile.Folder.Name}/{Uri.EscapeDataString(mediaFile.Name)}";
+            }
         }
     }
 }

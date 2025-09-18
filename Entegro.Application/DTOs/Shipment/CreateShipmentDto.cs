@@ -9,6 +9,7 @@ namespace Entegro.Application.DTOs.Shipment
         public int OrderId { get; set; }
         public OrderDto Order { get; set; }
         public string Carrier { get; set; } = string.Empty;
+        public string PackageNo { get; set; }
         public string? TrackingNumber { get; set; }
         public string? TrackingUrl { get; set; }
         public decimal? TotalWeight { get; set; }

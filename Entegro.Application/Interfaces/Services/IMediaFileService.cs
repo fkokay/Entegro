@@ -15,5 +15,6 @@ namespace Entegro.Application.Interfaces.Services
         Task<MediaFileDto?> GetByNameAndFolderAsync(string name, int? folderId);
         Task<CreateMediaFileDto> BuildMediaFileDtoAsync(IFormFile file, string fileName, int? folderId);
         Task<bool> OverwriteByNameAsync(string name, int? folderId, CreateMediaFileDto builtDto);
+        Task<string> GetUrl(int id);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
 using Entegro.Web.Models.Catalog.Products;
@@ -6,6 +7,7 @@ using Entegro.Web.Models.Checkout.Orders;
 using Entegro.Web.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -13,9 +15,13 @@ namespace Entegro.Web.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
-        public OrderController(IOrderService orderService)
+        private readonly IShipmentService _shipmentService;
+        private readonly IShipmentItemService _shipmentItemService;
+        public OrderController(IOrderService orderService, IShipmentService shipmentService, IShipmentItemService shipmentItemService)
         {
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
+            _shipmentService = shipmentService;
+            _shipmentItemService = shipmentItemService;
         }
 
         public IActionResult Index()
@@ -29,9 +35,9 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> OrderList([FromBody] GridCommand gridCommand)
+        public async Task<IActionResult> OrderList([FromBody] GridCommand gridCommand, int orderStatus)
         {
-            var result = await _orderService.GetPagedAsync(gridCommand);
+            var result = await _orderService.GetPagedAsync(gridCommand, orderStatus);
             return Json(new
             {
                 draw = gridCommand.Draw,
@@ -47,7 +53,7 @@ namespace Entegro.Web.Controllers
             var orderDetailViewModel = new OrderViewModel
             {
                 Id = orderDetail.Id,
-                OrderSourceId = orderDetail.OrderSourceId,
+                IntegrationSystemId = orderDetail.IntegrationSystemId,
                 OrderNumber = orderDetail.OrderNumber,
                 OrderGuid = orderDetail.OrderGuid,
                 CustomerId = orderDetail.CustomerId,
@@ -118,28 +124,12 @@ namespace Entegro.Web.Controllers
                     UpdatedOn = orderDetail.ShippingAddress.UpdatedOn,
                     ZipPostalCode = orderDetail.ShippingAddress.ZipPostalCode,
                 },
-                PaymentMethodSystemName = orderDetail.PaymentMethodSystemName,
-                OrderDate = orderDetail.OrderDate,
-                CurrencyRate = orderDetail.CurrencyRate,
-                VatNumber = orderDetail.VatNumber,
-                OrderSubtotalInclTax = orderDetail.OrderSubtotalInclTax,
-                OrderSubtotalExclTax = orderDetail.OrderSubtotalExclTax,
-                OrderSubTotalDiscountInclTax = orderDetail.OrderSubTotalDiscountInclTax,
-                OrderSubTotalDiscountExclTax = orderDetail.OrderSubTotalDiscountExclTax,
-                OrderShippingInclTax = orderDetail.OrderShippingInclTax,
-                OrderShippingExclTax = orderDetail.OrderShippingExclTax,
-                OrderShippingTaxRate = orderDetail.OrderShippingTaxRate,
-                PaymentMethodAdditionalFeeExclTax = orderDetail.PaymentMethodAdditionalFeeExclTax,
-                PaymentMethodAdditionalFeeInclTax = orderDetail.PaymentMethodAdditionalFeeInclTax,
-                PaymentMethodAdditionalFeeTaxRate = orderDetail.PaymentMethodAdditionalFeeTaxRate,
                 OrderTax = orderDetail.OrderTax,
                 OrderDiscount = orderDetail.OrderDiscount,
                 OrderTotal = orderDetail.OrderTotal,
                 RefundedAmount = orderDetail.RefundedAmount,
-                CustomerIp = orderDetail.CustomerIp,
                 Deleted = orderDetail.Deleted,
                 IsTransient = orderDetail.IsTransient,
-                TaxRates = orderDetail.TaxRates,
                 PaidDateUtc = orderDetail.PaidDateUtc,
                 ShippingMethod = orderDetail.ShippingMethod,
                 OrderStatusId = orderDetail.OrderStatusId,
@@ -158,9 +148,9 @@ namespace Entegro.Web.Controllers
                     Quantity = oi.Quantity,
                     TaxRate = oi.TaxRate,
                     UnitPrice = oi.UnitPrice,
-                    Product = new ProductViewModel
+                    Product = oi.Product == null ? null : new ProductViewModel
                     {
-                        Id = oi.ProductId,
+                        Id = oi.Product.Id,
                         PictureUrl = oi.Product.MainPicture?.Url,
                         Name = oi.Product.Name,
                     }
@@ -174,6 +164,154 @@ namespace Entegro.Web.Controllers
                 }).ToList()
             };
             return View(orderDetailViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Packaging(int id)
+        {
+            var orderDetail = await _orderService.GetOrderByIdAsync(id);
+            var model = new OrderViewModel
+            {
+                Id = orderDetail.Id,
+                IntegrationSystemId = orderDetail.IntegrationSystemId,
+                OrderNumber = orderDetail.OrderNumber,
+                OrderGuid = orderDetail.OrderGuid,
+                CustomerId = orderDetail.CustomerId,
+                Customer = orderDetail.Customer == null ? null : new CustomerViewModel
+                {
+                    Id = orderDetail.Customer.Id,
+                    UpdatedOn = orderDetail.Customer.UpdatedOnUtc,
+                    Address = orderDetail.Customer.Address,
+                    City = orderDetail.Customer.City,
+                    CreatedOn = orderDetail.Customer.CreatedOnUtc,
+                    District = orderDetail.Customer.District,
+                    CustomerType = orderDetail.Customer.CustomerType,
+                    Email = orderDetail.Customer.Email,
+                    Name = orderDetail.Customer.Name,
+                    PhoneNumber = orderDetail.Customer.PhoneNumber,
+                    Street = orderDetail.Customer.Street,
+                    Town = orderDetail.Customer.Town,
+                    TaxOffice = orderDetail.Customer.TaxOffice,
+                    TaxNumber = orderDetail.Customer.TaxNumber,
+                },
+                BillingAddressId = orderDetail.BillingAddressId == null ? null : orderDetail.BillingAddressId,
+                BillingAddress = orderDetail.BillingAddress == null ? null : new AddressViewModel
+                {
+                    CityId = orderDetail.BillingAddress.CityId,
+                    LastName = orderDetail.BillingAddress.LastName,
+                    Address1 = orderDetail.BillingAddress.Address1,
+                    Address2 = orderDetail.BillingAddress.Address2,
+                    AddressType = orderDetail.BillingAddress.AddressType,
+                    Company = orderDetail.BillingAddress.Company,
+                    CountryId = orderDetail.BillingAddress.CountryId,
+                    CreatedOn = orderDetail.BillingAddress.CreatedOn,
+                    DistrictId = orderDetail.BillingAddress.DistrictId,
+                    Email = orderDetail.BillingAddress.Email,
+                    FaxNumber = orderDetail.BillingAddress.FaxNumber,
+                    FirstName = orderDetail.BillingAddress.FirstName,
+                    Id = orderDetail.BillingAddress.Id,
+                    PhoneNumber = orderDetail.BillingAddress.PhoneNumber,
+                    Salutation = orderDetail.BillingAddress.Salutation,
+                    TaxOffice = orderDetail.BillingAddress.TaxOffice,
+                    TaxOfficeNumber = orderDetail.BillingAddress.TaxOfficeNumber,
+                    Title = orderDetail.BillingAddress.Title,
+                    TownId = orderDetail.BillingAddress.Id,
+                    UpdatedOn = orderDetail.BillingAddress.UpdatedOn,
+                    ZipPostalCode = orderDetail.BillingAddress.ZipPostalCode,
+                },
+                ShippingAddressId = orderDetail.ShippingAddressId == null ? null : orderDetail.ShippingAddressId,
+                ShippingAddress = orderDetail.ShippingAddress == null ? null : new AddressViewModel
+                {
+                    CityId = orderDetail.ShippingAddress.CityId,
+                    LastName = orderDetail.ShippingAddress.LastName,
+                    Address1 = orderDetail.ShippingAddress.Address1,
+                    Address2 = orderDetail.ShippingAddress.Address2,
+                    AddressType = orderDetail.ShippingAddress.AddressType,
+                    Company = orderDetail.ShippingAddress.Company,
+                    CountryId = orderDetail.ShippingAddress.CountryId,
+                    CreatedOn = orderDetail.ShippingAddress.CreatedOn,
+                    DistrictId = orderDetail.ShippingAddress.DistrictId,
+                    Email = orderDetail.ShippingAddress.Email,
+                    FaxNumber = orderDetail.ShippingAddress.FaxNumber,
+                    FirstName = orderDetail.ShippingAddress.FirstName,
+                    Id = orderDetail.ShippingAddress.Id,
+                    PhoneNumber = orderDetail.ShippingAddress.PhoneNumber,
+                    Salutation = orderDetail.ShippingAddress.Salutation,
+                    TaxOffice = orderDetail.ShippingAddress.TaxOffice,
+                    TaxOfficeNumber = orderDetail.ShippingAddress.TaxOfficeNumber,
+                    Title = orderDetail.ShippingAddress.Title,
+                    TownId = orderDetail.ShippingAddress.Id,
+                    UpdatedOn = orderDetail.ShippingAddress.UpdatedOn,
+                    ZipPostalCode = orderDetail.ShippingAddress.ZipPostalCode,
+                },
+                PaymentMethod = orderDetail.PaymentMethod,
+                OrderDateUtc = orderDetail.OrderDateUtc,
+                OrderTax = orderDetail.OrderTax,
+                OrderDiscount = orderDetail.OrderDiscount,
+                OrderTotal = orderDetail.OrderTotal,
+                RefundedAmount = orderDetail.RefundedAmount,
+                Deleted = orderDetail.Deleted,
+                IsTransient = orderDetail.IsTransient,
+                PaidDateUtc = orderDetail.PaidDateUtc,
+                ShippingMethod = orderDetail.ShippingMethod,
+                OrderStatusId = orderDetail.OrderStatusId,
+                OrderStatus = orderDetail.OrderStatus,
+                PaymentStatusId = orderDetail.PaymentStatusId,
+                PaymentStatus = orderDetail.PaymentStatus,
+                ShippingStatusId = orderDetail.ShippingStatusId,
+                ShippingStatus = orderDetail.ShippingStatus,
+                OrderItems = orderDetail.OrderItems.Select(oi => new OrderItemViewModel
+                {
+                    OrderId = oi.OrderId,
+                    DiscountAmount = oi.DiscountAmount,
+                    Id = oi.Id,
+                    Price = oi.Price,
+                    ProductId = oi.ProductId,
+                    Quantity = oi.Quantity,
+                    TaxRate = oi.TaxRate,
+                    UnitPrice = oi.UnitPrice,
+                    Product = oi.Product == null ? null : new ProductViewModel
+                    {
+                        Id = oi.Product.Id,
+                        PictureUrl = oi.Product.MainPicture?.Url,
+                        Name = oi.Product.Name,
+                        Code = oi.Product.Code,
+                        Price = oi.Product.Price
+                    }
+                }).ToList(),
+                OrderNotes = orderDetail.OrderNotes.Select(on => new OrderNoteViewModel
+                {
+                    Id = on.OrderId,
+                    CreatedOnUtc = on.CreatedOnUtc,
+                    Note = on.Note,
+                    OrderId = on.OrderId,
+                }).ToList()
+            };
+            return PartialView("_Packaging", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PackagingSave(string carrier, List<OrderPackageViewModel> orderPackages)
+        {
+            CreateShipmentDto createShipment = new CreateShipmentDto();
+            createShipment.Carrier = carrier;
+            createShipment.TrackingNumber = "";
+            createShipment.PackageNo = new string(Guid.NewGuid().ToString("N").Where(char.IsDigit).Take(10).ToArray());
+            createShipment.TrackingUrl = "";
+            createShipment.TotalWeight = 0;
+            createShipment.DeliveryDateUtc = null;
+            createShipment.ShippedDateUtc = null;
+            createShipment.OrderId = orderPackages[0].OrderId;
+            createShipment.CreatedOnUtc = DateTime.UtcNow;
+            createShipment.ShipmentItems = orderPackages.Where(m => m.IsPackage).Select(m => new Application.DTOs.ShipmentItem.CreateShipmentItemDto()
+            {
+                OrderItemId = m.OrderItemId,
+                Quantity = m.Quantity,
+            }).ToList();
+
+            var result = await _shipmentService.AddAsync(createShipment);
+
+            return Json(new { success = true });
         }
     }
 }

@@ -1,6 +1,25 @@
 ﻿var Entegro = Entegro || {};
 Entegro.product = Entegro.product || {};
 Entegro.product.list = (function ($) {
+    function showMessage(title, message, type = "info", redirectUrl = null, reload = null) {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: type, // success | error | warning | info | question
+            confirmButtonText: 'Tamam',
+            customClass: { confirmButton: 'btn btn-primary' },
+            buttonsStyling: false
+        }).then(() => {
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
+
+            if (reload) {
+                location.reload();
+            }
+        });
+    }
+
     function getIntegrationLogo(value) {
         switch (value) {
             case "Smartstore": return "/assets/img/brandicons/smartstore.png";

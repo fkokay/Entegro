@@ -36,6 +36,12 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             orderItem.Product = new DTOs.Product.ProductDto();
             orderItem.Product.Code = trendyolOrderLine.Barcode;
             orderItem.TaxRate = trendyolOrderLine.VatBaseAmount;
+            orderItem.Sku = trendyolOrderLine.Sku;
+            orderItem.IntegrationSku = trendyolOrderLine.Sku;
+            orderItem.IntegrationProductName = trendyolOrderLine.ProductName;
+            orderItem.ProductCost = 0;
+            orderItem.ItemWeight = 0;
+            orderItem.AttributesXml = "";
 
 
             return orderItem;

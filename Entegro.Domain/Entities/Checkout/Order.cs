@@ -1,4 +1,5 @@
 ﻿using Entegro.Domain.Entities.Common;
+using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -13,8 +14,6 @@ namespace Entegro.Domain.Entities.Checkout
         public void Configure(EntityTypeBuilder<Order> builder)
         {
             builder.HasQueryFilter(c => !c.Deleted);
-
-            builder.Property(x => x.CurrencyRate).HasPrecision(18, 8);
             builder.Property(x => x.OrderTotal).HasPrecision(18, 4);
 
             builder
@@ -39,59 +38,31 @@ namespace Entegro.Domain.Entities.Checkout
     [Table("Order")]
     public class Order : BaseEntity, ISoftDeletable, ITransient
     {
-        public int OrderSourceId { get; set; }
-        [NotMapped]
-        public OrderSource OrderSource
-        {
-            get => (OrderSource)OrderSourceId;
-            set => OrderSourceId = (int)value;
-        }
-        [NotMapped]
-        public string OrderSourceLabelHint
-        {
-            get
-            {
-                return OrderSource switch
-                {
-                    OrderSource.Smartstore => "Smartstore",
-                    OrderSource.Trendyol => "Trendyol",
-                    _ => throw new NotImplementedException(),
-                };
-            }
-        }
         public string OrderNumber { get; set; }
         public Guid OrderGuid { get; set; }
+        public int? IntegrationSystemId { get; set; }
+        public virtual IntegrationSystem? IntegrationSystem { get; set; }
+        public string? IntegrationOrderNumber { get; set; }
         public int CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
         public int? BillingAddressId { get; set; }
         public virtual Address? BillingAddress { get; set; }
         public int? ShippingAddressId { get; set; }
         public virtual Address? ShippingAddress { get; set; }
-        public string PaymentMethodSystemName { get; set; }
-        public DateTime OrderDate { get; set; }
-        public decimal CurrencyRate { get; set; }
-        public string VatNumber { get; set; }
-        public decimal OrderSubtotalInclTax { get; set; }
-        public decimal OrderSubtotalExclTax { get; set; }
-        public decimal OrderSubTotalDiscountInclTax { get; set; }
-        public decimal OrderSubTotalDiscountExclTax { get; set; }
-        public decimal OrderShippingInclTax { get; set; }
-        public decimal OrderShippingExclTax { get; set; }
-        public decimal OrderShippingTaxRate { get; set; }
-        public decimal PaymentMethodAdditionalFeeInclTax { get; set; }
-        public decimal PaymentMethodAdditionalFeeExclTax { get; set; }
-        public decimal PaymentMethodAdditionalFeeTaxRate { get; set; }
-        public decimal OrderTax { get; set; }
+        public string PaymentMethod { get; set; }
+        public decimal PaymentFee { get; set; }
+        public string ShippingMethod { get; set; }
+        public decimal OrderShipping { get; set; }
+        public DateTime OrderDateUtc { get; set; }
+        public decimal OrderSubTotal { get; set; }
         public decimal OrderDiscount { get; set; }
+        public decimal OrderTax { get; set; }
         public decimal OrderTotal { get; set; }
         public decimal RefundedAmount { get; set; }
-        public string? CustomerIp { get; set; }
         public bool Deleted { get; set; }
         public bool IsTransient { get; set; }
-        public string TaxRates { get; set; }
         public DateTime? PaidDateUtc { get; set; }
-        public DateTime? DueDateUtc { get; set; }
-        public string ShippingMethod { get; set; }
+        public DateTime DueDateUtc { get; set; }
         public int OrderStatusId { get; set; }
 
         [NotMapped]
@@ -108,6 +79,24 @@ namespace Entegro.Domain.Entities.Checkout
         {
             get => (PaymentStatus)PaymentStatusId;
             set => PaymentStatusId = (int)value;
+        }
+
+        [NotMapped]
+        public string PaymentStatusLabelHint
+        {
+            get
+            {
+                return PaymentStatus switch
+                {
+                    PaymentStatus.Pending => "Beklemede",
+                    PaymentStatus.Authorized => "Onaylandı",
+                    PaymentStatus.Paid => "Ödendi",
+                    PaymentStatus.PartiallyRefunded => "Kısmen İade Edildi",
+                    PaymentStatus.Refunded => "İade Edildi",
+                    PaymentStatus.Voided => "Geçersiz",
+                    _ => throw new NotImplementedException(),
+                };
+            }
         }
 
         public int ShippingStatusId { get; set; }

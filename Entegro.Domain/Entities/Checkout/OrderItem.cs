@@ -21,13 +21,21 @@ namespace Entegro.Domain.Entities.Checkout
     {
         public int OrderId { get; set; }
         public virtual Order Order { get; set; }
-        public int ProductId { get; set; }
-        public virtual Product Product { get; set; }
+        public int? ProductId { get; set; }
+        public virtual Product? Product { get; set; }
+        public string Sku { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Price { get; set; }
         public decimal TaxRate { get; set; }
         public decimal DiscountAmount { get; set; }
+        public string? AttributesXml { get; set; }
+        public decimal ItemWeight { get; set; }
+        public decimal ProductCost { get; set; }
+        public string? IntegrationSku { get; set; }
+        public string? IntegrationProductName { get; set; }
+
+        public virtual ICollection<ShipmentItem> ShipmentItems { get; set; } = new List<ShipmentItem>();
     
     }
 }

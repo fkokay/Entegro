@@ -27,35 +27,21 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
             }
 
             OrderDto order = new OrderDto();
-            order.OrderSource = Domain.Enums.OrderSource.Hepsiburada;
             order.OrderNumber = hepsiburadaShipmentPackage.Id;
             order.OrderGuid = Guid.Parse(hepsiburadaShipmentPackage.Id);
             order.OrderTax = 0;
             order.OrderDiscount = 0;
             order.RefundedAmount = 0;
-            order.OrderSubtotalInclTax = 0;
-            order.OrderSubtotalExclTax = 0;
-            order.OrderSubTotalDiscountInclTax = 0;
-            order.OrderSubTotalDiscountExclTax = 0;
-            order.OrderShippingExclTax = 0;
-            order.OrderShippingInclTax = 0;
-            order.OrderShippingTaxRate = 0;
-            order.PaymentMethodAdditionalFeeExclTax = 0;
-            order.PaymentMethodAdditionalFeeInclTax = 0;
-            order.PaymentMethodAdditionalFeeTaxRate = 0;
             order.OrderTotal = hepsiburadaShipmentPackage.TotalPrice.Amount;
-            order.PaymentMethodSystemName = "Hepsiburada";
-            order.OrderDate = hepsiburadaShipmentPackage.OrderDate;
-            order.CurrencyRate = 1;
-            order.VatNumber = "";
-            order.CustomerIp = "127.0.0.1";
+            order.PaymentMethod = "Hepsiburada";
+            order.OrderDateUtc = hepsiburadaShipmentPackage.OrderDate;
             order.Deleted = false;
             order.IsTransient = false;
             order.OrderStatus =  Domain.Enums.OrderStatus.Pending;
             order.PaymentStatus =  Domain.Enums.PaymentStatus.Paid;
             order.ShippingMethod = hepsiburadaShipmentPackage.CargoCompany;
             order.ShippingStatus = Domain.Enums.ShippingStatus.Shipped;
-            order.TaxRates = "";
+            order.DueDateUtc = hepsiburadaShipmentPackage.DueDate;
             order.Customer = new DTOs.Customer.CustomerDto()
             {
                 Address = hepsiburadaShipmentPackage.BillingAddress,
@@ -117,18 +103,24 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
                  Product = new DTOs.Product.ProductDto()
                  {
                       Code = m.MerchantSku,
-                      
                  },
                  Quantity = m.Quantity,
                  Price = m.MerchantTotalPrice.Amount,
                  UnitPrice = m.MerchantUnitPrice.Amount,
                  TaxRate = m.Vat,
-                 DiscountAmount = m.TotalMerchantDiscount.Amount, 
+                 DiscountAmount = m.TotalMerchantDiscount.Amount,
+                 IntegrationSku = m.MerchantSku,
+                 IntegrationProductName = m.ProductName,
+                 ItemWeight = 0,
+                 AttributesXml = "",
+                 ProductCost = 0,
+                 Sku = m.MerchantSku,
             }).ToList();
 
             ShipmentDto shipmentDto = new ShipmentDto();
             shipmentDto.OrderId = 0;
             shipmentDto.Carrier = hepsiburadaShipmentPackage.CargoCompany;
+            shipmentDto.PackageNo = hepsiburadaShipmentPackage.PackageNumber;
             shipmentDto.TrackingNumber = hepsiburadaShipmentPackage.Barcode;
             shipmentDto.TrackingUrl = "";
             shipmentDto.TotalWeight = 0;

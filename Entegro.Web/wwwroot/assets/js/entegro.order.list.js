@@ -3,21 +3,10 @@ Entegro.order = Entegro.order || {};
 
 
 Entegro.order.OrderList = (function ($) {
-    function getIntegrationLogo(value) {
-        switch (value) {
-            case "Smartstore": return "/assets/img/logo/smartstore.png";
-            case "Trendyol": return "/assets/img/logo/trendyol.webp";
-            case "N11": return "/assets/img/logo/n11.jpeg";
-            case "Pazarama": return "/assets/img/logo/pazarama.png";
-            case "Idefix": return "/assets/img/logo/idefix.png";
-            case "CicekSepeti": return "/assets/img/logo/ciceksepeti.jpeg";
-            case "Hepsiburada": return "/assets/img/logo/hepsiburada.png";
-            default: return "/assets/img/icons/logo/default.png";
-        }
-    }
 
-    const init = function () {
+    const initTable = function (orderStatus) {
         const table = $('#OrderTable').DataTable({
+            destroy: true,
             language: {
                 paginate: {
                     next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
@@ -30,7 +19,7 @@ Entegro.order.OrderList = (function ($) {
             serverSide: true,
             order: [[3, 'asc']],
             ajax: {
-                url: '/Order/OrderList',
+                url: '/Order/OrderList?orderStatus=' + orderStatus,
                 type: 'POST',
                 contentType: 'application/json',
                 data: function (d) {
@@ -40,13 +29,13 @@ Entegro.order.OrderList = (function ($) {
             columns: [
                 { data: 'Id', orderable: false }, // checkbox
                 { data: 'Id', visible: false }, // hidden ID
-                { data: 'OrderSourceLabelHint',name:'OrderSourceId' },
+                { data: 'IntegrationSystemId' },
                 { data: 'Id' },
                 { data: 'Customer.Name' },
                 { data: 'Id' },
                 { data: 'Id' },
                 { data: 'Id' },
-                { data: 'PaymentStatusLabelHint' },
+                { data: 'PaymentStatus' },
                 { data: 'Id' } // İşlemler
             ],
             columnDefs: [
@@ -66,10 +55,16 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
-                        return `
-                        <div>
-                            <img src="${getIntegrationLogo(row.OrderSourceLabelHint)}" style="max-width:115px;"/>
-                        </div>`;
+                        var type = "";
+                        if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "E-Ticareti Entegrasyonu") {
+                            type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "CommerceType").Value;
+                        } else if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "Pazaryeri Entegrasyonu") {
+                            type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "MarketplaceType").Value;
+                        }
+
+                        return `<div>
+                                <img src="${getIntegrationLogo(type)}" style="max-width:115px;"/>
+                            </div>`;
                     }
                 },
                 {
@@ -82,7 +77,7 @@ Entegro.order.OrderList = (function ($) {
                         <div>
                             <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
                             <div>Sipariş Tarihi : <b>${moment(row.OrderDate).format("DD.MM.yyyy HH:mm")}</b></div>
-                            <div class="mb-3">Paket No : <b>3250544</b></div>
+                            <div class="mb-3">Paket No : <b>${row.PackegeNo}</b></div>
                             <div class="text-primary">
                                 <div>Kalan Süre:</div>
                                 <div>1 gün 07 saat 37 dakika</div>
@@ -98,8 +93,8 @@ Entegro.order.OrderList = (function ($) {
                     render: function (data, type, row) {
                         return `
                         <div>
-                            <div><i class="menu-icon tf-icons ti ti-star"></i><b>${row.Customer.Name}</b></div>
-                            <div>1. sipariş</div>
+                            <div><i class="menu-icon tf-icons ti ti-star"></i><b>${row.CustomerName}</b></div>
+                            <div>${row.CustomerOrderCounts}. sipariş</div>
                         </div>`;
                     }
                 },
@@ -111,18 +106,31 @@ Entegro.order.OrderList = (function ($) {
                     render: function (data, type, row) {
                         var items = "";
                         for (var i = 0; i < row.OrderItems.length; i++) {
-                            items +=
-                                `<div class="d-flex mb-5">
+                            if (row.OrderItems[i].ProductId == null) {
+                                items +=
+                                    `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.OrderItems[i].Id}, '${row.OrderItems[i].IntegrationProductName}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
+                                        <div class="p-5">
+                                            <div class="order-item-no-integration-title">Eşleştirilmemiş Ürün, Eşleştirme Yapmak İçin Tıklayın.</div>
+                                            <div class="order-item-no-integration-info">${row.OrderItems[i].IntegrationProductName}</div>
+                                            <div class="order-item-no-integration-info">${row.OrderItems[i].IntegrationSku}</div>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                items +=
+                                    `<div class="d-flex mb-5 mt-5">
                                     <div class="me-5 position-relative">
-                                        <img src="${row.OrderItems[i].Product.MainPicture.Url}" width="40" height="60"/>
+                                        <img src="${row.OrderItems[i].ProductMainPicture}" width="40" height="60"/>
                                         <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">${row.OrderItems[i].Quantity}</span>
                                     </div>
                                     <div>
-                                        <div><b>${row.OrderItems[i].Product.Name}</b></div>
-                                        <div>Stok Kodu: ${row.OrderItems[i].Product.Code}</div>
-                                        <div>Birim Fiyat: ${row.OrderItems[i].UnitPrice} TL</div>
+                                        <div><b>${row.OrderItems[i].ProductName}</b></div>
+                                        <div>Stok Kodu   : ${row.OrderItems[i].ProductCode}</div>
+                                        <div>Barkod      : ${row.OrderItems[i].ProductBarcode ?? ""}</div>
+                                        <div>Birim Fiyat : ${row.OrderItems[i].UnitPrice} TL</div>
                                     </div>
-                                </div>`;
+                                </div>
+                                `;
+                            }
                         }
 
 
@@ -138,12 +146,15 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
+                        if (row.ShippingTrackingNumber == null || row.ShippingTrackingNumber == "") {
+                            return ``;
+                        }
                         return `
                         <div>
                             <div><img src="https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg" width="100px" style="margin:0px auto;display:block;"/></div>
-                            <div class="text-center">7330026152879643</div>
+                            <div class="text-center">${row.ShippingTrackingNumber}</div>
                         </div>`;
-                       
+
                     }
                 },
                 {
@@ -154,8 +165,8 @@ Entegro.order.OrderList = (function ($) {
                     render: function (data, type, row) {
                         return `
                         <div>
-                            <div>Tutar  :${row.OrderSubtotalInclTax} TL</div>
-                            <div>İndirim:${row.OrderDiscount} TL</div>
+                            <div>Tutar  :${row.OrderSubTotal} TL</div>
+                            <div>İndirim:${row.OrderDiscountTotal} TL</div>
                             <div>Faturalanacak Tutar</div>
                             <div class="mb-4"><b>${row.OrderTotal} TL</b></div>
                             <div class="text-warning mb-1">Fatura Bekleniyor</div>
@@ -184,9 +195,9 @@ Entegro.order.OrderList = (function ($) {
                         return `
                         <div>
                             <div>Ödeme Yöntemi  :</div>
-                            <div><b>${row.PaymentMethodSystemName}</b></div>
+                            <div><b>${row.PaymentMethod}</b></div>
                             <div>Ödeme Durumu   :</div>
-                            <div><b>${row.PaymentStatusLabelHint}</b></div>
+                            <div><b>${row.PaymentStatus}</b></div>
                         </div>`;
 
                     }
@@ -196,21 +207,14 @@ Entegro.order.OrderList = (function ($) {
                     title: 'İşlemler',
                     searchable: false,
                     orderable: false,
-                    render: (data, type, row) => `
-                        <div class="d-inline-block text-nowrap">
-                            <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
-                                <i class="icon-base ti ti-pencil icon-22px"></i>
-                            </a>
-                            <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end m-0">
-                                <a href="/Order/Detail?id=${row.Id}" class="dropdown-item">Sipariş Detaylar</a>
-                                <a href="Archive?id=${row.Id}" class="dropdown-item">Arşiv</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Sipariş Sil</a>
-                            </div>
-                        </div>`
+                    render: function (data, type, row) {
+                        if (orderStatus == 1) {
+                            return `<div><button class="btn btn-warning" onclick="Entegro.order.OrderList.OrderPackage(${row.Id})">Paketle</button></div>`;
+                        }
+
+
+                        return ``;
+                    }
                 }
             ],
             select: {
@@ -315,70 +319,157 @@ Entegro.order.OrderList = (function ($) {
                 });
             });
         }, 100);
+    };
 
-        // Delete Button
-        $(document).on('click', '.delete-record', function () {
-            const orderId = $(this).data('id');
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: 'Bu sipariş silinecek!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'İptal',
-                customClass: {
-                    confirmButton: 'btn btn-danger me-3',
-                    cancelButton: 'btn btn-secondary'
-                },
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/Order/Delete',
-                        type: 'POST',
-                        data: { id: orderId },
-                        success: function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Silindi!',
-                                    text: 'Sipariş başarıyla silindi.',
-                                    confirmButtonText: 'Tamam',
-                                    customClass: { confirmButton: 'btn btn-success' },
-                                    buttonsStyling: false
-                                }).then(() => {
-                                    table.ajax.reload(null, false);
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Hata!',
-                                    text: response.message || 'Silme işlemi başarısız oldu.',
-                                    confirmButtonText: 'Tamam',
-                                    customClass: { confirmButton: 'btn btn-danger' },
-                                    buttonsStyling: false
-                                });
-                            }
-                        },
-                        error: function () {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Sunucu Hatası!',
-                                text: 'İstek gönderilirken bir hata oluştu.',
-                                confirmButtonText: 'Tamam',
-                                customClass: { confirmButton: 'btn btn-danger' },
-                                buttonsStyling: false
-                            });
-                        }
-                    });
-                }
-            });
+    const initTab = function () {
+        $(".order-actions .btn").click(function () {
+            var orderStatus = $(this).data("order-status");
+            $(".order-actions .btn").removeClass("active");
+            $(this).addClass("active");
+
+            initTable(orderStatus);
         });
     };
 
+    const OrderPackage = function OrderPackage(id) {
+        $.ajax({
+            url: '/Order/Packaging?id='+id,
+            type: 'POST',
+            dataType: 'html',
+            success: function (html) {
+                $('#OrderPackageModal .modal-body').html(html);
+                OrderPackageInit();
+                $('#OrderPackageModal').modal('show');
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('Form yüklenemedi.');
+            }
+        });
+    }
+
+    const ProductIntegration = function ProductIntegration(orderItemId, productIntegrationName, productIntegrationSku) {
+
+        $("#ProductIntegrationName").val(productIntegrationName);
+        $("#ProductIntegrationSku").val(productIntegrationSku);
+        $("#ProductId").select2({
+            placeholder: 'Ürün seçiniz',
+            allowClear: true,
+            dropdownParent: $('#ProudctIntegrationModal'),
+            width: '100%',
+            ajax: {
+                url: "/Product/AllProduct",
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '', page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination?.more === true
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+        $('#ProudctIntegrationModal').modal('show');
+    }
+
+    function OrderPackageInit() {
+        $(".btn-minus").click(function () {
+            var input = $(this).parent().find("input");
+            var span = $(this).parent().find("span");
+            var maxQuantity = parseInt($(span).data("max-quantity"));
+            var quantity = parseInt($(span).html());
+            if (quantity > 1) {
+                quantity = quantity - 1;
+            }
+
+            if (quantity == 1) {
+                $(this).prop("disabled", true);
+            }
+
+            if (quantity < maxQuantity) {
+                $(".btn-plus").prop("disabled", false);
+            }
+
+            $(span).html(quantity);
+            $(input).val(quantity);
+        });
+
+        $(".btn-plus").click(function () {
+            var input = $(this).parent().find("input");
+            var span = $(this).parent().find("span");
+            var maxQuantity = parseInt($(span).data("max-quantity"));
+            var quantity = parseInt($(span).html());
+            if (quantity < maxQuantity) {
+                quantity = quantity + 1;
+            }
+
+            if (quantity == maxQuantity) {
+                $(this).prop("disabled", true);
+            }
+
+            $(".btn-minus").prop("disabled", false);
+
+            $(span).html(quantity);
+            $(input).val(quantity);
+        });
+
+        $(".package-remove").click(function () {
+
+        });
+
+        $(".orderpackage-save").click(function () {
+            const action = $('#PackagingForm').attr("action");
+            const formData = $('#PackagingForm').serialize();
+
+            $.ajax({
+                url: action,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        showMessage("Başarılı!", 'Ürün başarıyla kaydedildi.', "success", "/Product/List");
+                    } else {
+                        showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
+                    }
+                },
+                error: function (xhr) {
+                    showMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
+                }
+            });
+        });
+    }
+
     return {
-        init: init
+        initTable: initTable,
+        initTab: initTab,
+        OrderPackage: OrderPackage,
+        ProductIntegration: ProductIntegration
     };
+
+    function getIntegrationLogo(value) {
+        switch (value) {
+            case "Smartstore": return "/assets/img/logo/smartstore.png";
+            case "Trendyol": return "/assets/img/logo/trendyol.png";
+            case "N11": return "/assets/img/logo/n11.png";
+            case "Pazarama": return "/assets/img/logo/pazarama.png";
+            case "Idefix": return "/assets/img/logo/idefix.png";
+            case "CicekSepeti": return "/assets/img/logo/ciceksepeti.png";
+            case "Hepsiburada": return "/assets/img/logo/hepsiburada.png";
+            default: return "/assets/img/icons/logo/default.png";
+        }
+    }
+
+
 
 })(jQuery);
 

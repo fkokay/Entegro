@@ -1,4 +1,5 @@
 ﻿
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.Interfaces.Repositories;
@@ -13,12 +14,19 @@ namespace Entegro.Application.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICustomerService _customerService;
+        private readonly IMediaFileService _medaFileService;
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
-        public OrderService(IOrderRepository orderRepository, ICustomerService customerService, IMapper mapper, ILogger<OrderService> logger)
+        public OrderService(
+            IOrderRepository orderRepository, 
+            ICustomerService customerService, 
+            IMediaFileService medaFileService,
+            IMapper mapper, 
+            ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
+            _medaFileService = medaFileService ?? throw new ArgumentNullException(nameof(medaFileService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -72,12 +80,22 @@ namespace Entegro.Application.Services
             return orderDtos;
         }
 
-        public async Task<PagedResult<OrderDto>> GetPagedAsync(GridCommand gridCommand)
+        public async Task<PagedResult<OrderModel>> GetPagedAsync(GridCommand gridCommand,int orderStatus)
         {
-            var orders = await _orderRepository.GetPagedAsync(gridCommand);
-            return new PagedResult<OrderDto>
+            var orders = await _orderRepository.GetPagedAsync(gridCommand,orderStatus);
+
+            var items = await orders.Items.SelectAwait(async x =>
             {
-                Items = _mapper.Map<IEnumerable<OrderDto>>(orders.Items),
+                foreach (var orderItem in x.OrderItems)
+                {
+                    orderItem.ProductMainPicture = orderItem.ProductMainPictureId.HasValue ? await _medaFileService.GetUrl(orderItem.ProductMainPictureId.Value) : "";
+                }
+                return x;
+            }).AsyncToList();
+
+            return new PagedResult<OrderModel>
+            {
+                Items = orders.Items,
                 TotalCount = orders.TotalCount,
                 PageNumber = orders.PageNumber,
                 PageSize = orders.PageSize

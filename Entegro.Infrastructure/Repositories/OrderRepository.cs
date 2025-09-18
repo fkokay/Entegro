@@ -1,4 +1,8 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.IntegrationSystemParameter;
+using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
@@ -7,7 +11,6 @@ using Entegro.Domain.Entities.Content;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
-using Order = Entegro.Domain.Entities.Checkout.Order;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -41,34 +44,11 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.Orders.AsNoTracking().AsQueryable();
+            var query = _context.Orders.Include(m => m.OrderItems).AsNoTracking().AsQueryable();
 
             var totalCount = await query.CountAsync();
 
-            var orders = await query.Select(o => new Order
-            {
-                Id = o.Id,
-                OrderNumber = o.OrderNumber,
-                OrderDate = o.OrderDate,
-                CustomerId = o.CustomerId,
-                OrderTotal = o.OrderTotal,
-                Deleted = o.Deleted,
-                IsTransient = o.IsTransient,
-                OrderSource = o.OrderSource,
-                OrderSourceId = o.OrderSourceId,
-                Customer = o.Customer,
-                OrderItems = o.OrderItems.Select(i => new OrderItem
-                {
-                    Id = i.Id,
-                    DiscountAmount = i.DiscountAmount,
-                    OrderId = i.OrderId,
-                    Price = i.Price,
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    TaxRate = i.TaxRate,
-                    UnitPrice = i.UnitPrice
-                }).ToList()
-            }).OrderBy(m => m.Id)
+            var orders = await query.OrderBy(m => m.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -85,168 +65,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Order?> GetByIdAsync(int id)
         {
-            var order = await _context.Orders.Select(o => new Order
-            {
-                Id = o.Id,
-                CustomerId = o.CustomerId,
-                Deleted = o.Deleted,
-                VatNumber = o.VatNumber,
-                CurrencyRate = o.CurrencyRate,
-                CustomerIp = o.CustomerIp,
-                OrderDiscount = o.OrderDiscount,
-                OrderGuid = o.OrderGuid,
-                OrderShippingExclTax = o.OrderShippingExclTax,
-                OrderShippingInclTax = o.OrderShippingInclTax,
-                OrderShippingTaxRate = o.OrderShippingTaxRate,
-                OrderStatus = o.OrderStatus,
-                OrderStatusId = o.OrderStatusId,
-                OrderSubTotalDiscountExclTax = o.OrderSubTotalDiscountExclTax,
-                OrderSubTotalDiscountInclTax = o.OrderSubTotalDiscountInclTax,
-                OrderSubtotalExclTax = o.OrderSubtotalExclTax,
-                OrderSubtotalInclTax = o.OrderSubtotalInclTax,
-                OrderTax = o.OrderTax,
-                PaidDateUtc = o.PaidDateUtc == null ? null : o.PaidDateUtc,
-                PaymentMethodAdditionalFeeExclTax = o.PaymentMethodAdditionalFeeExclTax,
-                PaymentMethodAdditionalFeeInclTax = o.PaymentMethodAdditionalFeeInclTax,
-                PaymentMethodAdditionalFeeTaxRate = o.PaymentMethodAdditionalFeeTaxRate,
-                PaymentMethodSystemName = o.PaymentMethodSystemName,
-                PaymentStatus = o.PaymentStatus,
-                PaymentStatusId = o.PaymentStatusId,
-                RefundedAmount = o.RefundedAmount,
-                Shipments = o.Shipments.Select(x => new Shipment
-                {
-                    Id = x.Id,
-                    CreatedOnUtc = x.CreatedOnUtc,
-                    DeliveryDateUtc = x.DeliveryDateUtc,
-                    OrderId = x.OrderId,
-                    ShippedDateUtc = x.ShippedDateUtc,
-                    TrackingNumber = x.TrackingNumber,
-                    TotalWeight = x.TotalWeight,
-                    TrackingUrl = x.TrackingUrl,
-                    ShipmentItems = x.ShipmentItems.Select(s => new ShipmentItem
-                    {
-                        Id = s.Id,
-                        OrderItemId = s.OrderItemId,
-                        Quantity = s.Quantity,
-                        ShipmentId = s.ShipmentId
-                    }).ToList()
-                }).ToList(),
-                ShippingMethod = o.ShippingMethod,
-                TaxRates = o.TaxRates,
-                ShippingStatus = o.ShippingStatus,
-                ShippingStatusId = o.ShippingStatusId,
-                IsTransient = o.Deleted,
-                OrderNumber = o.OrderNumber,
-                Customer = new Customer
-                {
-                    Id = o.Customer.Id,
-                    Name = o.Customer.Name,
-                    Email = o.Customer.Email,
-                    PhoneNumber = o.Customer.PhoneNumber
-                },
-                OrderDate = o.OrderDate,
-                OrderSource = o.OrderSource,
-                OrderSourceId = o.OrderSourceId,
-                OrderTotal = o.OrderTotal,
-                BillingAddress = o.BillingAddress == null ? null : new Address
-                {
-                    CityId = o.BillingAddress.CityId,
-                    LastName = o.BillingAddress.LastName,
-                    Address1 = o.BillingAddress.Address1,
-                    Address2 = o.BillingAddress.Address2,
-                    AddressType = o.BillingAddress.AddressType,
-                    Company = o.BillingAddress.Company,
-                    CountryId = o.BillingAddress.CountryId,
-                    CreatedOnUtc = o.BillingAddress.CreatedOnUtc,
-                    DistrictId = o.BillingAddress.DistrictId,
-                    Email = o.BillingAddress.Email,
-                    FaxNumber = o.BillingAddress.FaxNumber,
-                    FirstName = o.BillingAddress.FirstName,
-                    Id = o.BillingAddress.Id,
-                    PhoneNumber = o.BillingAddress.PhoneNumber,
-                    Salutation = o.BillingAddress.Salutation,
-                    TaxOffice = o.BillingAddress.TaxOffice,
-                    TaxOfficeNumber = o.BillingAddress.TaxOfficeNumber,
-                    Title = o.BillingAddress.Title,
-                    TownId = o.BillingAddress.Id,
-                    UpdatedOnUtc = o.BillingAddress.UpdatedOnUtc,
-                    ZipPostalCode = o.BillingAddress.ZipPostalCode,
-                },
-                BillingAddressId = o.BillingAddressId == null ? null : o.BillingAddressId,
-                ShippingAddress = o.ShippingAddress == null ? null : new Address
-                {
-                    CityId = o.ShippingAddress.CityId,
-                    LastName = o.ShippingAddress.LastName,
-                    Address1 = o.ShippingAddress.Address1,
-                    Address2 = o.ShippingAddress.Address2,
-                    AddressType = o.ShippingAddress.AddressType,
-                    Company = o.ShippingAddress.Company,
-                    CountryId = o.ShippingAddress.CountryId,
-                    CreatedOnUtc = o.ShippingAddress.CreatedOnUtc,
-                    DistrictId = o.ShippingAddress.DistrictId,
-                    Email = o.ShippingAddress.Email,
-                    FaxNumber = o.ShippingAddress.FaxNumber,
-                    FirstName = o.ShippingAddress.FirstName,
-                    Id = o.ShippingAddress.Id,
-                    PhoneNumber = o.ShippingAddress.PhoneNumber,
-                    Salutation = o.ShippingAddress.Salutation,
-                    TaxOffice = o.ShippingAddress.TaxOffice,
-                    TaxOfficeNumber = o.ShippingAddress.TaxOfficeNumber,
-                    Title = o.ShippingAddress.Title,
-                    TownId = o.ShippingAddress.Id,
-                    UpdatedOnUtc = o.ShippingAddress.UpdatedOnUtc,
-                    ZipPostalCode = o.ShippingAddress.ZipPostalCode,
-                },
-                ShippingAddressId = o.ShippingAddressId,
-                OrderNotes = o.OrderNotes.Select(x => new OrderNote
-                {
-                    Id = x.Id,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    Note = x.Note,
-                    OrderId = x.OrderId,
-                }).ToList(),
-                OrderItems = o.OrderItems.Select(x => new OrderItem
-                {
-                    Id = x.Id,
-                    DiscountAmount = x.DiscountAmount,
-                    OrderId = x.OrderId,
-                    Price = x.Price,
-                    ProductId = x.ProductId,
-                    Quantity = x.Quantity,
-                    TaxRate = x.TaxRate,
-                    UnitPrice = x.UnitPrice,
-                    Product = new Product
-                    {
-                        Id = x.Product.Id,
-                        Name = x.Product.Name,
-                        Code = x.Product.Code,
-                        MainPictureId = x.Product.MainPictureId,
-                        MainPicture = x.Product.MainPicture == null ? null : new MediaFile()
-                        {
-                            Alt = x.Product.MainPicture.Alt,
-                            CreatedOn = x.Product.MainPicture.CreatedOn,
-                            Deleted = x.Product.MainPicture.Deleted,
-                            Extension = x.Product.MainPicture.Extension,
-                            Folder = x.Product.MainPicture.Folder,
-                            FolderId = x.Product.MainPicture.FolderId,
-                            Height = x.Product.MainPicture.Height,
-                            Hidden = x.Product.MainPicture.Hidden,
-                            Id = x.Product.MainPicture.Id,
-                            IsTransient = x.Product.MainPicture.IsTransient,
-                            MediaType = x.Product.MainPicture.MediaType,
-                            Metadata = x.Product.MainPicture.Metadata,
-                            MimeType = x.Product.MainPicture.MimeType,
-                            Name = x.Product.MainPicture.Name,
-                            PixelSize = x.Product.MainPicture.PixelSize,
-                            Size = x.Product.MainPicture.Size,
-                            Title = x.Product.MainPicture.Title,
-                            UpdatedOn = x.Product.MainPicture.UpdatedOn,
-                            Version = x.Product.MainPicture.Version,
-                            Width = x.Product.MainPicture.Width
-                        },
-                    }
-                }).ToList()
-            }).FirstOrDefaultAsync(o => o.Id == id);
+            var query = _context.Orders
+                .Include(o => o.OrderItems)
+                .Include(c => c.Customer)
+            .AsNoTracking();
+
+            var order = await query.FirstOrDefaultAsync(o => o.Id == id);
 
             if (order is null)
                 return new Order();
@@ -255,11 +79,12 @@ namespace Entegro.Infrastructure.Repositories
             return order;
         }
 
-        public async Task<Application.DTOs.Common.PagedResult<Order>> GetPagedAsync(GridCommand gridCommand)
+        public async Task<Application.DTOs.Common.PagedResult<OrderModel>> GetPagedAsync(GridCommand gridCommand, int orderStatus)
         {
             var query = _context.Orders
                 .Include(o => o.OrderItems)
                 .Include(c => c.Customer)
+                .Include(c => c.Shipments)
             .AsNoTracking();
 
             if (gridCommand.Search != null)
@@ -294,18 +119,171 @@ namespace Entegro.Infrastructure.Repositories
             }
 
             var totalCount = await query.CountAsync();
-            var orders = await query
-            .Skip(gridCommand.Start)
-            .Take(gridCommand.Length)
-            .ToListAsync();
 
-            return new Application.DTOs.Common.PagedResult<Order>
+            //Paketlenecek Siparişler
+            if (orderStatus == 1)
             {
-                Items = orders,
-                TotalCount = totalCount,
-                PageNumber = gridCommand.Start + 1,
-                PageSize = gridCommand.Length
-            };
+                var orders = await query
+                .Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => si.Quantity)))
+                .Select(m => new OrderModel()
+                {
+                    Id = m.Id,
+                    PackegeNo = "",
+                    IntegrationSystemId = m.IntegrationSystemId,
+                    IntegrationSystem = m.IntegrationSystem == null ? null : new IntegrationSystemDto()
+                    {
+                        Id = m.IntegrationSystem.Id,
+                        Description = m.IntegrationSystem.Description,
+                        Name = m.IntegrationSystem.Name,
+                        IntegrationSystemType = m.IntegrationSystem.IntegrationSystemType,
+                        IntegrationSystemTypeId = m.IntegrationSystem.IntegrationSystemTypeId,
+                        IntegrationSystemParameters = m.IntegrationSystem.IntegrationSystemParameters.Select(x => new IntegrationSystemParameterDto()
+                        {
+                            Id = x.Id,
+                            IntegrationSystemId = x.IntegrationSystemId,
+                            Key = x.Key,
+                            Value = x.Value
+                        }).ToList(),
+                    },
+                    OrderNumber = m.OrderNumber,
+                    OrderDate = m.OrderDateUtc,
+                    DueDate = m.DueDateUtc,
+                    CustomerName = m.Customer.Name,
+                    CustomerOrderCounts = m.Customer.Orders.Count(),
+                    ShipmentCarrier = "",
+                    ShippingTrackingNumber = "",
+                    OrderSubTotal = m.OrderSubTotal,
+                    OrderDiscount = m.OrderDiscount,
+                    OrderTotal = m.OrderTotal,
+                    PaymentMethod = m.PaymentMethod,
+                    PaymentStatus = m.PaymentStatusLabelHint,
+                    OrderItems = m.OrderItems.Select(x => new OrderItemModel()
+                    {
+                        Id = x.Id,
+                        OrderId = x.OrderId,
+                        UnitPrice = x.UnitPrice,
+                        AttributeDescription = "",
+                        ProductId = x.ProductId,
+                        ProductBarcode = x.Product == null ? "": x.Product.Barcode,
+                        ProductCode = x.Product == null ? "" : x.Product.Code,
+                        ProductName = x.Product == null ? "" : x.Product.Name,
+                        ProductMainPicture = "",
+                        ProductMainPictureId = x.Product == null ? null : x.Product.MainPictureId,
+                        IntegrationSku = x.IntegrationSku,
+                        IntegrationProductName = x.IntegrationProductName,
+                        Quantity = x.Quantity - x.ShipmentItems.Sum(si => si.Quantity)
+                    }).ToList()
+                })
+                .Skip(gridCommand.Start)
+                .Take(gridCommand.Length)
+                .ToListAsync();
+
+                return new Application.DTOs.Common.PagedResult<OrderModel>
+                {
+                    Items = orders,
+                    TotalCount = totalCount,
+                    PageNumber = gridCommand.Start + 1,
+                    PageSize = gridCommand.Length
+                };
+            }
+            else
+            {
+                //Gönderime Hazır
+                if (orderStatus == 2)
+                {
+                    query = query.Where(m => m.Shipments.Any() && !m.Shipments.Where(m => m.ShippedDateUtc != null).Any());
+                }
+                //Kargoda
+                else if (orderStatus == 3)
+                {
+                    query = query.Where(m => m.Shipments.Any() && m.Shipments.Where(m => m.ShippedDateUtc != null).Any());
+                }
+                //Teslim Edildi
+                else if (orderStatus == 4)
+                {
+                    query = query.Where(m => m.Shipments.Any() && m.Shipments.Where(m => m.DeliveryDateUtc != null).Any());
+                }
+                //Teslim Edilemedi
+                else if (orderStatus == 5)
+                {
+                    query = query.Where(m => m.Shipments.Any() && m.Shipments.Where(m => m.DeliveryDateUtc != null).Any());
+                }
+                //Ödemesi Bekleniyor
+                else if (orderStatus == 6)
+                {
+                    query = query.Where(m => m.PaymentStatus == Domain.Enums.PaymentStatus.Pending);
+                }
+                //İptal Edildi
+                else if (orderStatus == 7)
+                {
+                    query = query.Where(m => m.OrderStatus == Domain.Enums.OrderStatus.Cancelled);
+                }
+
+
+
+                var orders = await query
+                .SelectMany(order => order.Shipments, (order, shipment) => new { order, shipment })
+                .Select(x => new OrderModel
+                {
+                    Id = x.order.Id,
+                    PackegeNo = x.shipment.PackageNo,
+                    IntegrationSystemId = x.order.IntegrationSystemId,
+                    IntegrationSystem = x.order.IntegrationSystem == null ? null : new IntegrationSystemDto()
+                    {
+                        Id = x.order.IntegrationSystem.Id,
+                        Description = x.order.IntegrationSystem.Description,
+                        Name = x.order.IntegrationSystem.Name,
+                        IntegrationSystemType = x.order.IntegrationSystem.IntegrationSystemType,
+                        IntegrationSystemTypeId = x.order.IntegrationSystem.IntegrationSystemTypeId,
+                        IntegrationSystemParameters = x.order.IntegrationSystem.IntegrationSystemParameters.Select(m => new IntegrationSystemParameterDto()
+                        {
+                            Id = m.Id,
+                            IntegrationSystemId = m.IntegrationSystemId,
+                            Key = m.Key,
+                            Value = m.Value
+                        }).ToList(),
+                    },
+                    OrderNumber = x.order.OrderNumber,
+                    OrderDate = x.order.OrderDateUtc,
+                    DueDate = x.order.DueDateUtc,
+                    CustomerName = x.order.Customer.Name,
+                    CustomerOrderCounts = x.order.Customer.Orders.Count(),
+                    ShipmentCarrier = x.shipment.Carrier,
+                    ShippingTrackingNumber = x.shipment.TrackingNumber,
+                    OrderSubTotal = x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity),
+                    OrderDiscount = 0,
+                    OrderTotal = x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity),
+                    PaymentMethod = x.order.PaymentMethod,
+                    PaymentStatus = x.order.PaymentStatusLabelHint,
+                    OrderItems = x.shipment.ShipmentItems.Select(si => new OrderItemModel
+                    {
+                        Id = si.Id,
+                        OrderId = si.OrderItem.OrderId,
+                        UnitPrice = si.OrderItem.UnitPrice,
+                        AttributeDescription = "",
+                        ProductBarcode = si.OrderItem.Product.Barcode,
+                        ProductCode = si.OrderItem.Product.Code,
+                        ProductName = si.OrderItem.Product.Name,
+                        ProductMainPicture = "",
+                        ProductMainPictureId = si.OrderItem.Product.MainPictureId,
+                        Quantity = si.Quantity,
+                        ProductId = si.OrderItem.ProductId,
+                        IntegrationSku = si.OrderItem.IntegrationSku,
+                        IntegrationProductName = si.OrderItem.IntegrationProductName,
+                    }).ToList()
+                })
+                .Skip(gridCommand.Start)
+                .Take(gridCommand.Length)
+                .ToListAsync();
+
+                return new Application.DTOs.Common.PagedResult<OrderModel>
+                {
+                    Items = orders,
+                    TotalCount = totalCount,
+                    PageNumber = gridCommand.Start + 1,
+                    PageSize = gridCommand.Length
+                };
+            }
         }
 
         public async Task UpdateAsync(Order order)

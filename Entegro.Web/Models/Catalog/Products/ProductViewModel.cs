@@ -11,18 +11,6 @@ namespace Entegro.Web.Models.Catalog.Products
         public string Code { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string? Image
-        {
-            get
-            {
-                if (ProductMediaFiles.Any())
-                {
-                    return ProductMediaFiles.OrderBy(m => m.DisplayOrder).Select(m => m.Url).FirstOrDefault();
-                }
-
-                return "";
-            }
-        }
         public decimal Price { get; set; }
         public string? Currency { get; set; }
         public string? Unit { get; set; }

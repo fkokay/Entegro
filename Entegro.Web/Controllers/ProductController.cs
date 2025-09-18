@@ -85,6 +85,26 @@ namespace Entegro.Web.Controllers
         }
 
         #region Product list / create / edit / delete
+        [HttpPost]
+        public async Task<IActionResult> AllProduct([FromForm] int page = 1, [FromForm] string? term = null)
+        {
+            var products = await _productService.GetProductsAsync();
+
+            var query = products.SelectAwait(async c => new
+            {
+                id = c.Id.ToString(),
+                text = c.Name
+            });
+
+            var mainList = await query.AsyncToList();
+
+            return Json(new
+            {
+                results = mainList,
+                pagination = new { more = false }
+            });
+        }
+
         public Task<IActionResult> Index()
         {
             return List();

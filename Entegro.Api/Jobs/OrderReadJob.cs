@@ -22,6 +22,7 @@ using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Application.Services;
 using Entegro.Application.Services.Commerce;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 using Quartz;
@@ -117,7 +118,7 @@ namespace Entegro.Api.Jobs
                     await HepsiburadaOrderSync(item);
                     break;
                 case "Trendyol":
-                    //await TrendyolOrderSync(item);
+                    await TrendyolOrderSync(item);
                     break;
                 case "CicekSepeti":
                     //await CicekSepetiOrderSync(item);
@@ -417,6 +418,8 @@ namespace Entegro.Api.Jobs
                 {
                     try
                     {
+                        order.IntegrationSystemId = item.Id;
+
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {
@@ -466,16 +469,18 @@ namespace Entegro.Api.Jobs
                         {
                             if (orderItem.Product != null)
                             {
-                                var product = await _productService.GetProductByCodeAsync(orderItem.Product.Code);
+                                var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.Product.Code);
 
-                                if (product == null)
+                                if (productIntegration != null)
                                 {
-                                    _logger.Error($"{orderItem.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
-                                    continue;
+                                    orderItem.Product = null;
+                                    orderItem.ProductId = productIntegration.ProductId;
                                 }
-
-                                orderItem.Product = null;
-                                orderItem.ProductId = product.Id;
+                                else
+                                {
+                                    orderItem.Product = null;
+                                    orderItem.ProductId = null; 
+                                }
                             }
                         }
                         #endregion
@@ -550,6 +555,8 @@ namespace Entegro.Api.Jobs
                 {
                     try
                     {
+                        order.IntegrationSystemId = item.Id;
+
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {
@@ -601,14 +608,16 @@ namespace Entegro.Api.Jobs
                             {
                                 var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.Product.Code);
 
-                                if (productIntegration == null)
+                                if (productIntegration != null)
                                 {
-                                    _logger.Error($"{orderItem.Product.Code} kodlu ürün eşleştirlmemiştir.");
-                                    continue;
+                                    orderItem.Product = null;
+                                    orderItem.ProductId = productIntegration.ProductId;
                                 }
-
-                                orderItem.Product = null;
-                                orderItem.ProductId = productIntegration.ProductId;
+                                else
+                                {
+                                    orderItem.Product = null;
+                                    orderItem.ProductId = null;
+                                }
                             }
                         }
                         #endregion
@@ -850,6 +859,7 @@ namespace Entegro.Api.Jobs
                 {
                     try
                     {
+                        order.IntegrationSystemId = item.Id;
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {

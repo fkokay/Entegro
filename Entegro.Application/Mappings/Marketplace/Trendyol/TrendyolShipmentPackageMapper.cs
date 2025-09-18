@@ -30,12 +30,17 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
 
             OrderDto order = new OrderDto();
             order.OrderNumber = trendyolShipmentPackage.OrderNumber;
-            order.OrderDate = FromUnixTimeMilliseconds(trendyolShipmentPackage.OrderDate);
+            order.OrderGuid = Guid.NewGuid();
+            order.OrderDateUtc = FromUnixTimeMilliseconds(trendyolShipmentPackage.OrderDate);
             order.OrderTotal = trendyolShipmentPackage.TotalPrice;
-            order.OrderSource = Domain.Enums.OrderSource.Trendyol;
             order.CustomerId = 0;
             order.Deleted = false;
             order.IsTransient = true;
+            order.PaymentMethod = "Trendyol";
+            order.PaymentStatus = Domain.Enums.PaymentStatus.Authorized;
+            order.OrderStatus = Domain.Enums.OrderStatus.Processing;
+            order.ShippingStatus = Domain.Enums.ShippingStatus.Shipped;
+            order.ShippingMethod = trendyolShipmentPackage.CargoProviderName;
 
             order.OrderItems = TrendyolOrderLineMapper.ToDtoList(trendyolShipmentPackage.Lines).ToList();
             order.Customer = new DTOs.Customer.CustomerDto();

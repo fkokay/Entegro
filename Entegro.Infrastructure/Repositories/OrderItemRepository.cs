@@ -34,55 +34,11 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<OrderItem>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.OrderItems.AsQueryable();
+            var query = _context.OrderItems.Include(m=>m.Product).AsQueryable();
 
             var totalCount = await query.CountAsync();
 
-            var orderItems = await query.Select(o => new OrderItem
-            {
-                Id = o.Id,
-                DiscountAmount = o.DiscountAmount,
-                OrderId = o.OrderId,
-                Price = o.Price,
-                ProductId = o.ProductId,
-                Quantity = o.Quantity,
-                TaxRate = o.TaxRate,
-                UnitPrice = o.UnitPrice,
-                Product = new Product
-                {
-                    Id = o.ProductId,
-                    MetaDescription = o.Product.MetaDescription,
-                    Name = o.Product.Name,
-                    Barcode = o.Product.Barcode,
-                    Brand = o.Product.Brand,
-                    BrandId = o.Product.BrandId,
-                    Code = o.Product.Code,
-                    CreatedOnUtc = o.Product.CreatedOnUtc,
-                    Currency = o.Product.Currency,
-                    Deleted = o.Product.Deleted,
-                    Description = o.Product.Description,
-                    Gtin = o.Product.Gtin,
-                    Height = o.Product.Height,
-                    Length = o.Product.Length,
-                    MainPicture = o.Product.MainPicture,
-                    MainPictureId = o.Product.MainPictureId,
-                    ManufacturerPartNumber = o.Product.ManufacturerPartNumber,
-                    MetaKeywords = o.Product.MetaKeywords,
-                    MetaTitle = o.Product.MetaTitle,
-                    OldPrice = o.Product.OldPrice,
-                    Price = o.Product.Price,
-                    Published = o.Product.Published,
-                    Width = o.Product.Width,
-                    SpecialPrice = o.Product.SpecialPrice,
-                    Unit = o.Product.Unit,
-                    VatInc = o.Product.VatInc,
-                    VatRate = o.Product.VatRate,
-                    UpdatedOnUtc = o.Product.UpdatedOnUtc,
-                    Weight = o.Product.Weight
-
-                },
-                Order = o.Order
-            })  .OrderBy(o => o.Id)
+            var orderItems = await query.OrderBy(o => o.Id)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250916213621_ShipmentPackageNo")]
+    partial class ShipmentPackageNo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -707,8 +710,15 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int?>("BillingAddressId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("CurrencyRate")
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CustomerIp")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
@@ -716,16 +726,10 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<DateTime>("DueDateUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("IntegrationOrderNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("IntegrationSystemId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsTransient")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("OrderDateUtc")
+                    b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("OrderDiscount")
@@ -738,13 +742,31 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("OrderShipping")
+                    b.Property<decimal>("OrderShippingExclTax")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OrderShippingInclTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OrderShippingTaxRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("OrderSourceId")
+                        .HasColumnType("int");
 
                     b.Property<int>("OrderStatusId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("OrderSubTotal")
+                    b.Property<decimal>("OrderSubTotalDiscountExclTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OrderSubTotalDiscountInclTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OrderSubtotalExclTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OrderSubtotalInclTax")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("OrderTax")
@@ -757,10 +779,16 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<DateTime?>("PaidDateUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("PaymentFee")
+                    b.Property<decimal>("PaymentMethodAdditionalFeeExclTax")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("PaymentMethod")
+                    b.Property<decimal>("PaymentMethodAdditionalFeeInclTax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PaymentMethodAdditionalFeeTaxRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PaymentMethodSystemName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -780,13 +808,19 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<int>("ShippingStatusId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TaxRates")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VatNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BillingAddressId");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("IntegrationSystemId");
 
                     b.HasIndex("ShippingAddressId");
 
@@ -801,21 +835,9 @@ namespace Entegro.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AttributesXml")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("DiscountAmount")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("IntegrationProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IntegrationSku")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ItemWeight")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -824,18 +846,11 @@ namespace Entegro.Infrastructure.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal>("ProductCost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<string>("Sku")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TaxRate")
                         .HasPrecision(18, 4)
@@ -1792,10 +1807,6 @@ namespace Entegro.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entegro.Domain.Entities.Integration.IntegrationSystem", "IntegrationSystem")
-                        .WithMany()
-                        .HasForeignKey("IntegrationSystemId");
-
                     b.HasOne("Entegro.Domain.Entities.Common.Address", "ShippingAddress")
                         .WithMany()
                         .HasForeignKey("ShippingAddressId")
@@ -1804,8 +1815,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("BillingAddress");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("IntegrationSystem");
 
                     b.Navigation("ShippingAddress");
                 });
@@ -1820,7 +1829,9 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasOne("Entegro.Domain.Entities.Catalog.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Order");
 
@@ -1863,7 +1874,7 @@ namespace Entegro.Infrastructure.Migrations
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.ShipmentItem", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Checkout.OrderItem", "OrderItem")
-                        .WithMany("ShipmentItems")
+                        .WithMany()
                         .HasForeignKey("OrderItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2008,11 +2019,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("OrderNotes");
 
                     b.Navigation("Shipments");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Checkout.OrderItem", b =>
-                {
-                    b.Navigation("ShipmentItems");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Checkout.Shipment", b =>

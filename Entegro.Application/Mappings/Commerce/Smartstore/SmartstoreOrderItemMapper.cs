@@ -36,6 +36,11 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 orderItem.DiscountAmount = smartstoreOrderItem.DiscountAmountInclTax;
                 orderItem.TaxRate = smartstoreOrderItem.TaxRate;
                 orderItem.Product = SmartstoreProductMapper.ToDto(smartstoreOrderItem.Product);
+                orderItem.AttributesXml = smartstoreOrderItem.AttributeDescription;
+                orderItem.Sku = smartstoreOrderItem.Sku;
+                orderItem.IntegrationSku = smartstoreOrderItem.Sku;
+                orderItem.IntegrationProductName = smartstoreOrderItem.Product.Name;
+
 
 
                 return orderItem; ;
