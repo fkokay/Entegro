@@ -68,6 +68,7 @@ namespace Entegro.Infrastructure.Repositories
             var query = _context.Orders
                 .Include(o => o.OrderItems)
                 .Include(c => c.Customer)
+                .Include(s => s.Shipments)
             .AsNoTracking();
 
             var order = await query.FirstOrDefaultAsync(o => o.Id == id);
@@ -128,7 +129,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Select(m => new OrderModel()
                 {
                     Id = m.Id,
-                    PackegeNo = "",
+                    PackageNo = "",
                     IntegrationSystemId = m.IntegrationSystemId,
                     IntegrationSystem = m.IntegrationSystem == null ? null : new IntegrationSystemDto()
                     {
@@ -164,7 +165,7 @@ namespace Entegro.Infrastructure.Repositories
                         UnitPrice = x.UnitPrice,
                         AttributeDescription = "",
                         ProductId = x.ProductId,
-                        ProductBarcode = x.Product == null ? "": x.Product.Barcode,
+                        ProductBarcode = x.Product == null ? "" : x.Product.Barcode,
                         ProductCode = x.Product == null ? "" : x.Product.Code,
                         ProductName = x.Product == null ? "" : x.Product.Name,
                         ProductMainPicture = "",
@@ -226,7 +227,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Select(x => new OrderModel
                 {
                     Id = x.order.Id,
-                    PackegeNo = x.shipment.PackageNo,
+                    PackageNo = x.shipment.PackageNo,
                     IntegrationSystemId = x.order.IntegrationSystemId,
                     IntegrationSystem = x.order.IntegrationSystem == null ? null : new IntegrationSystemDto()
                     {

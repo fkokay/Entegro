@@ -1,7 +1,11 @@
 ﻿
+using Entegro.Application.DTOs.Address;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.OrderItem;
+using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using MapsterMapper;
@@ -64,6 +68,37 @@ namespace Entegro.Application.Services
 
             var orderDto = _mapper.Map<OrderDto>(order);
             return orderDto;
+        }
+
+        public async Task<OrderPrintDto> GetOrderPrintByIdAsync(int orderId,string packageNo)
+        {
+            var order = await _orderRepository.GetByIdAsync(orderId);
+            if (order == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {orderId} not found.");
+            }
+
+            var shipment = order.Shipments.Where(m => m.PackageNo == packageNo).FirstOrDefault();
+            if (shipment == null)
+            {
+                throw new KeyNotFoundException($"Order with Shipment {packageNo} not found.");
+            }
+
+            OrderPrintDto orderPrint = new OrderPrintDto();
+            orderPrint.OrderId = orderId;
+            orderPrint.OrderNumber = order.OrderNumber;
+            orderPrint.IntegrationSystem = _mapper.Map<IntegrationSystemDto>(order.IntegrationSystem);
+            orderPrint.ShippingAddress = _mapper.Map<AddressDto>(order.ShippingAddress);
+            orderPrint.BillingAddress = _mapper.Map<AddressDto>(order.BillingAddress);
+            orderPrint.Shipment = _mapper.Map<ShipmentDto>(shipment);
+            orderPrint.OrderItems = orderPrint.Shipment.ShipmentItems.Select(m => new OrderItemDto()
+            {
+                Quantity = m.Quantity,
+                IntegrationSku = m.OrderItem.IntegrationSku,
+                IntegrationProductName = m.OrderItem.IntegrationProductName,
+            }).ToList();
+
+            return orderPrint;
         }
 
         public async Task<IEnumerable<OrderDto>> GetOrdersAsync()

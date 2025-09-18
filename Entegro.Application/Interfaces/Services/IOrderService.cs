@@ -6,6 +6,7 @@ namespace Entegro.Application.Interfaces.Services
     public interface IOrderService
     {
         Task<OrderDto> GetOrderByIdAsync(int orderId);
+        Task<OrderPrintDto> GetOrderPrintByIdAsync(int orderId, string packageNo);
         Task<bool> ExistsByOrderNoAsync(string orderNo);
         Task<IEnumerable<OrderDto>> GetOrdersAsync();
         Task<PagedResult<OrderDto>> GetPagedAsync(int pageNumber, int pageSize);
