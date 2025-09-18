@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Import
 {
-    public class ColumnMapping
+    public class ExcelColumnMapping
     {
         public string ExcelHeader { get; set; }
         public bool IsImport { get; set; }

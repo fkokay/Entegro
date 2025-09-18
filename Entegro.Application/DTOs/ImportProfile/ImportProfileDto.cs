@@ -7,7 +7,12 @@
         public string ColumnMapping { get; set; } = null!;
         public string? MediaFileType { get; set; }
         public string? MediaFileUrl { get; set; }
-        public int MediaFileId { get; set; }
+        public int? MediaFileId { get; set; }
+
+        public bool? ApplyPriceAdjustment { get; set; }
+        public decimal? PriceAdjustmentAmount { get; set; }
+        public decimal? OptionalExtraAmount { get; set; }
+        public string? PriceAdjustmentType { get; set; }
         public bool Enable { get; set; }
         public DateTime CreatedOnUtc { get; set; }
     }
