@@ -36,7 +36,7 @@ namespace Entegro.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateSetting(CreateGeneralCommonViewModel model)
+        public async Task<IActionResult> CreateOrUpdateSetting(CreateGeneralCommonViewModel model)
         {
             var existingSetting = await _settingService.GetByKeyAsync(model.Key);
 
