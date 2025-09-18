@@ -7,6 +7,7 @@ using Entegro.Web.Models.Checkout.Orders;
 using Entegro.Web.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Rotativa.AspNetCore;
 using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
@@ -312,6 +313,24 @@ namespace Entegro.Web.Controllers
             var result = await _shipmentService.AddAsync(createShipment);
 
             return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> Print(int id, string packageNo)
+        {
+            var orderPrintModel = await _orderService.GetOrderPrintByIdAsync(id, packageNo);
+
+            //return View(orderPrintModel);
+
+            var pdf = new ViewAsPdf("Print", orderPrintModel)
+            {
+                FileName = "Test.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                CustomSwitches = "--enable-local-file-access"
+            };
+            var pdfBytes = await pdf.BuildFile(ControllerContext);
+
+            return File(pdfBytes, "application/pdf");
         }
     }
 }

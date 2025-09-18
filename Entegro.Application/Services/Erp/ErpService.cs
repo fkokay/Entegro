@@ -18,7 +18,7 @@ namespace Entegro.Application.Services.Erp
         public ErpService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri($"https://localhost:3000/api/");
+            _httpClient.BaseAddress = new Uri($"http://85.105.46.204:5000/api/");
 
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

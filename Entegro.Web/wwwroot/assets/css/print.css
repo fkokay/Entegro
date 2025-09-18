@@ -1,0 +1,8 @@
+﻿
+
+/* Yazdırmada butonları gizle */
+@media print {
+    .no-print {
+        display: none;
+    }
+}

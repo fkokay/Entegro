@@ -1,0 +1,183 @@
+﻿@using Entegro.Application.DTOs.Order
+@model OrderPrintDto
+@{
+    Layout = null;
+
+    string getIntegrationLogo(string? value)
+    {
+        switch (value)
+        {
+            case "Smartstore": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/smartstore.png";
+            case "Trendyol": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/trendyol.png";
+            case "N11": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/n11.png";
+            case "Pazarama": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/pazarama.png";
+            case "Idefix": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/idefix.png";
+            case "CicekSepeti": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/ciceksepeti.png";
+            case "Hepsiburada": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/hepsiburada.png";
+            case "YurtiçiKargo": return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/logo/yurticikargo.jpg";
+            default: return Directory.GetCurrentDirectory() + "/wwwroot/assets/img/icons/logo/default.png";
+        }
+    }
+
+    string? type = "";
+    if (Model.IntegrationSystem.IntegrationSystemType == Entegro.Domain.Enums.IntegrationSystemType.Marketplace)
+    {
+        type = Model.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MarketplaceType").Select(m => m.Value).FirstOrDefault();
+    }
+
+    if (Model.IntegrationSystem.IntegrationSystemType == Entegro.Domain.Enums.IntegrationSystemType.Commerce)
+    {
+        type = Model.IntegrationSystem.IntegrationSystemParameters.Where(m => m.Key == "CommerceType").Select(m => m.Value).FirstOrDefault();
+    }
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kargo Fişi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            margin: 20px;
+            color: #000;
+        }
+
+        .header {
+            height: 200px;
+            margin-bottom: 20px;
+        }
+
+            .header img {
+                height: 200px;
+                margin: 0px auto;
+                display: block;
+            }
+
+        .barcode {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+            .barcode img {
+                width: 200px;
+            }
+
+        .section::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .box {
+            width: 48%;
+            float: left;
+            margin-bottom: 20px;
+        }
+
+            .box h3 {
+                font-size: 14px;
+                border-bottom: 1px solid #ccc;
+                margin-bottom: 5px;
+            }
+
+        .products table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products th, .products td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="@getIntegrationLogo(type)" />
+    </div>
+
+    <div class="section barcode">
+        <div class="box">
+            <img src="https://barcode.tec-it.com/barcode.ashx?data=@(Model.Shipment.TrackingNumber)&code=Code128&dpi=96" alt="Barkod">
+        </div>
+        <div class="box">
+            <div><img src="@getIntegrationLogo("YurtiçiKargo")" height="100" /></div>
+            <div>@Model.Shipment.Carrier</div>
+        </div>
+    </div>
+
+    <div class="section">
+        @if (Model.ShippingAddress != null)
+        {
+            <div class="box">
+                <h3>Teslimat Bilgileri</h3>
+                <p><b>Teslim Alacak Kişi:</b> @Model.ShippingAddress.FirstName @Model.ShippingAddress.LastName @Model.ShippingAddress.Company</p>
+                <p><b>Semt/İlçe/İl:</b> Kuştepe / Kuştepe / İstanbul</p>
+                <p><b>Adres:</b> @Model.ShippingAddress.Address1 @Model.ShippingAddress.Address2</p>
+            </div>
+        }
+
+        @if (Model.BillingAddress != null)
+        {
+            <div class="box">
+                <h3>Fatura Bilgileri</h3>
+                <p><b>Müşteri Adı:</b> @Model.BillingAddress.FirstName @Model.BillingAddress.LastName @Model.BillingAddress.Company</p>
+                <p><b>Semt/İlçe/İl:</b> Şişli / İstanbul</p>
+                <p><b>Adres:</b> @Model.BillingAddress.Address1 @Model.BillingAddress.Address2</p>
+                <p><b>Vergi Dairesi:</b> İstanbul</p>
+            </div>
+        }
+    </div>
+
+    <div class="section">
+        <div class="box">
+            <h3>Satıcı Bilgileri</h3>
+            <p><b>Satıcı Adı:</b> @Model.IntegrationSystem.Name</p>
+        </div>
+
+        <div class="box">
+            <h3>Sipariş Bilgileri</h3>
+            <p><b>Sipariş No:</b> @Model.OrderNumber</p>
+        </div>
+    </div>
+
+    <div class="products">
+        <h3>Ürünler</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ürün Adı</th>
+                    <th>Stok Kodu</th>
+                    <th>Adet</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var orderItem in Model.OrderItems)
+                {
+                    <tr>
+                        <td>
+                            @orderItem.IntegrationProductName
+                        </td>
+                        <td>@orderItem.IntegrationSku</td>
+                        <td>@orderItem.Quantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

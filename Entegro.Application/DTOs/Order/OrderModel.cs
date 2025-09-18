@@ -11,7 +11,7 @@ namespace Entegro.Application.DTOs.Order
     public class OrderModel
     {
         public int Id { get; set; }
-        public string PackegeNo { get; set; }
+        public string PackageNo { get; set; }
         public int? IntegrationSystemId { get; set; }
         public IntegrationSystemDto? IntegrationSystem { get; set; }
         public string OrderNumber { get; set; }

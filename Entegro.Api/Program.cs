@@ -123,17 +123,17 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    var orderReadJob = new JobKey("OrderReadJob");
+    //var orderReadJob = new JobKey("OrderReadJob");
 
-    q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
+    //q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
 
-    q.AddTrigger(opts => opts
-        .ForJob(orderReadJob)
-        .WithIdentity("OrderReadJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(1)
-            .RepeatForever())
-        );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(orderReadJob)
+    //    .WithIdentity("OrderReadJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(1)
+    //        .RepeatForever())
+    //    );
 
     //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
@@ -159,17 +159,17 @@ builder.Services.AddQuartz(q =>
     //        .RepeatForever())
     //);
 
-    //var jobKeyErp = new JobKey("ErpDataSyncJob");
+    var jobKeyErp = new JobKey("ErpcJob");
 
-    //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+    q.AddJob<ErpcJob>(opts => opts.WithIdentity(jobKeyErp));
 
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeyErp)
-    //    .WithIdentity("ErpDataSyncJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(10)
-    //        .RepeatForever())
-    //    );
+    q.AddTrigger(opts => opts
+        .ForJob(jobKeyErp)
+        .WithIdentity("ErpcJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(10)
+            .RepeatForever())
+        );
 });
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 #endregion

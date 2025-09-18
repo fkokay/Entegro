@@ -36,7 +36,7 @@ Entegro.order.OrderList = (function ($) {
                 { data: 'Id' },
                 { data: 'Id' },
                 { data: 'PaymentStatus' },
-                { data: 'Id' } // İşlemler
+                { data: 'Id', width: '200px', } // İşlemler
             ],
             columnDefs: [
                 {
@@ -63,7 +63,9 @@ Entegro.order.OrderList = (function ($) {
                         }
 
                         return `<div>
-                                <img src="${getIntegrationLogo(type)}" style="max-width:115px;"/>
+                                <div><img src="${getIntegrationLogo(type)}" style="max-width:115px;"/></div>
+                                <div class="text-center">Mağaza Adı</div>
+                                <div class="text-center fw-bold">${row.IntegrationSystem.Name}</div>
                             </div>`;
                     }
                 },
@@ -77,7 +79,7 @@ Entegro.order.OrderList = (function ($) {
                         <div>
                             <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
                             <div>Sipariş Tarihi : <b>${moment(row.OrderDate).format("DD.MM.yyyy HH:mm")}</b></div>
-                            <div class="mb-3">Paket No : <b>${row.PackegeNo}</b></div>
+                            <div class="mb-3">Paket No : <b>${row.PackageNo}</b></div>
                             <div class="text-primary">
                                 <div>Kalan Süre:</div>
                                 <div>1 gün 07 saat 37 dakika</div>
@@ -210,6 +212,26 @@ Entegro.order.OrderList = (function ($) {
                     render: function (data, type, row) {
                         if (orderStatus == 1) {
                             return `<div><button class="btn btn-warning" onclick="Entegro.order.OrderList.OrderPackage(${row.Id})">Paketle</button></div>`;
+                        } else if (orderStatus == 2) {
+                            return `
+                            <div>
+                                <button class="btn btn-warning mb-4" style="width:200px;" onclick="Entegro.order.OrderList.OrderPrint(${row.Id},'${row.PackageNo}')">Etiketi Yazıdr</button>
+                                <div class="btn-group" style="width:200px;">
+                                  <button type="button" class="btn btn-info waves-effect waves-light">Diğer İşlemler</button>
+                                  <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split waves-effect waves-light" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                  </button>
+                                  <ul class="dropdown-menu" style="">
+                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Action</a></li>
+                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Another action</a></li>
+                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Something else here</a></li>
+                                    <li>
+                                      <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Separated link</a></li>
+                                  </ul>
+                                </div>
+                            </div>`;
                         }
 
 
@@ -382,6 +404,11 @@ Entegro.order.OrderList = (function ($) {
         $('#ProudctIntegrationModal').modal('show');
     }
 
+    const OrderPrint = function OrderPrint(id, packageNo) {
+        $('#OrderPrintModal').find(".modal-body").html(' <iframe src="/Order/Print?id=' + id + '&packageNo=' + packageNo + '" width="100%" height="600px"></iframe>')
+        $('#OrderPrintModal').modal('show');
+    };
+
     function OrderPackageInit() {
         $(".btn-minus").click(function () {
             var input = $(this).parent().find("input");
@@ -453,7 +480,8 @@ Entegro.order.OrderList = (function ($) {
         initTable: initTable,
         initTab: initTab,
         OrderPackage: OrderPackage,
-        ProductIntegration: ProductIntegration
+        ProductIntegration: ProductIntegration,
+        OrderPrint: OrderPrint
     };
 
     function getIntegrationLogo(value) {

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
 using Serilog;
 using Serilog.Extensions.Logging;
 using Serilog.Sinks.Graylog;
@@ -126,6 +127,9 @@ builder.Services.AddSignalR();
 
 #region Build App
 var app = builder.Build();
+
+RotativaConfiguration.Setup(builder.Environment.WebRootPath);
+
 (appContext as IServiceProviderContainer)!.ApplicationServices = app.Services;
 
 engine.Scope = new ScopedServiceContainer(
