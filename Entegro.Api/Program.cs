@@ -2,17 +2,10 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
 using Entegro.Api.Jobs;
-using Entegro.Application.Interfaces.Repositories;
-using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings;
-using Entegro.Application.Mappings.Commerce.Smartstore;
-using Entegro.Application.Services;
-using Entegro.Application.Services.Commerce;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Extensions;
-using Entegro.Infrastructure.Repositories;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
@@ -123,6 +116,16 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
+    var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
+    q.AddJob<XmlFileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
+    q.AddTrigger(opts => opts
+        .ForJob(xmlFileDownloadJob)
+        .WithIdentity("XmlFileDownloadJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInHours(1)
+            .RepeatForever())
+        );
+
     //var orderReadJob = new JobKey("OrderReadJob");
 
     //q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
@@ -159,17 +162,17 @@ builder.Services.AddQuartz(q =>
     //        .RepeatForever())
     //);
 
-    var jobKeyErp = new JobKey("ErpcJob");
+    //var jobKeyErp = new JobKey("ErpDataSyncJob");
 
-    q.AddJob<ErpcJob>(opts => opts.WithIdentity(jobKeyErp));
+    //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
 
-    q.AddTrigger(opts => opts
-        .ForJob(jobKeyErp)
-        .WithIdentity("ErpcJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(10)
-            .RepeatForever())
-        );
+    //q.AddTrigger(opts => opts
+    //    .ForJob(jobKeyErp)
+    //    .WithIdentity("ErpDataSyncJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(10)
+    //        .RepeatForever())
+    //    );
 });
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 #endregion
