@@ -2,17 +2,10 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
 using Entegro.Api.Jobs;
-using Entegro.Application.Interfaces.Repositories;
-using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Mappings;
-using Entegro.Application.Mappings.Commerce.Smartstore;
-using Entegro.Application.Services;
-using Entegro.Application.Services.Commerce;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Extensions;
-using Entegro.Infrastructure.Repositories;
 using Entegro.Utilities;
 using Mapster;
 using MapsterMapper;
@@ -123,17 +116,27 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    var orderReadJob = new JobKey("OrderReadJob");
-
-    q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
-
+    var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
+    q.AddJob<XmlFileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
     q.AddTrigger(opts => opts
-        .ForJob(orderReadJob)
-        .WithIdentity("OrderReadJob-trigger")
+        .ForJob(xmlFileDownloadJob)
+        .WithIdentity("XmlFileDownloadJob-trigger")
         .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(1)
+            .WithIntervalInHours(1)
             .RepeatForever())
         );
+
+    //var orderReadJob = new JobKey("OrderReadJob");
+
+    //q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
+
+    //q.AddTrigger(opts => opts
+    //    .ForJob(orderReadJob)
+    //    .WithIdentity("OrderReadJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInMinutes(1)
+    //        .RepeatForever())
+    //    );
 
     //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 
