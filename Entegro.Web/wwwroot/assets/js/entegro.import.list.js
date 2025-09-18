@@ -74,6 +74,9 @@ Entegro.import.list = (function ($) {
                                 <i class="icon-base ti ti-dots-vertical icon-22px"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end m-0">
+                            <a href="ImportAllProductsFromXml?profileId=${row.Id}" class="dropdown-item">Bütün Ürünleri Kaydet</a>
+                         
+                                <div class="dropdown-divider"></div>
                                 <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Sil</a>
                             </div>
                         </div>`
