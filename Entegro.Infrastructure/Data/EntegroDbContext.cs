@@ -9,6 +9,7 @@ using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform;
 using Entegro.Domain.Entities.Platform.Identity;
 using Entegro.Domain.Entities.Platform.Messaging;
+using Entegro.Domain.Entities.Setttings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Data
@@ -67,6 +68,7 @@ namespace Entegro.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new TownMap());
             modelBuilder.ApplyConfiguration(new UserMap());
             modelBuilder.ApplyConfiguration(new ImportProfileMap());
+            modelBuilder.ApplyConfiguration(new SettingMap());
 
         }
 
@@ -108,5 +110,6 @@ namespace Entegro.Infrastructure.Data
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ImportProfile> ImportProfiles { get; set; }
+        public DbSet<Setting> Settings { get; set; }
     }
 }

@@ -25,7 +25,7 @@ namespace Entegro.Api.Controllers
             {
                 var scheduler = await _schedulerFactory.GetScheduler();
 
-                var job = JobBuilder.Create<XmlFileDownloadJob>()
+                var job = JobBuilder.Create<FileDownloadJob>()
                     .WithIdentity(Guid.NewGuid().ToString(), "XmlJobs")
                     .UsingJobData("ProfileId", profileId)
                     .Build();

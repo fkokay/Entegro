@@ -16,13 +16,18 @@ namespace Entegro.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IImportProfileService _importProfileService;
         private readonly HttpClient _client;
-
-        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client)
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
+        private readonly IBrandService _brandService;
+        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService)
         {
             _mediaFileService = mediaFileService;
             _webHostEnvironment = webHostEnvironment;
             _importProfileService = importProfileService;
             _client = client;
+            _productService = productService;
+            _categoryService = categoryService;
+            _brandService = brandService;
         }
 
 
@@ -256,15 +261,6 @@ namespace Entegro.Web.Controllers
                 Console.WriteLine("XML İçeriği:");
                 LogXmlDataElements(dataElements, headerMaps);
 
-
-                var response = await _client.PostAsync($"https://localhost:7095/api/Job/run?profileId={profile.Id}", null);
-                if (!response.IsSuccessStatusCode)
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Error: {error}");
-                }
-                var resultContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(resultContent);
             }
             else
             {
@@ -273,6 +269,20 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("List");
         }
+        public async Task<IActionResult> ImportAllProductsFromXml(int profileId)
+        {
+            var response = await _client.PostAsync($"https://localhost:7095/api/Job/run?profileId={profileId}", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error: {error}");
+            }
+            var resultContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(resultContent);
+
+            return View();
+        }
+
         private async Task<XDocument> ReadXml(string url)
         {
             using var httpClient = new HttpClient();
@@ -458,61 +468,6 @@ namespace Entegro.Web.Controllers
             };
         }
 
-
-        public async Task<IActionResult> ImportAllProductsFromXml(int profileId)
-        {
-            var profile = await _importProfileService.GetByIdAsync(profileId);
-
-            string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "Media", "Storage", "document");
-            string filePattern = $"{profileId}_*.xml";
-            var files = Directory.GetFiles(directoryPath, filePattern);
-            if (files.Length == 0)
-            {
-                return NotFound("Dosya bulunamadı.");
-            }
-            string xmlFilePath = files[0];
-            XDocument xDoc = XDocument.Load(xmlFilePath);
-            var products = xDoc.Descendants("Product")
-             .Select(p => new
-             {
-                 OriginalProductCode = p.Element("Product_code")?.Value,
-                 ProductCode = $"{profileId}_" + p.Element("Product_code")?.Value,
-                 Name = p.Element("Name")?.Value,
-                 Price = decimal.TryParse(p.Element("psf_fiyati")?.Value, out var price) ? price : 0m,
-                 Stock = decimal.TryParse(p.Element("Stock")?.Value, out var stock) ? stock : 0m,
-                 CurrencyType = p.Element("CurrencyType")?.Value,
-                 Tax = decimal.TryParse(p.Element("Tax")?.Value, out var tax) ? tax : 0m,
-                 Description = p.Element("Description")?.Value,
-                 Variants = p.Elements("variants").Elements("variant").Select(v => new
-                 {
-                     SpecName = v.Element("spec")?.Attribute("name")?.Value,
-                     SpecValue = v.Element("spec")?.Value,
-                     VariantPrice = decimal.TryParse(v.Element("price")?.Value, out var variantPrice) ? variantPrice : 0m,
-                 }).ToList()
-             })
-            .ToList();
-            products.ForEach(p =>
-            {
-                Console.WriteLine($"Ürün Kodu: {p.ProductCode}");
-                Console.WriteLine($"Kar Yüzdesi: {profile.OptionalExtraAmount}");
-                Console.WriteLine($"Sabit: {profile.PriceAdjustmentAmount}");
-                Console.WriteLine($"Adı: {p.Name}");
-                Console.WriteLine($"Fiyatı: {p.Price} {p.CurrencyType}");
-                Console.WriteLine($"Stok: {p.Stock}");
-                Console.WriteLine($"KDV: {p.Tax}%");
-                Console.WriteLine($"Açıklama: {p.Description}");
-                if (p.Variants.Any())
-                {
-                    Console.WriteLine("Varyantlar:");
-                    p.Variants.ForEach(v =>
-                    {
-                        Console.WriteLine($"\tÖzellik: {v.SpecName} - Değer: {v.SpecValue} - Fiyat: {v.VariantPrice}");
-                    });
-                }
-                Console.WriteLine("--------------------------------------------------");
-            });
-            return View();
-        }
         #endregion
 
         [HttpPost]

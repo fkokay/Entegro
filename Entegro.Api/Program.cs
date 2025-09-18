@@ -117,7 +117,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddQuartz(q =>
 {
     var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
-    q.AddJob<XmlFileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
+    q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
     q.AddTrigger(opts => opts
         .ForJob(xmlFileDownloadJob)
         .WithIdentity("XmlFileDownloadJob-trigger")

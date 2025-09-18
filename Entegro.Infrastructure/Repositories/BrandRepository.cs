@@ -47,7 +47,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<bool> ExistsByNameAsync(string name)
         {
-            return await _context.Brands.AnyAsync(o => o.Name == name);
+            return await _context.Brands.AsNoTracking().AnyAsync(o => o.Name == name);
         }
 
         public async Task<List<Brand>> GetAllAsync()
@@ -92,7 +92,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Brand?> GetByNameAsync(string name)
         {
-            return await _context.Brands.FirstOrDefaultAsync(o => o.Name == name);
+            return await _context.Brands.AsNoTracking().FirstOrDefaultAsync(o => o.Name == name);
         }
 
         public async Task<Application.DTOs.Common.PagedResult<Brand>> GetPagedAsync(GridCommand gridCommand)

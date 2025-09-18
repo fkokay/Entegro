@@ -5,7 +5,6 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
-using Entegro.Application.DTOs.ProductVariantAttributeValue;
 
 namespace Entegro.Application.DTOs.Product
 {
@@ -14,8 +13,12 @@ namespace Entegro.Application.DTOs.Product
         public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
+        public string? ManufacturerPartNumber { get; set; }
+        public string? Gtin { get; set; }
         public decimal Price { get; set; }
+        public decimal OldPrice { get; set; }
+        public decimal SpecialPrice { get; set; }
         public string? Currency { get; set; }
         public string? Unit { get; set; }
         public decimal VatRate { get; set; }
@@ -30,13 +33,12 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
+        public int? MainPictureId { get; set; }
+        public bool Published { get; set; }
+        public bool Deleted { get; set; }
         public DateTime CreatedOnUtc { get; set; }
         public DateTime UpdatedOnUtc { get; set; }
-        public string? ManufacturerPartNumber { get; set; }
-        public string? Gtin { get; set; }
-        public bool Published { get; set; } = true;
         public BrandDto? Brand { get; set; }
-        public int? MainPictureId { get; set; }
         public MediaFileDto? MainPicture { get; set; }
 
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();

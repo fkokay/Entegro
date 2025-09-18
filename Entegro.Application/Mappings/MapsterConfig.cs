@@ -25,6 +25,7 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.Setting;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.DTOs.SpecificationAttribute;
@@ -39,6 +40,7 @@ using Entegro.Domain.Entities.Import;
 using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform.Identity;
 using Entegro.Domain.Entities.Platform.Messaging;
+using Entegro.Domain.Entities.Setttings;
 using Mapster;
 using Order = Entegro.Domain.Entities.Checkout.Order;
 
@@ -167,6 +169,12 @@ namespace Entegro.Application.Mappings
             config.NewConfig<ShipmentItem, ShipmentItemDto>().TwoWays();
             config.NewConfig<ShipmentItem, CreateShipmentItemDto>().TwoWays();
             config.NewConfig<ShipmentItem, UpdateShipmentItemDto>().TwoWays();
+
+
+            // ---------------- Setting ----------------
+            config.NewConfig<Setting, SettingDto>().TwoWays();
+            config.NewConfig<Setting, CreateSettingDto>().TwoWays();
+            config.NewConfig<Setting, UpdateSettingDto>().TwoWays();
 
 
         }
