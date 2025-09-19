@@ -10,6 +10,6 @@ namespace Entegro.Application.Interfaces.Services.Erp
 {
     public interface IErpService : IErpProductReader
     {
-        Task<List<ErpProductDto>> GetProductsAsync(string erpType,int pageSize = 50);
+    
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Erp;
+using Entegro.Application.DTOs.Marketplace.CicekSepeti;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.Interfaces.Services.Erp;
 using System;
@@ -13,27 +14,35 @@ namespace Entegro.Application.Services.Erp
 {
     public class ErpService : IErpService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public ErpService(HttpClient httpClient)
+        public ErpService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri($"http://85.105.46.204:5000/api/");
-
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<List<ErpProductDto>> GetProductsAsync(string erpType,int pageSize = 50)
+        private HttpClient CreateHttpClient(ErpApiContext context)
         {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(context.BaseUrl);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            return client;
+        }
+
+        public async Task<List<ErpProductDto>> GetProductsAsync(ErpApiContext context,int pageSize = 50)
+        {
+            using var client = CreateHttpClient(context);
+
             var allProducts = new List<ErpProductDto>();
             bool moreData = true;
             int page = 1;
 
             while (moreData)
             {
-                var url = $"{erpType}/products?pageSize={pageSize}&page={page}";
-                var response = await _httpClient.GetAsync(url);
+                var url = $"{context.ErpType}/products?pageSize={pageSize}&page={page}";
+                var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
