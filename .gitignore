@@ -367,3 +367,5 @@ FodyWeavers.xsd
 
 # Proje içindeki storage klasörü ve içeriğini ignore et
 /storage/
+
+App_Data/
