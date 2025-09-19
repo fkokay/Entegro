@@ -180,7 +180,8 @@ Entegro.brand = (function ($) {
                                 }).then(() => {
                                     window.location.href = '/brand/list';
                                 });
-                            } else {
+                            }
+                            else {
                                 Swal.fire({
                                     title: 'Hata!',
                                     text: response.message || 'Bir hata oluştu.',

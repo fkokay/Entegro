@@ -52,6 +52,29 @@
         }
     };
 
+    window.showLoading = function (message) {
+        $.blockUI({
+            message: '<div class="custom-loader"><div class="spinner"></div><p>' + message +'</p></div>',
+            css: {
+                border: 'none',
+                padding: '20px',
+                backgroundColor: 'transparent',
+                color: '#fff',
+                zIndex:999999
+            },
+            overlayCSS: {
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                opacity: 1,
+                cursor: 'wait',
+                zIndex:99999
+            }
+        });
+    };
+
+    window.hideLoading = function () {
+        $.unblockUI();
+    };
+
     window.connectionTest = function () {
         const integrationSystemId = $('#IntegrationSystemId').val();
         const marketplaceType = $('#MarketplaceType').val();

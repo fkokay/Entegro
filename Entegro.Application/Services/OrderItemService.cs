@@ -60,9 +60,26 @@ namespace Entegro.Application.Services
 
         public async Task<OrderItemDto> UpdateAsync(UpdateOrderItemDto orderItem)
         {
-            var orderItemDto = _mapper.Map<OrderItem>(orderItem);
-            await _orderItemRepository.UpdateAsync(orderItemDto);
-            return _mapper.Map<OrderItemDto>(orderItemDto);
+            if (orderItem == null)
+                throw new ArgumentNullException(nameof(orderItem));
+
+            var existingOrderItem = await _orderItemRepository.GetByIdAsync(orderItem.Id);
+            if (existingOrderItem == null)
+                throw new KeyNotFoundException($"ID {existingOrderItem.Id} ile OrderItem bulunamadı.");
+
+
+            _mapper.Map(orderItem, existingOrderItem);
+
+            await _orderItemRepository.UpdateAsync(existingOrderItem);
+
+            return _mapper.Map<OrderItemDto>(existingOrderItem);
+        }
+
+        public async Task<List<OrderItemDto>> GetAllWithIntegrationSkuAsync(string integrationSku)
+        {
+            var orderItems = await _orderItemRepository.GetAllIntegrationSkuWithAsync(integrationSku);
+            var orderItemDtos = _mapper.Map<IEnumerable<OrderItemDto>>(orderItems);
+            return orderItemDtos.ToList();
         }
     }
 }

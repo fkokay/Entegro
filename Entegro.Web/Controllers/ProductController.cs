@@ -86,14 +86,15 @@ namespace Entegro.Web.Controllers
 
         #region Product list / create / edit / delete
         [HttpPost]
-        public async Task<IActionResult> AllProduct([FromForm] int page = 1, [FromForm] string? term = null)
+        public async Task<IActionResult> AllProduct([FromForm] int page = 1, [FromForm] string term = "")
         {
-            var products = await _productService.GetProductsAsync();
+            var products = await _productService.GetProductsAsync(page, term);
 
-            var query = products.SelectAwait(async c => new
+            var query = products.Items.SelectAwait(async c => new
             {
                 id = c.Id.ToString(),
-                text = c.Name
+                text = c.Name,
+                code = c.Code,
             });
 
             var mainList = await query.AsyncToList();
@@ -101,8 +102,33 @@ namespace Entegro.Web.Controllers
             return Json(new
             {
                 results = mainList,
-                pagination = new { more = false }
+                pagination = new { more = products.HasNextPage }
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetProductVariantAttributeCombination(int productId)
+        {
+            var product = await _productService.GetProductByIdAsync(productId);
+
+            var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+            {
+                Id = m.Id,
+                ProductId = m.Id,
+                Gtin = m.Gtin,
+                ManufacturerPartNumber = m.ManufacturerPartNumber,
+                Price = m.Price,
+                StockQuantity = m.StockQuantity,
+                StokCode = m.StokCode,
+                ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+            }).ToList();
+
+            foreach (var item in productVariantAttributeCombinations)
+            {
+                item.Name = await _productAttributeFormatter.FormatAttributesAsync(item.ProductVariantAttributeSelections);
+            }
+
+            return Json(productVariantAttributeCombinations);
         }
 
         public Task<IActionResult> Index()
@@ -1918,6 +1944,7 @@ namespace Entegro.Web.Controllers
             }
         }
         #endregion
+
         private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
         {
             if (product != null)

@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
+using Entegro.Collections;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -58,10 +59,33 @@ namespace Entegro.Infrastructure.Repositories
             return product;
         }
 
+        public async Task<Application.DTOs.Common.PagedResult<Product>> GetAllAsync(int page,string term)
+        {
+            var query = IncludeAllProperties(_context.Products.AsNoTracking());
+            if (!string.IsNullOrEmpty(term))
+            {
+                query = query.Where(b =>
+                b.Name.Contains(term) ||
+                b.Code.Contains(term) ||
+                b.Barcode.Contains(term)).AsQueryable();
+            }
+
+            var totalCount = await query.CountAsync();
+            var products = await query.Skip((page * 7) - 7)
+                .Take(7).ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<Product>
+            {
+                Items = products,
+                TotalCount = totalCount,
+                PageNumber = page,
+                PageSize = 7
+            };
+        }
+
         public async Task<List<Product>> GetAllAsync()
         {
             var query = IncludeAllProperties(_context.Products.AsNoTracking());
-
             var products = await query.ToListAsync();
 
             return products;

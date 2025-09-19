@@ -163,14 +163,19 @@ namespace Entegro.Application.Services
             return productDto;
         }
 
+        public async Task<PagedResult<ProductDto>> GetProductsAsync(int page, string term)
+        {
+            var products = await _productRepository.GetAllAsync(page,term);
+            var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
+            return productDtos;
+        }
+
         public async Task<IEnumerable<ProductDto>> GetProductsAsync()
         {
             var products = await _productRepository.GetAllAsync();
             var productDtos = _mapper.Map<IEnumerable<ProductDto>>(products);
             return productDtos;
         }
-
-       
 
         public async Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId)
         {
