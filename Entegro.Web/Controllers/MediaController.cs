@@ -98,43 +98,43 @@ namespace Entegro.Web.Controllers
                 Directory.CreateDirectory(storagePath);
             }
 
+            MediaFolderDto? mediaFolder = null;
+            if (!string.IsNullOrEmpty(directory))
+            {
+                path = Path.Combine(storagePath, path, directory);
+
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                mediaFolder = await _mediaFolderService.GetMediaFolderByNameAsync(directory);
+                if (mediaFolder == null)
+                {
+                    mediaFolder = await _mediaFolderService.CreateFolderAsync(directory, parentId: null);
+                }
+            }
+            else
+            {
+                directory = path;
+                path = Path.Combine(storagePath, path);
+
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                mediaFolder = await _mediaFolderService.GetMediaFolderByNameAsync(directory);
+                if (mediaFolder == null)
+                {
+                    mediaFolder = await _mediaFolderService.CreateFolderAsync(directory, parentId: null);
+                }
+            }
+
             for (int i = 0; i < numFiles; i++)
             {
                 try
                 {
-                    MediaFolderDto? mediaFolder = null;
-                    if (!string.IsNullOrEmpty(directory))
-                    {
-                        path = Path.Combine(storagePath, path, directory);
-
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-
-                        mediaFolder = await _mediaFolderService.GetMediaFolderByNameAsync(directory);
-                        if (mediaFolder == null)
-                        {
-                            mediaFolder = await _mediaFolderService.CreateFolderAsync(directory, parentId: null);
-                        }
-                    }
-                    else
-                    {
-                        directory = path;
-                        path = Path.Combine(storagePath, path);
-
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-
-                        mediaFolder = await _mediaFolderService.GetMediaFolderByNameAsync(directory);
-                        if (mediaFolder == null)
-                        {
-                            mediaFolder = await _mediaFolderService.CreateFolderAsync(directory, parentId: null);
-                        }
-                    }
-
                     var uploadedFile = Request.Form.Files[i];
                     var fileName = uploadedFile.FileName;
                     var filePath = Path.Combine(path, fileName);
