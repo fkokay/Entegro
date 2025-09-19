@@ -1,7 +1,14 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.DTOs.ProductAttributeValue;
+using Entegro.Application.DTOs.ProductVariantAttribute;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
+using Newtonsoft.Json;
 using Quartz;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
@@ -9,6 +16,7 @@ using File = System.IO.File;
 
 namespace Entegro.Api.Jobs
 {
+    [DisallowConcurrentExecution]
     public class FileDownloadJob : IJob
     {
         private readonly IImportProfileService _importProfileService;
@@ -19,7 +27,14 @@ namespace Entegro.Api.Jobs
         private readonly IProductCategoryService _productCategoryService;
 
 
-        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductImageMappingService productImageMappingService, IProductCategoryService productCategoryService)
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeValueService _productAttributeValueService;
+        private readonly IProductVariantAttributeService _productVariantAttributeService;
+        private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        private readonly ConcurrentDictionary<string, int> _attributeCache = new();
+        private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
+        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductImageMappingService productImageMappingService, IProductCategoryService productCategoryService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
         {
             _importProfileService = importProfileService;
             _productService = productService;
@@ -27,11 +42,17 @@ namespace Entegro.Api.Jobs
             _brandService = brandService;
             _productImageMappingService = productImageMappingService;
             _productCategoryService = productCategoryService;
+            _productAttributeService = productAttributeService;
+            _productAttributeValueService = productAttributeValueService;
+            _productVariantAttributeService = productVariantAttributeService;
+            _productVariantAttributeValueService = productVariantAttributeValueService;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
             try
             {
+                await LoadAttributeCacheAsync();
                 var profileId = context.JobDetail.JobDataMap.GetInt("ProfileId");
                 var profile = await _importProfileService.GetByIdAsync(profileId);
                 if (profile == null)
@@ -129,9 +150,15 @@ namespace Entegro.Api.Jobs
                            Description = p.Element("Description")?.Value,
                            Variants = p.Elements("variants").Elements("variant").Select(v => new
                            {
-                               SpecName = v.Element("spec")?.Attribute("name")?.Value,
-                               SpecValue = v.Element("spec")?.Value,
-                               VariantPrice = decimal.TryParse(v.Element("price")?.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var variantPrice) ? variantPrice : 0m,
+                               Specs = v.Elements("spec").Select(s => new
+                               {
+                                   SpecName = s.Attribute("name")?.Value,
+                                   SpecValue = s.Value
+                               }).ToList(),
+                               VariantPrice = decimal.TryParse(v.Element("price")?.Value.Replace(",", "."), out var variantPrice) ? variantPrice : 0m,
+                               Barcode = v.Element("barcode")?.Value,
+                               Quantity = v.Element("quantity")?.Value,
+                               VariantProductCode = v.Element("productCode")?.Value,
                            }).ToList()
                        };
                    }).ToList();
@@ -143,8 +170,6 @@ namespace Entegro.Api.Jobs
 
                 foreach (var p in products)
                 {
-
-
                     if (await _productService.ExistsByCodeAsync(p.ProductCode))
                         continue;
 
@@ -309,32 +334,35 @@ namespace Entegro.Api.Jobs
                     };
                     await _productCategoryService.CreateProductCategoryAsync(newProductCategory);
 
-                    // Loglama
-                    Console.WriteLine($"Ürün Kodu: {p.ProductCode}");
-                    Console.WriteLine($"Kar Yüzdesi: {profile.OptionalExtraAmount}");
-                    Console.WriteLine($"Sabit: {profile.PriceAdjustmentAmount}");
-                    Console.WriteLine($"Kategori: {p.Category}");
-                    Console.WriteLine($"Adı: {p.Name}");
-                    Console.WriteLine($"Marka: {p.Brand}");
-                    Console.WriteLine($"Fiyatı: {p.Price} {p.CurrencyType}");
-                    Console.WriteLine($"Maliyet Fiyatı: {p.CostPrice} {p.CurrencyType}");
-                    Console.WriteLine($"Resimler: {p.Image}");
-                    Console.WriteLine($"Stok: {p.Stock}");
-                    Console.WriteLine($"KDV: {p.Tax}%");
-                    Console.WriteLine($"Açıklama: {p.Description}");
-
+                    var variantAttribute = new ProductAttributeDto();
                     if (p.Variants.Any())
                     {
-                        Console.WriteLine("Varyantlar:");
-                        p.Variants.ForEach(v =>
-                        {
-                            Console.WriteLine($"\tÖzellik: {v.SpecName} - Değer: {v.SpecValue} - Fiyat: {v.VariantPrice}");
-                        });
-                    }
 
-                    Console.WriteLine("--------------------------------------------------");
+                        foreach (var variant in p.Variants)
+                        {
+                            List<ProductVariantAttributeModel> variantAttributes = new List<ProductVariantAttributeModel>();
+                            foreach (var spec in variant.Specs)
+                            {
+                                await AddVariantAttributeAsync(createdProduct.Id, spec.SpecName, spec.SpecValue, variantAttributes);
+                            }
+
+                            var combinationDto = new CreateProductVariantAttributeCombinationDto
+                            {
+                                ProductId = createdProduct.Id,
+                                Gtin = "",
+                                ManufacturerPartNumber = variant.Barcode,
+                                Price = 0,
+                                StockQuantity = 0,
+                                StokCode = variant.VariantProductCode,
+                                RawAttribute = JsonConvert.SerializeObject(variantAttributes),
+                            };
+
+                            await _productVariantAttributeCombinationService.AddAsync(combinationDto);
+                        }
+                    }
                 }
 
+                Console.WriteLine($"Aktarım tamaMlandı");
             }
             catch (Exception ex)
             {
@@ -343,7 +371,81 @@ namespace Entegro.Api.Jobs
         }
 
 
+        private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeModel> variantAttributes)
+        {
+            if (string.IsNullOrEmpty(attributeName) || string.IsNullOrEmpty(attributeValue)) return;
 
+            int attrId = await EnsureProductAttributeAsync(attributeName);
+            int attrValueId = await EnsureProductAttributeValueAsync(attrId, attributeValue);
+
+            var existingVariant = await _productVariantAttributeService.GetByAttibuteIdAsync(productId, attrId);
+            int variantId = existingVariant?.Id ?? (await _productVariantAttributeService.AddAsync(new CreateProductVariantAttributeDto
+            {
+                ProductId = productId,
+                ProductAttributeId = attrId,
+                DisplayOrder = 0,
+                AttributeControlTypeId = 0
+            })).Id;
+
+            var existingVariantValue = await _productVariantAttributeValueService.GetByNameAsync(variantId, attributeValue);
+            int variantValueId = existingVariantValue?.Id ?? (await _productVariantAttributeValueService.AddAsync(new CreateProductVariantAttributeValueDto()
+            {
+                Name = attributeValue,
+                ProductVariantAttributeId = variantId
+            })).Id;
+
+            variantAttributes.Add(new ProductVariantAttributeModel
+            {
+                ProductVariantAttributeId = variantId,
+                ProductVariantAttributeValueId = variantValueId
+            });
+        }
+        private async Task<int> EnsureProductAttributeAsync(string name)
+        {
+            if (_attributeCache.TryGetValue(name, out int id)) return id;
+
+            var created = await _productAttributeService.AddAsync(new CreateProductAttributeDto
+            {
+                Name = name,
+                Description = "",
+                DisplayOrder = 0
+            });
+
+            _attributeCache.TryAdd(name, created.Id);
+            return created.Id;
+        }
+        private async Task<int> EnsureProductAttributeValueAsync(int attributeId, string value)
+        {
+            if (_attributeValueCache.TryGetValue((attributeId, value), out int id)) return id;
+
+            var created = await _productAttributeValueService.AddAsync(new CreateProductAttributeValueDto
+            {
+                Name = value,
+                DisplayOrder = 0,
+                ProductAttributeId = attributeId
+            });
+
+            _attributeValueCache.TryAdd((attributeId, value), created.Id);
+            return created.Id;
+        }
+
+        private async Task LoadAttributeCacheAsync()
+        {
+            var allAttributes = await _productAttributeService.GetAllAsync();
+            foreach (var attr in allAttributes)
+                _attributeCache.TryAdd(attr.Name, attr.Id);
+
+            var allValues = await _productAttributeValueService.GetAllAsync();
+            foreach (var val in allValues)
+                _attributeValueCache.TryAdd((val.ProductAttributeId, val.Name), val.Id);
+
+        }
     }
+}
 
+
+public class ProductVariantAttributeModel
+{
+    public int ProductVariantAttributeId { get; set; }
+    public int ProductVariantAttributeValueId { get; set; }
 }
