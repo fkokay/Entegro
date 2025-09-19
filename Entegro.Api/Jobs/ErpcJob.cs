@@ -20,6 +20,7 @@ using System.Collections.Concurrent;
 
 namespace Entegro.Api.Jobs
 {
+    [DisallowConcurrentExecution]
     public class ErpcJob : IJob
     {
         private readonly IErpService _erpService;

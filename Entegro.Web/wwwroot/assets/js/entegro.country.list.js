@@ -14,7 +14,7 @@ Entegro.Country.List = (function ($) {
                         first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
                         last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
                     },
-                    url: '//cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
+                    url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
                 },
                 serverSide: true,
                 order: [[2, 'asc']],
