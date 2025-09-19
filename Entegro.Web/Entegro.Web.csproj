@@ -43,7 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Data\Media\Test\" />
     <Folder Include="App_Data\Media\Storage\" />
     <Folder Include="wwwroot\assets\img\brandicons\" />
   </ItemGroup>
