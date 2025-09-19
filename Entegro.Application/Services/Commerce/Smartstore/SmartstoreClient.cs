@@ -4,7 +4,6 @@ using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
-using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductBrand;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductMediaFile;
@@ -12,24 +11,14 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Mappings.Commerce.Smartstore;
-using Entegro.Domain.Entities;
-using Entegro.Domain.Entities.Catalog;
-using Humanizer;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Hashing;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Entegro.Application.Services.Commerce.Smartstore
 {
