@@ -20,11 +20,19 @@
                     <div class="tab-content">
                         <!-- Personal Info -->
                         <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
-                            <div class="col-md-12">
+                            <div class="col-md-12 mb-4">
+                                <div class="row">
+                                    <label class="col-sm-3 col-form-label text-sm-start" for="SystemUrl">Entegro Url</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" asp-for="SystemUrl" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-4">
                                 <div class="row">
                                     <label class="col-sm-3 col-form-label text-sm-start" for="SystemApiUrl">Entegro Api Url</label>
                                     <div class="col-sm-9">
-                                        <input type="text" asp-for="SystemApiUrl" class="form-control" required />
+                                        <input type="text" asp-for="SystemApiUrl" class="form-control" />
                                     </div>
                                 </div>
                             </div>

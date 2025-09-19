@@ -70,7 +70,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                     await _smartstoreClient.UpsertProductAsync(request);
 
-                    await EntegroNotification.SendNotification($"Smartstore {product.Name} stok ve fiyat güncellendi");
+                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

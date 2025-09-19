@@ -33,6 +33,7 @@ namespace Entegro.Web.Controllers
             var settings = await _settingService.GetAllAsync();
 
             CreateGeneralCommonViewModel model = new CreateGeneralCommonViewModel();
+            model.SystemUrl = settings.Where(m => m.Key == "SystemUrl").Select(m => m.Value).FirstOrDefault() ?? "";
             model.SystemApiUrl = settings.Where(m => m.Key == "SystemApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
 
             return View(model);
@@ -41,25 +42,24 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateSetting(CreateGeneralCommonViewModel model)
         {
-            var systemApiUrlExists = await _settingService.ExistsByKeyAsync("SystemApiUrl");
-            if (systemApiUrlExists)
+            var systemUrlExists = await _settingService.ExistsByKeyAsync("SystemUrl");
+            if (systemUrlExists)
             {
-                var sysApiUrl = await _settingService.GetByKeyAsync("SystemApiUrl");
-
-                UpdateSettingDto updateSetting = new UpdateSettingDto();
-                updateSetting.Id = sysApiUrl.Id;
-                updateSetting.Key = sysApiUrl.Key;
-                updateSetting.Value = sysApiUrl.Value;
-                await _settingService.UpdateAsync(updateSetting);
+                await _settingService.UpdateAsync("SystemUrl", model.SystemUrl);
             }
             else
             {
-                var sysApiUrl = await _settingService.GetByKeyAsync("SystemApiUrl");
+                await _settingService.CreateAsync("SystemUrl", model.SystemUrl);
+            }
 
-                CreateSettingDto createSetting = new CreateSettingDto();
-                createSetting.Key = sysApiUrl.Key;
-                createSetting.Value = sysApiUrl.Value;
-                await _settingService.CreateAsync(createSetting);
+            var systemApiUrlExists = await _settingService.ExistsByKeyAsync("SystemApiUrl");
+            if (systemApiUrlExists)
+            {
+                await _settingService.UpdateAsync("SystemApiUrl", model.SystemApiUrl);
+            }
+            else
+            {
+                await _settingService.CreateAsync("SystemApiUrl", model.SystemApiUrl);
             }
 
             return RedirectToAction("GeneralCommon");

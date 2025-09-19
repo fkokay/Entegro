@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using Entegro.Domain.Enums;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Entegro.Application.Notifications
 {
     public static class EntegroNotification
     {
-        public static async Task SendNotification(string message)
+        public static async Task SendNotification(NotificationType notificationType, string title, string message)
         {
             var connection = new HubConnectionBuilder()
           .WithUrl("https://localhost:4000/notificationHub") // Hub’ın adresi
@@ -17,7 +18,7 @@ namespace Entegro.Application.Notifications
 
             await connection.StartAsync();
 
-            await connection.InvokeAsync("SendNotification", message);
+            await connection.InvokeAsync("SendNotification", notificationType, title, message);
 
             await connection.StopAsync();
         }

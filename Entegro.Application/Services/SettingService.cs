@@ -28,6 +28,17 @@ namespace Entegro.Application.Services
             return _mapper.Map<SettingDto>(setting);
         }
 
+        public async Task<SettingDto> CreateAsync(string key, string value)
+        {
+            Setting setting = new Setting();
+            setting.Key = key;
+            setting.Value = value;
+
+            await _settingRepository.AddAsync(setting);
+
+            return _mapper.Map<SettingDto>(setting);
+        }
+
         public async Task DeleteAsync(int id)
         {
             if (id <= 0)
@@ -56,14 +67,6 @@ namespace Entegro.Application.Services
                 throw new ArgumentException("Key değeri boş olamaz", nameof(key));
 
             return await _settingRepository.ExistsByKeyAsync(key);
-        }
-
-        public async Task<bool> ExistsByValueAsync(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Value değeri boş olamaz", nameof(value));
-
-            return await _settingRepository.ExistsByValueAsync(value);
         }
 
         public async Task<IEnumerable<SettingDto>> GetAllAsync()
@@ -156,6 +159,20 @@ namespace Entegro.Application.Services
                 throw new KeyNotFoundException($"ID {model.Id} ile Setting bulunamadı.");
 
             _mapper.Map(model, existingSetting);
+            await _settingRepository.UpdateAsync(existingSetting);
+
+            return _mapper.Map<SettingDto>(existingSetting);
+        }
+
+        public async Task<SettingDto> UpdateAsync(string key, string value)
+        {
+            var existingSetting = await _settingRepository.GetByKeyAsync(key);
+            if (existingSetting == null)
+            {
+                throw new KeyNotFoundException($"Key {key} ile Setting bulunamadı.");
+            }
+
+            existingSetting.Value = value;
             await _settingRepository.UpdateAsync(existingSetting);
 
             return _mapper.Map<SettingDto>(existingSetting);

@@ -122,7 +122,7 @@ namespace Entegro.Application.Services.Marketplace
                     await UpdatePriceAndStockAsync(apiContext,request);
 
 
-                    await EntegroNotification.SendNotification($"Trendyol {product.Name} stok ve fiyat güncellendi");
+                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"Trendyol {product.Name} stok ve fiyat güncellendi");
 
                 }
             }

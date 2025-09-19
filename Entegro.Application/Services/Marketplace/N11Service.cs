@@ -110,7 +110,7 @@ namespace Entegro.Application.Services.Marketplace
 
                     await UpdatePriceAndStockAsync(apiContext, request);
 
-                    await EntegroNotification.SendNotification($"N11 {product.Name} stok ve fiyat güncellendi");
+                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"N11 {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }
