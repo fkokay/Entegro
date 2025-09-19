@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Product;
+﻿using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.Product;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace Entegro.Application.DTOs.OrderItem
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
+        public OrderDto Order { get; set; }
         public int? ProductId { get; set; }
         public ProductDto? Product { get; set; }
         public string Sku { get; set; }

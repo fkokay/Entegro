@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="/assets/vendor/libs/quill/typography.css" />
     <link rel="stylesheet" href="/assets/vendor/libs/quill/katex.css" />
     <link rel="stylesheet" href="/assets/vendor/libs/quill/editor.css" />
-    <link href="~/assets/vendor/libs/toastr/toastr.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/vendor/libs/toastr/toastr.css" />
     <!-- Page CSS -->
     @await RenderSectionAsync("PageCss", required: false)
 
@@ -120,6 +120,7 @@
     <script src="/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
     <script src="/assets/vendor/libs/moment/moment.js"></script>
     <script src="/assets/vendor/libs/select2/select2.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/tr.min.js"></script>
     <script src="/assets/vendor/libs/sweetalert2/sweetalert2.js"></script>
     <script src="/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js"></script>
     <script src="/assets/vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js"></script>
@@ -143,6 +144,7 @@
     <script src="/assets/js/entegro.admin.media.js"></script>
     <script src="/assets/js/entegro.dropzonewrapper.js"></script>
     <!-- Page JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <script>
         const connection = new signalR.HubConnectionBuilder()

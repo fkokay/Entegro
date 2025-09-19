@@ -110,7 +110,7 @@ Entegro.order.OrderList = (function ($) {
                         for (var i = 0; i < row.OrderItems.length; i++) {
                             if (row.OrderItems[i].ProductId == null) {
                                 items +=
-                                    `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.OrderItems[i].Id}, '${row.OrderItems[i].IntegrationProductName}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
+                                    `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.IntegrationSystemId}, '${row.OrderItems[i].IntegrationProductName}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
                                         <div class="p-5">
                                             <div class="order-item-no-integration-title">Eşleştirilmemiş Ürün, Eşleştirme Yapmak İçin Tıklayın.</div>
                                             <div class="order-item-no-integration-info">${row.OrderItems[i].IntegrationProductName}</div>
@@ -355,7 +355,7 @@ Entegro.order.OrderList = (function ($) {
 
     const OrderPackage = function OrderPackage(id) {
         $.ajax({
-            url: '/Order/Packaging?id='+id,
+            url: '/Order/Packaging?id=' + id,
             type: 'POST',
             dataType: 'html',
             success: function (html) {
@@ -370,11 +370,13 @@ Entegro.order.OrderList = (function ($) {
         });
     }
 
-    const ProductIntegration = function ProductIntegration(orderItemId, productIntegrationName, productIntegrationSku) {
-
+    const ProductIntegration = function ProductIntegration(integrationSystemId, productIntegrationName, productIntegrationSku) {
+        $("#IntegrationSystemId").val(integrationSystemId);
         $("#ProductIntegrationName").val(productIntegrationName);
         $("#ProductIntegrationSku").val(productIntegrationSku);
+        $("#IntegrationCode").val(productIntegrationSku);
         $("#ProductId").select2({
+            language: "tr",
             placeholder: 'Ürün seçiniz',
             allowClear: true,
             dropdownParent: $('#ProudctIntegrationModal'),
@@ -399,9 +401,148 @@ Entegro.order.OrderList = (function ($) {
                     };
                 },
                 cache: true
+            },
+            templateResult: function (state) {
+                if (!state.id) {
+                    return state.text;
+                }
+
+                var $state = $('<span>' + state.text + '</span><br><span>' + state.code + '</span>');
+                return $state;
+            }
+        });
+        $("#ProductId").change(function () {
+            var productId = $(this).val();
+            const select = document.getElementById("ProductVariantAttributeCombinationId");
+       
+            if (productId == undefined) {
+                select.innerHTML = "";
+                $("#ProductVariantAttributeCombination").hide();
+            } else {
+                window.showLoading("Lütfen bekleyiniz varyantlar kontrol ediliyor..");
+                $.ajax({
+                    url: '/Product/GetProductVariantAttributeCombination?productId=' + productId,
+                    type: 'POST',
+                    success: function (response) {
+                        if (response.length > 0) {
+                           
+                            select.innerHTML = "";
+
+                            response.forEach(item => {
+                                const option = document.createElement("option");
+                                option.value = item.Id;            // backend'den gelen Id
+                                option.text = item.Name;           // backend'den gelen isim
+                                select.appendChild(option);
+                            });
+
+                            $("#ProductVariantAttributeCombinationId").select2({
+                                placeholder: 'Varyant seçiniz',
+                                allowClear: false,
+                                dropdownParent: $('#ProudctIntegrationModal'),
+                                width: '100%'
+                            });
+
+                            $("#ProductVariantAttributeCombination").show();
+                        } else {
+                            $("#ProductVariantAttributeCombination").hide();
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sunucu Hatası!',
+                            text: 'İstek gönderilirken bir hata oluştu.',
+                            confirmButtonText: 'Tamam',
+                            customClass: {
+                                confirmButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    },
+                    complete: function () {
+                        window.hideLoading();
+                    }
+                });
             }
         });
         $('#ProudctIntegrationModal').modal('show');
+
+        $("#CreateProductIntegrationForm").submit(function (e) {
+            e.preventDefault();
+            const $form = $(this);
+            const serializedData = $form.serialize();
+
+            if ($form.find("#ProductId").val() == undefined) {
+                Swal.fire({
+                    title: 'Hata!',
+                    text: 'Ürün seçiniz',
+                    icon: 'error',
+                    confirmButtonText: 'Tamam',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false
+                });
+                return;
+            }
+
+            const $submitBtn = $form.find('button[type="submit"]');
+            $submitBtn.prop('disabled', true);
+            window.showLoading("Lütfen bekleyiniz..");
+
+            $.ajax({
+                url: "/Order/CreateProductIntegration",
+                type: 'POST',
+                data: serializedData,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: 'İşlem başarıyla tamamlandı.',
+                            icon: 'success',
+                            confirmButtonText: 'Tamam',
+                            customClass: {
+                                confirmButton: 'btn btn-success'
+                            },
+                            buttonsStyling: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: response.message || 'Bir hata oluştu.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam',
+                            customClass: {
+                                confirmButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam',
+                        customClass: {
+                            confirmButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: false
+                    });
+                },
+                complete: function () {
+                    $("#ProductVariantAttributeCombinationId").html("");
+                    $("#ProductVariantAttributeCombination").hide();
+                    $submitBtn.prop('disabled', false);
+
+                    window.hideLoading();
+                }
+            });
+        });
     }
 
     const OrderPrint = function OrderPrint(id, packageNo) {

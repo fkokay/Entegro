@@ -90,33 +90,40 @@
 <div class="modal fade" id="ProudctIntegrationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
         <div class="modal-content p-3 p-md-5">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ProudctIntegrationModalLabel">Ürün Eşleştirme</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row g-3 mb-5">
-                    <!-- Kategori Seçimi -->
-                    <div class="col-md-12">
-                        <label class="form-label text-sm-start" for="ProductIntegrationName">Trendyol Ürün Adı</label>
-                        <input type="text" id="ProductIntegrationName" name="ProductIntegrationName" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label text-sm-start" for="ProductIntegrationSku">Trendyol Ürün Kodu</label>
-                        <input type="text" id="ProductIntegrationSku" name="ProductIntegrationSku" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label text-sm-start" for="ProductId">Trendyol Ürün Kodu</label>
-                        <select id="ProductId" name="ProductId" class="select2 form-select form-select-lg">
-
-                       </select>
+            <form asp-action="/Order/CreateProductIntegration" method="post" id="CreateProductIntegrationForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ProudctIntegrationModalLabel">Ürün Eşleştirme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-5">
+                        <input type="hidden" id="IntegrationSystemId" name="IntegrationSystemId" />
+                        <input type="hidden" id="OrderItemId" name="OrderItemId" />
+                        <input type="hidden" id="IntegrationCode" name="IntegrationCode" />
+                        <!-- Kategori Seçimi -->
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductIntegrationName">Trendyol Ürün Adı</label>
+                            <input type="text" id="ProductIntegrationName" name="ProductIntegrationName" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductIntegrationSku">Trendyol Ürün Kodu</label>
+                            <input type="text" id="ProductIntegrationSku" name="ProductIntegrationSku" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductId">Ürün</label>
+                            <select id="ProductId" name="ProductId" class="select2 form-select"></select>
+                        </div>
+                        <div id="ProductVariantAttributeCombination" class="col-md-12" style="display:none;">
+                            <label class="form-label text-sm-start" for="ProductVariantAttributeCombinationId">Varyant</label>
+                            <select id="ProductVariantAttributeCombinationId" name="ProductVariantAttributeCombinationId" class="select2 form-select"></select>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
-                <button type="button" class="btn btn-warning proudctintegration-save">Eşleştir</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                    <button type="submit" class="btn btn-warning">Eşleştir</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

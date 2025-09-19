@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<List<OrderItemDto>> GetByOrderIdAsync(int orderId);
         Task<OrderItemDto?> GetByIdAsync(int id);
+        Task<List<OrderItemDto>> GetAllWithIntegrationSkuAsync(string integrationSku);
         Task<List<OrderItemDto>> GetAllAsync();
         Task<PagedResult<OrderItemDto>> GetPagedAsync(int pageNumber, int pageSize);
         Task<OrderItemDto> AddAsync(CreateOrderItemDto orderItem);

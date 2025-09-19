@@ -53,6 +53,11 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
+        public async Task<List<OrderItem>> GetAllIntegrationSkuWithAsync(string integrationSku)
+        {
+            return await _context.OrderItems.Where(m=>m.IntegrationSku == integrationSku).ToListAsync();
+        }
+
         public async Task<OrderItem?> GetByIdAsync(int id)
         {
             return await _context.OrderItems.FirstOrDefaultAsync(o => o.Id == id);
@@ -79,6 +84,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(OrderItem orderItem)
         {
+            _context.Entry(orderItem).State = EntityState.Modified;
             _context.OrderItems.Update(orderItem);
             await _context.SaveChangesAsync();
         }
