@@ -52,6 +52,17 @@ namespace Entegro.Api.Jobs
                     folderName
                 );
 
+                var appDataForImagePath = Path.Combine(
+                    Directory.GetParent(Directory.GetCurrentDirectory()).FullName,
+                    "Entegro.Web",
+                    "App_Data",
+                    "Media",
+                    "Storage",
+                    "catalog" // folderName burada sabit "images"
+                );
+
+                if (!Directory.Exists(appDataForImagePath))
+                    Directory.CreateDirectory(appDataForImagePath);
 
                 if (!Directory.Exists(appDataPath))
                     Directory.CreateDirectory(appDataPath);
@@ -200,7 +211,35 @@ namespace Entegro.Api.Jobs
 
 
                     //await _productService.CreateProductAsync(model);
+                    var imageUrls = p.Image?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
+                    if (imageUrls != null && imageUrls.Any())
+                    {
+                        int index = 1;
+
+                        foreach (var imageUrl in imageUrls)
+                        {
+                            try
+                            {
+
+                                var extension = Path.GetExtension(imageUrl);
+                                if (string.IsNullOrWhiteSpace(extension))
+                                    extension = ".jpg";
+                                var imageName = $"{p.ProductCode}_{index}{extension}";
+                                var filePath = Path.Combine(appDataForImagePath, imageName);
+                                var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+                                await File.WriteAllBytesAsync(filePath, imageBytes);
+                                Console.WriteLine($"\t✓ İndirildi: {fileName}");
+
+                                index++;
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"\tX HATA (indirilemedi): {imageUrl}");
+                                Console.WriteLine($"\t→ {ex.Message}");
+                            }
+                        }
+                    }
 
                     // Loglama
                     Console.WriteLine($"Ürün Kodu: {p.ProductCode}");
