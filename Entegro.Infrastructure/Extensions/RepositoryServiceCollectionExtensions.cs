@@ -42,6 +42,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IImportProfileRepository, ImportProfileRepository>();
             services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
             services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();
+            services.AddScoped<ISettingRepository, SettingRepository>();
             return services;
         }
     }

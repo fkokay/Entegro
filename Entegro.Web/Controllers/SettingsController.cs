@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
+using Entegro.Application.DTOs.Setting;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models.Integration;
@@ -8,6 +9,7 @@ using Entegro.Web.Models.Integration.Commerce;
 using Entegro.Web.Models.Integration.EInvoice;
 using Entegro.Web.Models.Integration.Erp;
 using Entegro.Web.Models.Integration.Marketplace;
+using Entegro.Web.Models.Setting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,17 +20,59 @@ namespace Entegro.Web.Controllers
     {
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IIntegrationSystemParameterService _integrationSystemParameterService;
-        public SettingsController(IIntegrationSystemService integrationSystemService, IIntegrationSystemParameterService integrationSystemParameterService)
+        private readonly ISettingService _settingService;
+        public SettingsController(IIntegrationSystemService integrationSystemService, IIntegrationSystemParameterService integrationSystemParameterService, ISettingService settingService)
         {
             _integrationSystemService = integrationSystemService;
             _integrationSystemParameterService = integrationSystemParameterService;
+            _settingService = settingService;
         }
 
-        public IActionResult GeneralCommon()
+        public async Task<IActionResult> GeneralCommon()
         {
-            return View();
+            CreateGeneralCommonViewModel model = new CreateGeneralCommonViewModel();
+            var settings = await _settingService.GetAllAsync();
+            ViewBag.Settings = string.Join(", ", settings.Select(s => s.Value));
+            return View(model);
         }
+        [HttpPost]
+        public async Task<IActionResult> CreateOrUpdateSetting(CreateGeneralCommonViewModel model)
+        {
+            var existingSetting = await _settingService.GetByKeyAsync(model.Key);
 
+            string[] newValues = model.Value?.Split(',') ?? Array.Empty<string>();
+            string[] existingValues = existingSetting?.Value?.Split(',') ?? Array.Empty<string>();
+
+            bool valuesAreEqual = newValues.Length == existingValues.Length &&
+                                  !newValues.Except(existingValues).Any() &&
+                                  !existingValues.Except(newValues).Any();
+
+            if (existingSetting != null)
+            {
+                if (!valuesAreEqual)
+                {
+                    await _settingService.UpdateAsync(new UpdateSettingDto
+                    {
+                        Id = existingSetting.Id,
+                        Key = model.Key,
+                        Value = model.Value
+                    });
+                }
+            }
+            else
+            {
+                await _settingService.CreateAsync(new CreateSettingDto
+                {
+                    Key = model.Key,
+                    Value = model.Value
+                });
+            }
+
+            return RedirectToAction("GeneralCommon");
+
+
+
+        }
         #region Erp Entegrasyonları
         [HttpGet]
         public async Task<IActionResult> Erp()
@@ -1771,7 +1815,6 @@ namespace Entegro.Web.Controllers
             return Json(new { success = false, message = "Silinecek E-Fatura Bulunamadı" });
         }
         #endregion
-
 
     }
 }

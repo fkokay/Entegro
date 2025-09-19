@@ -43,6 +43,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IShipmentService, ShipmentService>();
             services.AddScoped<IShipmentItemService, ShipmentItemService>();
             services.AddScoped<IProductSpecificationAttributeMappingService, ProductSpecificationAttributeMappingService>();
+            services.AddScoped<ISettingService, SettingService>();
 
             services.AddScoped<IEventPublisher, EventBus>();
             services.AddHttpClient();

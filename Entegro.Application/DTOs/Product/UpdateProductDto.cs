@@ -10,13 +10,16 @@ namespace Entegro.Application.DTOs.Product
         public string Code { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
+        public string? ManufacturerPartNumber { get; set; }
+        public string? Gtin { get; set; }
         public decimal Price { get; set; }
+        public decimal OldPrice { get; set; }
+        public decimal SpecialPrice { get; set; }
         public string? Currency { get; set; }
         public string? Unit { get; set; }
         public decimal VatRate { get; set; }
         public bool VatInc { get; set; }
         public int? BrandId { get; set; }
-        public BrandDto? Brand { get; set; }
         public int StockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }
@@ -26,9 +29,12 @@ namespace Entegro.Application.DTOs.Product
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
         public string? Barcode { get; set; }
-        public string? ManufacturerPartNumber { get; set; }
-        public string? Gtin { get; set; }
-        public bool Published { get; set; } = true;
+        public int? MainPictureId { get; set; }
+        public bool Published { get; set; }
+        public bool Deleted { get; set; }
+        public DateTime CreatedOnUtc { get; set; }
+        public DateTime UpdatedOnUtc { get; set; }
+        public BrandDto? Brand { get; set; }
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
         public List<ProductVariantAttributeCombinationDto> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationDto>();
     }
