@@ -44,6 +44,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IShipmentItemService, ShipmentItemService>();
             services.AddScoped<IProductSpecificationAttributeMappingService, ProductSpecificationAttributeMappingService>();
             services.AddScoped<ISettingService, SettingService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             services.AddScoped<IEventPublisher, EventBus>();
             services.AddHttpClient();
