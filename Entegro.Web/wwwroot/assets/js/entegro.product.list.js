@@ -237,12 +237,12 @@ Entegro.product.list = (function ($) {
                 },
                 { data: 'BrandId', visible: false },
                 { data: 'Name' },
-                { data: 'Code' },
                 { data: 'Barcode' },
                 {
                     data: 'Price',
                     render: $.fn.dataTable.render.number(".", ",", 2)
                 },
+                { data: 'StockQuantity'},
                 {
                     data: 'UpdatedOnUtc',
                     render: function (data, type) {
@@ -282,20 +282,21 @@ Entegro.product.list = (function ($) {
                                       </div>
                                       <div class="d-flex flex-column">
                                           <h6 class="mb-0">${row.Name}</h6>
+                                          <small class="text-truncate">${row.Code || ""}</small>
                                           <small class="text-truncate">${row.Brand?.Name || ""}</small>
                                       </div>
                                   </div>`;
                     }
                 },
                 {
-                    targets: 8,
+                    targets: -2,
                     className: "text-center",
                     render: data => {
                         const checked = data ? "checked" : "";
                         const titleText = data ? "Yayında" : "Yayında Değil";
                         return `
                                 <div class="form-check d-inline-flex justify-content-center">
-                                    <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
+                                    <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
                                 </div>`;
                     }
                 },
@@ -526,7 +527,6 @@ Entegro.product.list = (function ($) {
             }
         });
     }
-
     function deleteIntegration(integrationId) {
         Swal.fire({
             title: 'Emin misiniz?',

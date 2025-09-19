@@ -1,4 +1,6 @@
-﻿using Entegro.Domain.Entities.Content;
+﻿using AngleSharp.Dom;
+using Entegro.Domain.Entities.Content;
+using Entegro.Domain.Entities.Integration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -38,7 +40,7 @@ namespace Entegro.Domain.Entities.Catalog
 
             builder.Property(p => p.Price).HasPrecision(18, 4);
             builder.Property(p => p.OldPrice).HasPrecision(18, 4);
-            builder.Property(p => p.SpecialPrice).HasPrecision(18, 4);
+            builder.Property(p => p.SalePrice).HasPrecision(18, 4);
             builder.Property(p => p.VatRate).HasPrecision(18, 4);
             builder.Property(p => p.Weight).HasPrecision(18, 4);
             builder.Property(p => p.Length).HasPrecision(18, 4);
@@ -48,16 +50,25 @@ namespace Entegro.Domain.Entities.Catalog
     }
 
     [Table("Product")]
-    public class Product : BaseEntity, ISoftDeletable, IAuditable
+    [Index(nameof(Deleted), Name = "IX_Product_Deleted")]
+    [Index(nameof(IsTransient), Name = "IX_Product_IsTransient")]
+    [Index(nameof(Gtin), Name = "IX_Product_Gtin")]
+    [Index(nameof(ManufacturerPartNumber), Name = "IX_Product_ManufacturerPartNumber")]
+    [Index(nameof(Name), Name = "IX_Product_Name")]
+    [Index(nameof(Code), Name = "IX_Product_Code")]
+    [Index(nameof(Published), Name = "IX_Product_Published")]
+    public class Product : BaseEntity, ISoftDeletable, IAuditable, ITransient
     {
+
         public string Code { get; set; }
         public string Name { get; set; }
+        public string? ShortDescription { get; set; }
         public string? Description { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public string? Gtin { get; set; }
         public decimal Price { get; set; }
         public decimal OldPrice { get; set; }
-        public decimal SpecialPrice { get; set; }
+        public decimal SalePrice { get; set; }
         public string? Currency { get; set; }
         public string? Unit { get; set; }
         public decimal VatRate { get; set; }
@@ -75,8 +86,12 @@ namespace Entegro.Domain.Entities.Catalog
         public string? Barcode { get; set; }
         public int? MainPictureId { get; set; }
         public virtual MediaFile? MainPicture { get; set; }
+        public int? IntegrationSystemId { get; set; }
+        public virtual IntegrationSystem? IntegrationSystem { get; set; }
+        public string? IntegrationSku { get; set; }
         public bool Published { get; set; } = true;
         public bool Deleted { get; set; } = false;
+        public bool IsTransient { get; set; } = false;
         public DateTime CreatedOnUtc { get; set; }
         public DateTime UpdatedOnUtc { get; set; }
         public virtual ICollection<ProductMediaFile> ProductMediaFiles { get; set; } = new HashSet<ProductMediaFile>();
@@ -84,5 +99,6 @@ namespace Entegro.Domain.Entities.Catalog
         public virtual ICollection<ProductVariantAttribute> ProductVariantAttributes { get; set; } = new HashSet<ProductVariantAttribute>();
         public virtual ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; } = new HashSet<ProductVariantAttributeCombination>();
         public virtual ICollection<ProductIntegration> ProductIntegrations { get; set; } = new HashSet<ProductIntegration>();
+
     }
 }
