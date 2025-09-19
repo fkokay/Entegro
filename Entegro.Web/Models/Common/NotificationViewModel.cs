@@ -1,5 +1,5 @@
-﻿using Entegro.Application.DTOs.User;
-using Entegro.Domain.Enums;
+﻿using Entegro.Domain.Enums;
+using Entegro.Web.Models.Platform.Identity;
 
 namespace Entegro.Web.Models.Common
 {
@@ -12,6 +12,6 @@ namespace Entegro.Web.Models.Common
         public DateTime NotificationDate { get; set; }
         public bool IsRead { get; set; }
         public int? UserId { get; set; }
-        public UserDto User { get; set; }
+        public UserViewModel User { get; set; }
     }
 }
