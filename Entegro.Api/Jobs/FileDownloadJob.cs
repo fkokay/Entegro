@@ -1,6 +1,4 @@
-﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Category;
-using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.Interfaces.Services;
 using Quartz;
 using System.Xml.Linq;
 
@@ -54,7 +52,10 @@ namespace Entegro.Api.Jobs
                     folderName
                 );
 
-                Directory.CreateDirectory(appDataPath);
+
+                if (!Directory.Exists(appDataPath))
+                    Directory.CreateDirectory(appDataPath);
+
                 var fullFilePath = Path.Combine(appDataPath, fileName);
                 await File.WriteAllTextAsync(fullFilePath, xmlContent);
                 Console.WriteLine($"XML file saved to: {fullFilePath}");
@@ -70,8 +71,6 @@ namespace Entegro.Api.Jobs
                 string xmlFilePath = files[0];
                 XDocument xDoc = XDocument.Load(xmlFilePath);
 
-                decimal priceAdjustment = profile.PriceAdjustmentAmount ?? 0;
-                decimal optionalExtra = profile.OptionalExtraAmount ?? 0;
                 var products = xDoc.Descendants("Product")
                  .Select(p =>
                  {
@@ -84,6 +83,12 @@ namespace Entegro.Api.Jobs
                      decimal priceAdjustment = profile.PriceAdjustmentAmount ?? 0;
                      decimal optionalExtra = profile.OptionalExtraAmount ?? 0;
                      decimal adjustedPrice = price * priceAdjustment / 100 + price + optionalExtra;
+                     string images = string.Join(",",
+                         p.Elements()
+                          .Where(e => e.Name.LocalName.StartsWith("Image", StringComparison.OrdinalIgnoreCase))
+                          .Select(e => e.Value?.Trim())
+                          .Where(val => !string.IsNullOrWhiteSpace(val)));
+
 
                      return new
                      {
@@ -97,6 +102,7 @@ namespace Entegro.Api.Jobs
                          CostPrice = price,
                          CurrencyType = p.Element("CurrencyType")?.Value,
                          Tax = tax,
+                         Image = images,
                          Description = p.Element("Description")?.Value,
                          Variants = p.Elements("variants").Elements("variant").Select(v => new
                          {
@@ -110,90 +116,91 @@ namespace Entegro.Api.Jobs
                 foreach (var p in products)
                 {
 
-                    if (await _productService.ExistsByCodeAsync(p.ProductCode))
-                        continue;
+                    //if (await _productService.ExistsByCodeAsync(p.ProductCode))
+                    //    continue;
 
 
-                    BrandDto brand;
-                    if (!string.IsNullOrWhiteSpace(p.Brand))
-                    {
-                        var existingBrand = await _brandService.GetByNameAsync(p.Brand);
-                        if (existingBrand != null)
-                        {
-                            brand = existingBrand;
-                        }
-                        else
-                        {
-                            brand = await _brandService.CreateAsync(new Application.DTOs.Brand.CreateBrandDto
-                            {
-                                DisplayOrder = 0,
-                                Name = p.Brand,
-                                Published = false
-                            });
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Ürün {p.ProductCode} için marka bilgisi eksik, atlanıyor.");
-                        continue;
-                    }
+                    //BrandDto brand;
+                    //if (!string.IsNullOrWhiteSpace(p.Brand))
+                    //{
+                    //    var existingBrand = await _brandService.GetByNameAsync(p.Brand);
+                    //    if (existingBrand != null)
+                    //    {
+                    //        brand = existingBrand;
+                    //    }
+                    //    else
+                    //    {
+                    //        brand = await _brandService.CreateAsync(new Application.DTOs.Brand.CreateBrandDto
+                    //        {
+                    //            DisplayOrder = 0,
+                    //            Name = p.Brand,
+                    //            Published = false
+                    //        });
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine($"Ürün {p.ProductCode} için marka bilgisi eksik, atlanıyor.");
+                    //    continue;
+                    //}
 
-                    CategoryDto category;
-                    if (!string.IsNullOrWhiteSpace(p.Category))
-                    {
-                        var existingCategory = await _categoryService.GetCategoryByNameAsync(p.Category);
-                        if (existingCategory != null)
-                        {
-                            category = existingCategory;
-                        }
-                        else
-                        {
-                            category = await _categoryService.CreateCategoryAsync(new Application.DTOs.Category.CreateCategoryDto
-                            {
-                                DisplayOrder = 0,
-                                Name = p.Category,
-                                Published = false
-                            });
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Ürün {p.ProductCode} için kategori bilgisi eksik, atlanıyor.");
-                        continue;
-                    }
+                    //CategoryDto category;
+                    //if (!string.IsNullOrWhiteSpace(p.Category))
+                    //{
+                    //    var existingCategory = await _categoryService.GetCategoryByNameAsync(p.Category);
+                    //    if (existingCategory != null)
+                    //    {
+                    //        category = existingCategory;
+                    //    }
+                    //    else
+                    //    {
+                    //        category = await _categoryService.CreateCategoryAsync(new Application.DTOs.Category.CreateCategoryDto
+                    //        {
+                    //            DisplayOrder = 0,
+                    //            Name = p.Category,
+                    //            Published = false
+                    //        });
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine($"Ürün {p.ProductCode} için kategori bilgisi eksik, atlanıyor.");
+                    //    continue;
+                    //}
 
-                    // Ürün modelini oluştur
-                    var model = new Application.DTOs.Product.CreateProductDto
-                    {
-                        Code = p.ProductCode,
-                        Name = p.Name,
-                        Description = p.Description,
-                        ManufacturerPartNumber = null,
-                        Gtin = null,
-                        Price = p.Price,
-                        OldPrice = 0,
-                        SpecialPrice = 0,
-                        Currency = p.CurrencyType,
-                        Unit = "Adet",
-                        VatRate = p.Tax,
-                        VatInc = true,
-                        BrandId = brand.Id,
-                        StockQuantity = (int)p.Stock,
-                        Weight = 0,
-                        Length = 0,
-                        Height = 0,
-                        Width = 0,
-                        MetaKeywords = null,
-                        MetaDescription = null,
-                        MetaTitle = null,
-                        MainPictureId = null,
-                        Barcode = null,
-                        Published = false,
-                        Deleted = false,
-                    };
+                    //// Ürün modelini oluştur
+                    //var model = new Application.DTOs.Product.CreateProductDto
+                    //{
+                    //    Code = p.ProductCode,
+                    //    Name = p.Name,
+                    //    Description = p.Description,
+                    //    ManufacturerPartNumber = null,
+                    //    Gtin = null,
+                    //    Price = p.Price,
+                    //    OldPrice = 0,
+                    //    SpecialPrice = 0,
+                    //    Currency = p.CurrencyType,
+                    //    Unit = "Adet",
+                    //    VatRate = p.Tax,
+                    //    VatInc = true,
+                    //    BrandId = brand.Id,
+                    //    StockQuantity = (int)p.Stock,
+                    //    Weight = 0,
+                    //    Length = 0,
+                    //    Height = 0,
+                    //    Width = 0,
+                    //    MetaKeywords = null,
+                    //    MetaDescription = null,
+                    //    MetaTitle = null,
+                    //    MainPictureId = null,
+                    //    Barcode = null,
+                    //    Published = false,
+                    //    Deleted = false,
+                    //};
 
 
-                    await _productService.CreateProductAsync(model);
+                    //await _productService.CreateProductAsync(model);
+
 
                     // Loglama
                     Console.WriteLine($"Ürün Kodu: {p.ProductCode}");
@@ -204,6 +211,7 @@ namespace Entegro.Api.Jobs
                     Console.WriteLine($"Marka: {p.Brand}");
                     Console.WriteLine($"Fiyatı: {p.Price} {p.CurrencyType}");
                     Console.WriteLine($"Maliyet Fiyatı: {p.CostPrice} {p.CurrencyType}");
+                    Console.WriteLine($"Resimler: {p.Image}");
                     Console.WriteLine($"Stok: {p.Stock}");
                     Console.WriteLine($"KDV: {p.Tax}%");
                     Console.WriteLine($"Açıklama: {p.Description}");
