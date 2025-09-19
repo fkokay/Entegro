@@ -16,14 +16,17 @@ namespace Entegro.Api.Jobs
         private readonly ICategoryService _categoryService;
         private readonly IBrandService _brandService;
         private readonly IProductImageMappingService _productImageMappingService;
+        private readonly IProductCategoryService _productCategoryService;
 
-        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductImageMappingService productImageMappingService)
+
+        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductImageMappingService productImageMappingService, IProductCategoryService productCategoryService)
         {
             _importProfileService = importProfileService;
             _productService = productService;
             _categoryService = categoryService;
             _brandService = brandService;
             _productImageMappingService = productImageMappingService;
+            _productCategoryService = productCategoryService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -293,6 +296,18 @@ namespace Entegro.Api.Jobs
                         });
                         orderIndex++;
                     }
+
+                    var categoryDto = await _categoryService.GetCategoryByNameAsync(p.Category);
+                    if (categoryDto == null)
+                    {
+                        return;
+                    }
+                    var newProductCategory = new Application.DTOs.ProductCategory.CreateProductCategoryDto
+                    {
+                        ProductId = createdProduct.Id,
+                        CategoryId = categoryDto.Id
+                    };
+                    await _productCategoryService.CreateProductCategoryAsync(newProductCategory);
 
                     // Loglama
                     Console.WriteLine($"Ürün Kodu: {p.ProductCode}");

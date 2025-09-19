@@ -160,7 +160,7 @@ namespace Entegro.Application.Services
                 return GetCategoryPath(treeNode, aliasPattern, separator);
             }
 
-            return string.Empty;
+            return categoryNode.Name;
         }
 
         public string GetCategoryPath(TreeNode<ICategoryNode> treeNode, string aliasPattern = null, string separator = " » ")
