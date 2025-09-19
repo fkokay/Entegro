@@ -13,6 +13,7 @@ using Entegro.Application.DTOs.IntegrationSystemLog;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.MediaFolder;
+using Entegro.Application.DTOs.Notification;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.OrderNote;
@@ -175,6 +176,12 @@ namespace Entegro.Application.Mappings
             config.NewConfig<Setting, SettingDto>().TwoWays();
             config.NewConfig<Setting, CreateSettingDto>().TwoWays();
             config.NewConfig<Setting, UpdateSettingDto>().TwoWays();
+
+            // ---------------- Notification ----------------
+
+            config.NewConfig<Notification, NotificationDto>().TwoWays();
+            config.NewConfig<Notification, CreateNotificationDto>().TwoWays();
+            config.NewConfig<Notification, UpdateNotificationDto>().TwoWays();
 
 
         }
