@@ -30,48 +30,39 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> GeneralCommon()
         {
-            CreateGeneralCommonViewModel model = new CreateGeneralCommonViewModel();
             var settings = await _settingService.GetAllAsync();
-            ViewBag.Settings = string.Join(", ", settings.Select(s => s.Value));
+
+            CreateGeneralCommonViewModel model = new CreateGeneralCommonViewModel();
+            model.SystemApiUrl = settings.Where(m => m.Key == "SystemApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
+
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateSetting(CreateGeneralCommonViewModel model)
         {
-            var existingSetting = await _settingService.GetByKeyAsync(model.Key);
-
-            string[] newValues = model.Value?.Split(',') ?? Array.Empty<string>();
-            string[] existingValues = existingSetting?.Value?.Split(',') ?? Array.Empty<string>();
-
-            bool valuesAreEqual = newValues.Length == existingValues.Length &&
-                                  !newValues.Except(existingValues).Any() &&
-                                  !existingValues.Except(newValues).Any();
-
-            if (existingSetting != null)
+            var systemApiUrlExists = await _settingService.ExistsByKeyAsync("SystemApiUrl");
+            if (systemApiUrlExists)
             {
-                if (!valuesAreEqual)
-                {
-                    await _settingService.UpdateAsync(new UpdateSettingDto
-                    {
-                        Id = existingSetting.Id,
-                        Key = model.Key,
-                        Value = model.Value
-                    });
-                }
+                var sysApiUrl = await _settingService.GetByKeyAsync("SystemApiUrl");
+
+                UpdateSettingDto updateSetting = new UpdateSettingDto();
+                updateSetting.Id = sysApiUrl.Id;
+                updateSetting.Key = sysApiUrl.Key;
+                updateSetting.Value = sysApiUrl.Value;
+                await _settingService.UpdateAsync(updateSetting);
             }
             else
             {
-                await _settingService.CreateAsync(new CreateSettingDto
-                {
-                    Key = model.Key,
-                    Value = model.Value
-                });
+                var sysApiUrl = await _settingService.GetByKeyAsync("SystemApiUrl");
+
+                CreateSettingDto createSetting = new CreateSettingDto();
+                createSetting.Key = sysApiUrl.Key;
+                createSetting.Value = sysApiUrl.Value;
+                await _settingService.CreateAsync(createSetting);
             }
 
             return RedirectToAction("GeneralCommon");
-
-
-
         }
         #region Erp Entegrasyonları
         [HttpGet]

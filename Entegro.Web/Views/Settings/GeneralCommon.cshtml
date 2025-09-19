@@ -1,47 +1,50 @@
 ﻿@model CreateGeneralCommonViewModel
 
-<div class="container-fluid flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sistem Ayarları /</span></h4>
+<form asp-action="CreateOrUpdateSetting" id="setting-form">
+    <div class="container-fluid flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">Sistem Ayarları</h4>
 
-    <div class="row">
-        <div class="col-lg-12 col-12 mb-lg-0 mb-4">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <ul class="nav nav-tabs card-header-tabs" id="setting-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" type="button" role="tab">Sistem Ayarları</button>
-                        </li>
+        <div class="row">
+            <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" role="tab" aria-selected="true">
+                                    Genel Ayarlar
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
 
-                    </ul>
-                </div>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
-                        <div class="row g-3 p-3">
-                            <form asp-action="CreateOrUpdateSetting" id="setting-form">
+                    <div class="tab-content">
+                        <!-- Personal Info -->
+                        <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
+                            <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="row">
-                                            <label class="col-sm-3 col-form-label text-sm-start" asp-for="Value">Servis Api Url</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" value="@ViewBag.Settings" asp-for="Value" class="form-control" required />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 mt-3">
-                                        <div class="text-center">
-                                            <button type="submit" class="btn btn-primary w-25 mb-2">
-                                                <span class="d-flex align-items-center justify-content-center text-nowrap">Kaydet</span>
-                                            </button>
-                                        </div>
+                                    <label class="col-sm-3 col-form-label text-sm-start" for="SystemApiUrl">Entegro Api Url</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" asp-for="SystemApiUrl" class="form-control" required />
                                     </div>
                                 </div>
-                            </form>
+                            </div>
+
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
+                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
+                        </button>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-label-secondary d-grid w-100 waves-effect">Vazgeç</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 
 

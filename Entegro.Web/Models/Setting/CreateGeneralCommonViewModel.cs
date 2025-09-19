@@ -2,7 +2,7 @@
 {
     public class CreateGeneralCommonViewModel
     {
-        public string Key { get; set; } = "SystemApiUrl";
-        public string? Value { get; set; }
+ 
+        public string SystemApiUrl { get; set; }
     }
 }
