@@ -17,6 +17,7 @@ using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
+using Entegro.Application.DTOs.User;
 using Entegro.Web.Models;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Brands;
@@ -26,6 +27,7 @@ using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
 using Entegro.Web.Models.Checkout.Orders;
 using Entegro.Web.Models.Common;
 using Entegro.Web.Models.Content;
+using Entegro.Web.Models.Platform.Identity;
 using Entegro.Web.Models.Platform.Messaging;
 using Mapster;
 
@@ -104,6 +106,10 @@ namespace Entegro.Web.Mappings
             config.NewConfig<AddressModel, AddressDto>().TwoWays();
             config.NewConfig<AddressModel, CreateAddressDto>().TwoWays();
             config.NewConfig<AddressModel, UpdateAddressDto>().TwoWays();
+
+            config.NewConfig<UserModel, UserDto>().TwoWays();
+            config.NewConfig<UserModel, CreateUserDto>().TwoWays();
+            config.NewConfig<UserModel, UpdateUserDto>().TwoWays();
 
             config.NewConfig<MediaFileModel, MediaFileDto>().TwoWays();
             config.NewConfig<MediaFolderModel, MediaFolderModel>().TwoWays();
