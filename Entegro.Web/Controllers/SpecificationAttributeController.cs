@@ -32,11 +32,11 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult SpecificationAttributeCreatePopup()
         {
-            return PartialView("_SpecificationAttributeCreatePopup", new CreateSpecificationAttributeModel());
+            return PartialView("_SpecificationAttributeCreatePopup", new SpecificationAttributeModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> SpecificationAttributeCreate([FromBody] CreateSpecificationAttributeModel model)
+        public async Task<IActionResult> SpecificationAttributeCreate([FromBody] SpecificationAttributeModel model)
         {
             await _specificationAttributeService.CreateAsync(new CreateSpecificationAttributeDto
             {
@@ -64,7 +64,7 @@ namespace Entegro.Web.Controllers
             return View(specificationAttributeModel);
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateSpecificationAttributeModel model)
+        public async Task<IActionResult> Edit(SpecificationAttributeModel model)
         {
             await _specificationAttributeService.UpdateAsync(new UpdateSpecificationAttributeDto
             {
@@ -93,12 +93,12 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult SpecificationAttributeOptionCreatePopup(int id)
         {
-            CreateSpecificationAttributeOptionModel model = new CreateSpecificationAttributeOptionModel();
+            SpecificationAttributeOptionModel model = new SpecificationAttributeOptionModel();
             model.SpecificationAttributeId = id;
             return PartialView("_SpecificationAttributeOptionCreatePopup", model);
         }
         [HttpPost]
-        public async Task<IActionResult> SpecificationAttributeOptionCreate([FromBody] CreateSpecificationAttributeOptionModel model)
+        public async Task<IActionResult> SpecificationAttributeOptionCreate([FromBody] SpecificationAttributeOptionModel model)
         {
             await _specificationAttributeOptionService.CreateAsync(new CreateSpecificationAttributeOptionDto
             {

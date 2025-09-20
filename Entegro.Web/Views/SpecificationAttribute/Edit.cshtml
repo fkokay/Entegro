@@ -21,7 +21,7 @@
                     <div class="tab-content">
 
                         <div class="tab-pane fade show active" id="form-tabs-attribute" role="tabpanel">
-                            @await Html.PartialAsync("_SpecificationAttributeEdit", new UpdateSpecificationAttributeModel { Id = Model.Id, Name = Model.Name })
+                            @await Html.PartialAsync("_SpecificationAttributeEdit", new SpecificationAttributeModel { Id = Model.Id, Name = Model.Name })
                         </div>
 
                         <div class="tab-pane fade" id="form-tabs-attributeOption" role="tabpanel">
