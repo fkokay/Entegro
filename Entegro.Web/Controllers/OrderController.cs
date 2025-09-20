@@ -79,10 +79,10 @@ namespace Entegro.Web.Controllers
                 Customer = new CustomerViewModel
                 {
                     Id = orderDetail.Customer.Id,
-                    UpdatedOn = orderDetail.Customer.UpdatedOnUtc,
+                    UpdatedOn = orderDetail.Customer.UpdatedOn,
                     Address = orderDetail.Customer.Address,
                     City = orderDetail.Customer.City,
-                    CreatedOn = orderDetail.Customer.CreatedOnUtc,
+                    CreatedOn = orderDetail.Customer.CreatedOn,
                     District = orderDetail.Customer.District,
                     CustomerType = orderDetail.Customer.CustomerType,
                     Email = orderDetail.Customer.Email,
@@ -199,10 +199,10 @@ namespace Entegro.Web.Controllers
                 Customer = orderDetail.Customer == null ? null : new CustomerViewModel
                 {
                     Id = orderDetail.Customer.Id,
-                    UpdatedOn = orderDetail.Customer.UpdatedOnUtc,
+                    UpdatedOn = orderDetail.Customer.UpdatedOn,
                     Address = orderDetail.Customer.Address,
                     City = orderDetail.Customer.City,
-                    CreatedOn = orderDetail.Customer.CreatedOnUtc,
+                    CreatedOn = orderDetail.Customer.CreatedOn,
                     District = orderDetail.Customer.District,
                     CustomerType = orderDetail.Customer.CustomerType,
                     Email = orderDetail.Customer.Email,
