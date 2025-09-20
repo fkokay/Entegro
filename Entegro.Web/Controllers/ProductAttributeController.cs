@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Attributes;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +12,11 @@ namespace Entegro.Web.Controllers
     public class ProductAttributeController : Controller
     {
         private readonly IProductAttributeService _productAttributeService;
-        public ProductAttributeController(IProductAttributeService productAttributeService)
+        private readonly IMapper _mapper;
+        public ProductAttributeController(IProductAttributeService productAttributeService,IMapper mapper)
         {
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         public IActionResult Index()
         {
@@ -27,18 +30,12 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> CreateOrUpdate(int id)
         {
-            ProductAttributeModel model = new ProductAttributeModel();
-            if (id > 0)
+            var productAttribute = await _productAttributeService.GetByIdAsync(id);
+            if (productAttribute == null)
             {
-                var productAttribute = await _productAttributeService.GetByIdAsync(id);
-                if (productAttribute != null)
-                {
-                    model.Id = productAttribute.Id;
-                    model.DisplayOrder = productAttribute.DisplayOrder;
-                    model.Description = productAttribute.Description;
-                    model.Name = productAttribute.Name;
-                }
+                return NotFound();
             }
+            var model = _mapper.Map<ProductAttributeModel>(productAttribute);
             return PartialView("_CreateOrUpdate", model);
         }
 
@@ -47,24 +44,13 @@ namespace Entegro.Web.Controllers
         {
             if (model.Id > 0)
             {
-                var updateModelDto = new UpdateProductAttributeDto
-                {
-                    Description = model.Description,
-                    Name = model.Name,
-                    Id = model.Id,
-                    DisplayOrder = model.DisplayOrder,
-                };
-                await _productAttributeService.UpdateAsync(updateModelDto);
+                var updateDto = _mapper.Map<UpdateProductAttributeDto>(model);
+                await _productAttributeService.UpdateAsync(updateDto);
                 return Json(new { success = true });
             }
 
-            var createModelDto = new CreateProductAttributeDto
-            {
-                Description = model.Description,
-                Name = model.Name,
-                DisplayOrder = model.DisplayOrder
-            };
-            await _productAttributeService.AddAsync(createModelDto);
+            var createDto = _mapper.Map<CreateProductAttributeDto>(model);
+            await _productAttributeService.AddAsync(createDto);
             return Json(new { success = true });
         }
 

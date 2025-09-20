@@ -1,7 +1,10 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Web.Models.Catalog.Attributes;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,10 +16,15 @@ namespace Entegro.Web.Controllers
     {
         private readonly IProductAttributeValueService _productAttributeValueService;
         private readonly IProductAttributeService _productAttributeService;
-        public ProductAttributeValueController(IProductAttributeValueService productAttributeValueService, IProductAttributeService productAttributeService)
+        private readonly IMapper _mapper;
+        public ProductAttributeValueController(
+            IProductAttributeValueService productAttributeValueService,
+            IProductAttributeService productAttributeService,
+            IMapper mapper)
         {
             _productAttributeValueService = productAttributeValueService ?? throw new ArgumentNullException(nameof(productAttributeValueService));
             _productAttributeService = productAttributeService;
+            _mapper = mapper;
         }
         public IActionResult Index()
         {
@@ -29,26 +37,38 @@ namespace Entegro.Web.Controllers
         }
         public async Task<IActionResult> CreateOrUpdate(int id)
         {
-            ProductAttributeValueModel model = new ProductAttributeValueModel();
+            if (id > 0)
+            {
+                var productAttributeValue = await _productAttributeValueService.GetByIdAsync(id);
+                if (productAttributeValue == null)
+                {
+                    return NotFound();
+                }
+
+                var model = _mapper.Map<ProductAttributeValueModel>(productAttributeValue);
+                await PrepareProductAttributeValueModel(model, productAttributeValue);
+
+                return PartialView("_CreateOrUpdate", model);
+            }
+            else
+            {
+                ProductAttributeValueModel model = new ProductAttributeValueModel();
+                await PrepareProductAttributeValueModel(model, null);
+
+                return PartialView("_CreateOrUpdate", model);
+            }
+  
+        }
+
+        private async Task PrepareProductAttributeValueModel(ProductAttributeValueModel model, ProductAttributeValueDto? value)
+        {
             var productAttributes = await _productAttributeService.GetAllAsync();
+
             ViewBag.ProductAttributes = productAttributes.Select(m => new SelectListItem()
             {
                 Text = m.Name,
                 Value = m.Id.ToString()
             }).ToList();
-
-            if (id > 0)
-            {
-                var productAttributeValue = await _productAttributeValueService.GetByIdAsync(id);
-                if (productAttributeValue != null)
-                {
-                    model.Id = productAttributeValue.Id;
-                    model.ProductAttributeId = productAttributeValue.ProductAttributeId;
-                    model.DisplayOrder = productAttributeValue.DisplayOrder;
-                    model.Name = productAttributeValue.Name;
-                }
-            }
-            return PartialView("_CreateOrUpdate", model);
         }
 
         [HttpPost]
@@ -56,24 +76,13 @@ namespace Entegro.Web.Controllers
         {
             if (model.Id > 0)
             {
-                var updateModelDto = new UpdateProductAttributeValueDto
-                {
-                    ProductAttributeId = model.ProductAttributeId,
-                    Name = model.Name,
-                    Id = model.Id,
-                    DisplayOrder = model.DisplayOrder,
-                };
-                await _productAttributeValueService.UpdateAsync(updateModelDto);
+                var updateDto = _mapper.Map<UpdateProductAttributeValueDto>(model);
+                await _productAttributeValueService.UpdateAsync(updateDto);
                 return Json(new { success = true });
             }
 
-            var createModelDto = new CreateProductAttributeValueDto
-            {
-                ProductAttributeId = model.ProductAttributeId,
-                Name = model.Name,
-                DisplayOrder = model.DisplayOrder,
-            };
-            await _productAttributeValueService.AddAsync(createModelDto);
+            var createDto = _mapper.Map<CreateProductAttributeValueDto>(model);
+            await _productAttributeValueService.AddAsync(createDto);
             return Json(new { success = true });
         }
 
@@ -112,5 +121,7 @@ namespace Entegro.Web.Controllers
             var results = data.Select(d => new { id = d.Id, text = d.Name, });
             return Json(new { results });
         }
+
+
     }
 }
