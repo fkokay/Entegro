@@ -179,13 +179,14 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            ProductModel model = new ProductModel();
 
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
+
+            var model = _mapper.Map<ProductModel>(product);
 
             await PrepareProductModel(model, product);
             return View(model);
