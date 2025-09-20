@@ -123,7 +123,7 @@ namespace Entegro.Application.Services
             {
                 foreach (var orderItem in x.OrderItems)
                 {
-                    orderItem.ProductMainPicture = orderItem.ProductMainPictureId.HasValue ? await _medaFileService.GetUrl(orderItem.ProductMainPictureId.Value) : "";
+                    orderItem.ProductMainPicture = orderItem.ProductMainPictureId.HasValue ? await _medaFileService.GetUrl(orderItem.ProductMainPictureId.Value) : "/assets/img/products/empty.jpg";
                 }
                 return x;
             }).AsyncToList();

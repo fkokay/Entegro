@@ -31,12 +31,12 @@ Entegro.order.OrderList = (function ($) {
                 { data: 'Id', visible: false }, // hidden ID
                 { data: 'IntegrationSystemId' },
                 { data: 'Id' },
-                { data: 'Customer.Name' },
+                { data: 'Customer.Name', width: '200px' },
                 { data: 'Id' },
                 { data: 'Id' },
                 { data: 'Id' },
                 { data: 'PaymentStatus' },
-                { data: 'Id', width: '200px', } // İşlemler
+                { data: 'Id', width: '150px', } // İşlemler
             ],
             columnDefs: [
                 {
@@ -121,7 +121,7 @@ Entegro.order.OrderList = (function ($) {
                                 items +=
                                     `<div class="d-flex mb-5 mt-5">
                                     <div class="me-5 position-relative">
-                                        <img src="${row.OrderItems[i].ProductMainPicture}" width="40" height="60"/>
+                                        <img src="${row.OrderItems[i].ProductMainPicture}" width="60"/>
                                         <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">${row.OrderItems[i].Quantity}</span>
                                     </div>
                                     <div>
@@ -168,7 +168,7 @@ Entegro.order.OrderList = (function ($) {
                         return `
                         <div>
                             <div>Tutar  :${row.OrderSubTotal} TL</div>
-                            <div>İndirim:${row.OrderDiscountTotal} TL</div>
+                            <div>İndirim:${row.OrderDiscount} TL</div>
                             <div>Faturalanacak Tutar</div>
                             <div class="mb-4"><b>${row.OrderTotal} TL</b></div>
                             <div class="text-warning mb-1">Fatura Bekleniyor</div>
