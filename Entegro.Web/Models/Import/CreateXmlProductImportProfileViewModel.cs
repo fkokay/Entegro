@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Import
 {
-    public class CreateXmlProductImportProfileViewModel
+    public class CreateXmlProductImportProfileModel
     {
         public string? Name { get; set; }
         public string? Brand { get; set; }

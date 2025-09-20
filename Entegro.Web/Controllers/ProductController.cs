@@ -111,7 +111,7 @@ namespace Entegro.Web.Controllers
         {
             var product = await _productService.GetProductByIdAsync(productId);
 
-            var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+            var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
             {
                 Id = m.Id,
                 ProductId = m.Id,
@@ -152,13 +152,13 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ProductViewModel model = new ProductViewModel();
+            ProductModel model = new ProductModel();
             await PrepareProductModel(model, null);
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProductViewModel model)
+        public async Task<IActionResult> Create(ProductModel model)
         {
             if (ModelState.IsValid)
             {
@@ -194,7 +194,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            ProductViewModel model = new ProductViewModel();
+            ProductModel model = new ProductModel();
 
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
@@ -207,7 +207,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(ProductViewModel model)
+        public async Task<IActionResult> Edit(ProductModel model)
         {
             if (ModelState.IsValid)
             {
@@ -320,7 +320,7 @@ namespace Entegro.Web.Controllers
             ViewBag.ProductId = productId;
             var productCategories = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
 
-            return PartialView("_CreateOrUpdate.Categories", productCategories.Select(x => new ProductCategoryViewModel
+            return PartialView("_CreateOrUpdate.Categories", productCategories.Select(x => new ProductCategoryModel
             {
                 Id = x.Id,
                 CategoryId = x.CategoryId,
@@ -333,14 +333,14 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult ProductCategoryCreatePopup(int productId)
         {
-            ProductCategoryViewModel model = new ProductCategoryViewModel();
+            ProductCategoryModel model = new ProductCategoryModel();
             model.ProductId = productId;
 
             return PartialView("_ProductCategoryCreatePopup");
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProductCategoryInsert([FromBody] ProductCategoryViewModel model)
+        public async Task<IActionResult> ProductCategoryInsert([FromBody] ProductCategoryModel model)
         {
             if (ModelState.IsValid)
             {
@@ -380,12 +380,12 @@ namespace Entegro.Web.Controllers
             ViewBag.ProductId = productId;
             var productSpecificationAttribute = await _productSpecificationAttributeMappingService.GetSpecificationAttributeByProductId(productId);
 
-            return PartialView("_CreateOrUpdate.SpecificationAttributes", productSpecificationAttribute.Select(x => new ProductSpecificationAttributeViewModel
+            return PartialView("_CreateOrUpdate.SpecificationAttributes", productSpecificationAttribute.Select(x => new ProductSpecificationAttributeModel
             {
                 Id = x.Id,
                 DisplayOrder = x.DisplayOrder,
                 ProductId = x.ProductId,
-                SpecificationAttributeOption = new SpecificationAttributeOptionViewModel
+                SpecificationAttributeOption = new SpecificationAttributeOptionModel
                 {
                     Id = x.SpecificationAttributeOption.Id,
                     Name = x.SpecificationAttributeOption.Name,
@@ -402,13 +402,13 @@ namespace Entegro.Web.Controllers
         {
             ViewBag.ProductId = productId;
             var productMediaFiles = await _productImageMappingService.GetAllAsync(productId);
-            var model = productMediaFiles.Select(m => new ProductMediaFileViewModel()
+            var model = productMediaFiles.Select(m => new ProductMediaFileModel()
             {
                 Id = m.Id,
                 DisplayOrder = m.DisplayOrder,
                 MediaFileId = m.MediaFileId,
                 ProductId = m.ProductId,
-                MediaFile = new MediaFileViewModel()
+                MediaFile = new MediaFileModel()
                 {
                     Alt = m.MediaFile.Alt,
                     CreatedOn = m.MediaFile.CreatedOn,
@@ -427,7 +427,7 @@ namespace Entegro.Web.Controllers
                     Title = m.MediaFile.Title,
                     UpdatedOn = m.MediaFile.UpdatedOn,
                     Width = m.MediaFile.Width,
-                    Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    Folder = m.MediaFile.Folder == null ? null : new MediaFolderModel()
                     {
                         Id = m.MediaFile.Folder.Id,
                         Name = m.MediaFile.Folder.Name,
@@ -611,7 +611,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProductIntegrationDialog(ProductIntegrationDialogViewModel model)
+        public async Task<IActionResult> ProductIntegrationDialog(ProductIntegrationDialogModel model)
         {
             var product = await _productService.GetProductByIdAsync(model.ProductId);
             var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
@@ -652,13 +652,13 @@ namespace Entegro.Web.Controllers
         }
 
         #region Marketplace Dialogs
-        private async Task<IActionResult> ProductIntegrationHepsiburadaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationHepsiburadaDialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "Hepsiburada";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new HepsiburadaProductIntegrationViewModel
+                var createModel = new HepsiburadaProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -674,7 +674,7 @@ namespace Entegro.Web.Controllers
                     Active = true,
                 };
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -713,7 +713,7 @@ namespace Entegro.Web.Controllers
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingHepsiburadaProduct = await _hepsiburadaService.GetProductWithMerchantSkuAsync(context, existingProductIntegration.IntegrationCode);
 
-                var createModel = new HepsiburadaProductIntegrationViewModel
+                var createModel = new HepsiburadaProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -732,10 +732,10 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<HepsiburadaProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<HepsiburadaProductIntegrationCustomModel>(existingProductIntegration.Custom);
                 }
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -762,13 +762,13 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        private async Task<IActionResult> ProductIntegrationPazaramaDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationPazaramaDialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "Pazarama";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new PazaramaProductIntegrationViewModel
+                var createModel = new PazaramaProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -784,7 +784,7 @@ namespace Entegro.Web.Controllers
                     Active = true,
                 };
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -821,7 +821,7 @@ namespace Entegro.Web.Controllers
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, existingProductIntegration.IntegrationCode);
 
-                var createModel = new PazaramaProductIntegrationViewModel
+                var createModel = new PazaramaProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -840,10 +840,10 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<PazaramaProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<PazaramaProductIntegrationCustomModel>(existingProductIntegration.Custom);
                 }
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -870,13 +870,13 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        private async Task<IActionResult> ProductIntegrationCicekSepetiDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationCicekSepetiDialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "CicekSepeti";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new CicekSepetiProductIntegrationViewModel
+                var createModel = new CicekSepetiProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -892,7 +892,7 @@ namespace Entegro.Web.Controllers
                     Active = true,
                 };
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -924,7 +924,7 @@ namespace Entegro.Web.Controllers
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingCicekSepetiProduct = "";
 
-                var createModel = new CicekSepetiProductIntegrationViewModel
+                var createModel = new CicekSepetiProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -943,10 +943,10 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<CicekSepetiProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<CicekSepetiProductIntegrationCustomModel>(existingProductIntegration.Custom);
                 }
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -973,13 +973,13 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        private async Task<IActionResult> ProductIntegrationN11Dialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationN11Dialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "N11";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new N11ProductIntegrationViewModel
+                var createModel = new N11ProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -995,7 +995,7 @@ namespace Entegro.Web.Controllers
                     Active = true,
                 };
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -1033,7 +1033,7 @@ namespace Entegro.Web.Controllers
                 //var existingN11Product = await _n11Service.GetProductWithN11CodeAsync(context, existingProductIntegration.IntegrationCode);
 
 
-                var createModel = new N11ProductIntegrationViewModel
+                var createModel = new N11ProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -1052,10 +1052,10 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<N11ProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<N11ProductIntegrationCustomModel>(existingProductIntegration.Custom);
                 }
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -1082,13 +1082,13 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        private async Task<IActionResult> ProductIntegrationIdefixDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationIdefixDialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "Idefix";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new IdefixProductIntegrationViewModel
+                var createModel = new IdefixProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -1104,7 +1104,7 @@ namespace Entegro.Web.Controllers
                     Active = true,
                 };
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -1136,7 +1136,7 @@ namespace Entegro.Web.Controllers
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingIdefixProduct = "";
 
-                var createModel = new IdefixProductIntegrationViewModel
+                var createModel = new IdefixProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -1155,10 +1155,10 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<IdefixProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<IdefixProductIntegrationCustomModel>(existingProductIntegration.Custom);
                 }
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -1185,13 +1185,13 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        private async Task<IActionResult> ProductIntegrationTrendyolDialog(ProductIntegrationDialogViewModel model, ProductDto product, IntegrationSystemDto integrationSystem)
+        private async Task<IActionResult> ProductIntegrationTrendyolDialog(ProductIntegrationDialogModel model, ProductDto product, IntegrationSystemDto integrationSystem)
         {
             var marketplaceType = "Trendyol";
 
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new TrendyolProductIntegrationViewModel
+                var createModel = new TrendyolProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -1207,7 +1207,7 @@ namespace Entegro.Web.Controllers
                     Active = true,
                 };
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -1244,7 +1244,7 @@ namespace Entegro.Web.Controllers
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, existingProductIntegration.IntegrationCode);
 
-                var createModel = new TrendyolProductIntegrationViewModel
+                var createModel = new TrendyolProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -1263,10 +1263,10 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<TrednyolProductIntegrationCustomViewModel>(existingProductIntegration.Custom);
+                    createModel.Custom = JsonConvert.DeserializeObject<TrednyolProductIntegrationCustomModel>(existingProductIntegration.Custom);
                 }
 
-                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                var productVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductId = m.Id,
@@ -1297,12 +1297,12 @@ namespace Entegro.Web.Controllers
 
 
         #region Commerce Dialogs
-        private async Task<IActionResult> ProductIntegrationSmartstoreDialog(ProductIntegrationDialogViewModel model, ProductDto? product, IntegrationSystemDto? integrationSystem)
+        private async Task<IActionResult> ProductIntegrationSmartstoreDialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto? integrationSystem)
         {
             var commerceType = "Smartstore";
             if (model.ProductIntegrationId == 0)
             {
-                var createModel = new SmartstoreProductIntegrationViewModel
+                var createModel = new SmartstoreProductIntegrationModel
                 {
                     Id = 0,
                     ProductId = product.Id,
@@ -1323,7 +1323,7 @@ namespace Entegro.Web.Controllers
             {
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
 
-                var createModel = new SmartstoreProductIntegrationViewModel
+                var createModel = new SmartstoreProductIntegrationModel
                 {
                     Id = existingProductIntegration.Id,
                     ProductId = existingProductIntegration.ProductId,
@@ -1340,8 +1340,8 @@ namespace Entegro.Web.Controllers
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
                 {
-                    createModel.Custom = JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomViewModel>(existingProductIntegration.Custom)
-                        ?? new SmartstoreProductIntegrationCustomViewModel();
+                    createModel.Custom = JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomModel>(existingProductIntegration.Custom)
+                        ?? new SmartstoreProductIntegrationCustomModel();
                 }
 
                 return PartialView($"_IntegrationDialog.Commerce.{commerceType}", createModel);
@@ -1351,7 +1351,7 @@ namespace Entegro.Web.Controllers
         #endregion
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationSmartstore(SmartstoreProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationSmartstore(SmartstoreProductIntegrationModel model)
         {
 
             try
@@ -1413,7 +1413,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationTrendyol(TrendyolProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationTrendyol(TrendyolProductIntegrationModel model)
         {
             try
             {
@@ -1494,7 +1494,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationCicekSepeti(CicekSepetiProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationCicekSepeti(CicekSepetiProductIntegrationModel model)
         {
             try
             {
@@ -1575,7 +1575,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationIdefix(IdefixProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationIdefix(IdefixProductIntegrationModel model)
         {
             try
             {
@@ -1656,7 +1656,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationN11(N11ProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationN11(N11ProductIntegrationModel model)
         {
             try
             {
@@ -1737,7 +1737,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationPazarama(PazaramaProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationPazarama(PazaramaProductIntegrationModel model)
         {
             try
             {
@@ -1818,7 +1818,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateProductIntegrationHepsiburada(HepsiburadaProductIntegrationViewModel model)
+        public async Task<IActionResult> CreateOrUpdateProductIntegrationHepsiburada(HepsiburadaProductIntegrationModel model)
         {
             try
             {
@@ -1945,7 +1945,7 @@ namespace Entegro.Web.Controllers
         }
         #endregion
 
-        private async Task PrepareProductModel(ProductViewModel model, ProductDto? product)
+        private async Task PrepareProductModel(ProductModel model, ProductDto? product)
         {
             if (product != null)
             {
@@ -1972,7 +1972,7 @@ namespace Entegro.Web.Controllers
                 model.ManufacturerPartNumber = product.ManufacturerPartNumber;
                 model.Published = product.Published;
                 model.SelectedProductAttributeIds = product.ProductVariantAttributes.Select(x => x.ProductAttributeId).ToArray();
-                model.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new ProductVariantAttributeViewModel()
+                model.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new ProductVariantAttributeModel()
                 {
                     AttributeControlTypeId = m.AttributeControlTypeId,
                     DisplayOrder = m.DisplayOrder,
@@ -1981,14 +1981,14 @@ namespace Entegro.Web.Controllers
                     ProductAttribute = m.ProductAttribute.Name,
                     ProductAttributeId = m.ProductAttributeId,
                     ProductId = m.ProductId,
-                    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new ProductVariantAttributeValueViewModel()
+                    ProductVariantAttributeValues = m.ProductVariantAttributeValues.Select(x => new ProductVariantAttributeValueModel()
                     {
                         Id = x.Id,
                         Name = x.Name,
                         ProductVariantAttributeId = x.ProductVariantAttributeId,
                     }).ToList()
                 }).ToList();
-                model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationViewModel()
+                model.ProductVariantAttributeCombinations = product.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationModel()
                 {
                     Id = m.Id,
                     ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
@@ -2000,13 +2000,13 @@ namespace Entegro.Web.Controllers
                     StokCode = m.StokCode,
                     AssignedPictureIds = m.AssignedPictureIds
                 }).ToList();
-                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileViewModel()
+                model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileModel()
                 {
                     Id = m.Id,
                     DisplayOrder = m.DisplayOrder,
                     MediaFileId = m.MediaFileId,
                     ProductId = m.ProductId,
-                    MediaFile = new MediaFileViewModel()
+                    MediaFile = new MediaFileModel()
                     {
                         Alt = m.MediaFile.Alt,
                         CreatedOn = m.MediaFile.CreatedOn,
@@ -2025,7 +2025,7 @@ namespace Entegro.Web.Controllers
                         Title = m.MediaFile.Title,
                         UpdatedOn = m.MediaFile.UpdatedOn,
                         Width = m.MediaFile.Width,
-                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                        Folder = m.MediaFile.Folder == null ? null : new MediaFolderModel()
                         {
                             Id = m.MediaFile.Folder.Id,
                             Name = m.MediaFile.Folder.Name,

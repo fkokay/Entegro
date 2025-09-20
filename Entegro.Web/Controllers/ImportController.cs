@@ -70,7 +70,7 @@ namespace Entegro.Web.Controllers
                 TempData["UploadedFilePath"] = windowsFilePath;
                 if (System.IO.File.Exists(windowsFilePath))
                 {
-                    var detail = new ExcelImportProfileViewModel();
+                    var detail = new ExcelImportProfileModel();
 
                     using var stream = new FileStream(windowsFilePath, FileMode.Open, FileAccess.Read);
                     using var workbook = new XLWorkbook(stream);
@@ -104,7 +104,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ImportData(ExcelImportProfileViewModel detail)
+        public async Task<IActionResult> ImportData(ExcelImportProfileModel detail)
         {
             var filePath = TempData["UploadedFilePath"] as string;
             if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
@@ -180,11 +180,11 @@ namespace Entegro.Web.Controllers
         #region XML Import
         public IActionResult Xml()
         {
-            XmlImportProfileViewModel model = new XmlImportProfileViewModel();
+            XmlImportProfileModel model = new XmlImportProfileModel();
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Xml(XmlImportProfileViewModel model)
+        public async Task<IActionResult> Xml(XmlImportProfileModel model)
         {
             if (string.IsNullOrWhiteSpace(model.MediaFileUrl))
                 return View(CreateErrorModel("Lütfen bir XML URL girin."));
@@ -210,9 +210,9 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        public IActionResult XmlMapping(XmlImportProfileViewModel model)
+        public IActionResult XmlMapping(XmlImportProfileModel model)
         {
-            CreateXmlImportProfileViewModel createModel = new CreateXmlImportProfileViewModel()
+            CreateXmlImportProfileModel createModel = new CreateXmlImportProfileModel()
             {
                 MediaFileUrl = model.MediaFileUrl,
                 ProfileName = model.ProfileName,
@@ -225,7 +225,7 @@ namespace Entegro.Web.Controllers
             return View(createModel);
         }
         [HttpPost]
-        public async Task<IActionResult> XmlMapping(CreateXmlImportProfileViewModel model, string SelectedImagePaths, string SelectedAttributeSpecifications, int VariantCount)
+        public async Task<IActionResult> XmlMapping(CreateXmlImportProfileModel model, string SelectedImagePaths, string SelectedAttributeSpecifications, int VariantCount)
         {
             UpdateVariantMappedProperties(model, VariantCount);
             UpdateImagesAndSpecifications(model, SelectedImagePaths, SelectedAttributeSpecifications, VariantCount);
@@ -355,7 +355,7 @@ namespace Entegro.Web.Controllers
                 }
             }
         }
-        private void UpdateVariantMappedProperties(CreateXmlImportProfileViewModel model, int variantCount)
+        private void UpdateVariantMappedProperties(CreateXmlImportProfileModel model, int variantCount)
         {
             var variantMappedProps = new[]
             {
@@ -387,7 +387,7 @@ namespace Entegro.Web.Controllers
                 }
             }
         }
-        private void UpdateImagesAndSpecifications(CreateXmlImportProfileViewModel model, string selectedImagePaths, string selectedAttributeSpecifications, int variantCount)
+        private void UpdateImagesAndSpecifications(CreateXmlImportProfileModel model, string selectedImagePaths, string selectedAttributeSpecifications, int variantCount)
         {
             model.CreateXmlProduct.Images = selectedImagePaths;
             model.CreateXmlProduct.AttributeSpecifications = selectedAttributeSpecifications;
@@ -416,7 +416,7 @@ namespace Entegro.Web.Controllers
                 model.CreateXmlProduct.AttributeSpecifications = string.Join(",", updatedSpecifications.Distinct());
             }
         }
-        private List<XmlColumnMappingResult> GetHeaderMappings(CreateXmlImportProfileViewModel model)
+        private List<XmlColumnMappingResult> GetHeaderMappings(CreateXmlImportProfileModel model)
         {
             return model.CreateXmlProduct.GetType().GetProperties()
                 .Where(p => p.PropertyType == typeof(string))
@@ -459,9 +459,9 @@ namespace Entegro.Web.Controllers
                 .OrderBy(p => p, StringComparer.OrdinalIgnoreCase)
                 .ToList();
         }
-        private XmlImportProfileViewModel CreateErrorModel(string errorMessage, string? mediaFileUrl = null)
+        private XmlImportProfileModel CreateErrorModel(string errorMessage, string? mediaFileUrl = null)
         {
-            return new XmlImportProfileViewModel
+            return new XmlImportProfileModel
             {
                 MediaFileUrl = mediaFileUrl,
                 Error = errorMessage

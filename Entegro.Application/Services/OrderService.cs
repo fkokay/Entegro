@@ -115,7 +115,7 @@ namespace Entegro.Application.Services
             return orderDtos;
         }
 
-        public async Task<PagedResult<OrderModel>> GetPagedAsync(GridCommand gridCommand,int orderStatus)
+        public async Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand,int orderStatus)
         {
             var orders = await _orderRepository.GetPagedAsync(gridCommand,orderStatus);
 
@@ -128,7 +128,7 @@ namespace Entegro.Application.Services
                 return x;
             }).AsyncToList();
 
-            return new PagedResult<OrderModel>
+            return new PagedResult<OrderListDto>
             {
                 Items = orders.Items,
                 TotalCount = orders.TotalCount,

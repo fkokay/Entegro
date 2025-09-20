@@ -30,7 +30,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            CategoryViewModel model = new CategoryViewModel()
+            CategoryModel model = new CategoryModel()
             {
                 Published = true
             };
@@ -38,7 +38,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CategoryViewModel model)
+        public async Task<IActionResult> Create(CategoryModel model)
         {
             var createDto = new CreateCategoryDto
             {
@@ -66,7 +66,7 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            var categoryModel = new CategoryViewModel
+            var categoryModel = new CategoryModel
             {
                 Id = category.Id,
                 CreatedOn = category.CreatedOn,
@@ -78,7 +78,7 @@ namespace Entegro.Web.Controllers
                 MetaTitle = category.MetaTitle,
                 Name = category.Name,
                 ParentCategoryId = category.ParentId,
-                Parent = category.Parent == null ? null : new CategoryViewModel()
+                Parent = category.Parent == null ? null : new CategoryModel()
                 {
                     Id = category.Parent.Id,
                     CreatedOn = category.Parent.CreatedOn,
@@ -94,7 +94,7 @@ namespace Entegro.Web.Controllers
                 },
                 Published = category.Published,
                 MediaFileId = category.MediaFileId,
-                MediaFile = category.MediaFile == null ? null : new MediaFileViewModel()
+                MediaFile = category.MediaFile == null ? null : new MediaFileModel()
                 {
                     Alt = category.MediaFile.Alt,
                     CreatedOn = category.MediaFile.CreatedOn,
@@ -113,7 +113,7 @@ namespace Entegro.Web.Controllers
                     Title = category.MediaFile.Title,
                     UpdatedOn = category.MediaFile.UpdatedOn,
                     Width = category.MediaFile.Width,
-                    Folder = category.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    Folder = category.MediaFile.Folder == null ? null : new MediaFolderModel()
                     {
                         Id = category.MediaFile.Folder.Id,
                         Name = category.MediaFile.Folder.Name,
@@ -125,7 +125,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CategoryViewModel model)
+        public async Task<IActionResult> Edit(CategoryModel model)
         {
             if (ModelState.IsValid)
             {

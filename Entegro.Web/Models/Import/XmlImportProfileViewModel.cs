@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Import
 {
-    public class XmlImportProfileViewModel
+    public class XmlImportProfileModel
     {
         public string? MediaFileUrl { get; set; }
         public string ProfileName { get; set; } = null!;

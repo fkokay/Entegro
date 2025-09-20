@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Checkout.Orders
 {
-    public class OrderItemViewModel
+    public class OrderItemModel
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
@@ -13,7 +13,7 @@ namespace Entegro.Web.Models.Checkout.Orders
         public decimal TaxRate { get; set; }
         public decimal DiscountAmount { get; set; }
 
-        public OrderViewModel Order { get; set; }
-        public ProductViewModel? Product { get; set; }
+        public OrderModel Order { get; set; }
+        public ProductModel? Product { get; set; }
     }
 }

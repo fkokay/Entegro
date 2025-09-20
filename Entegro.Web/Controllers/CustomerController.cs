@@ -21,11 +21,11 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            CustomerViewModel model = new CustomerViewModel();
+            CustomerModel model = new CustomerModel();
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CustomerViewModel model)
+        public async Task<IActionResult> Create(CustomerModel model)
         {
             if (ModelState.IsValid)
             {
@@ -53,7 +53,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            CustomerViewModel model = new CustomerViewModel();
+            CustomerModel model = new CustomerModel();
 
             var customer = await _customerService.GetCustomerByIdAsync(id);
             if (customer == null)
@@ -77,7 +77,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CustomerViewModel model)
+        public async Task<IActionResult> Edit(CustomerModel model)
         {
             if (ModelState.IsValid)
             {

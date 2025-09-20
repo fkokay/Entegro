@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class HepsiburadaProductIntegrationViewModel
+    public class HepsiburadaProductIntegrationModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -17,9 +17,9 @@
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
 
-        public HepsiburadaProductIntegrationCustomViewModel Custom { get; set; } = new HepsiburadaProductIntegrationCustomViewModel();
+        public HepsiburadaProductIntegrationCustomModel Custom { get; set; } = new HepsiburadaProductIntegrationCustomModel();
     }
-    public class HepsiburadaProductIntegrationCustomViewModel
+    public class HepsiburadaProductIntegrationCustomModel
     {
     }
 }

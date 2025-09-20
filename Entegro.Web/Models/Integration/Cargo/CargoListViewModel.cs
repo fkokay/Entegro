@@ -2,8 +2,8 @@
 
 namespace Entegro.Web.Models.Integration.Cargo
 {
-    public class CargoListViewModel
+    public class CargoListModel
     {
-        public List<CargoIntegrationSystemViewModel> CargoList { get; set; } = new();
+        public List<CargoIntegrationSystemModel> CargoList { get; set; } = new();
     }
 }

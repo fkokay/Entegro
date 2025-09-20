@@ -3,7 +3,7 @@ using Entegro.Web.Models.Platform.Identity;
 
 namespace Entegro.Web.Models.Common
 {
-    public class NotificationViewModel
+    public class NotificationModel
     {
         public int Id { get; set; }
         public NotificationType Type { get; set; }
@@ -12,6 +12,6 @@ namespace Entegro.Web.Models.Common
         public DateTime NotificationDate { get; set; }
         public bool IsRead { get; set; }
         public int? UserId { get; set; }
-        public UserViewModel User { get; set; }
+        public UserModel User { get; set; }
     }
 }

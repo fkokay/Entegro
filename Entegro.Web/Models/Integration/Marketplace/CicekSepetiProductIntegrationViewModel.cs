@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class CicekSepetiProductIntegrationViewModel
+    public class CicekSepetiProductIntegrationModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -17,9 +17,9 @@
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
 
-        public CicekSepetiProductIntegrationCustomViewModel Custom { get; set; } = new CicekSepetiProductIntegrationCustomViewModel();
+        public CicekSepetiProductIntegrationCustomModel Custom { get; set; } = new CicekSepetiProductIntegrationCustomModel();
     }
-    public class CicekSepetiProductIntegrationCustomViewModel
+    public class CicekSepetiProductIntegrationCustomModel
     {
     }
 

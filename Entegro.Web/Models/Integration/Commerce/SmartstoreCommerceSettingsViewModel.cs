@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Commerce
 {
-    public class SmartstoreCommerceSettingsViewModel
+    public class SmartstoreCommerceSettingsModel
     {
         //mağaza bilgileri
         public int Id { get; set; }

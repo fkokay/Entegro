@@ -69,14 +69,14 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             var orderDetail = await _orderService.GetOrderByIdAsync(id);
-            var orderDetailViewModel = new OrderViewModel
+            var orderDetailModel = new OrderModel
             {
                 Id = orderDetail.Id,
                 IntegrationSystemId = orderDetail.IntegrationSystemId,
                 OrderNumber = orderDetail.OrderNumber,
                 OrderGuid = orderDetail.OrderGuid,
                 CustomerId = orderDetail.CustomerId,
-                Customer = new CustomerViewModel
+                Customer = new CustomerModel
                 {
                     Id = orderDetail.Customer.Id,
                     UpdatedOn = orderDetail.Customer.UpdatedOn,
@@ -94,7 +94,7 @@ namespace Entegro.Web.Controllers
                     TaxNumber = orderDetail.Customer.TaxNumber,
                 },
                 BillingAddressId = orderDetail.BillingAddressId == null ? null : orderDetail.BillingAddressId,
-                BillingAddress = orderDetail.BillingAddress == null ? null : new AddressViewModel
+                BillingAddress = orderDetail.BillingAddress == null ? null : new AddressModel
                 {
                     CityId = orderDetail.BillingAddress.CityId,
                     LastName = orderDetail.BillingAddress.LastName,
@@ -119,7 +119,7 @@ namespace Entegro.Web.Controllers
                     ZipPostalCode = orderDetail.BillingAddress.ZipPostalCode,
                 },
                 ShippingAddressId = orderDetail.ShippingAddressId == null ? null : orderDetail.ShippingAddressId,
-                ShippingAddress = orderDetail.ShippingAddress == null ? null : new AddressViewModel
+                ShippingAddress = orderDetail.ShippingAddress == null ? null : new AddressModel
                 {
                     CityId = orderDetail.ShippingAddress.CityId,
                     LastName = orderDetail.ShippingAddress.LastName,
@@ -157,7 +157,7 @@ namespace Entegro.Web.Controllers
                 PaymentStatus = orderDetail.PaymentStatus,
                 ShippingStatusId = orderDetail.ShippingStatusId,
                 ShippingStatus = orderDetail.ShippingStatus,
-                OrderItems = orderDetail.OrderItems.Select(oi => new OrderItemViewModel
+                OrderItems = orderDetail.OrderItems.Select(oi => new OrderItemModel
                 {
                     OrderId = oi.OrderId,
                     DiscountAmount = oi.DiscountAmount,
@@ -167,14 +167,14 @@ namespace Entegro.Web.Controllers
                     Quantity = oi.Quantity,
                     TaxRate = oi.TaxRate,
                     UnitPrice = oi.UnitPrice,
-                    Product = oi.Product == null ? null : new ProductViewModel
+                    Product = oi.Product == null ? null : new ProductModel
                     {
                         Id = oi.Product.Id,
                         PictureUrl = oi.Product.MainPicture?.Url,
                         Name = oi.Product.Name,
                     }
                 }).ToList(),
-                OrderNotes = orderDetail.OrderNotes.Select(on => new OrderNoteViewModel
+                OrderNotes = orderDetail.OrderNotes.Select(on => new OrderNoteModel
                 {
                     Id = on.OrderId,
                     CreatedOnUtc = on.CreatedOnUtc,
@@ -182,21 +182,21 @@ namespace Entegro.Web.Controllers
                     OrderId = on.OrderId,
                 }).ToList()
             };
-            return View(orderDetailViewModel);
+            return View(orderDetailModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Packaging(int id)
         {
             var orderDetail = await _orderService.GetOrderByIdAsync(id);
-            var model = new OrderViewModel
+            var model = new OrderModel
             {
                 Id = orderDetail.Id,
                 IntegrationSystemId = orderDetail.IntegrationSystemId,
                 OrderNumber = orderDetail.OrderNumber,
                 OrderGuid = orderDetail.OrderGuid,
                 CustomerId = orderDetail.CustomerId,
-                Customer = orderDetail.Customer == null ? null : new CustomerViewModel
+                Customer = orderDetail.Customer == null ? null : new CustomerModel
                 {
                     Id = orderDetail.Customer.Id,
                     UpdatedOn = orderDetail.Customer.UpdatedOn,
@@ -214,7 +214,7 @@ namespace Entegro.Web.Controllers
                     TaxNumber = orderDetail.Customer.TaxNumber,
                 },
                 BillingAddressId = orderDetail.BillingAddressId == null ? null : orderDetail.BillingAddressId,
-                BillingAddress = orderDetail.BillingAddress == null ? null : new AddressViewModel
+                BillingAddress = orderDetail.BillingAddress == null ? null : new AddressModel
                 {
                     CityId = orderDetail.BillingAddress.CityId,
                     LastName = orderDetail.BillingAddress.LastName,
@@ -239,7 +239,7 @@ namespace Entegro.Web.Controllers
                     ZipPostalCode = orderDetail.BillingAddress.ZipPostalCode,
                 },
                 ShippingAddressId = orderDetail.ShippingAddressId == null ? null : orderDetail.ShippingAddressId,
-                ShippingAddress = orderDetail.ShippingAddress == null ? null : new AddressViewModel
+                ShippingAddress = orderDetail.ShippingAddress == null ? null : new AddressModel
                 {
                     CityId = orderDetail.ShippingAddress.CityId,
                     LastName = orderDetail.ShippingAddress.LastName,
@@ -279,7 +279,7 @@ namespace Entegro.Web.Controllers
                 PaymentStatus = orderDetail.PaymentStatus,
                 ShippingStatusId = orderDetail.ShippingStatusId,
                 ShippingStatus = orderDetail.ShippingStatus,
-                OrderItems = orderDetail.OrderItems.Select(oi => new OrderItemViewModel
+                OrderItems = orderDetail.OrderItems.Select(oi => new OrderItemModel
                 {
                     OrderId = oi.OrderId,
                     DiscountAmount = oi.DiscountAmount,
@@ -289,7 +289,7 @@ namespace Entegro.Web.Controllers
                     Quantity = oi.Quantity,
                     TaxRate = oi.TaxRate,
                     UnitPrice = oi.UnitPrice,
-                    Product = oi.Product == null ? null : new ProductViewModel
+                    Product = oi.Product == null ? null : new ProductModel
                     {
                         Id = oi.Product.Id,
                         PictureUrl = oi.Product.MainPicture?.Url,
@@ -298,7 +298,7 @@ namespace Entegro.Web.Controllers
                         Price = oi.Product.Price
                     }
                 }).ToList(),
-                OrderNotes = orderDetail.OrderNotes.Select(on => new OrderNoteViewModel
+                OrderNotes = orderDetail.OrderNotes.Select(on => new OrderNoteModel
                 {
                     Id = on.OrderId,
                     CreatedOnUtc = on.CreatedOnUtc,
@@ -310,7 +310,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PackagingSave(string carrier, List<OrderPackageViewModel> orderPackages)
+        public async Task<IActionResult> PackagingSave(string carrier, List<OrderPackageModel> orderPackages)
         {
             CreateShipmentDto createShipment = new CreateShipmentDto();
             createShipment.Carrier = carrier;

@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Setting
 {
-    public class CreateGeneralCommonViewModel
+    public class CreateGeneralCommonModel
     {
         public string SystemUrl { get; set; }
  

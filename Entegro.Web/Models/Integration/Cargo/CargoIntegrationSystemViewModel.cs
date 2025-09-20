@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Integration.Cargo
 {
-    public class CargoIntegrationSystemViewModel
+    public class CargoIntegrationSystemModel
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }

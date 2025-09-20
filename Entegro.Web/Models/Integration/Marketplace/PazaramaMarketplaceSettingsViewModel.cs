@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class PazaramaMarketplaceSettingsViewModel
+    public class PazaramaMarketplaceSettingsModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

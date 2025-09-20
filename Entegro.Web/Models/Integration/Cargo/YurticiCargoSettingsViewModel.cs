@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Cargo
 {
-    public class YurticiCargoSettingsViewModel
+    public class YurticiCargoSettingsModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

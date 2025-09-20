@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Cargo
 {
-    public class PTTCargoSettingsViewModel
+    public class PTTCargoSettingsModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

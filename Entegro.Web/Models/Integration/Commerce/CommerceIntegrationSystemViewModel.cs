@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Integration.Commerce
 {
-    public class CommerceIntegrationSystemViewModel
+    public class CommerceIntegrationSystemModel
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }

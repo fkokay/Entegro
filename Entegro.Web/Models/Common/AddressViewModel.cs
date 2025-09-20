@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Common
 {
-    public class AddressViewModel
+    public class AddressModel
     {
         public int Id { get; set; }
         public string? Salutation { get; set; }

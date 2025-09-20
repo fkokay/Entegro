@@ -3,8 +3,8 @@ using Entegro.Web.Models.Integration.Marketplace;
 
 namespace Entegro.Web.Models.Integration
 {
-    public class MarketplaceListViewModel
+    public class MarketplaceListModel
     {
-        public List<MarketplaceIntegrationSystemViewModel> MarketplaceList { get; set; } = new();
+        public List<MarketplaceIntegrationSystemModel> MarketplaceList { get; set; } = new();
     }
 }

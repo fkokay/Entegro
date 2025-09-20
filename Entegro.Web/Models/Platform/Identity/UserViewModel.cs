@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Platform.Identity
 {
-    public class UserViewModel
+    public class UserModel
     {
         public int Id { get; set; }
         public string FirstName { get; set; }

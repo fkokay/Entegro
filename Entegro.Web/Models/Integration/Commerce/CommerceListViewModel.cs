@@ -2,8 +2,8 @@
 
 namespace Entegro.Web.Models.Integration.Commerce
 {
-    public class CommerceListViewModel
+    public class CommerceListModel
     {
-        public List<CommerceIntegrationSystemViewModel> CommerceList { get; set; } = new();
+        public List<CommerceIntegrationSystemModel> CommerceList { get; set; } = new();
     }
 }

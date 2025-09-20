@@ -1,6 +1,6 @@
 namespace Entegro.Web.Models.Common
 {
-    public class ErrorViewModel
+    public class ErrorModel
     {
         public string? RequestId { get; set; }
 

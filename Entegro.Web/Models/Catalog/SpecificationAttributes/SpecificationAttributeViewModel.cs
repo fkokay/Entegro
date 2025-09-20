@@ -2,10 +2,10 @@
 
 namespace Entegro.Web.Models.Catalog.SpecificationAttributes
 {
-    public class SpecificationAttributeViewModel
+    public class SpecificationAttributeModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<SpecificationAttributeOptionViewModel>? SpecificationAttributeOptions { get; set; }
+        public List<SpecificationAttributeOptionModel>? SpecificationAttributeOptions { get; set; }
     }
 }

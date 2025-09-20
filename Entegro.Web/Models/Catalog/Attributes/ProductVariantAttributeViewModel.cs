@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Catalog.Attributes
 {
-    public class ProductVariantAttributeViewModel
+    public class ProductVariantAttributeModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -13,8 +13,8 @@ namespace Entegro.Web.Models.Catalog.Attributes
         public int DisplayOrder { get; set; }
 
 
-        public ProductViewModel Product { get; set; }
-        public ProductAttributeViewModel Attribute { get; set; }
-        public List<ProductVariantAttributeValueViewModel> ProductVariantAttributeValues { get; set; } = new List<ProductVariantAttributeValueViewModel>();
+        public ProductModel Product { get; set; }
+        public ProductAttributeModel Attribute { get; set; }
+        public List<ProductVariantAttributeValueModel> ProductVariantAttributeValues { get; set; } = new List<ProductVariantAttributeValueModel>();
     }
 }

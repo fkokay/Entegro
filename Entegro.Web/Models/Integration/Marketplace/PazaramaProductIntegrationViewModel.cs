@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class PazaramaProductIntegrationViewModel
+    public class PazaramaProductIntegrationModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -17,9 +17,9 @@
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
 
-        public PazaramaProductIntegrationCustomViewModel Custom { get; set; } = new PazaramaProductIntegrationCustomViewModel();
+        public PazaramaProductIntegrationCustomModel Custom { get; set; } = new PazaramaProductIntegrationCustomModel();
     }
-    public class PazaramaProductIntegrationCustomViewModel
+    public class PazaramaProductIntegrationCustomModel
     {
     }
 }

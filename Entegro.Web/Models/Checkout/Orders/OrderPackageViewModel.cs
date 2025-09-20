@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Checkout.Orders
 {
-    public class OrderPackageViewModel
+    public class OrderPackageModel
     {
         public int OrderId { get; set; }
         public int OrderItemId { get; set; }

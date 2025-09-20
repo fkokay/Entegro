@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Integration.EInvoice
 {
-    public class EInvoiceIntegrationSystemViewModel
+    public class EInvoiceIntegrationSystemModel
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }

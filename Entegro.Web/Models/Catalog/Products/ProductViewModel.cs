@@ -5,7 +5,7 @@ using Entegro.Web.Models.Catalog.Brands;
 
 namespace Entegro.Web.Models.Catalog.Products
 {
-    public class ProductViewModel
+    public class ProductModel
     {
         public int Id { get; set; }
         public string Code { get; set; }
@@ -34,10 +34,10 @@ namespace Entegro.Web.Models.Catalog.Products
         public string? Gtin { get; set; }
         public bool Published { get; set; } = true;
         public int[] SelectedProductAttributeIds { get; set; } = Array.Empty<int>();
-        public BrandViewModel? Brand { get; set; }
+        public BrandModel? Brand { get; set; }
         public string? PictureUrl { get; set; }
-        public List<ProductMediaFileViewModel> ProductMediaFiles { get; set; } = new List<ProductMediaFileViewModel>();
-        public List<ProductVariantAttributeViewModel> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeViewModel>();
-        public List<ProductVariantAttributeCombinationViewModel> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationViewModel>();
+        public List<ProductMediaFileModel> ProductMediaFiles { get; set; } = new List<ProductMediaFileModel>();
+        public List<ProductVariantAttributeModel> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeModel>();
+        public List<ProductVariantAttributeCombinationModel> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationModel>();
     }
 }

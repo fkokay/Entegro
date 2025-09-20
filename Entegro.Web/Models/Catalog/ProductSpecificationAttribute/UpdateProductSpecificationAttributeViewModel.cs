@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Catalog.ProductSpecificationAttribute
 {
-    public class UpdateProductSpecificationAttributeViewModel
+    public class UpdateProductSpecificationAttributeModel
     {
         public int Id { get; set; }
         public int SpecificationAttributeOptionId { get; set; }

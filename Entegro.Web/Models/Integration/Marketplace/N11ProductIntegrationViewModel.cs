@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class N11ProductIntegrationViewModel
+    public class N11ProductIntegrationModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -17,9 +17,9 @@
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
 
-        public N11ProductIntegrationCustomViewModel Custom { get; set; } = new N11ProductIntegrationCustomViewModel();
+        public N11ProductIntegrationCustomModel Custom { get; set; } = new N11ProductIntegrationCustomModel();
     }
-    public class N11ProductIntegrationCustomViewModel
+    public class N11ProductIntegrationCustomModel
     {
     }
 

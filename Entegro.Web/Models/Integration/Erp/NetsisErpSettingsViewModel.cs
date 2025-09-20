@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Erp
 {
-    public class NetsisErpSettingsViewModel
+    public class NetsisErpSettingsModel
     {   //mağaza bilgileri
         public int Id { get; set; }
         public string Name { get; set; }

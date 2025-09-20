@@ -29,7 +29,7 @@ namespace Entegro.Web.Controllers
         }
         public async Task<IActionResult> CreateOrUpdate(int id)
         {
-            ProductAttributeValueViewModel model = new ProductAttributeValueViewModel();
+            ProductAttributeValueModel model = new ProductAttributeValueModel();
             var productAttributes = await _productAttributeService.GetAllAsync();
             ViewBag.ProductAttributes = productAttributes.Select(m => new SelectListItem()
             {
@@ -52,7 +52,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdate(ProductAttributeValueViewModel model)
+        public async Task<IActionResult> CreateOrUpdate(ProductAttributeValueModel model)
         {
             if (model.Id > 0)
             {

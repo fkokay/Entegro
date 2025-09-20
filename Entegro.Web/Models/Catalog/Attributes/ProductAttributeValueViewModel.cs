@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Catalog.Attributes
 {
-    public class ProductAttributeValueViewModel
+    public class ProductAttributeValueModel
     {
         public int Id { get; set; }
         public int ProductAttributeId { get; set; }

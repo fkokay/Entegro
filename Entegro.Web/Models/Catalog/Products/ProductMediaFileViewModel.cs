@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Catalog.Products
 {
-    public class ProductMediaFileViewModel
+    public class ProductMediaFileModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -10,7 +10,7 @@ namespace Entegro.Web.Models.Catalog.Products
         public string? Url { get; set; }
         public int DisplayOrder { get; set; }
 
-        public ProductViewModel Product { get; set; }
-        public MediaFileViewModel MediaFile { get; set; }
+        public ProductModel Product { get; set; }
+        public MediaFileModel MediaFile { get; set; }
     }
 }

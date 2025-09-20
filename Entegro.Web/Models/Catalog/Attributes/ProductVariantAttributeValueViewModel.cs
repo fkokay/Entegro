@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Catalog.Attributes
 {
-    public class ProductVariantAttributeValueViewModel
+    public class ProductVariantAttributeValueModel
     {
         public int Id { get; set; }
         public int ProductVariantAttributeId { get; set; }

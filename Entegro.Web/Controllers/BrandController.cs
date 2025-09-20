@@ -29,13 +29,13 @@ namespace Entegro.Web.Controllers
 
         public IActionResult Create()
         {
-            BrandViewModel model = new BrandViewModel();
+            BrandModel model = new BrandModel();
             model.DisplayOrder = 0;
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(BrandViewModel model)
+        public async Task<IActionResult> Create(BrandModel model)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace Entegro.Web.Controllers
                 return NotFound();
             }
             var size = brand.MediaFile?.Size;
-            var brandModel = new BrandViewModel
+            var brandModel = new BrandModel
             {
                 Id = brand.Id,
                 Name = brand.Name,
@@ -76,7 +76,7 @@ namespace Entegro.Web.Controllers
                 Published = brand.Published,
                 MetaKeywords = brand.MetaKeywords,
                 MediaFileId = brand.MediaFileId,
-                MediaFile = brand.MediaFile == null ? null : new MediaFileViewModel()
+                MediaFile = brand.MediaFile == null ? null : new MediaFileModel()
                 {
                     Alt = brand.MediaFile.Alt,
                     CreatedOn = brand.MediaFile.CreatedOn,
@@ -95,7 +95,7 @@ namespace Entegro.Web.Controllers
                     Title = brand.MediaFile.Title,
                     UpdatedOn = brand.MediaFile.UpdatedOn,
                     Width = brand.MediaFile.Width,
-                    Folder = brand.MediaFile.Folder == null ? null : new MediaFolderViewModel()
+                    Folder = brand.MediaFile.Folder == null ? null : new MediaFolderModel()
                     {
                         Id = brand.MediaFile.Folder.Id,
                         Name = brand.MediaFile.Folder.Name,
@@ -106,7 +106,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(BrandViewModel model)
+        public async Task<IActionResult> Edit(BrandModel model)
         {
             if (ModelState.IsValid)
             {

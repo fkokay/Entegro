@@ -3,7 +3,7 @@ using Entegro.Web.Models.Content;
 
 namespace Entegro.Web.Models.Catalog.Brands
 {
-    public class BrandViewModel
+    public class BrandModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -17,6 +17,6 @@ namespace Entegro.Web.Models.Catalog.Brands
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
-        public MediaFileViewModel? MediaFile { get; set; }
+        public MediaFileModel? MediaFile { get; set; }
     }
 }

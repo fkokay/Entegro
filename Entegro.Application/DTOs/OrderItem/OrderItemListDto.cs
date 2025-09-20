@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.OrderItem
 {
-    public class OrderItemModel
+    public class OrderItemListDto
     {
         public int Id { get; set; }
         public int OrderId { get; set; }

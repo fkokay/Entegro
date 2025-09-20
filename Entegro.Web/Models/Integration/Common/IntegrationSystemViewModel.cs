@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Integration.Common
 {
-    public class IntegrationSystemViewModel
+    public class IntegrationSystemModel
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }
@@ -11,7 +11,7 @@ namespace Entegro.Web.Models.Integration.Common
         public string Name { get; set; }
         public string? Description { get; set; }
 
-        public List<IntegrationSystemParameterViewModel> IntegrationSystemParameters { get; set; } = new List<IntegrationSystemParameterViewModel>();
+        public List<IntegrationSystemParameterModel> IntegrationSystemParameters { get; set; } = new List<IntegrationSystemParameterModel>();
 
     }
 }

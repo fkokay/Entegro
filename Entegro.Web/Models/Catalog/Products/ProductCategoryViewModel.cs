@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Catalog.Products
 {
-    public class ProductCategoryViewModel
+    public class ProductCategoryModel
     {
         public int Id { get; set; }
         public int CategoryId { get; set; }

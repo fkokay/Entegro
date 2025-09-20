@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Platform.Messaging
 {
-    public class EmailAccountViewModel
+    public class EmailAccountModel
     {
         public int Id { get; set; }
         public string Email { get; set; }

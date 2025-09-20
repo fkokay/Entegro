@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Catalog.SpecificationAttributes
 {
-    public class CreateSpecificationAttributeViewModel
+    public class CreateSpecificationAttributeModel
     {
         public string Name { get; set; }
     }

@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Platform.Identity
 {
-    public class ForgotPasswordViewModel
+    public class ForgotPasswordModel
     {
         public string Email { get; set; } = null!;
     }

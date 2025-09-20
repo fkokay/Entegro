@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Import
 {
-    public class ExcelImportProfileViewModel
+    public class ExcelImportProfileModel
     {
         public List<ExcelColumnMapping> ColumnMappings { get; set; } = new List<ExcelColumnMapping>();
         public int MediaFileId { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Content
 {
-    public class MediaFileViewModel
+    public class MediaFileModel
     {
         public int Id { get; set; }
         public int? FolderId { get; set; }
@@ -22,7 +22,7 @@ namespace Entegro.Web.Models.Content
         public bool IsTransient { get; set; }
         public bool Deleted { get; set; }
 
-        public MediaFolderViewModel? Folder { get; set; }
+        public MediaFolderModel? Folder { get; set; }
 
         public string Url
         {

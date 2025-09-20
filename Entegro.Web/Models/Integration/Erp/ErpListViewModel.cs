@@ -2,8 +2,8 @@
 
 namespace Entegro.Web.Models.Integration.Erp
 {
-    public class ErpListViewModel
+    public class ErpListModel
     {
-        public List<ErpIntegrationSystemViewModel> ErpList { get; set; } = new();
+        public List<ErpIntegrationSystemModel> ErpList { get; set; } = new();
     }
 }

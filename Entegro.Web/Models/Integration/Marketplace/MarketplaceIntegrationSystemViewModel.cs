@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class MarketplaceIntegrationSystemViewModel
+    public class MarketplaceIntegrationSystemModel
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }

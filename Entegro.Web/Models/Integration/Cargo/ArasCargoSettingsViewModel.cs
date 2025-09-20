@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Cargo
 {
-    public class ArasCargoSettingsViewModel
+    public class ArasCargoSettingsModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

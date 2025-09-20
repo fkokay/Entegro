@@ -2,8 +2,8 @@
 
 namespace Entegro.Web.Models.Integration.EInvoice
 {
-    public class EInvoiceListViewModel
+    public class EInvoiceListModel
     {
-        public List<EInvoiceIntegrationSystemViewModel> EInvoiceList { get; set; } = new();
+        public List<EInvoiceIntegrationSystemModel> EInvoiceList { get; set; } = new();
     }
 }

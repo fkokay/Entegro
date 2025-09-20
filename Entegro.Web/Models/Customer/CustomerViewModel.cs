@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models
 {
-    public class CustomerViewModel
+    public class CustomerModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

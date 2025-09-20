@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Common
 {
-    public class ProductIntegrationDialogViewModel
+    public class ProductIntegrationDialogModel
     {
         public int ProductIntegrationId { get; set; }
         public int IntegrationSystemId { get; set; }

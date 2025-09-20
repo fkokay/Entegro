@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Setting
 {
-    public class UpdateSettingViewModel
+    public class UpdateSettingModel
     {
         public int Id { get; set; }
         public string Key { get; set; } = null!;

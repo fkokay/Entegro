@@ -7,20 +7,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Web.Models.Checkout.Orders
 {
-    public class OrderViewModel
+    public class OrderModel
     {
         public int Id { get; set; }
         public string OrderNumber { get; set; }
         public Guid OrderGuid { get; set; }
         public int? IntegrationSystemId { get; set; }
-        public virtual IntegrationSystemViewModel? IntegrationSystem { get; set; }
+        public virtual IntegrationSystemModel? IntegrationSystem { get; set; }
         public string? IntegrationOrderNumber { get; set; }
         public int CustomerId { get; set; }
-        public virtual CustomerViewModel Customer { get; set; }
+        public virtual CustomerModel Customer { get; set; }
         public int? BillingAddressId { get; set; }
-        public virtual AddressViewModel? BillingAddress { get; set; }
+        public virtual AddressModel? BillingAddress { get; set; }
         public int? ShippingAddressId { get; set; }
-        public virtual AddressViewModel? ShippingAddress { get; set; }
+        public virtual AddressModel? ShippingAddress { get; set; }
         public string PaymentMethod { get; set; }
         public decimal PaymentFee { get; set; }
         public string ShippingMethod { get; set; }
@@ -79,7 +79,7 @@ namespace Entegro.Web.Models.Checkout.Orders
             get => (ShippingStatus)ShippingStatusId;
             set => ShippingStatusId = (int)value;
         }
-        public virtual List<OrderItemViewModel> OrderItems { get; set; } = new List<OrderItemViewModel>();
-        public virtual List<OrderNoteViewModel> OrderNotes { get; set; } = new List<OrderNoteViewModel>();
+        public virtual List<OrderItemModel> OrderItems { get; set; } = new List<OrderItemModel>();
+        public virtual List<OrderNoteModel> OrderNotes { get; set; } = new List<OrderNoteModel>();
     }
 }

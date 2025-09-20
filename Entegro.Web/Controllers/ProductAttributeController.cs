@@ -27,7 +27,7 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> CreateOrUpdate(int id)
         {
-            ProductAttributeViewModel model = new ProductAttributeViewModel();
+            ProductAttributeModel model = new ProductAttributeModel();
             if (id > 0)
             {
                 var productAttribute = await _productAttributeService.GetByIdAsync(id);
@@ -43,7 +43,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdate(ProductAttributeViewModel model)
+        public async Task<IActionResult> CreateOrUpdate(ProductAttributeModel model)
         {
             if (model.Id > 0)
             {

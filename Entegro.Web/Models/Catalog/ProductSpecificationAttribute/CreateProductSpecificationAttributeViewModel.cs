@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Catalog.ProductSpecificationAttribute
 {
-    public class CreateProductSpecificationAttributeViewModel
+    public class CreateProductSpecificationAttributeModel
     {
         public int SpecificationAttributeOptionId { get; set; }
         public int ProductId { get; set; }

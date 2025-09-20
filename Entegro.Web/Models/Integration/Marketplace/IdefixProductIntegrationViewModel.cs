@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class IdefixProductIntegrationViewModel
+    public class IdefixProductIntegrationModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -17,9 +17,9 @@
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
 
-        public IdefixProductIntegrationCustomViewModel Custom { get; set; } = new IdefixProductIntegrationCustomViewModel();
+        public IdefixProductIntegrationCustomModel Custom { get; set; } = new IdefixProductIntegrationCustomModel();
     }
-    public class IdefixProductIntegrationCustomViewModel
+    public class IdefixProductIntegrationCustomModel
     {
     }
 

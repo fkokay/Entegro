@@ -3,7 +3,7 @@ using Entegro.Web.Models.Content;
 
 namespace Entegro.Web.Models.Catalog.Categories
 {
-    public class CategoryViewModel
+    public class CategoryModel
     {
         public int Id { get; set; }
         public int? ParentCategoryId { get; set; }
@@ -17,8 +17,8 @@ namespace Entegro.Web.Models.Catalog.Categories
         public bool Published { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public CategoryViewModel? Parent { get; set; }
-        public MediaFileViewModel? MediaFile { get; set; }
+        public CategoryModel? Parent { get; set; }
+        public MediaFileModel? MediaFile { get; set; }
 
     }
 }

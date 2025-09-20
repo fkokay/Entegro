@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Integration.Erp
 {
-    public class ErpIntegrationSystemViewModel
+    public class ErpIntegrationSystemModel
     {
         public int Id { get; set; }
         public int IntegrationSystemTypeId { get; set; }

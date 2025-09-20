@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.Order
 {
-    public class OrderModel
+    public class OrderListDto
     {
         public int Id { get; set; }
         public string PackageNo { get; set; }
@@ -26,6 +26,6 @@ namespace Entegro.Application.DTOs.Order
         public decimal OrderTotal { get; set; }
         public string PaymentMethod { get; set; }
         public string PaymentStatus { get; set; }
-        public List<OrderItemModel> OrderItems { get; set; } = new List<OrderItemModel>();
+        public List<OrderItemListDto> OrderItems { get; set; } = new List<OrderItemListDto>();
     }
 }

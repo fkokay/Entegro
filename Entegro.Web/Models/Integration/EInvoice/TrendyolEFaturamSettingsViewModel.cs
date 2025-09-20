@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.EInvoice
 {
-    public class TrendyolEFaturamSettingsViewModel
+    public class TrendyolEFaturamSettingsModel
     {
         //mağaza bilgileri
         public int Id { get; set; }

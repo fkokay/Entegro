@@ -21,7 +21,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ModalTownViewModel model)
+        public async Task<IActionResult> Create(ModalTownModel model)
         {
             var createDto = new CreateTownDto
             {

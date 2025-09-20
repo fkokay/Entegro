@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Content
 {
-    public class MediaFolderViewModel
+    public class MediaFolderModel
     {
         public int Id { get; set; }
         public int? ParentId { get; set; }

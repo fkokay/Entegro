@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Marketplace
 {
-    public class N11MarketplaceSettingsViewModel
+    public class N11MarketplaceSettingsModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

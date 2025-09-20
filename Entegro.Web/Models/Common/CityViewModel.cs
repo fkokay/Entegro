@@ -2,7 +2,7 @@
 
 namespace Entegro.Web.Models.Common
 {
-    public class CityViewModel
+    public class CityModel
     {
         public int Id { get; set; }
         public int CountryId { get; set; }
@@ -10,7 +10,7 @@ namespace Entegro.Web.Models.Common
         public bool Published { get; set; }
         public List<TownDto>? Towns { get; set; }
     }
-    public class ModalCityViewModel
+    public class ModalCityModel
     {
         public int CountryId { get; set; }
         public string CityName { get; set; }
@@ -18,7 +18,7 @@ namespace Entegro.Web.Models.Common
         public bool Published { get; set; }
     }
 
-    public class ModalTownViewModel
+    public class ModalTownModel
     {
         public int CityId { get; set; }
         public string TownName { get; set; }

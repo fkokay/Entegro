@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration.Erp
 {
-    public class LogoErpSettingsViewModel
+    public class LogoErpSettingsModel
     {
         //mağaza bilgileri
         public int Id { get; set; }

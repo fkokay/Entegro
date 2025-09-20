@@ -1,6 +1,6 @@
 ﻿namespace Entegro.Web.Models.Integration
 {
-    public class SmartstoreProductIntegrationViewModel
+    public class SmartstoreProductIntegrationModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -15,10 +15,10 @@
         public DateTime? LastSyncDate { get; set; }
         public bool Active { get; set; } = true;
 
-        public SmartstoreProductIntegrationCustomViewModel Custom { get; set; } = new SmartstoreProductIntegrationCustomViewModel();
+        public SmartstoreProductIntegrationCustomModel Custom { get; set; } = new SmartstoreProductIntegrationCustomModel();
     }
 
-    public class SmartstoreProductIntegrationCustomViewModel
+    public class SmartstoreProductIntegrationCustomModel
     {
         public int ManageInventoryMethod { get; set; }
     }

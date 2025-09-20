@@ -32,11 +32,11 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            EmailAccountViewModel model = new EmailAccountViewModel();
+            EmailAccountModel model = new EmailAccountModel();
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(EmailAccountViewModel model)
+        public async Task<IActionResult> Create(EmailAccountModel model)
         {
             if (ModelState.IsValid)
             {
@@ -60,7 +60,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            EmailAccountViewModel model = new EmailAccountViewModel();
+            EmailAccountModel model = new EmailAccountModel();
 
             var account = await _emailAccountService.GetByIdAsync(id);
             if (account == null)
@@ -81,7 +81,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EmailAccountViewModel model)
+        public async Task<IActionResult> Edit(EmailAccountModel model)
         {
             if (ModelState.IsValid)
             {
