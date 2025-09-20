@@ -25,6 +25,7 @@ namespace Entegro.Application.DTOs.Product
         public bool VatInc { get; set; }
         public int? BrandId { get; set; }
         public int StockQuantity { get; set; }
+        public int MinStockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }
         public decimal Width { get; set; }

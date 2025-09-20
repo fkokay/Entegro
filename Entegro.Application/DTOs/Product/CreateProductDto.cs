@@ -22,6 +22,7 @@ namespace Entegro.Application.DTOs.Product
         public int? BrandId { get; set; }
         public BrandDto? Brand { get; set; }
         public int StockQuantity { get; set; }
+        public int MinStockQuantity { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }
         public decimal Width { get; set; }

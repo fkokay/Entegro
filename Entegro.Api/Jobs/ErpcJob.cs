@@ -12,6 +12,8 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Mappings.Erp;
 using Entegro.Application.Services;
+using Entegro.Domain.Enums;
+using Mapster;
 using MapsterMapper;
 using Newtonsoft.Json;
 using Polly;
@@ -34,6 +36,7 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeService _productVariantAttributeService;
         private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IMapper _mapper;
         private readonly ILogger<ErpcJob> _logger;
 
@@ -52,6 +55,7 @@ namespace Entegro.Api.Jobs
             IProductVariantAttributeService productVariantAttributeService,
             IProductVariantAttributeValueService productVariantAttributeValueService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            IIntegrationSystemService integrationSystemService,
             IMapper mapper,
             ILogger<ErpcJob> logger)
         {
@@ -66,19 +70,31 @@ namespace Entegro.Api.Jobs
             _productVariantAttributeService = productVariantAttributeService ?? throw new ArgumentNullException(nameof(productVariantAttributeService));
             _productVariantAttributeValueService = productVariantAttributeValueService ?? throw new ArgumentNullException(nameof(productVariantAttributeValueService));
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService ?? throw new ArgumentNullException(nameof(productVariantAttributeCombinationService));
+            _integrationSystemService = integrationSystemService;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            string erpType = "netsis";
-            await ProductSync(erpType);
+            var erpIntegrations = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP);
+
+            foreach (var erpIntegration in erpIntegrations)
+            {
+                ErpApiContext apiContext = new ErpApiContext();
+                apiContext.ErpType = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ErpType").Select(m => m.Value).FirstOrDefault() ?? "";
+                apiContext.BaseUrl = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
+                apiContext.ApiUser = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "";
+                apiContext.ApiPassword = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "";
+
+                await ProductSync(apiContext);
+            }
+     
         }
 
-        private async Task ProductSync(string erpType)
+        private async Task ProductSync(ErpApiContext apiContext)
         {
-            _logger.LogInformation("{erpType} ürün senkronizasyonu başlatıldı. Zaman: {Time}", erpType, DateTime.UtcNow);
+            _logger.LogInformation("{erpType} ürün senkronizasyonu başlatıldı. Zaman: {Time}", apiContext.ErpType, DateTime.UtcNow);
 
             _logger.LogInformation("Cache yükleme başlatılıyor...");
             await LoadAttributeCacheAsync();
@@ -87,17 +103,17 @@ namespace Entegro.Api.Jobs
             List<ErpProductDto> erpProducts;
             try
             {
-                erpProducts = (await _erpService.GetProductsAsync(erpType, 500)).ToList();
+                erpProducts = (await _erpService.GetProductsAsync(apiContext, 500)).ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{erpType}'dan ürünler alınırken bir hata oluştu.", erpType);
+                _logger.LogError(ex, "{erpType}'dan ürünler alınırken bir hata oluştu.", apiContext.ErpType);
                 return;
             }
 
             if (!erpProducts.Any())
             {
-                _logger.LogWarning("{erpType}'dan hiç ürün alınamadı.", erpType);
+                _logger.LogWarning("{erpType}'dan hiç ürün alınamadı.", apiContext.ErpType);
                 return;
             }
 
@@ -187,7 +203,7 @@ namespace Entegro.Api.Jobs
                 }
             }
 
-            _logger.LogInformation("{erpType} ürün senkronizasyonu tamamlandı. Zaman: {Time}", erpType, DateTime.UtcNow);
+            _logger.LogInformation("{erpType} ürün senkronizasyonu tamamlandı. Zaman: {Time}", apiContext.ErpType, DateTime.UtcNow);
         }
 
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeModel> variantAttributes)
