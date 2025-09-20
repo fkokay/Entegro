@@ -30,7 +30,7 @@ Entegro.brand.list = (function ($) {
                 { data: 'Name' },
                 { data: 'DisplayOrder' },
                 {
-                    data: 'CreatedOn',
+                    data: 'UpdatedOn',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.yyyy HH:mm");

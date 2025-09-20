@@ -134,6 +134,8 @@ namespace Entegro.Application.Services
             {
                 var model = _mapper.Map<CategoryDto>(x);
                 model.Breadcrumb = await GetCategoryPathAsync(x, "<small class='text-muted d-none d-sm-block'>{0}</small>");
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
                 return model;
             }).AsyncToList();
 
