@@ -38,7 +38,7 @@ namespace Entegro.Web.Controllers
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductVariantAttributeService _productVariantAttributeService;
-        private readonly IProductImageMappingService _productImageMappingService;
+        private readonly IProductMediaFileMappingService _productMediaFileMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
@@ -56,7 +56,7 @@ namespace Entegro.Web.Controllers
             IBrandService brandService,
             IProductAttributeService productAttributeService,
             IProductVariantAttributeService productVariantAttributeService,
-            IProductImageMappingService productImageMappingService,
+            IProductMediaFileMappingService productMediaFileMappingService,
             IIntegrationSystemService integrationSystemService,
             IProductIntegrationService productIntegrationService,
             IProductAttributeFormatter productAttributeFormatter,
@@ -74,7 +74,7 @@ namespace Entegro.Web.Controllers
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _productVariantAttributeService = productVariantAttributeService ?? throw new ArgumentNullException(nameof(productVariantAttributeService));
-            _productImageMappingService = productImageMappingService ?? throw new ArgumentNullException(nameof(productImageMappingService));
+            _productMediaFileMappingService = productMediaFileMappingService ?? throw new ArgumentNullException(nameof(productMediaFileMappingService));
             _integrationSystemService = integrationSystemService ?? throw new ArgumentNullException(nameof(integrationSystemService));
             _productIntegrationService = productIntegrationService;
             _productAttributeFormatter = productAttributeFormatter;
@@ -196,29 +196,9 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateProductDto();
-                updateDto.Id = model.Id;
-                updateDto.Barcode = model.Barcode;
-                updateDto.BrandId = model.BrandId;
-                updateDto.Code = model.Code;
-                updateDto.Currency = model.Currency;
-                updateDto.Description = model.Description;
-                updateDto.Height = model.Height;
-                updateDto.Length = model.Length;
-                updateDto.MetaDescription = model.MetaDescription;
-                updateDto.MetaTitle = model.MetaTitle;
-                updateDto.MetaKeywords = model.MetaKeywords;
-                updateDto.Name = model.Name;
-                updateDto.Price = model.Price;
-                updateDto.StockQuantity = model.StockQuantity;
-                updateDto.Unit = model.Unit;
-                updateDto.VatInc = model.VatInc;
-                updateDto.VatRate = model.VatRate;
-                updateDto.Weight = model.Weight;
-                updateDto.Width = model.Width;
-                updateDto.ManufacturerPartNumber = model.ManufacturerPartNumber;
-                updateDto.Gtin = model.Gtin;
-                updateDto.Published = model.Published;
+
+
+                var updateDto = _mapper.Map<UpdateProductDto>(model);
                 updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
                 {
                     RawAttribute = JsonConvert.SerializeObject(m.ProductVariantAttributeSelections),
@@ -304,15 +284,9 @@ namespace Entegro.Web.Controllers
         {
             ViewBag.ProductId = productId;
             var productCategories = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
+            var model = _mapper.Map<List<ProductCategoryModel>>(productCategories);
 
-            return PartialView("_CreateOrUpdate.Categories", productCategories.Select(x => new ProductCategoryModel
-            {
-                Id = x.Id,
-                CategoryId = x.CategoryId,
-                CategoryBreadcrumb = x.CategoryBreadcrumb,
-                ProductId = x.ProductId,
-                DisplayOrder = x.DisplayOrder,
-            }).ToList());
+            return PartialView("_CreateOrUpdate.Categories", model);
         }
 
         [HttpGet]
@@ -329,12 +303,9 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                CreateProductCategoryDto createProductCategory = new CreateProductCategoryDto();
-                createProductCategory.ProductId = model.ProductId;
-                createProductCategory.CategoryId = model.CategoryId;
-                createProductCategory.DisplayOrder = model.DisplayOrder;
+                var createDto = _mapper.Map<CreateProductCategoryDto>(model);
 
-                await _productCategoryMappingService.CreateProductCategoryAsync(createProductCategory);
+                await _productCategoryMappingService.CreateProductCategoryAsync(createDto);
                 return Json(new { success = true });
             }
             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
@@ -363,21 +334,11 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> LoadTabSpecificationAttribute(int productId)
         {
             ViewBag.ProductId = productId;
-            var productSpecificationAttribute = await _productSpecificationAttributeMappingService.GetSpecificationAttributeByProductId(productId);
+            var productSpecificationAttributes = await _productSpecificationAttributeMappingService.GetSpecificationAttributeByProductId(productId);
+            var model = _mapper.Map<List<ProductSpecificationAttributeModel>>(productSpecificationAttributes);
 
-            return PartialView("_CreateOrUpdate.SpecificationAttributes", productSpecificationAttribute.Select(x => new ProductSpecificationAttributeModel
-            {
-                Id = x.Id,
-                DisplayOrder = x.DisplayOrder,
-                ProductId = x.ProductId,
-                SpecificationAttributeOption = new SpecificationAttributeOptionModel
-                {
-                    Id = x.SpecificationAttributeOption.Id,
-                    Name = x.SpecificationAttributeOption.Name,
-                    SpecificationAttributeId = x.SpecificationAttributeOption.SpecificationAttributeId,
-                    DisplayOrder = x.SpecificationAttributeOption.DisplayOrder,
-                }
-            }).ToList());
+
+            return PartialView("_CreateOrUpdate.SpecificationAttributes", model);
         }
         #endregion
 
@@ -386,40 +347,8 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> LoadTabImages(int productId)
         {
             ViewBag.ProductId = productId;
-            var productMediaFiles = await _productImageMappingService.GetAllAsync(productId);
-            var model = productMediaFiles.Select(m => new ProductMediaFileModel()
-            {
-                Id = m.Id,
-                DisplayOrder = m.DisplayOrder,
-                MediaFileId = m.MediaFileId,
-                ProductId = m.ProductId,
-                MediaFile = new MediaFileModel()
-                {
-                    Alt = m.MediaFile.Alt,
-                    CreatedOn = m.MediaFile.CreatedOn,
-                    Deleted = m.MediaFile.Deleted,
-                    Extension = m.MediaFile.Extension,
-                    FolderId = m.MediaFile.FolderId,
-                    Height = m.MediaFile.Height,
-                    Id = m.MediaFile.Id,
-                    IsTransient = m.MediaFile.IsTransient,
-                    MediaType = m.MediaFile.MediaType,
-                    Metadata = m.MediaFile.Metadata,
-                    MimeType = m.MediaFile.MimeType,
-                    Name = m.MediaFile.Name,
-                    PixelSize = m.MediaFile.PixelSize,
-                    Size = m.MediaFile.Size,
-                    Title = m.MediaFile.Title,
-                    UpdatedOn = m.MediaFile.UpdatedOn,
-                    Width = m.MediaFile.Width,
-                    Folder = m.MediaFile.Folder == null ? null : new MediaFolderModel()
-                    {
-                        Id = m.MediaFile.Folder.Id,
-                        Name = m.MediaFile.Folder.Name,
-                    }
-                }
-            }).ToList();
-
+            var productMediaFiles = await _productMediaFileMappingService.GetAllAsync(productId);
+            var model = _mapper.Map<List<ProductMediaFileModel>>(productMediaFiles);
             return PartialView("_CreateOrUpdate.Pictures", model);
         }
 
@@ -451,7 +380,7 @@ namespace Entegro.Web.Controllers
                             DisplayOrder = i
                         };
 
-                        var productMediaFile = await _productImageMappingService.AddAsync(productPicture);
+                        var productMediaFile = await _productMediaFileMappingService.AddAsync(productPicture);
 
                         // İsteğe bağlı olarak frontend’e dönecek bilgi
                         var respObj = new
@@ -494,7 +423,7 @@ namespace Entegro.Web.Controllers
         {
             try
             {
-                await _productImageMappingService.DeleteAsync(id);
+                await _productMediaFileMappingService.DeleteAsync(id);
                 return StatusCode((int)HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -520,7 +449,7 @@ namespace Entegro.Web.Controllers
                     {
                         int pictureId = pictureIds[i];
 
-                        var productPicture = await _productImageMappingService.GetByPictureIdSortAsync(pictureId, entityId);
+                        var productPicture = await _productMediaFileMappingService.GetByPictureIdSortAsync(pictureId, entityId);
 
                         if (productPicture != null)
                         {
@@ -533,7 +462,7 @@ namespace Entegro.Web.Controllers
                                 EntityMediaId = productPicture.Id
                             });
 
-                            await _productImageMappingService.UpdateAsync(new UpdateProductMediaFileDto
+                            await _productMediaFileMappingService.UpdateAsync(new UpdateProductMediaFileDto
                             {
                                 Id = pictureId,
                                 DisplayOrder = i,
@@ -1934,28 +1863,6 @@ namespace Entegro.Web.Controllers
         {
             if (product != null)
             {
-                model.Id = product.Id;
-                model.Barcode = product.Barcode;
-                model.BrandId = product.BrandId;
-                model.Code = product.Code;
-                model.Currency = product.Currency;
-                model.Description = product.Description;
-                model.Height = product.Height;
-                model.Length = product.Length;
-                model.MetaDescription = product.MetaDescription;
-                model.MetaTitle = product.MetaTitle;
-                model.MetaKeywords = product.MetaKeywords;
-                model.Name = product.Name;
-                model.VatInc = product.VatInc;
-                model.Price = product.Price;
-                model.StockQuantity = product.StockQuantity;
-                model.Unit = product.Unit;
-                model.VatRate = product.VatRate;
-                model.Weight = product.Weight;
-                model.Width = product.Width;
-                model.Gtin = product.Gtin;
-                model.ManufacturerPartNumber = product.ManufacturerPartNumber;
-                model.Published = product.Published;
                 model.SelectedProductAttributeIds = product.ProductVariantAttributes.Select(x => x.ProductAttributeId).ToArray();
                 model.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new ProductVariantAttributeModel()
                 {

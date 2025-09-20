@@ -8,11 +8,11 @@ using MapsterMapper;
 
 namespace Entegro.Application.Services
 {
-    public class ProductImageMappingService : IProductImageMappingService
+    public class ProductMediaFileMappingService : IProductMediaFileMappingService
     {
         private readonly IProductImageMappingRepository _productImageMappingRepository;
         private readonly IMapper _mapper;
-        public ProductImageMappingService(IProductImageMappingRepository productImageMappingRepository, IMapper mapper)
+        public ProductMediaFileMappingService(IProductImageMappingRepository productImageMappingRepository, IMapper mapper)
         {
             _productImageMappingRepository = productImageMappingRepository ?? throw new ArgumentNullException(nameof(productImageMappingRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

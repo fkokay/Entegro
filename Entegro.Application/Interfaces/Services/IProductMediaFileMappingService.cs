@@ -3,7 +3,7 @@ using Entegro.Application.DTOs.ProductMediaFile;
 
 namespace Entegro.Application.Interfaces.Services
 {
-    public interface IProductImageMappingService
+    public interface IProductMediaFileMappingService
     {
         Task<ProductMediaFileDto?> GetByIdAsync(int id);
         Task<List<ProductMediaFileDto>> GetAllAsync();
