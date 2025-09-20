@@ -7,6 +7,7 @@ using Entegro.Infrastructure.Data;
 using Entegro.Infrastructure.Extensions;
 using Entegro.Utilities;
 using Entegro.Web.Hubs;
+using Entegro.Web.Mappings;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -119,6 +120,7 @@ builder.Services.AddErpServices();
 builder.Services.AddMarketplaceServices();
 
 MapsterConfig.RegisterMappings();
+WebMapsterConfig.RegisterMappings();
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 

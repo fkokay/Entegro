@@ -5,40 +5,39 @@
     ViewData["Title"] = "Kategori Bilgilerini Düzenle - " + Model.Name;
 }
 
-<form asp-action="Edit" id="category-form">
-    <div class="container-fluid flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Yönetimi/</span><span class="text-muted fw-light">Kategoriler/</span> Kategori Bilgilerini Düzenle</h4>
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Edit" id="category-form">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
+            <div class="d-flex flex-column justify-content-center">
+                <h4 class="mb-1">Kategori Bilgilerini Düzenle</h4>
+                <p class="mb-0">Kategori Bilgilerini Düzenle</p>
+            </div>
+            <div class="d-flex align-content-center flex-wrap gap-4">
+                <div class="d-flex gap-4">
+                    <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                        <span class="d-flex justify-content-center text-nowrap">
+                            <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
+                        </span>
+                    </a>
+                    <button type="button" id="btnDeleteCategory" data-id="@Model.Id" class="btn btn-danger d-grid w-100 waves-effect waves-light">
+                        <span class="d-flex justify-content-center text-nowrap">
+                            <i class="ti ti-trash ti-xs me-1"></i> Sil
+                        </span>
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-primary waves-effect waves-light">
+                    <span class="d-flex justify-content-center text-nowrap">
+                        <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
+                    </span>
+                </button>
+            </div>
+        </div>
 
         <div class="row">
             <partial name="_CreateOrUpdate" />
-            <div class="col-lg-3 col-12 invoice-actions">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
-                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
-                        </button>
-                        @if (Model.Id > 0)
-                        {
-                            <button type="button"
-                                    id="btnDeleteCategory"
-                                    data-id="@Model.Id"
-                                    class="btn btn-danger d-grid w-100 mb-2 waves-effect waves-light">
-                                <span class="d-flex align-items-center justify-content-center text-nowrap">
-                                    <i class="ti ti-trash ti-xs me-1"></i>Sil
-                                </span>
-                            </button>
-
-
-                        }
-                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
-                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-cancel ti-xs me-1"></i>Vazgeç</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 @section scripts {
     <script src="/assets/js/entegro.category.js"></script>
@@ -47,265 +46,4 @@
             Entegro.category.init('edit', '/category/edit');
         });
     </script>
-
-    @* <script data-origin="FileUploader">
-        $(function () {
-            // Init dropzone
-            $("#MediaUpload").dropzoneWrapper({
-                onUploading: null,
-                onUploadCompleted: null,
-                onAborted: null,
-                onError: null,
-                onFileRemove: null,
-                onCompleted: null,
-                onMediaSelected: null,
-                maxFiles: 1,
-                maxFilesSize: 102400,
-                timeout: 300000,
-                clickableElement: null,
-                previewContainerId: "",
-                showRemoveButton: true,
-                showRemoveButtonAfterUpload: true,
-                downloadEnabled: false
-            });
-        });
-    </script>
-    <script>
-        $('#btnDeleteCategory').on('click', function () {
-          const categoryId = $(this).data('id');
-
-          Swal.fire({
-            title: 'Silme Türünü Seçin',
-            html: `
-              <div style="text-align: left">
-                <label><input type="radio" name="delete-option" value="0" checked> Sadece bağlantıyı kaldır</label><br>
-                <label><input type="radio" name="delete-option" value="1"> Bağlantı ve alt kategorileri sil</label>
-              </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Devam Et',
-            cancelButtonText: 'İptal',
-            customClass: {
-              confirmButton: 'btn btn-danger me-3',
-              cancelButton: 'btn btn-secondary'
-            },
-            buttonsStyling: false,
-            preConfirm: () => {
-              const selected = document.querySelector('input[name="delete-option"]:checked');
-              if (!selected) {
-                Swal.showValidationMessage('Lütfen bir seçenek seçin.');
-                return false;
-              }
-              return selected.value;
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              const chooseType = parseInt(result.value);
-
-              $.ajax({
-                url: '@Url.Action("Delete", "Category")',
-                type: 'POST',
-                data: {
-                  id: categoryId,
-                  chooseType: chooseType
-                },
-                success: function (response) {
-                  if (response.success) {
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Silindi!',
-                      text: 'Kategori başarıyla silindi.',
-                      confirmButtonText: 'Tamam',
-                      customClass: {
-                        confirmButton: 'btn btn-success'
-                      },
-                      buttonsStyling: false
-                    }).then(() => {
-                      window.location.href = '@Url.Action("List", "Category")';
-                    });
-                  } else {
-                    Swal.fire({
-                      icon: 'error',
-                      title: 'Hata!',
-                      text: response.message || 'Silme işlemi başarısız oldu.',
-                      confirmButtonText: 'Tamam',
-                      customClass: {
-                        confirmButton: 'btn btn-danger'
-                      },
-                      buttonsStyling: false
-                    });
-                  }
-                },
-                error: function () {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Sunucu Hatası!',
-                    text: 'İstek gönderilirken bir hata oluştu.',
-                    confirmButtonText: 'Tamam',
-                    customClass: {
-                      confirmButton: 'btn btn-danger'
-                    },
-                    buttonsStyling: false
-                  });
-                }
-              });
-            }
-          });
-        });
-    </script>
-    <script>
-
-        const formValidation = FormValidation.formValidation(
-            document.getElementById('category-form'),
-            {
-                locale: 'tr_TR',
-                localization: FormValidation.locales.tr_TR,
-                fields: {
-                    'Name': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Kategori adı boş bırakılamaz.'
-                            },
-                            stringLength: {
-                                min: 3,
-                                message: 'Kategori adı en az 3 karakter olmalıdır.'
-                            }
-                        }
-                    },
-                    'DisplayOrder': {
-                        validators: {
-                            notEmpty: {
-                                message: 'Sıra boş bırakılamaz.'
-                            },
-                            numeric: {
-                                message: 'Sıra sadece sayı olmalıdır.'
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    trigger: new FormValidation.plugins.Trigger(),
-                    bootstrap5: new FormValidation.plugins.Bootstrap5({
-                        eleValidClass: '',
-                        rowSelector: '.row'  // senin markupta row kullanılıyor
-                    }),
-                    submitButton: new FormValidation.plugins.SubmitButton(),
-                    autoFocus: new FormValidation.plugins.AutoFocus()
-                },
-                init: instance => {
-                    instance.on('plugins.message.placed', function (e) {
-                        if (e.element.parentElement.classList.contains('input-group')) {
-                            e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
-                        }
-                    });
-
-                    instance.on('core.form.valid', function () {
-                        const $form = $('#category-form');
-                        const serializedData = $form.serialize();
-
-                        $.ajax({
-                            url: '@Url.Action("Edit", "Category")',
-                            type: 'POST',
-                            data: serializedData,
-                            success: function (response) {
-                                if (response.success) {
-                                    Swal.fire({
-                                        title: 'Başarılı!',
-                                        text: 'Değişiklikler başarıyla kaydedildi.',
-                                        icon: 'success',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: {
-                                            confirmButton: 'btn btn-success'
-                                        },
-                                        buttonsStyling: false
-                                    }).then(() => {
-                                        window.location.href = '@Url.Action("List", "Category")';
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: 'Hata!',
-                                        text: response.message || 'Bir hata oluştu.',
-                                        icon: 'error',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: {
-                                            confirmButton: 'btn btn-danger'
-                                        },
-                                        buttonsStyling: false
-                                    });
-                                }
-                            },
-                            error: function (xhr) {
-                                Swal.fire({
-                                    title: 'Hata!',
-                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
-                                    icon: 'error',
-                                    confirmButtonText: 'Tamam',
-                                    customClass: {
-                                        confirmButton: 'btn btn-danger'
-                                    },
-                                    buttonsStyling: false
-                                });
-                            }
-                        });
-                    });
-
-                }
-            }
-        );
-
-    </script>
-    <script>
-        $(function () {
-          const $cat = $('#ParentCategoryId');
-          // Taşma/overlay sorunlarına karşı güvenli kapsayıcı
-          if ($cat.parent().css('position') !== 'relative') {
-            $cat.wrap('<div class="position-relative"></div>');
-          }
-
-          $cat.select2({
-            width: '100%',
-            placeholder: 'Kategori seçiniz',
-            allowClear: true,
-            dropdownParent: $cat.parent(),
-            minimumInputLength: 0,     // istersen 2 yap
-            language: {
-              inputTooShort: () => 'Daha fazla karakter yazın',
-              searching:     () => 'Aranıyor...',
-              noResults:     () => 'Sonuç bulunamadı'
-            },
-            ajax: {
-              url: '@Url.Action("AllCategory", "Category")', // was: AllCateogry
-              type: 'POST',
-              dataType: 'json',
-              delay: 250,
-              data: function (params) {
-                return {
-                  term: params.term || '',
-                  page: params.page || 1
-                };
-              },
-              headers: {
-                // Antiforgery kullanıyorsan yorumu kaldır:
-                // 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-              },
-              processResults: function (data, params) {
-                params.page = params.page || 1;
-
-                // Sunucu zaten { results:[{id,text}], pagination:{ more } } dönüyor
-                // Yine de korumalı döndür.
-                return {
-                  results: Array.isArray(data.results) ? data.results : [],
-                  pagination: { more: !!(data.pagination && data.pagination.more) }
-                };
-              },
-              cache: true
-            },
-            // Görünüm özelleştirme istersen:
-            templateResult: function (item) { return item.text || ''; },
-            templateSelection: function (item) { return item.text || ''; },
-            escapeMarkup: function (m) { return m; } // templateResult HTML kullanacaksan kalsın
-          });
-        });
-    </script> *@
-
 }

@@ -1,8 +1,10 @@
-﻿using Entegro.Application.DTOs.Category;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Categories;
 using Entegro.Web.Models.Content;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +14,11 @@ namespace Entegro.Web.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
-        public CategoryController(ICategoryService categoryService)
+        private readonly IMapper _mapper;
+        public CategoryController(ICategoryService categoryService,IMapper mapper)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public IActionResult Index()
@@ -40,19 +44,7 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CategoryModel model)
         {
-            var createDto = new CreateCategoryDto
-            {
-                Name = model.Name,
-                ParentId = model.ParentCategoryId,
-                MediaFileId = model.MediaFileId,
-                Description = model.Description,
-                MetaDescription = model.MetaDescription,
-                MetaTitle = model.MetaTitle,
-                DisplayOrder = model.DisplayOrder,
-                MetaKeywords = model.MetaKeywords,
-                Published = model.Published,
-
-            };
+            var createDto = _mapper.Map<CreateCategoryDto>(model);
             await _categoryService.CreateCategoryAsync(createDto);
 
             return Json(new { success = true });
@@ -66,62 +58,9 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            var categoryModel = new CategoryModel
-            {
-                Id = category.Id,
-                CreatedOn = category.CreatedOn,
-                UpdatedOn = category.UpdatedOn,
-                Description = category.Description,
-                DisplayOrder = category.DisplayOrder,
-                MetaDescription = category.MetaDescription,
-                MetaKeywords = category.MetaKeywords,
-                MetaTitle = category.MetaTitle,
-                Name = category.Name,
-                ParentCategoryId = category.ParentId,
-                Parent = category.Parent == null ? null : new CategoryModel()
-                {
-                    Id = category.Parent.Id,
-                    CreatedOn = category.Parent.CreatedOn,
-                    UpdatedOn = category.Parent.UpdatedOn,
-                    Description = category.Parent.Description,
-                    DisplayOrder = category.Parent.DisplayOrder,
-                    MetaDescription = category.Parent.MetaDescription,
-                    MetaKeywords = category.Parent.MetaKeywords,
-                    MetaTitle = category.Parent.MetaTitle,
-                    Name = category.Parent.Name,
-                    ParentCategoryId = category.Parent.ParentId,
-                    Published = category.Parent.Published,
-                },
-                Published = category.Published,
-                MediaFileId = category.MediaFileId,
-                MediaFile = category.MediaFile == null ? null : new MediaFileModel()
-                {
-                    Alt = category.MediaFile.Alt,
-                    CreatedOn = category.MediaFile.CreatedOn,
-                    Deleted = category.MediaFile.Deleted,
-                    Extension = category.MediaFile.Extension,
-                    FolderId = category.MediaFile.FolderId,
-                    Height = category.MediaFile.Height,
-                    Id = category.MediaFile.Id,
-                    IsTransient = category.MediaFile.IsTransient,
-                    MediaType = category.MediaFile.MediaType,
-                    Metadata = category.MediaFile.Metadata,
-                    MimeType = category.MediaFile.MimeType,
-                    Name = category.MediaFile.Name,
-                    PixelSize = category.MediaFile.PixelSize,
-                    Size = category.MediaFile.Size,
-                    Title = category.MediaFile.Title,
-                    UpdatedOn = category.MediaFile.UpdatedOn,
-                    Width = category.MediaFile.Width,
-                    Folder = category.MediaFile.Folder == null ? null : new MediaFolderModel()
-                    {
-                        Id = category.MediaFile.Folder.Id,
-                        Name = category.MediaFile.Folder.Name,
-                    }
-                }
-            };
 
-            return View(categoryModel);
+            var model = _mapper.Map<CategoryModel>(category);
+            return View(model);
         }
 
         [HttpPost]
@@ -129,19 +68,7 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateCategoryDto
-                {
-                    Id = model.Id,
-                    ParentId = model.ParentCategoryId,
-                    Name = model.Name,
-                    MediaFileId = model.MediaFileId == 0 ? null : model.MediaFileId,
-                    Description = model.Description,
-                    MetaDescription = model.MetaDescription,
-                    MetaTitle = model.MetaTitle,
-                    DisplayOrder = model.DisplayOrder,
-                    MetaKeywords = model.MetaKeywords,
-                    Published = model.Published,
-                };
+                var updateDto = _mapper.Map<UpdateCategoryDto>(model);
                 await _categoryService.UpdateCategoryAsync(updateDto);
                 return Json(new { success = true });
             }

@@ -20,6 +20,7 @@ using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Common;
 using Entegro.Web.Models.Integration.Marketplace;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -48,6 +49,7 @@ namespace Entegro.Web.Controllers
         private readonly IPazaramaService _pazaramaService;
         private readonly IHepsiburadaService _hepsiburadaService;
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
+        private readonly IMapper _mapper;
         public ProductController(
             IProductService productService,
             IProductCategoryService productCategoryMappingService,
@@ -64,7 +66,8 @@ namespace Entegro.Web.Controllers
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IN11Service n11Service,
             IPazaramaService pazaramaService,
-            IHepsiburadaService hepsiburadaService)
+            IHepsiburadaService hepsiburadaService,
+            IMapper mapper)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -82,6 +85,7 @@ namespace Entegro.Web.Controllers
             _n11Service = n11Service;
             _pazaramaService = pazaramaService;
             _hepsiburadaService = hepsiburadaService;
+            _mapper = mapper;
         }
 
         #region Product list / create / edit / delete
@@ -162,26 +166,7 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var createDto = new CreateProductDto();
-                createDto.Barcode = model.Barcode;
-                createDto.BrandId = model.BrandId;
-                createDto.Code = model.Code;
-                createDto.Currency = model.Currency;
-                createDto.Description = model.Description;
-                createDto.Height = model.Height;
-                createDto.Length = model.Length;
-                createDto.MetaDescription = model.MetaDescription;
-                createDto.MetaTitle = model.MetaTitle;
-                createDto.MetaKeywords = model.MetaKeywords;
-                createDto.Name = model.Name;
-                createDto.Price = model.Price;
-                createDto.StockQuantity = model.StockQuantity;
-                createDto.Unit = model.Unit;
-                createDto.VatInc = model.VatInc;
-                createDto.VatRate = model.VatRate;
-                createDto.Weight = model.Weight;
-                createDto.Width = model.Width;
-
+                var createDto = _mapper.Map<CreateProductDto>(model);
                 await _productService.CreateProductAsync(createDto);
 
                 return Json(new { success = true });
