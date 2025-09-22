@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -89,8 +90,21 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<CustomerDto>> GetPagedAsync(GridCommand gridCommand)
         {
             var customers = await _customerRepository.GetPagedAsync(gridCommand);
-            var customerDtos = _mapper.Map<PagedResult<CustomerDto>>(customers);
-            return customerDtos;
+            var items = await customers.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<CustomerDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<CustomerDto>
+            {
+                Items = items,
+                TotalCount = customers.TotalCount,
+                PageNumber = customers.PageNumber,
+                PageSize = customers.PageSize
+            };
         }
 
         public async Task<bool> UpdateCustomerAsync(UpdateCustomerDto updateCustomer)

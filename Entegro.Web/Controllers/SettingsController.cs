@@ -32,7 +32,7 @@ namespace Entegro.Web.Controllers
         {
             var settings = await _settingService.GetAllAsync();
 
-            CreateGeneralCommonViewModel model = new CreateGeneralCommonViewModel();
+            CreateGeneralCommonModel model = new CreateGeneralCommonModel();
             model.SystemUrl = settings.Where(m => m.Key == "SystemUrl").Select(m => m.Value).FirstOrDefault() ?? "";
             model.SystemApiUrl = settings.Where(m => m.Key == "SystemApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
 
@@ -40,7 +40,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateSetting(CreateGeneralCommonViewModel model)
+        public async Task<IActionResult> CreateOrUpdateSetting(CreateGeneralCommonModel model)
         {
             var systemUrlExists = await _settingService.ExistsByKeyAsync("SystemUrl");
             if (systemUrlExists)
@@ -70,8 +70,8 @@ namespace Entegro.Web.Controllers
         {
             var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP);
 
-            var model = new ErpListViewModel();
-            model.ErpList = allErpIntegrationSystem.Select(m => new ErpIntegrationSystemViewModel
+            var model = new ErpListModel();
+            model.ErpList = allErpIntegrationSystem.Select(m => new ErpIntegrationSystemModel
             {
                 Id = m.Id,
                 Name = m.Name,
@@ -86,7 +86,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Erp(ErpIntegrationSystemViewModel model)
+        public async Task<IActionResult> Erp(ErpIntegrationSystemModel model)
         {
             var createIntegrationSystem = new CreateIntegrationSystemDto();
             createIntegrationSystem.Name = model.Name;
@@ -133,7 +133,7 @@ namespace Entegro.Web.Controllers
                     var apiUser = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
                     var apiPassword = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
 
-                    LogoErpSettingsViewModel model = new LogoErpSettingsViewModel();
+                    LogoErpSettingsModel model = new LogoErpSettingsModel();
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
@@ -154,7 +154,7 @@ namespace Entegro.Web.Controllers
                     var apiUserForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
                     var apiPasswordForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
 
-                    NetsisErpSettingsViewModel modelForNetsis = new NetsisErpSettingsViewModel();
+                    NetsisErpSettingsModel modelForNetsis = new NetsisErpSettingsModel();
                     modelForNetsis.Id = idForNetsis;
                     modelForNetsis.Name = nameForNetsis;
                     modelForNetsis.Description = descriptionForNetsis;
@@ -173,7 +173,7 @@ namespace Entegro.Web.Controllers
                     var apiUserForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
                     var apiPasswordForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
 
-                    OpakErpSettingsViewModel modelForOpak = new OpakErpSettingsViewModel();
+                    OpakErpSettingsModel modelForOpak = new OpakErpSettingsModel();
                     modelForOpak.Id = idForOpak;
                     modelForOpak.Name = nameForOpak;
                     modelForOpak.Description = descriptionForOpak;
@@ -190,7 +190,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ErpParameterLogo(LogoErpSettingsViewModel model)
+        public async Task<IActionResult> ErpParameterLogo(LogoErpSettingsModel model)
         {
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
 
@@ -269,7 +269,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ErpParameterNetsis(NetsisErpSettingsViewModel model)
+        public async Task<IActionResult> ErpParameterNetsis(NetsisErpSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -348,7 +348,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ErpParameterOpak(OpakErpSettingsViewModel model)
+        public async Task<IActionResult> ErpParameterOpak(OpakErpSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -443,8 +443,8 @@ namespace Entegro.Web.Controllers
         {
             var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce);
 
-            var model = new CommerceListViewModel();
-            model.CommerceList = allErpIntegrationSystem.Select(m => new CommerceIntegrationSystemViewModel
+            var model = new CommerceListModel();
+            model.CommerceList = allErpIntegrationSystem.Select(m => new CommerceIntegrationSystemModel
             {
                 Id = m.Id,
                 Name = m.Name,
@@ -459,7 +459,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Commerce(CommerceIntegrationSystemViewModel model)
+        public async Task<IActionResult> Commerce(CommerceIntegrationSystemModel model)
         {
             var createIntegrationSystem = new CreateIntegrationSystemDto();
             createIntegrationSystem.Name = model.Name;
@@ -504,7 +504,7 @@ namespace Entegro.Web.Controllers
                     var apiUser = integrationSystemCommerce.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
                     var apiPassword = integrationSystemCommerce.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
 
-                    SmartstoreCommerceSettingsViewModel model = new SmartstoreCommerceSettingsViewModel();
+                    SmartstoreCommerceSettingsModel model = new SmartstoreCommerceSettingsModel();
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
@@ -521,7 +521,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CommerceParameterSmartstore(SmartstoreCommerceSettingsViewModel model)
+        public async Task<IActionResult> CommerceParameterSmartstore(SmartstoreCommerceSettingsModel model)
         {
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
 
@@ -617,8 +617,8 @@ namespace Entegro.Web.Controllers
         {
             var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Cargo);
 
-            var model = new CargoListViewModel();
-            model.CargoList = allErpIntegrationSystem.Select(m => new CargoIntegrationSystemViewModel
+            var model = new CargoListModel();
+            model.CargoList = allErpIntegrationSystem.Select(m => new CargoIntegrationSystemModel
             {
                 Id = m.Id,
                 Name = m.Name,
@@ -633,7 +633,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Cargo(CargoIntegrationSystemViewModel model)
+        public async Task<IActionResult> Cargo(CargoIntegrationSystemModel model)
         {
             var createIntegrationSystem = new CreateIntegrationSystemDto();
             createIntegrationSystem.Name = model.Name;
@@ -679,7 +679,7 @@ namespace Entegro.Web.Controllers
                     var apiUser = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
                     var apiPassword = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
 
-                    YurticiCargoSettingsViewModel yurticiCargoSettings = new YurticiCargoSettingsViewModel();
+                    YurticiCargoSettingsModel yurticiCargoSettings = new YurticiCargoSettingsModel();
                     yurticiCargoSettings.Id = id;
                     yurticiCargoSettings.Name = name;
                     yurticiCargoSettings.Description = description;
@@ -701,7 +701,7 @@ namespace Entegro.Web.Controllers
                     var barkodStartPrefix = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "BarkodStartPrefix" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
                     var barkodEndPrefix = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "BarkodEndPrefix" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
 
-                    PTTCargoSettingsViewModel pTTCargoSettings = new PTTCargoSettingsViewModel();
+                    PTTCargoSettingsModel pTTCargoSettings = new PTTCargoSettingsModel();
                     pTTCargoSettings.Id = idForPTT;
                     pTTCargoSettings.Name = nameForPTT;
                     pTTCargoSettings.Description = descriptionForPTT;
@@ -722,7 +722,7 @@ namespace Entegro.Web.Controllers
                     var nameForAras = integrationSystemCargo.Name;
                     var descriptionForAras = integrationSystemCargo.Description;
 
-                    ArasCargoSettingsViewModel arasCargoSettings = new ArasCargoSettingsViewModel();
+                    ArasCargoSettingsModel arasCargoSettings = new ArasCargoSettingsModel();
                     arasCargoSettings.Id = idForAras;
                     arasCargoSettings.Name = nameForAras;
                     arasCargoSettings.Description = descriptionForAras;
@@ -739,7 +739,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CargoParameterYurtici(YurticiCargoSettingsViewModel model)
+        public async Task<IActionResult> CargoParameterYurtici(YurticiCargoSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -817,7 +817,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CargoParameterPTT(PTTCargoSettingsViewModel model)
+        public async Task<IActionResult> CargoParameterPTT(PTTCargoSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -915,7 +915,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CargoParameterAras(ArasCargoSettingsViewModel model)
+        public async Task<IActionResult> CargoParameterAras(ArasCargoSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -988,8 +988,8 @@ namespace Entegro.Web.Controllers
         {
             var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Marketplace);
 
-            var model = new MarketplaceListViewModel();
-            model.MarketplaceList = allErpIntegrationSystem.Select(m => new MarketplaceIntegrationSystemViewModel
+            var model = new MarketplaceListModel();
+            model.MarketplaceList = allErpIntegrationSystem.Select(m => new MarketplaceIntegrationSystemModel
             {
                 Id = m.Id,
                 Name = m.Name,
@@ -1020,7 +1020,7 @@ namespace Entegro.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Marketplace(MarketplaceIntegrationSystemViewModel model)
+        public async Task<IActionResult> Marketplace(MarketplaceIntegrationSystemModel model)
         {
             var createIntegrationSystem = new CreateIntegrationSystemDto();
             createIntegrationSystem.Name = model.Name;
@@ -1082,7 +1082,7 @@ namespace Entegro.Web.Controllers
             var apiPassword = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            TrendyolMarketplaceSettingsViewModel model = new TrendyolMarketplaceSettingsViewModel();
+            TrendyolMarketplaceSettingsModel model = new TrendyolMarketplaceSettingsModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1103,7 +1103,7 @@ namespace Entegro.Web.Controllers
             var appSecret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "AppSecret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var appKey = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "AppKey" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            N11MarketplaceSettingsViewModel model = new N11MarketplaceSettingsViewModel();
+            N11MarketplaceSettingsModel model = new N11MarketplaceSettingsModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1122,7 +1122,7 @@ namespace Entegro.Web.Controllers
             var clientId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ClientId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var clientSecret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            PazaramaMarketplaceSettingsViewModel model = new PazaramaMarketplaceSettingsViewModel();
+            PazaramaMarketplaceSettingsModel model = new PazaramaMarketplaceSettingsModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1143,7 +1143,7 @@ namespace Entegro.Web.Controllers
             var secret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "Secret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var sellerId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SellerId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            IdefixMarketplaceSettingsViewModel model = new IdefixMarketplaceSettingsViewModel();
+            IdefixMarketplaceSettingsModel model = new IdefixMarketplaceSettingsModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1164,7 +1164,7 @@ namespace Entegro.Web.Controllers
             var apiUser = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var supplierId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "SupplierId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            CicekSepetiMarketplaceSettingsViewModel model = new CicekSepetiMarketplaceSettingsViewModel();
+            CicekSepetiMarketplaceSettingsModel model = new CicekSepetiMarketplaceSettingsModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1186,7 +1186,7 @@ namespace Entegro.Web.Controllers
             var merchantId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "MerchantId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var userAgent = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "UserAgent" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
-            HepsiburadaMarketplaceSettingsViewModel model = new HepsiburadaMarketplaceSettingsViewModel();
+            HepsiburadaMarketplaceSettingsModel model = new HepsiburadaMarketplaceSettingsModel();
             model.Id = id;
             model.Name = name;
             model.Description = description;
@@ -1202,7 +1202,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterTrendyol(TrendyolMarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterTrendyol(TrendyolMarketplaceSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -1280,7 +1280,7 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("marketplace");
         }
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterN11(N11MarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterN11(N11MarketplaceSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -1336,7 +1336,7 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("marketplace");
         }
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterPazarama(PazaramaMarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterPazarama(PazaramaMarketplaceSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -1391,7 +1391,7 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("marketplace");
         }
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterIdefix(IdefixMarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterIdefix(IdefixMarketplaceSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -1468,7 +1468,7 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("marketplace");
         }
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterCicekSepeti(CicekSepetiMarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterCicekSepeti(CicekSepetiMarketplaceSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -1522,7 +1522,7 @@ namespace Entegro.Web.Controllers
             return RedirectToAction("marketplace");
         }
         [HttpPost]
-        public async Task<IActionResult> MarketplaceParameterHepsiburada(HepsiburadaMarketplaceSettingsViewModel model)
+        public async Task<IActionResult> MarketplaceParameterHepsiburada(HepsiburadaMarketplaceSettingsModel model)
         {
             //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
@@ -1638,8 +1638,8 @@ namespace Entegro.Web.Controllers
         {
             var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.EInvoice);
 
-            var model = new EInvoiceListViewModel();
-            model.EInvoiceList = allErpIntegrationSystem.Select(m => new EInvoiceIntegrationSystemViewModel
+            var model = new EInvoiceListModel();
+            model.EInvoiceList = allErpIntegrationSystem.Select(m => new EInvoiceIntegrationSystemModel
             {
                 Id = m.Id,
                 Name = m.Name,
@@ -1654,7 +1654,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EInvoice(EInvoiceIntegrationSystemViewModel model)
+        public async Task<IActionResult> EInvoice(EInvoiceIntegrationSystemModel model)
         {
             var createIntegrationSystem = new CreateIntegrationSystemDto();
             createIntegrationSystem.Name = model.Name;
@@ -1701,7 +1701,7 @@ namespace Entegro.Web.Controllers
                     var apiUser = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
                     var apiPassword = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
 
-                    TrendyolEFaturamSettingsViewModel model = new TrendyolEFaturamSettingsViewModel();
+                    TrendyolEFaturamSettingsModel model = new TrendyolEFaturamSettingsModel();
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
@@ -1718,7 +1718,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CommerceParameterTrendyolEFaturam(SmartstoreCommerceSettingsViewModel model)
+        public async Task<IActionResult> CommerceParameterTrendyolEFaturam(SmartstoreCommerceSettingsModel model)
         {
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
             {

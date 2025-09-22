@@ -1,4 +1,4 @@
-﻿@model SpecificationAttributeViewModel
+﻿@model SpecificationAttributeModel
 
 <form asp-action="Edit" id="specificationattribute-form">
     <div class="container-fluid flex-grow-1 container-p-y">
@@ -21,7 +21,7 @@
                     <div class="tab-content">
 
                         <div class="tab-pane fade show active" id="form-tabs-attribute" role="tabpanel">
-                            @await Html.PartialAsync("_SpecificationAttributeEdit", new UpdateSpecificationAttributeViewModel { Id = Model.Id, Name = Model.Name })
+                            @await Html.PartialAsync("_SpecificationAttributeEdit", new SpecificationAttributeModel { Id = Model.Id, Name = Model.Name })
                         </div>
 
                         <div class="tab-pane fade" id="form-tabs-attributeOption" role="tabpanel">

@@ -34,15 +34,9 @@ namespace Entegro
     public static class EntegroVersion
     {
         private static readonly Version _infoVersion = new("1.0.0.0");
-        private static readonly List<Version> _breakingChangesHistory = new()
-        {
-            // IMPORTANT: Add app versions from low to high
-            // NOTE: do not specify build & revision unless you have good reasons for it.
-            //       A release with breaking changes should definitely have at least
-            //       a greater minor version.
-        };
+        private static readonly List<Version> _breakingChangesHistory = new() { };
 
-        private const string HELP_BASEURL = "https://Entegro.atlassian.net/wiki/x/";
+        private const string HELP_BASEURL = "https://entegro.atlassian.net/wiki/x/";
 
         static EntegroVersion()
         {

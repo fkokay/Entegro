@@ -24,7 +24,7 @@ namespace Entegro.Api.Jobs
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly IBrandService _brandService;
-        private readonly IProductImageMappingService _productImageMappingService;
+        private readonly IProductMediaFileMappingService _productImageMappingService;
         private readonly IProductCategoryService _productCategoryService;
 
 
@@ -35,7 +35,7 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
-        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductImageMappingService productImageMappingService, IProductCategoryService productCategoryService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
+        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductMediaFileMappingService productImageMappingService, IProductCategoryService productCategoryService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
         {
             _importProfileService = importProfileService;
             _productService = productService;

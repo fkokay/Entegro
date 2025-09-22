@@ -1,7 +1,9 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.EmailAccount;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Platform.Messaging;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +13,12 @@ namespace Entegro.Web.Controllers
     public class EmailAccountController : Controller
     {
         private readonly IEmailAccountService _emailAccountService;
+        private readonly IMapper _mapper;
 
-        public EmailAccountController(IEmailAccountService emailAccountService)
+        public EmailAccountController(IEmailAccountService emailAccountService,IMapper mapper)
         {
             _emailAccountService = emailAccountService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -32,25 +36,15 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            EmailAccountViewModel model = new EmailAccountViewModel();
+            EmailAccountModel model = new EmailAccountModel();
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(EmailAccountViewModel model)
+        public async Task<IActionResult> Create(EmailAccountModel model)
         {
             if (ModelState.IsValid)
             {
-                var createDto = new CreateEmailAccountDto();
-                createDto.Host = model.Host;
-                createDto.Password = model.Password;
-                createDto.UserDefaultCredentials = model.UserDefaultCredentials;
-                createDto.Password = model.Password;
-                createDto.Username = model.Username;
-                createDto.DisplayName = model.DisplayName;
-                createDto.Port = model.Port;
-                createDto.Email = model.Email;
-                createDto.Host = model.Host;
-
+                var createDto = _mapper.Map<CreateEmailAccountDto>(model);
                 await _emailAccountService.AddAsync(createDto);
                 return Json(new { success = true });
             }
@@ -60,42 +54,22 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            EmailAccountViewModel model = new EmailAccountViewModel();
-
-            var account = await _emailAccountService.GetByIdAsync(id);
-            if (account == null)
+            var emailAccount = await _emailAccountService.GetByIdAsync(id);
+            if (emailAccount == null)
             {
                 return NotFound();
             }
-            model.Id = account.Id;
-            model.Email = account.Email;
-            model.Password = account.Password;
-            model.Username = account.Username;
-            model.DisplayName = account.DisplayName;
-            model.Port = account.Port;
-            model.Email = account.Email;
-            model.EnableSsl = account.EnableSsl;
-            model.Host = account.Host;
-            model.Port = account.Port;
+
+            var model = _mapper.Map<EmailAccountModel>(emailAccount);
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EmailAccountViewModel model)
+        public async Task<IActionResult> Edit(EmailAccountModel model)
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateEmailAccountDto();
-                updateDto.Host = model.Host;
-                updateDto.Password = model.Password;
-                updateDto.UserDefaultCredentials = model.UserDefaultCredentials;
-                updateDto.Password = model.Password;
-                updateDto.Username = model.Username;
-                updateDto.DisplayName = model.DisplayName;
-                updateDto.Port = model.Port;
-                updateDto.Email = model.Email;
-                updateDto.Host = model.Host;
-
+                var updateDto = _mapper.Map<UpdateEmailAccountDto>(model);
                 await _emailAccountService.UpdateAsync(updateDto);
 
                 return Json(new { success = true });

@@ -20,7 +20,7 @@ namespace Entegro.Web.Components
             int userId = Convert.ToInt32(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = await _userService.GetUserByIdAsync(userId);
 
-            NavbarViewModel model = new NavbarViewModel();
+            NavbarModel model = new NavbarModel();
             model.FirstName = user.FirstName;
             model.LastName = user.LastName;
             model.RoleName = "Admin";

@@ -26,12 +26,12 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            CountryViewModel model = new CountryViewModel();
+            CountryModel model = new CountryModel();
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CountryViewModel model)
+        public async Task<IActionResult> Create(CountryModel model)
         {
             var createDto = new CreateCountryDto
             {
@@ -53,13 +53,13 @@ namespace Entegro.Web.Controllers
                 return NotFound();
             }
 
-            var countryModel = new CountryViewModel
+            var countryModel = new CountryModel
             {
                 Id = country.Id,
                 Name = country.Name,
                 Published = country.Published,
                 DisplayOrder = country.DisplayOrder,
-                Cities = country.Cities.Select(c => new CityViewModel
+                Cities = country.Cities.Select(c => new CityModel
                 {
                     Id = c.Id,
                     Name = c.Name,
@@ -72,7 +72,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CountryViewModel model)
+        public async Task<IActionResult> Edit(CountryModel model)
         {
             if (ModelState.IsValid)
             {

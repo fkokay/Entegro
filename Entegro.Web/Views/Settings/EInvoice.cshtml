@@ -1,4 +1,4 @@
-﻿@model EInvoiceListViewModel
+﻿@model EInvoiceListModel
 @{
     ViewData["Title"] = "E-Ticaret Entegrasyonları";
 }
@@ -75,7 +75,7 @@
     }
 </div>
 
-@await Html.PartialAsync("_EInvoiceAdd", new EInvoiceIntegrationSystemViewModel())
+@await Html.PartialAsync("_EInvoiceAdd", new EInvoiceIntegrationSystemModel())
 
 @section Scripts {
 

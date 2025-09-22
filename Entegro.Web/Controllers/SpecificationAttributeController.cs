@@ -32,11 +32,11 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult SpecificationAttributeCreatePopup()
         {
-            return PartialView("_SpecificationAttributeCreatePopup", new CreateSpecificationAttributeViewModel());
+            return PartialView("_SpecificationAttributeCreatePopup", new SpecificationAttributeModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> SpecificationAttributeCreate([FromBody] CreateSpecificationAttributeViewModel model)
+        public async Task<IActionResult> SpecificationAttributeCreate([FromBody] SpecificationAttributeModel model)
         {
             await _specificationAttributeService.CreateAsync(new CreateSpecificationAttributeDto
             {
@@ -49,22 +49,22 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var specificationAttributeDto = await _specificationAttributeService.GetByIdAsync(id);
-            var specificationAttributeViewModel = new SpecificationAttributeViewModel
+            var specificationAttributeModel = new SpecificationAttributeModel
             {
                 Id = specificationAttributeDto.Id,
                 Name = specificationAttributeDto.Name,
                 SpecificationAttributeOptions = specificationAttributeDto.SpecificationAttributeOptions == null ? null :
-                    specificationAttributeDto.SpecificationAttributeOptions.Select(option => new SpecificationAttributeOptionViewModel
+                    specificationAttributeDto.SpecificationAttributeOptions.Select(option => new SpecificationAttributeOptionModel
                     {
                         Id = option.Id,
                         Name = option.Name,
                         DisplayOrder = option.DisplayOrder
                     }).ToList()
             };
-            return View(specificationAttributeViewModel);
+            return View(specificationAttributeModel);
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateSpecificationAttributeViewModel model)
+        public async Task<IActionResult> Edit(SpecificationAttributeModel model)
         {
             await _specificationAttributeService.UpdateAsync(new UpdateSpecificationAttributeDto
             {
@@ -93,12 +93,12 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult SpecificationAttributeOptionCreatePopup(int id)
         {
-            CreateSpecificationAttributeOptionViewModel model = new CreateSpecificationAttributeOptionViewModel();
+            SpecificationAttributeOptionModel model = new SpecificationAttributeOptionModel();
             model.SpecificationAttributeId = id;
             return PartialView("_SpecificationAttributeOptionCreatePopup", model);
         }
         [HttpPost]
-        public async Task<IActionResult> SpecificationAttributeOptionCreate([FromBody] CreateSpecificationAttributeOptionViewModel model)
+        public async Task<IActionResult> SpecificationAttributeOptionCreate([FromBody] SpecificationAttributeOptionModel model)
         {
             await _specificationAttributeOptionService.CreateAsync(new CreateSpecificationAttributeOptionDto
             {

@@ -80,211 +80,150 @@ namespace Entegro.Infrastructure.Repositories
             return order;
         }
 
-        public async Task<Application.DTOs.Common.PagedResult<OrderModel>> GetPagedAsync(GridCommand gridCommand, int orderStatus)
+        public async Task<Application.DTOs.Common.PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, int orderStatus)
         {
             var query = _context.Orders
                 .Include(o => o.OrderItems)
-                .Include(c => c.Customer)
-                .Include(c => c.Shipments)
-            .AsNoTracking();
+                .Include(o => o.Customer)
+                .Include(o => o.Shipments)
+                .AsNoTracking();
 
-            if (gridCommand.Search != null)
+            // Search filter
+            if (!string.IsNullOrEmpty(gridCommand.Search?.Value))
             {
-                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
-                {
-                    query = query.Where(b => b.OrderNumber.Contains(gridCommand.Search.Value)).AsQueryable();
-                }
+                query = query.Where(o => o.OrderNumber.Contains(gridCommand.Search.Value));
             }
 
+            // Dynamic ordering
+            IOrderedQueryable<Order> orderedQuery = null;
             if (gridCommand.Order.Any())
             {
                 foreach (var item in gridCommand.Order)
                 {
-                    string field = "";
-                    if (string.IsNullOrEmpty(gridCommand.Columns[item.Column].Name))
-                    {
-                        field = gridCommand.Columns[item.Column].Data;
-                    }
+                    var field = string.IsNullOrEmpty(gridCommand.Columns[item.Column].Name)
+                        ? gridCommand.Columns[item.Column].Data
+                        : gridCommand.Columns[item.Column].Name;
+
+                    if (orderedQuery == null)
+                        orderedQuery = query.OrderBy($"{field} {(item.Dir ?? "asc")}");
                     else
-                    {
-                        field = gridCommand.Columns[item.Column].Name;
-                    }
-
-
-                    query = query.OrderBy($"{field} {(item.Dir ?? "asc")}");
+                        orderedQuery = orderedQuery.ThenBy($"{field} {(item.Dir ?? "asc")}");
                 }
+                query = orderedQuery;
             }
             else
             {
-                query = query.OrderBy(b => b.Id);
+                query = query.OrderBy(o => o.Id);
             }
 
+            // Apply orderStatus filter
+            switch (orderStatus)
+            {
+                case 1: // Paketlenecek
+                    query = query.Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => (int?)si.Quantity ?? 0)));
+                    break;
+                case 2: // Gönderime Hazır
+                    query = query.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null));
+                    break;
+                case 3: // Kargoda
+                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null));
+                    break;
+                case 4: // Teslim Edildi
+                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null));
+                    break;
+                case 5: // Teslim Edilemedi
+                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc == null));
+                    break;
+                case 6: // Ödemesi Bekleniyor
+                    query = query.Where(o => o.PaymentStatus == Domain.Enums.PaymentStatus.Pending);
+                    break;
+                case 7: // İptal Edildi
+                    query = query.Where(o => o.OrderStatus == Domain.Enums.OrderStatus.Cancelled);
+                    break;
+            }
+
+            // Total count
             var totalCount = await query.CountAsync();
 
-            //Paketlenecek Siparişler
-            if (orderStatus == 1)
-            {
-                var orders = await query
-                .Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => si.Quantity)))
-                .Select(m => new OrderModel()
-                {
-                    Id = m.Id,
-                    PackageNo = "",
-                    IntegrationSystemId = m.IntegrationSystemId,
-                    IntegrationSystem = m.IntegrationSystem == null ? null : new IntegrationSystemDto()
-                    {
-                        Id = m.IntegrationSystem.Id,
-                        Description = m.IntegrationSystem.Description,
-                        Name = m.IntegrationSystem.Name,
-                        IntegrationSystemType = m.IntegrationSystem.IntegrationSystemType,
-                        IntegrationSystemTypeId = m.IntegrationSystem.IntegrationSystemTypeId,
-                        IntegrationSystemParameters = m.IntegrationSystem.IntegrationSystemParameters.Select(x => new IntegrationSystemParameterDto()
-                        {
-                            Id = x.Id,
-                            IntegrationSystemId = x.IntegrationSystemId,
-                            Key = x.Key,
-                            Value = x.Value
-                        }).ToList(),
-                    },
-                    OrderNumber = m.OrderNumber,
-                    OrderDate = m.OrderDateUtc,
-                    DueDate = m.DueDateUtc,
-                    CustomerName = m.Customer.Name,
-                    CustomerOrderCounts = m.Customer.Orders.Count(),
-                    ShipmentCarrier = "",
-                    ShippingTrackingNumber = "",
-                    OrderSubTotal = m.OrderSubTotal,
-                    OrderDiscount = m.OrderDiscount,
-                    OrderTotal = m.OrderTotal,
-                    PaymentMethod = m.PaymentMethod,
-                    PaymentStatus = m.PaymentStatusLabelHint,
-                    OrderItems = m.OrderItems.Select(x => new OrderItemModel()
-                    {
-                        Id = x.Id,
-                        OrderId = x.OrderId,
-                        UnitPrice = x.UnitPrice,
-                        AttributeDescription = "",
-                        ProductId = x.ProductId,
-                        ProductBarcode = x.Product == null ? "" : x.Product.Barcode,
-                        ProductCode = x.Product == null ? "" : x.Product.Code,
-                        ProductName = x.Product == null ? "" : x.Product.Name,
-                        ProductMainPicture = "",
-                        ProductMainPictureId = x.Product == null ? null : x.Product.MainPictureId,
-                        IntegrationSku = x.IntegrationSku,
-                        IntegrationProductName = x.IntegrationProductName,
-                        Quantity = x.Quantity - x.ShipmentItems.Sum(si => si.Quantity)
-                    }).ToList()
-                })
-                .Skip(gridCommand.Start)
-                .Take(gridCommand.Length)
-                .ToListAsync();
-
-                return new Application.DTOs.Common.PagedResult<OrderModel>
-                {
-                    Items = orders,
-                    TotalCount = totalCount,
-                    PageNumber = gridCommand.Start + 1,
-                    PageSize = gridCommand.Length
-                };
-            }
-            else
-            {
-                //Gönderime Hazır
-                if (orderStatus == 2)
-                {
-                    query = query.Where(m => m.Shipments.Any() && !m.Shipments.Where(m => m.ShippedDateUtc != null).Any());
-                }
-                //Kargoda
-                else if (orderStatus == 3)
-                {
-                    query = query.Where(m => m.Shipments.Any() && m.Shipments.Where(m => m.ShippedDateUtc != null).Any());
-                }
-                //Teslim Edildi
-                else if (orderStatus == 4)
-                {
-                    query = query.Where(m => m.Shipments.Any() && m.Shipments.Where(m => m.DeliveryDateUtc != null).Any());
-                }
-                //Teslim Edilemedi
-                else if (orderStatus == 5)
-                {
-                    query = query.Where(m => m.Shipments.Any() && m.Shipments.Where(m => m.DeliveryDateUtc != null).Any());
-                }
-                //Ödemesi Bekleniyor
-                else if (orderStatus == 6)
-                {
-                    query = query.Where(m => m.PaymentStatus == Domain.Enums.PaymentStatus.Pending);
-                }
-                //İptal Edildi
-                else if (orderStatus == 7)
-                {
-                    query = query.Where(m => m.OrderStatus == Domain.Enums.OrderStatus.Cancelled);
-                }
-
-
-
-                var orders = await query
-                .SelectMany(order => order.Shipments, (order, shipment) => new { order, shipment })
-                .Select(x => new OrderModel
+            // Projection
+            var orders = await query
+                .SelectMany(o => o.Shipments.DefaultIfEmpty(), (order, shipment) => new { order, shipment })
+                .Select(x => new OrderListDto
                 {
                     Id = x.order.Id,
-                    PackageNo = x.shipment.PackageNo,
+                    PackageNo = x.shipment != null ? x.shipment.PackageNo : "",
                     IntegrationSystemId = x.order.IntegrationSystemId,
-                    IntegrationSystem = x.order.IntegrationSystem == null ? null : new IntegrationSystemDto()
-                    {
-                        Id = x.order.IntegrationSystem.Id,
-                        Description = x.order.IntegrationSystem.Description,
-                        Name = x.order.IntegrationSystem.Name,
-                        IntegrationSystemType = x.order.IntegrationSystem.IntegrationSystemType,
-                        IntegrationSystemTypeId = x.order.IntegrationSystem.IntegrationSystemTypeId,
-                        IntegrationSystemParameters = x.order.IntegrationSystem.IntegrationSystemParameters.Select(m => new IntegrationSystemParameterDto()
+                    IntegrationSystem = x.order.IntegrationSystem != null
+                        ? new IntegrationSystemDto
                         {
-                            Id = m.Id,
-                            IntegrationSystemId = m.IntegrationSystemId,
-                            Key = m.Key,
-                            Value = m.Value
-                        }).ToList(),
-                    },
+                            Id = x.order.IntegrationSystem.Id,
+                            Name = x.order.IntegrationSystem.Name,
+                            Description = x.order.IntegrationSystem.Description,
+                            IntegrationSystemType = x.order.IntegrationSystem.IntegrationSystemType,
+                            IntegrationSystemTypeId = x.order.IntegrationSystem.IntegrationSystemTypeId,
+                            IntegrationSystemParameters = x.order.IntegrationSystem.IntegrationSystemParameters
+                                .Select(p => new IntegrationSystemParameterDto
+                                {
+                                    Id = p.Id,
+                                    IntegrationSystemId = p.IntegrationSystemId,
+                                    Key = p.Key,
+                                    Value = p.Value
+                                }).ToList()
+                        }
+                        : null,
                     OrderNumber = x.order.OrderNumber,
                     OrderDate = x.order.OrderDateUtc,
                     DueDate = x.order.DueDateUtc,
                     CustomerName = x.order.Customer.Name,
                     CustomerOrderCounts = x.order.Customer.Orders.Count(),
-                    ShipmentCarrier = x.shipment.Carrier,
-                    ShippingTrackingNumber = x.shipment.TrackingNumber,
-                    OrderSubTotal = x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity),
+                    ShipmentCarrier = x.shipment != null ? x.shipment.Carrier : "",
+                    ShippingTrackingNumber = x.shipment != null ? x.shipment.TrackingNumber : "",
+                    OrderSubTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) : x.order.OrderSubTotal,
                     OrderDiscount = 0,
-                    OrderTotal = x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity),
+                    OrderTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) : x.order.OrderTotal,
                     PaymentMethod = x.order.PaymentMethod,
                     PaymentStatus = x.order.PaymentStatusLabelHint,
-                    OrderItems = x.shipment.ShipmentItems.Select(si => new OrderItemModel
-                    {
-                        Id = si.Id,
-                        OrderId = si.OrderItem.OrderId,
-                        UnitPrice = si.OrderItem.UnitPrice,
-                        AttributeDescription = "",
-                        ProductBarcode = si.OrderItem.Product.Barcode,
-                        ProductCode = si.OrderItem.Product.Code,
-                        ProductName = si.OrderItem.Product.Name,
-                        ProductMainPicture = "",
-                        ProductMainPictureId = si.OrderItem.Product.MainPictureId,
-                        Quantity = si.Quantity,
-                        ProductId = si.OrderItem.ProductId,
-                        IntegrationSku = si.OrderItem.IntegrationSku,
-                        IntegrationProductName = si.OrderItem.IntegrationProductName,
-                    }).ToList()
+                    OrderItems = (x.shipment != null
+                          ? x.shipment.ShipmentItems.Select(si => new OrderItemListDto
+                          {
+                              Id = si.Id,
+                              OrderId = si.OrderItem.OrderId,
+                              UnitPrice = si.OrderItem.UnitPrice,
+                              ProductId = si.OrderItem.ProductId,
+                              ProductBarcode = si.OrderItem.Product.Barcode,
+                              ProductCode = si.OrderItem.Product.Code,
+                              ProductName = si.OrderItem.Product.Name,
+                              ProductMainPictureId = si.OrderItem.Product.MainPictureId,
+                              Quantity = si.Quantity,
+                              IntegrationSku = si.OrderItem.IntegrationSku,
+                              IntegrationProductName = si.OrderItem.IntegrationProductName
+                          }).ToList()
+                          : x.order.OrderItems.Select(oi => new OrderItemListDto
+                          {
+                              Id = oi.Id,
+                              OrderId = oi.OrderId,
+                              UnitPrice = oi.UnitPrice,
+                              ProductId = oi.ProductId,
+                              ProductBarcode = oi.Product != null ? oi.Product.Barcode : "",
+                              ProductCode = oi.Product != null ? oi.Product.Code : "",
+                              ProductName = oi.Product != null ? oi.Product.Name : "",
+                              ProductMainPictureId = oi.Product != null ? oi.Product.MainPictureId : null,
+                              Quantity = oi.Quantity,
+                              IntegrationSku = oi.IntegrationSku,
+                              IntegrationProductName = oi.IntegrationProductName
+                          }).ToList())
                 })
                 .Skip(gridCommand.Start)
                 .Take(gridCommand.Length)
                 .ToListAsync();
 
-                return new Application.DTOs.Common.PagedResult<OrderModel>
-                {
-                    Items = orders,
-                    TotalCount = totalCount,
-                    PageNumber = gridCommand.Start + 1,
-                    PageSize = gridCommand.Length
-                };
-            }
+            return new Application.DTOs.Common.PagedResult<OrderListDto>
+            {
+                Items = orders,
+                TotalCount = totalCount,
+                PageNumber = (gridCommand.Start / gridCommand.Length) + 1,
+                PageSize = gridCommand.Length
+            };
         }
 
         public async Task UpdateAsync(Order order)

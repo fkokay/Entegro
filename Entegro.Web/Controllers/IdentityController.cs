@@ -21,7 +21,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginModel model)
         {
             var user = await _userService.GetByEmailAndPasswordAsync(model.Email, model.Password);
             if (user is not null)
@@ -55,7 +55,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult ForgotPassword(ForgotPasswordViewModel model)
+        public IActionResult ForgotPassword(ForgotPasswordModel model)
         {
             //mail için servis gerekiyor
 

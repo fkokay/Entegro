@@ -1,8 +1,10 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Brands;
 using Entegro.Web.Models.Content;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +14,11 @@ namespace Entegro.Web.Controllers
     public class BrandController : Controller
     {
         private readonly IBrandService _brandService;
-        public BrandController(IBrandService brandService)
+        private readonly IMapper _mapper;
+        public BrandController(IBrandService brandService,IMapper mapper)
         {
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public IActionResult Index()
@@ -29,27 +33,17 @@ namespace Entegro.Web.Controllers
 
         public IActionResult Create()
         {
-            BrandViewModel model = new BrandViewModel();
+            BrandModel model = new BrandModel();
             model.DisplayOrder = 0;
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(BrandViewModel model)
+        public async Task<IActionResult> Create(BrandModel model)
         {
             if (ModelState.IsValid)
             {
-                var createDto = new CreateBrandDto
-                {
-                    Name = model.Name,
-                    Description = model.Description,
-                    MetaDescription = model.MetaDescription,
-                    MetaTitle = model.MetaTitle,
-                    DisplayOrder = model.DisplayOrder,
-                    MetaKeywords = model.MetaKeywords,
-                    MediaFileId = model.MediaFileId,
-                    Published = model.Published,
-                };
+                var createDto = _mapper.Map<CreateBrandDto>(model);
 
                 await _brandService.CreateAsync(createDto);
                 return Json(new { success = true });
@@ -64,65 +58,19 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            var size = brand.MediaFile?.Size;
-            var brandModel = new BrandViewModel
-            {
-                Id = brand.Id,
-                Name = brand.Name,
-                Description = brand.Description,
-                MetaDescription = brand.MetaDescription,
-                MetaTitle = brand.MetaTitle,
-                DisplayOrder = brand.DisplayOrder,
-                Published = brand.Published,
-                MetaKeywords = brand.MetaKeywords,
-                MediaFileId = brand.MediaFileId,
-                MediaFile = brand.MediaFile == null ? null : new MediaFileViewModel()
-                {
-                    Alt = brand.MediaFile.Alt,
-                    CreatedOn = brand.MediaFile.CreatedOn,
-                    Deleted = brand.MediaFile.Deleted,
-                    Extension = brand.MediaFile.Extension,
-                    FolderId = brand.MediaFile.FolderId,
-                    Height = brand.MediaFile.Height,
-                    Id = brand.MediaFile.Id,
-                    IsTransient = brand.MediaFile.IsTransient,
-                    MediaType = brand.MediaFile.MediaType,
-                    Metadata = brand.MediaFile.Metadata,
-                    MimeType = brand.MediaFile.MimeType,
-                    Name = brand.MediaFile.Name,
-                    PixelSize = brand.MediaFile.PixelSize,
-                    Size = brand.MediaFile.Size,
-                    Title = brand.MediaFile.Title,
-                    UpdatedOn = brand.MediaFile.UpdatedOn,
-                    Width = brand.MediaFile.Width,
-                    Folder = brand.MediaFile.Folder == null ? null : new MediaFolderViewModel()
-                    {
-                        Id = brand.MediaFile.Folder.Id,
-                        Name = brand.MediaFile.Folder.Name,
-                    }
-                }
-            };
-            return View(brandModel);
+
+            var model = _mapper.Map<BrandModel>(brand);
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(BrandViewModel model)
+        public async Task<IActionResult> Edit(BrandModel model)
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateBrandDto
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Description = model.Description,
-                    MediaFileId = model.MediaFileId == 0 ? null : model.MediaFileId,
-                    MetaDescription = model.MetaDescription,
-                    MetaTitle = model.MetaTitle,
-                    DisplayOrder = model.DisplayOrder,
-                    MetaKeywords = model.MetaKeywords,
-                    Published = model.Published,
-                };
+                var updateDto = _mapper.Map<UpdateBrandDto>(model);
                 await _brandService.UpdateAsync(updateDto);
+                
                 return Json(new { success = true });
             }
             return View(model);

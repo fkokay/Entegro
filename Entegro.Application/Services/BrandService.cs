@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -80,9 +81,17 @@ namespace Entegro.Application.Services
 
 
             var brands = await _brandRepository.GetAllAsync(pageNumber, pageSize);
+            var items = await brands.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<BrandDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
             return new PagedResult<BrandDto>
             {
-                Items = _mapper.Map<IEnumerable<BrandDto>>(brands.Items),
+                Items = items,
                 TotalCount = brands.TotalCount,
                 PageNumber = brands.PageNumber,
                 PageSize = brands.PageSize
@@ -130,9 +139,18 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<BrandDto>> GetPagedAsync(GridCommand gridCommand)
         {
             var brands = await _brandRepository.GetPagedAsync(gridCommand);
+
+            var items = await brands.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<BrandDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
             return new PagedResult<BrandDto>
             {
-                Items = _mapper.Map<IEnumerable<BrandDto>>(brands.Items),
+                Items = items,
                 TotalCount = brands.TotalCount,
                 PageNumber = brands.PageNumber,
                 PageSize = brands.PageSize

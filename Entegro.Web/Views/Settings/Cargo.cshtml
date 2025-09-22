@@ -1,4 +1,4 @@
-﻿@model CargoListViewModel
+﻿@model CargoListModel
 @{
     ViewData["Title"] = "Kargo Entegrasyonları";
 
@@ -136,7 +136,7 @@
 </div>
 
 
-@await Html.PartialAsync("_CargoAdd", new CargoIntegrationSystemViewModel())
+@await Html.PartialAsync("_CargoAdd", new CargoIntegrationSystemModel())
 
 @section Scripts {
 

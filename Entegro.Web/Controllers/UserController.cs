@@ -29,13 +29,13 @@ namespace Entegro.Web.Controllers
 
         public IActionResult Create()
         {
-            UserViewModel model = new UserViewModel();
+            UserModel model = new UserModel();
             model.Active = true;
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UserViewModel model)
+        public async Task<IActionResult> Create(UserModel model)
         {
             if (ModelState.IsValid)
             {
@@ -62,7 +62,7 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            var userModle = new UserViewModel
+            var userModle = new UserModel
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
@@ -76,7 +76,7 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UserViewModel model)
+        public async Task<IActionResult> Edit(UserModel model)
         {
             if (ModelState.IsValid)
             {

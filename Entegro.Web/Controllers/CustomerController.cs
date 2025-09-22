@@ -1,19 +1,30 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Catalog.Brands;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
 {
     public class CustomerController : Controller
     {
-        public readonly ICustomerService _customerService;
-        public CustomerController(ICustomerService customerService)
+        private readonly ICustomerService _customerService;
+        private readonly IMapper _mapper;
+        public CustomerController(ICustomerService customerService,IMapper mapper)
         {
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult List()
         {
             return View();
         }
@@ -21,29 +32,15 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            CustomerViewModel model = new CustomerViewModel();
+            CustomerModel model = new CustomerModel();
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Create(CustomerViewModel model)
+        public async Task<IActionResult> Create(CustomerModel model)
         {
             if (ModelState.IsValid)
             {
-                var createDto = new CreateCustomerDto
-                {
-                    Address = model.Address,
-                    City = model.City,
-                    Email = model.Email,
-                    CustomerType = model.CustomerType,
-                    Town = model.Town,
-                    District = model.District,
-                    Name = model.Name,
-                    PhoneNumber = model.PhoneNumber,
-                    Street = model.Street,
-                    TaxNumber = model.TaxNumber,
-                    TaxOffice = model.TaxOffice,
-                };
-
+                var createDto = _mapper.Map<CreateCustomerDto>(model);
                 await _customerService.CreateCustomerAsync(createDto);
                 return Json(new { success = true });
             }
@@ -53,61 +50,28 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            CustomerViewModel model = new CustomerViewModel();
-
             var customer = await _customerService.GetCustomerByIdAsync(id);
             if (customer == null)
             {
                 return NotFound();
             }
-            model.Id = customer.Id;
-            model.Address = customer.Address;
-            model.City = customer.City;
-            model.Email = customer.Email;
-            model.CustomerType = customer.CustomerType;
-            model.Town = customer.Town;
-            model.District = customer.District;
-            model.Name = customer.Name;
-            model.PhoneNumber = customer.PhoneNumber;
-            model.Street = customer.Street;
-            model.TaxNumber = customer.TaxNumber;
-            model.TaxOffice = customer.TaxOffice;
+
+            var model = _mapper.Map<CustomerModel>(customer);
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CustomerViewModel model)
+        public async Task<IActionResult> Edit(CustomerModel model)
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateCustomerDto
-                {
-                    CustomerId = model.Id,
-                    Address = model.Address,
-                    City = model.City,
-                    Email = model.Email,
-                    CustomerType = model.CustomerType,
-                    Town = model.Town,
-                    District = model.District,
-                    Name = model.Name,
-                    PhoneNumber = model.PhoneNumber,
-                    Street = model.Street,
-                    TaxNumber = model.TaxNumber,
-                    TaxOffice = model.TaxOffice,
-                };
-
+                var updateDto = _mapper.Map<UpdateCustomerDto>(model);
                 await _customerService.UpdateCustomerAsync(updateDto);
 
                 return Json(new { success = true });
             }
             return View(model);
-        }
-
-
-        public IActionResult List()
-        {
-            return View();
         }
 
         [HttpPost]
@@ -124,6 +88,7 @@ namespace Entegro.Web.Controllers
             });
 
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

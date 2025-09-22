@@ -1,4 +1,4 @@
-﻿@model CommerceListViewModel
+﻿@model CommerceListModel
 @{
     ViewData["Title"] = "E-Ticaret Entegrasyonları";
 }
@@ -76,7 +76,7 @@
 </div>
 
 
-@await Html.PartialAsync("_CommerceAdd", new CommerceIntegrationSystemViewModel())
+@await Html.PartialAsync("_CommerceAdd", new CommerceIntegrationSystemModel())
 
 @section Scripts {
     <script src="/assets/js/entegro.commerce.js" asp-append-version="true"></script>

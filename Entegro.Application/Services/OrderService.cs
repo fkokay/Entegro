@@ -115,7 +115,7 @@ namespace Entegro.Application.Services
             return orderDtos;
         }
 
-        public async Task<PagedResult<OrderModel>> GetPagedAsync(GridCommand gridCommand,int orderStatus)
+        public async Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand,int orderStatus)
         {
             var orders = await _orderRepository.GetPagedAsync(gridCommand,orderStatus);
 
@@ -123,12 +123,12 @@ namespace Entegro.Application.Services
             {
                 foreach (var orderItem in x.OrderItems)
                 {
-                    orderItem.ProductMainPicture = orderItem.ProductMainPictureId.HasValue ? await _medaFileService.GetUrl(orderItem.ProductMainPictureId.Value) : "";
+                    orderItem.ProductMainPicture = orderItem.ProductMainPictureId.HasValue ? await _medaFileService.GetUrl(orderItem.ProductMainPictureId.Value) : "/assets/img/products/empty.jpg";
                 }
                 return x;
             }).AsyncToList();
 
-            return new PagedResult<OrderModel>
+            return new PagedResult<OrderListDto>
             {
                 Items = orders.Items,
                 TotalCount = orders.TotalCount,

@@ -24,7 +24,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IProductVariantAttributeCombinationService, ProductVariantAttributeCombinationService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
             services.AddScoped<IProductAttributeFormatter, ProductAttributeFormatter>();
-            services.AddScoped<IProductImageMappingService, ProductImageMappingService>();
+            services.AddScoped<IProductMediaFileMappingService, ProductMediaFileMappingService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IIntegrationSystemService, IntegrationSystemService>();

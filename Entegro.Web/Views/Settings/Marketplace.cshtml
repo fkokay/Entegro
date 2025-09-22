@@ -1,4 +1,4 @@
-﻿@model MarketplaceListViewModel
+﻿@model MarketplaceListModel
 @{
     ViewData["Title"] = "Pazaryeri Entegrasyonları";
     var logoUrls = new Dictionary<string, string>
@@ -216,7 +216,7 @@
     }
 </div>
 
-@await Html.PartialAsync("_MarketplaceAdd", new MarketplaceIntegrationSystemViewModel())
+@await Html.PartialAsync("_MarketplaceAdd", new MarketplaceIntegrationSystemModel())
 
 @section Scripts {
     <script src="/assets/js/entegro.marketplace.js" asp-append-version="true"></script>
