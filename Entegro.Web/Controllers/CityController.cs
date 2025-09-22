@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.City;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Common;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,12 @@ namespace Entegro.Web.Controllers
     public class CityController : Controller
     {
         private readonly ICityService _cityService;
+        private readonly IMapper _mapper;
 
-        public CityController(ICityService cityService)
+        public CityController(ICityService cityService, IMapper mapper)
         {
             _cityService = cityService;
+            _mapper = mapper;
         }
 
         public IActionResult Index()
@@ -26,15 +29,14 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ModalCityModel model)
         {
-            var createDto = new CreateCityDto
-            {
-                Name = model.CityName,
-                CountryId = model.CountryId,
-                Published = model.Published
-            };
-            await _cityService.AddAsync(createDto);
 
-            return RedirectToAction("List", "Countries");
+            if (ModelState.IsValid)
+            {
+                var createDto = _mapper.Map<CreateCityDto>(model);
+                await _cityService.AddAsync(createDto);
+                return RedirectToAction("List", "Countries");
+            }
+            return View(model);
         }
     }
 }

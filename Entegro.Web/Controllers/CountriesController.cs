@@ -1,8 +1,9 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Country;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models;
+using Entegro.Web.Models.Catalog.Brands;
 using Entegro.Web.Models.Common;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,12 @@ namespace Entegro.Web.Controllers
     public class CountriesController : Controller
     {
         private readonly ICountryService _countryService;
+        private readonly IMapper _mapper;
 
-        public CountriesController(ICountryService countryService)
+        public CountriesController(ICountryService countryService, IMapper mapper)
         {
             _countryService = countryService;
+            _mapper = mapper;
         }
 
         public IActionResult List()
@@ -27,21 +30,23 @@ namespace Entegro.Web.Controllers
         public IActionResult Create()
         {
             CountryModel model = new CountryModel();
+            model.DisplayOrder = 0;
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CountryModel model)
         {
-            var createDto = new CreateCountryDto
+            if (ModelState.IsValid)
             {
-                Name = model.Name,
-                DisplayOrder = model.DisplayOrder,
-                Published = model.Published
-            };
-            await _countryService.AddAsync(createDto);
+                var createDto = _mapper.Map<CreateCountryDto>(model);
 
-            return Json(new { success = true });
+                await _countryService.AddAsync(createDto);
+                return Json(new { success = true });
+            }
+            return View(model);
+
+
         }
 
         [HttpGet]
@@ -53,37 +58,20 @@ namespace Entegro.Web.Controllers
                 return NotFound();
             }
 
-            var countryModel = new CountryModel
-            {
-                Id = country.Id,
-                Name = country.Name,
-                Published = country.Published,
-                DisplayOrder = country.DisplayOrder,
-                Cities = country.Cities.Select(c => new CityModel
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Published = c.Published,
-                    CountryId = c.CountryId,
-                }).ToList()
-            };
+            var model = _mapper.Map<BrandModel>(country);
+            return View(model);
 
-            return View(countryModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(CountryModel model)
         {
+
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateCountryDto
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    DisplayOrder = model.DisplayOrder,
-                    Published = model.Published
-                };
+                var updateDto = _mapper.Map<UpdateCountryDto>(model);
                 await _countryService.UpdateAsync(updateDto);
+
                 return Json(new { success = true });
             }
             return View(model);

@@ -1,10 +1,7 @@
-﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Web.Models;
-using Entegro.Web.Models.Catalog.Brands;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +11,7 @@ namespace Entegro.Web.Controllers
     {
         private readonly ICustomerService _customerService;
         private readonly IMapper _mapper;
-        public CustomerController(ICustomerService customerService,IMapper mapper)
+        public CustomerController(ICustomerService customerService, IMapper mapper)
         {
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

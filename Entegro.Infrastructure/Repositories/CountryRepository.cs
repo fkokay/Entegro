@@ -18,7 +18,7 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Country?> GetByIdAsync(int id)
         {
             return await _context.Countries
-                .Include(c => c.Cities)
+                .Include(c => c.Cities).AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 

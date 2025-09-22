@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.User;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Platform.Identity;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,12 @@ namespace Entegro.Web.Controllers
     {
         private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        private readonly IMapper _mapper;
+        public UserController(IUserService userService, ILogger<UserController> logger, IMapper mapper)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper;
         }
         public IActionResult Index()
         {
@@ -37,18 +40,10 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserModel model)
         {
+
             if (ModelState.IsValid)
             {
-                var createDto = new CreateUserDto
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    Password = model.Password,
-                    PhoneNumber = model.PhoneNumber,
-                    Active = model.Active
-                };
-
+                var createDto = _mapper.Map<CreateUserDto>(model);
                 await _userService.CreateUserAsync(createDto);
                 return Json(new { success = true });
             }
@@ -62,17 +57,9 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-            var userModle = new UserModel
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Password = user.Password,
-                PhoneNumber = user.PhoneNumber,
-                Active = user.Active
-            };
-            return View(userModle);
+
+            var model = _mapper.Map<UserModel>(user);
+            return View(model);
         }
 
         [HttpPost]
@@ -80,17 +67,9 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateUserDto
-                {
-                    Id = model.Id,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    Password = model.Password,
-                    PhoneNumber = model.PhoneNumber,
-                    Active = model.Active
-                };
+                var updateDto = _mapper.Map<UpdateUserDto>(model);
                 await _userService.UpdateUserAsync(updateDto);
+
                 return Json(new { success = true });
             }
             return View(model);
