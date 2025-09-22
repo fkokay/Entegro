@@ -5,6 +5,7 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Import;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -220,6 +221,24 @@ namespace Entegro.Web.Controllers
                 Enable = model.Enable,
             };
 
+            var variantIndices = model.Paths.SelectMany(path =>
+             {
+                 var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                 return parts.Where(part => int.TryParse(part, out _));
+             })
+             .Distinct().Select(int.Parse).ToList();
+
+
+            var variantCount = variantIndices.Count;
+            int targetIndex = 0;
+            var variantPaths = model.Paths.Where(path =>
+                {
+                    var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                    return parts.Contains(targetIndex.ToString());
+                }).ToList();
+
+            ViewBag.VariantCount = variantCount;
+            ViewBag.VariantPaths = variantPaths;
             ViewBag.XmlPaths = model.Paths;
             ViewBag.PreviewXml = model.PreviewXml;
             return View(createModel);
@@ -259,7 +278,7 @@ namespace Entegro.Web.Controllers
             if (dataElements != null)
             {
                 Console.WriteLine("XML İçeriği:");
-                LogXmlDataElements(dataElements, headerMaps);
+                //LogXmlDataElements(dataElements, headerMaps);
 
             }
             else
@@ -307,6 +326,9 @@ namespace Entegro.Web.Controllers
                     i++;
                 }
             }
+
+
+
         }
         private void LogXmlDataElements(IEnumerable<XElement> dataElements, List<XmlColumnMappingResult> headerMaps)
         {
@@ -358,7 +380,7 @@ namespace Entegro.Web.Controllers
         private void UpdateVariantMappedProperties(CreateXmlImportProfileViewModel model, int variantCount)
         {
             var variantMappedProps = new[]
-            {
+                     {
                 nameof(model.CreateXmlProduct.AttributePrice),
                 nameof(model.CreateXmlProduct.AttributeStockQuantity),
                 nameof(model.CreateXmlProduct.AttributeStockCode),
@@ -372,21 +394,39 @@ namespace Entegro.Web.Controllers
                 if (propInfo == null || propInfo.PropertyType != typeof(string)) continue;
 
                 var originalValue = propInfo.GetValue(model.CreateXmlProduct) as string;
+                if (string.IsNullOrWhiteSpace(originalValue)) continue;
 
-                if (!string.IsNullOrWhiteSpace(originalValue) && originalValue.Contains("variants->variant->0"))
+                var regex = new Regex(@"([a-zA-Z0-9_]+)->([a-zA-Z0-9_]+)->0");
+                var match = regex.Match(originalValue);
+
+
+                if (match.Success)
                 {
+                    var parentNode = match.Groups[1].Value;
+                    var repeatingNode = match.Groups[2].Value;
+
+                    Console.WriteLine($"🔍 İşleniyor: {propName}");
+                    Console.WriteLine($"   Orijinal: {originalValue}");
+                    Console.WriteLine($"   Parent Node: {parentNode}");
+                    Console.WriteLine($"   Repeating Node: {repeatingNode}");
+
                     var updatedPaths = new List<string>();
 
                     for (int i = 0; i < variantCount; i++)
                     {
-                        updatedPaths.Add(originalValue.Replace("variants->variant->0", $"variants->variant->{i}"));
+                        var newPath = originalValue.Replace($"{parentNode}->{repeatingNode}->0", $"{parentNode}->{repeatingNode}->{i}");
+                        updatedPaths.Add(newPath);
                     }
 
                     var newValue = string.Join(",", updatedPaths.Distinct());
+                    Console.WriteLine($"   Yeni Değer: {newValue}");
+                    Console.WriteLine();
+
                     propInfo.SetValue(model.CreateXmlProduct, newValue);
                 }
             }
         }
+
         private void UpdateImagesAndSpecifications(CreateXmlImportProfileViewModel model, string selectedImagePaths, string selectedAttributeSpecifications, int variantCount)
         {
             model.CreateXmlProduct.Images = selectedImagePaths;
@@ -423,7 +463,7 @@ namespace Entegro.Web.Controllers
                 .Select(p => new XmlColumnMappingResult
                 {
                     MappedName = p.Name,
-                    XmlHeader = p.GetValue(model.CreateXmlProduct)?.ToString().Replace("->", "/") ?? ""
+                    XmlHeader = p.GetValue(model.CreateXmlProduct)?.ToString() ?? ""
                 })
                 .Where(h => !string.IsNullOrWhiteSpace(h.XmlHeader))
                 .ToList();

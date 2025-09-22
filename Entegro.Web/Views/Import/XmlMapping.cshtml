@@ -2,20 +2,8 @@
 @{
     ViewData["Title"] = "XmlMapping";
     var paths = ViewBag.XmlPaths as List<string>;
-    var variantPaths = paths.Where(x => x.StartsWith("variants->variant->0->")).ToList();
-    var variantCount = paths.Where(p => p.StartsWith("variants->variant->")).Select(p =>
-    {
-        var parts = p.Split("->", StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 3 && int.TryParse(parts[2], out int index))
-        {
-            return index;
-        }
-        return -1;
-    })
-    .Where(index => index >= 0)
-    .Distinct()
-    .Count();
-
+    int variantCount = ViewBag.VariantCount != null ? (int)ViewBag.VariantCount : 0;
+    var variantPaths = ViewBag.VariantPaths as List<string> ?? new List<string>();
 }
 <div class="container-fluid flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -367,7 +355,7 @@
                                 <label asp-for="CreateXmlProduct.AttributePrice" class="form-label">Varyant Fiyat </label>
                                 <select asp-for="CreateXmlProduct.AttributePrice" class="form-select select2" id="variantPrice">
                                     <option value="">Seçiniz</option>
-                                    @foreach (var item in paths)
+                                    @foreach (var item in variantPaths)
                                     {
                                         <option value="@item">@item</option>
                                     }
@@ -443,7 +431,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="xmlStructureModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">

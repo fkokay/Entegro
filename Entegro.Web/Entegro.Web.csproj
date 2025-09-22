@@ -44,6 +44,7 @@
 
   <ItemGroup>
     <Folder Include="App_Data\Media\Storage\" />
+    <Folder Include="App_Data\Media\Storage\document\" />
     <Folder Include="wwwroot\assets\img\brandicons\" />
   </ItemGroup>
 
