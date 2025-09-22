@@ -162,14 +162,17 @@ Entegro.Attribute = (function ($) {
                         success: function (res) {
                             if (res && res.success) {
                                 Swal.fire({
-                                    title: 'Silindi!',
-                                    text: 'Kayıt başarıyla silindi.',
                                     icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'Özellik başarıyla silindi.',
                                     confirmButtonText: 'Tamam',
-                                    customClass: { confirmButton: 'btn btn-success' },
+                                    customClass: {
+                                        confirmButton: 'btn btn-success'
+                                    },
                                     buttonsStyling: false
+                                }).then(() => {
+                                    window.location.href = '/ProductAttribute/list';
                                 });
-                                dt.ajax.reload(null, false);
                             } else {
                                 Swal.fire({
                                     title: 'Hata!',

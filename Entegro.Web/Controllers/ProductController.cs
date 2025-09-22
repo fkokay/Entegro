@@ -15,7 +15,6 @@ using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
-using Entegro.Web.Models.Catalog.SpecificationAttributeOptions;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Common;
@@ -197,8 +196,6 @@ namespace Entegro.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-
-
                 var updateDto = _mapper.Map<UpdateProductDto>(model);
                 updateDto.ProductVariantAttributeCombinations = model.ProductVariantAttributeCombinations.Select(m => new ProductVariantAttributeCombinationDto()
                 {
@@ -383,6 +380,7 @@ namespace Entegro.Web.Controllers
 
                         var productMediaFile = await _productMediaFileMappingService.AddAsync(productPicture);
 
+
                         // İsteğe bağlı olarak frontend’e dönecek bilgi
                         var respObj = new
                         {
@@ -394,6 +392,8 @@ namespace Entegro.Web.Controllers
                         response.Add(respObj);
                     }
 
+                    int mainPictureId = response[0].MediaFileId;
+                    await _productService.UpdateProductMainPictureIdAsync(entityId, mainPictureId);
                 }
                 else
                 {

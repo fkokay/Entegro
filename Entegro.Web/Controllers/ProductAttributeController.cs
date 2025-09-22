@@ -13,7 +13,7 @@ namespace Entegro.Web.Controllers
     {
         private readonly IProductAttributeService _productAttributeService;
         private readonly IMapper _mapper;
-        public ProductAttributeController(IProductAttributeService productAttributeService,IMapper mapper)
+        public ProductAttributeController(IProductAttributeService productAttributeService, IMapper mapper)
         {
             _productAttributeService = productAttributeService ?? throw new ArgumentNullException(nameof(productAttributeService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -30,6 +30,9 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> CreateOrUpdate(int id)
         {
+            if (id == 0)
+                return PartialView("_CreateOrUpdate", new ProductAttributeModel());
+
             var productAttribute = await _productAttributeService.GetByIdAsync(id);
             if (productAttribute == null)
             {

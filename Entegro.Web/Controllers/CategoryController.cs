@@ -1,9 +1,7 @@
-﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Category;
+﻿using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Categories;
-using Entegro.Web.Models.Content;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +13,7 @@ namespace Entegro.Web.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
-        public CategoryController(ICategoryService categoryService,IMapper mapper)
+        public CategoryController(ICategoryService categoryService, IMapper mapper)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -58,7 +56,6 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-
             var model = _mapper.Map<CategoryModel>(category);
             return View(model);
         }

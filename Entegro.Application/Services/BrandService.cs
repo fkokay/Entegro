@@ -1,5 +1,4 @@
 ﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -48,7 +47,6 @@ namespace Entegro.Application.Services
                 return null;
             }
             var brandDto = _mapper.Map<BrandDto>(brand);
-
             return brandDto;
         }
 

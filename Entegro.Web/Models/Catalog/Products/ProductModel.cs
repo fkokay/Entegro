@@ -1,6 +1,4 @@
-﻿using Entegro.Application.DTOs.Common;
-using Entegro.Domain.Entities.Catalog;
-using Entegro.Web.Models.Catalog.Attributes;
+﻿using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Brands;
 
 namespace Entegro.Web.Models.Catalog.Products
@@ -32,6 +30,7 @@ namespace Entegro.Web.Models.Catalog.Products
         public DateTime UpdatedOn { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public string? Gtin { get; set; }
+        public int? MainPictureId { get; set; }
         public bool Published { get; set; } = true;
         public int[] SelectedProductAttributeIds { get; set; } = Array.Empty<int>();
         public BrandModel? Brand { get; set; }

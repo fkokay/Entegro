@@ -1,7 +1,4 @@
-﻿
-using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Category;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Events;
@@ -10,7 +7,6 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.ComponentModel;
 using Entegro.Domain.Entities.Catalog;
-using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 
 namespace Entegro.Application.Services
@@ -70,11 +66,13 @@ namespace Entegro.Application.Services
                 throw new ArgumentNullException(nameof(updateProduct));
 
             var existingProduct = await _productRepository.GetByAsync(m => m.Id == updateProduct.Id);
+            var mainPictureId = existingProduct?.MainPictureId ?? null;
             if (existingProduct == null)
                 throw new KeyNotFoundException($"ID {updateProduct.Id} ile Product bulunamadı.");
 
 
             _mapper.Map(updateProduct, existingProduct);
+            existingProduct.MainPictureId = mainPictureId;
             await _productRepository.UpdateAsync(existingProduct);
 
             foreach (var item in updateProduct.ProductVariantAttributeCombinations)
@@ -165,7 +163,7 @@ namespace Entegro.Application.Services
 
         public async Task<PagedResult<ProductDto>> GetProductsAsync(int page, string term)
         {
-            var products = await _productRepository.GetAllAsync(page,term);
+            var products = await _productRepository.GetAllAsync(page, term);
             var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
             return productDtos;
         }

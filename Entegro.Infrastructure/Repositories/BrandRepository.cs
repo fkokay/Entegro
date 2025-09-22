@@ -79,7 +79,10 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Brand?> GetByIdAsync(int id)
         {
-            return await _context.Brands.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.Brands
+                .Include(b => b.MediaFile)
+                .ThenInclude(b => b.Folder)
+                .AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<Brand?> GetByIdWithMediaAsync(int id)

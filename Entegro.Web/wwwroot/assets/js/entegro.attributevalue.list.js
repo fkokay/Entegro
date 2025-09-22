@@ -154,7 +154,7 @@ Entegro.AttributeValue.List = (function ($) {
                                         customClass: { confirmButton: 'btn btn-success' },
                                         buttonsStyling: false
                                     }).then(() => {
-                                        location.reload();
+                                        window.location.href = '/ProductAttributeValue/list';
                                     });
                                 } else {
                                     Swal.fire({
