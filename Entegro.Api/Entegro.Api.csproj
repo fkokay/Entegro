@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="App_Data\Media\Storage\document\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

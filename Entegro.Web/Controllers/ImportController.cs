@@ -220,6 +220,25 @@ namespace Entegro.Web.Controllers
                 Enable = model.Enable,
             };
 
+
+            var variantIndices = model.Paths.SelectMany(path =>
+            {
+                var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                return parts.Where(part => int.TryParse(part, out _));
+            })
+            .Distinct().Select(int.Parse).ToList();
+
+
+            var variantCount = variantIndices.Count;
+            int targetIndex = 0;
+            var variantPaths = model.Paths.Where(path =>
+            {
+                var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                return parts.Contains(targetIndex.ToString());
+            }).ToList();
+
+            ViewBag.VariantCount = variantCount;
+            ViewBag.VariantPaths = variantPaths;
             ViewBag.XmlPaths = model.Paths;
             ViewBag.PreviewXml = model.PreviewXml;
             return View(createModel);
