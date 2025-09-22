@@ -64,6 +64,7 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("GeneralCommon");
         }
+
         #region Erp Entegrasyonları
         [HttpGet]
         public async Task<IActionResult> Erp()
