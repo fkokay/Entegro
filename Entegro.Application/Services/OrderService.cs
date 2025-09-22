@@ -70,6 +70,12 @@ namespace Entegro.Application.Services
             return orderDto;
         }
 
+        public async Task<OrderListPageDto> GetOrderPageAsync()
+        {
+            var orderPage = await _orderRepository.GetOrderPageAsync();
+            return orderPage;
+        }
+
         public async Task<OrderPrintDto> GetOrderPrintByIdAsync(int orderId,string packageNo)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);

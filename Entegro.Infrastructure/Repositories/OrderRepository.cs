@@ -80,6 +80,20 @@ namespace Entegro.Infrastructure.Repositories
             return order;
         }
 
+        public async Task<OrderListPageDto> GetOrderPageAsync()
+        {
+            OrderListPageDto orderListPage = new OrderListPageDto();
+            orderListPage.ToBePackedQuantity = await _context.Orders.Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => (int?)si.Quantity ?? 0))).CountAsync();
+            orderListPage.ReadyToShipQuantity = await _context.Orders.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null)).CountAsync();
+            orderListPage.ShippedQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null)).CountAsync();
+            orderListPage.DeliveredQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null)).CountAsync();
+            orderListPage.UnDeliverdQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc == null)).CountAsync();
+            orderListPage.PaymentAwaitingQuantity = await _context.Orders.Where(o => o.PaymentStatusId == (int)Domain.Enums.PaymentStatus.Pending).CountAsync();
+            orderListPage.CancalledQuantity = await _context.Orders.Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Cancelled).CountAsync();
+
+            return orderListPage;
+        }
+
         public async Task<Application.DTOs.Common.PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, int orderStatus)
         {
             var query = _context.Orders
@@ -88,13 +102,11 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(o => o.Shipments)
                 .AsNoTracking();
 
-            // Search filter
             if (!string.IsNullOrEmpty(gridCommand.Search?.Value))
             {
                 query = query.Where(o => o.OrderNumber.Contains(gridCommand.Search.Value));
             }
 
-            // Dynamic ordering
             IOrderedQueryable<Order> orderedQuery = null;
             if (gridCommand.Order.Any())
             {
@@ -116,7 +128,6 @@ namespace Entegro.Infrastructure.Repositories
                 query = query.OrderBy(o => o.Id);
             }
 
-            // Apply orderStatus filter
             switch (orderStatus)
             {
                 case 1: // Paketlenecek
@@ -142,10 +153,8 @@ namespace Entegro.Infrastructure.Repositories
                     break;
             }
 
-            // Total count
             var totalCount = await query.CountAsync();
 
-            // Projection
             var orders = await query
                 .SelectMany(o => o.Shipments.DefaultIfEmpty(), (order, shipment) => new { order, shipment })
                 .Select(x => new OrderListDto

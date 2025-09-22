@@ -14,5 +14,6 @@ namespace Entegro.Application.Interfaces.Services
         Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrder);
         Task<OrderDto> UpdateOrderAsync(UpdateOrderDto updateOrder);
         Task DeleteOrderAsync(int orderId);
+        Task<OrderListPageDto> GetOrderPageAsync();
     }
 }

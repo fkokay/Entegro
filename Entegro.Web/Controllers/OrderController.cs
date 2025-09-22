@@ -48,14 +48,19 @@ namespace Entegro.Web.Controllers
             _mapper = mapper;
         }
 
-        public IActionResult Index()
+        public Task<IActionResult> Index()
         {
             return List();
         }
 
-        public IActionResult List()
+        public async Task<IActionResult> List()
         {
-            return View();
+           
+
+            var orderPage = await _orderService.GetOrderPageAsync();
+            var model = _mapper.Map<OrderListModel>(orderPage);
+
+            return View(model);
         }
 
         [HttpPost]

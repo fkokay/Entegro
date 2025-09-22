@@ -93,14 +93,14 @@ namespace Entegro.Web.Controllers
         {
             var products = await _productService.GetProductsAsync(page, term);
 
-            var query = products.Items.SelectAwait(async c => new
+            var query = products.Items.Select(c => new
             {
                 id = c.Id.ToString(),
                 text = c.Name,
                 code = c.Code,
             });
 
-            var mainList = await query.AsyncToList();
+            var mainList = query.ToList();
 
             return Json(new
             {

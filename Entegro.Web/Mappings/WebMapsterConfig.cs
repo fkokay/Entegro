@@ -113,6 +113,8 @@ namespace Entegro.Web.Mappings
 
             config.NewConfig<MediaFileModel, MediaFileDto>().TwoWays();
             config.NewConfig<MediaFolderModel, MediaFolderModel>().TwoWays();
+
+            config.NewConfig<OrderListModel, OrderListPageDto>().TwoWays();
         }
     }
 }
