@@ -87,18 +87,6 @@ namespace Entegro.Api.Jobs
                     folderName
                 );
 
-                var appDataForImagePath = Path.Combine(
-                    Directory.GetParent(Directory.GetCurrentDirectory()).FullName,
-                    "Entegro.Web",
-                    "App_Data",
-                    "Media",
-                    "Storage",
-                    "catalog" // folderName burada sabit "images"
-                );
-
-                if (!Directory.Exists(appDataForImagePath))
-                    Directory.CreateDirectory(appDataForImagePath);
-
                 if (!Directory.Exists(appDataPath))
                     Directory.CreateDirectory(appDataPath);
 
@@ -119,91 +107,87 @@ namespace Entegro.Api.Jobs
                 #endregion
 
 
-                var products = xDoc.Descendants("Product").Select(p =>
-                {
-                    string GetMappedValue(string mappedName)
-                    {
-                        var header = mappingList.FirstOrDefault(x => x.MappedName == mappedName)?.XmlHeader;
-                        if (string.IsNullOrEmpty(header))
-                            return null;
+                //var products = xDoc.Descendants("Product").Select(p =>
+                //{
+                //    string GetMappedValue(string mappedName)
+                //    {
+                //        var header = mappingList.FirstOrDefault(x => x.MappedName == mappedName)?.XmlHeader;
+                //        if (string.IsNullOrEmpty(header))
+                //            return null;
 
-                        if (header.Contains(","))
-                        {
-                            var parts = header.Split(",");
-                            var combined = string.Join(",", parts
-                                .Select(h => p.Element(h)?.Value?.Trim())
-                                .Where(v => !string.IsNullOrWhiteSpace(v)));
-                            return combined;
-                        }
+                //        if (header.Contains(","))
+                //        {
+                //            var parts = header.Split(",");
+                //            var combined = string.Join(",", parts
+                //                .Select(h => p.Element(h)?.Value?.Trim())
+                //                .Where(v => !string.IsNullOrWhiteSpace(v)));
+                //            return combined;
+                //        }
 
-                        return p.Element(header)?.Value?.Trim();
-                    }
-
-
-                    decimal SafeParseDecimal(string value)
-                    {
-                        if (string.IsNullOrWhiteSpace(value))
-                            return 0m;
+                //        return p.Element(header)?.Value?.Trim();
+                //    }
 
 
-                        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
-                            return result;
-
-                        if (decimal.TryParse(value, NumberStyles.Any, new CultureInfo("tr-TR"), out result))
-                            return result;
-
-                        return 0m;
-                    }
-
-                    var imageString = GetMappedValue("Images");
-                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg", ".tiff" };
-
-                    var imageUrls = Regex.Matches(imageString ?? "", @"https:\/\/[^\s]+")
-                                         .Cast<Match>()
-                                         .Select(m => m.Value)
-                                         .Where(url => allowedExtensions.Any(ext => url.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
-                                         .ToList();
+                //    decimal SafeParseDecimal(string value)
+                //    {
+                //        if (string.IsNullOrWhiteSpace(value))
+                //            return 0m;
 
 
+                //        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+                //            return result;
 
-                    decimal price = SafeParseDecimal(GetMappedValue("Price"));
-                    decimal stock = SafeParseDecimal(GetMappedValue("StockQuantity"));
-                    decimal tax = SafeParseDecimal(GetMappedValue("VatRate"));
+                //        if (decimal.TryParse(value, NumberStyles.Any, new CultureInfo("tr-TR"), out result))
+                //            return result;
 
-                    decimal priceAdjustment = profile.PriceAdjustmentAmount ?? 0;
-                    decimal optionalExtra = profile.OptionalExtraAmount ?? 0;
-                    decimal adjustedPrice = price * priceAdjustment / 100 + price + optionalExtra;
+                //        return 0m;
+                //    }
 
-                    return new
-                    {
-                        OriginalProductCode = GetMappedValue("Code"),
-                        ProductCode = $"{profileId}_" + GetMappedValue("Code"),
-                        Name = GetMappedValue("Name"),
-                        Brand = GetMappedValue("Brand"),
-                        Category = GetMappedValue("Categories"),
-                        Price = adjustedPrice,
-                        Stock = stock,
-                        CostPrice = price,
-                        CurrencyType = GetMappedValue("Currency"),
-                        Tax = tax,
-                        Image = imageUrls,
-                        Description = GetMappedValue("Description"),
-                        Variants = p.Elements("variants").Elements("variant").Select(v => new
-                        {
-                            Specs = v.Elements("spec").Select(s => new
-                            {
-                                SpecName = s.Attribute("name")?.Value,
-                                SpecValue = s.Value
-                            }).ToList(),
+                //    var imageString = GetMappedValue("Images");
+                //    var imageUrls = Regex.Matches(imageString ?? "", @"https:\/\/[^\s]+?(jpg|jpeg|png|gif)")
+                //                         .Cast<Match>()
+                //                         .Select(m => m.Value)
+                //                         .ToList();
 
-                            VariantPrice = SafeParseDecimal(v.Element("price")?.Value),
-                            Barcode = v.Element("barcode")?.Value,
-                            Quantity = SafeParseDecimal(v.Element("quantity")?.Value),
-                            VariantProductCode = v.Element("productCode")?.Value,
-                        }).ToList()
 
-                    };
-                }).ToList();
+                //    decimal price = SafeParseDecimal(GetMappedValue("Price"));
+                //    decimal stock = SafeParseDecimal(GetMappedValue("StockQuantity"));
+                //    decimal tax = SafeParseDecimal(GetMappedValue("VatRate"));
+
+                //    decimal priceAdjustment = profile.PriceAdjustmentAmount ?? 0;
+                //    decimal optionalExtra = profile.OptionalExtraAmount ?? 0;
+                //    decimal adjustedPrice = price * priceAdjustment / 100 + price + optionalExtra;
+
+                //    return new
+                //    {
+                //        OriginalProductCode = GetMappedValue("Code"),
+                //        ProductCode = $"{profileId}_" + GetMappedValue("Code"),
+                //        Name = GetMappedValue("Name"),
+                //        Brand = GetMappedValue("Brand"),
+                //        Category = GetMappedValue("Categories"),
+                //        Price = adjustedPrice,
+                //        Stock = stock,
+                //        CostPrice = price,
+                //        CurrencyType = GetMappedValue("Currency"),
+                //        Tax = tax,
+                //        Image = imageUrls,
+                //        Description = GetMappedValue("Description"),
+                //        Variants = p.Elements("variants").Elements("variant").Select(v => new
+                //        {
+                //            Specs = v.Elements("spec").Select(s => new
+                //            {
+                //                SpecName = s.Attribute("name")?.Value,
+                //                SpecValue = s.Value
+                //            }).ToList(),
+
+                //            VariantPrice = SafeParseDecimal(v.Element("price")?.Value),
+                //            Barcode = v.Element("barcode")?.Value,
+                //            Quantity = SafeParseDecimal(v.Element("quantity")?.Value),
+                //            VariantProductCode = v.Element("productCode")?.Value,
+                //        }).ToList()
+
+                //    };
+                //}).ToList();
 
 
                 foreach (var product in products)
@@ -245,6 +229,58 @@ namespace Entegro.Api.Jobs
 
                     Console.WriteLine("-------------------------\n");
                 }
+
+
+                //var products = xDoc.Descendants("Product")
+                //   .Select(p =>
+                //   {
+                //       // Orijinal fiyat
+                //       decimal price = decimal.TryParse(p.Element("psf_fiyati")?.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedPrice) ? parsedPrice : 0m;
+                //       decimal stock = decimal.TryParse(p.Element("Stock")?.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedStock) ? parsedStock : 0m;
+                //       decimal tax = decimal.TryParse(p.Element("Tax")?.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedTax) ? parsedTax : 0m;
+
+                //       // Ayarlamalar
+                //       decimal priceAdjustment = profile.PriceAdjustmentAmount ?? 0;
+                //       decimal optionalExtra = profile.OptionalExtraAmount ?? 0;
+                //       decimal adjustedPrice = price * priceAdjustment / 100 + price + optionalExtra;
+
+                //       string images = string.Join(",",
+                //           p.Elements()
+                //            .Where(e => e.Name.LocalName.StartsWith("Image", StringComparison.OrdinalIgnoreCase))
+                //            .Select(e => e.Value?.Trim())
+                //            .Where(val => !string.IsNullOrWhiteSpace(val)));
+
+                //       return new
+                //       {
+                //           OriginalProductCode = p.Element("Product_code")?.Value,
+                //           ProductCode = $"{profileId}_" + p.Element("Product_code")?.Value,
+                //           Name = p.Element("Name")?.Value,
+                //           Brand = p.Element("Brand")?.Value,
+                //           Category = p.Element("subCategory")?.Value,
+                //           Price = adjustedPrice,
+                //           Stock = stock,
+                //           CostPrice = price,
+                //           CurrencyType = p.Element("CurrencyType")?.Value,
+                //           Tax = tax,
+                //           Image = images,
+                //           Description = p.Element("Description")?.Value,
+                //           Variants = p.Elements("variants").Elements("variant").Select(v => new
+                //           {
+                //               Specs = v.Elements("spec").Select(s => new
+                //               {
+                //                   SpecName = s.Attribute("name")?.Value,
+                //                   SpecValue = s.Value
+                //               }).ToList(),
+                //               VariantPrice = decimal.TryParse(v.Element("price")?.Value.Replace(",", "."), out var variantPrice) ? variantPrice : 0m,
+                //               Barcode = v.Element("barcode")?.Value,
+                //               Quantity = v.Element("quantity")?.Value,
+                //               VariantProductCode = v.Element("productCode")?.Value,
+                //           }).ToList()
+                //       };
+                //   }).ToList();
+
+
+
 
                 #region post
                 foreach (var p in products)
@@ -289,10 +325,7 @@ namespace Entegro.Api.Jobs
 
 
 
-                    var imageUrls = p.Image?
-                    .SelectMany(item => item.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-                    .ToList();
-
+                    var imageUrls = p.Image;
                     List<int> fileIds = new();
 
 
@@ -396,6 +429,7 @@ namespace Entegro.Api.Jobs
                     int orderIndex = 0;
                     foreach (var id in fileIds)
                     {
+
                         await _productImageMappingService.AddAsync(new Application.DTOs.ProductMediaFile.CreateProductMediaFileDto
                         {
                             ProductId = createdProduct.Id,
@@ -514,6 +548,7 @@ namespace Entegro.Api.Jobs
             _attributeValueCache.TryAdd((attributeId, value), created.Id);
             return created.Id;
         }
+
         private async Task LoadAttributeCacheAsync()
         {
             var allAttributes = await _productAttributeService.GetAllAsync();
