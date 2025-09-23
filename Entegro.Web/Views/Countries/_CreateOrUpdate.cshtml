@@ -18,22 +18,18 @@
                 </li>
             </ul>
         </div>
-
         <div class="tab-content">
-
             <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3">
-                    <!-- Adı -->
                     <div class="col-md-12">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Ad</label>
                             <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control",@required="required" })
                             </div>
                         </div>
                     </div>
 
-                    <!-- Display Order -->
                     <div class="col-md-12">
                         <div class="row">
                             <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
@@ -61,12 +57,10 @@
             </div>
 
             <div class="tab-pane fade" id="form-tabs-city" role="tabpanel">
+
+               
                 @if (Model.Id>0)
                 {
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCity">
-                        Şehir Ekle
-                    </button>
-
                     <div class="row g-3 p-3">
                         <div class="col-12">
                             <div class="card">
@@ -79,6 +73,7 @@
                                                 <th>Şehir Adı</th>
                                                 <th>Yayınlandı</th>
                                                 <th>İşlemler</th>
+                                                <th>Diğer İşlemler</th>
                                             </tr>
                                         </thead>
                                         <tbody class="table-border-bottom-0">
@@ -87,23 +82,71 @@
                                                 <tr>
                                                     <td>@city.Id</td>
                                                     <td>@city.Name</td>
-                                                    <td>@city.Published</td>
+                                                    <td class="@(city.Published ? "text-success" : "text-danger")">
+                                                        @(city.Published ? "Yayında" : "Yayında Değil")
+                                                    </td>
                                                     <td>
                                                         <button type="button"
-                                                                class="btn btn-primary open-town-modal"
+                                                                class="btn btn-sm btn-primary btn-createorupdate-city"
+                                                                data-city-id="@city.Id"
+                                                                data-createorupdate-url="@Url.Action("CreateOrUpdateCity", "City", new { id = city.Id, countryId = Model.Id })"
                                                                 data-bs-toggle="modal"
-                                                                data-bs-target="#createTown"
-                                                                data-city-id="@city.Id">
-                                                            İlçe Ekle
+                                                                data-bs-target="#createOrUpdateCityModal">
+                                                            <span class="d-flex justify-content-center text-nowrap">
+                                                                <i class="ti ti-edit ti-xs me-1"></i> Güncelle
+                                                            </span>
+                                                        </button>
+
+                                                        <button type="button"
+                                                                class="btn btn-danger delete-city-button btn-sm"
+                                                                data-city-id="@city.Id"
+                                                                data-delete-url="@Url.Action("DeleteCity", "City")">
+                                                            <span class="d-flex justify-content-center text-nowrap">
+                                                                <i class="ti ti-trash ti-xs me-1"></i> Sil
+                                                            </span>
                                                         </button>
                                                     </td>
+                                                    <td>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-warning btn-createorupdate-town"
+                                                                data-town-id="0"
+                                                                data-createorupdate-url="@Url.Action("CreateOrUpdateTown", "Town", new { id = 0, cityId = city.Id })"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#createOrUpdateTownModal">
+                                                            <span class="d-flex justify-content-center text-nowrap">
+                                                                <i class="ti ti-plus ti-xs me-1"></i> İlçe Ekle
+                                                            </span>
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-info view-towns-button btn-sm"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#viewTownsModal"
+                                                                data-city-id="@city.Id"
+                                                                data-url="@Url.Action("GetTowns", "Town", new { cityId = city.Id })">
+                                                            <span class="d-flex justify-content-center text-nowrap">
+                                                                <i class="ti ti-eye ti-xs me-1"></i> İlçeleri Gör
+                                                            </span>
+                                                        </button>
+                                                    </td>
+
                                                 </tr>
                                             }
-                                            
-                                           
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                            <div class="text-end mt-3">
+                                <button type="button"
+                                        class="btn btn-sm btn-warning btn-createorupdate-city"
+                                        data-city-id="0"
+                                        data-createorupdate-url="@Url.Action("CreateOrUpdateCity", "City", new { id = 0, countryId = Model.Id })"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createOrUpdateCityModal">
+                                    <span class="d-flex justify-content-center text-nowrap">
+                                        <i class="ti ti-plus ti-xs me-1"></i> Şehir Ekle
+                                    </span>
+                                </button>
+
                             </div>
                         </div>
                     </div>

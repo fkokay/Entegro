@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Country;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Web.Models.Catalog.Brands;
 using Entegro.Web.Models.Common;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -40,13 +39,10 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var createDto = _mapper.Map<CreateCountryDto>(model);
-
                 await _countryService.AddAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
-
-
         }
 
         [HttpGet]
@@ -58,11 +54,9 @@ namespace Entegro.Web.Controllers
                 return NotFound();
             }
 
-            var model = _mapper.Map<BrandModel>(country);
+            var model = _mapper.Map<CountryModel>(country);
             return View(model);
-
         }
-
         [HttpPost]
         public async Task<IActionResult> Edit(CountryModel model)
         {

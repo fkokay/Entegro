@@ -2,17 +2,14 @@
 @{
     ViewData["Title"] = "ÇiçekSepeti Pazaryeri Entegrasyonu Ayarları";
 }
+<div class="flex-grow-1 container-p-y container-fluid">
+    <form asp-action="MarketplaceParameterCicekSepeti" id="marketplace-setting-ciceksepeti-form">
+        @Html.HiddenFor(m => m.IntegrationSystemId)
+        @Html.HiddenFor(m => m.MarketplaceType)
+        @Html.HiddenFor(m => m.IntegrationSystemTypeId)
+        @Html.HiddenFor(m => m.Id)
 
-<form asp-action="MarketplaceParameterCicekSepeti" id="marketplace-setting-ciceksepeti-form">
-    @Html.HiddenFor(m => m.IntegrationSystemId)
-    @Html.HiddenFor(m => m.MarketplaceType)
-    @Html.HiddenFor(m => m.IntegrationSystemTypeId)
-    @Html.HiddenFor(m => m.Id)
-
-    <div class="flex-grow-1 container-p-y container-fluid">
-        <div class="d-flex flex-column justify-content-center">
-            <h4 class="mb-3">@ViewData["Title"]</h4>
-        </div>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> @ViewData["Title"]</h4>
         <div class="row">
             <div class="col-lg-9 col-12 mb-lg-0 mb-4">
                 <div class="card">
@@ -42,11 +39,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="flex-grow-1 container-p-y container-fluid">
-        <div class="d-flex flex-column justify-content-center">
-            <h4 class="mb-3">@ViewData["Title"]</h4>
-        </div>
+
+        <h4 class="fw-bold py-3 mb-4  mt-3"><span class="text-muted fw-light"></span> Ayarlar</h4>
         <div class="row">
             <div class="col-lg-9 col-12 mb-lg-0 mb-4">
                 <div class="card">
@@ -56,20 +50,20 @@
                     <div class="card-body">
                         <div class="mb-6">
                             <label class="form-label" for="basic-default-fullname">API Kullanıcı Adı</label>
-                            @Html.TextBoxFor(m => m.ApiUser, new { @class = "form-control",required="required" })
+                            @Html.TextBoxFor(m => m.ApiUser, new { @class = "form-control", required = "required" })
                         </div>
                         <div class="mb-6">
                             <label class="form-label" for="basic-default-fullname">Satıcı Numarası </label>
-                            @Html.TextBoxFor(m => m.SupplierId, new { @class = "form-control",required="required" })
+                            @Html.TextBoxFor(m => m.SupplierId, new { @class = "form-control", required = "required" })
                         </div>
                     </div>
                 </div>
             </div>
-            
-        </div>
-    </div>
-</form>
 
+        </div>
+        
+    </form>
+</div>
 
 
 

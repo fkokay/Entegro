@@ -23,16 +23,65 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(ModalTownModel model)
+        [HttpGet]
+        public async Task<IActionResult> CreateOrUpdateTown(int id, int cityId)
         {
-            if (ModelState.IsValid)
+            if (id == 0)
             {
-                var createDto = _mapper.Map<CreateTownDto>(model);
-                await _townService.AddAsync(createDto);
+                TownModel model = new TownModel();
+                model.CityId = cityId;
+                return PartialView("_CreateOrUpdateTownPartial", model);
+            }
+            var town = await _townService.GetByIdAsync(id);
+            if (town == null)
+            {
+                return NotFound();
+            }
+
+            var mappedTown = _mapper.Map<TownModel>(town);
+            return PartialView("_CreateOrUpdateTownPartial", mappedTown);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateOrUpdateTown(TownModel model)
+        {
+            if (!ModelState.IsValid)
+                return PartialView("_CreateOrUpdateTownPartial", model);
+
+            if (model.Id == 0)
+            {
+                var createMappedTown = _mapper.Map<CreateTownDto>(model);
+                await _townService.AddAsync(createMappedTown);
                 return RedirectToAction("List", "Countries");
             }
-            return View(model);
+
+            var mappedTown = _mapper.Map<UpdateTownDto>(model);
+            await _townService.UpdateAsync(mappedTown);
+            return RedirectToAction("List", "Countries");
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetTowns(int cityId)
+        {
+            var townDto = await _townService.GetByCityIdAsync(cityId);
+            if (townDto == null)
+                return NotFound();
+            var town = _mapper.Map<List<TownModel>>(townDto);
+            return PartialView("_TownListPartial", town);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteTown(int id)
+        {
+            try
+            {
+                await _townService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

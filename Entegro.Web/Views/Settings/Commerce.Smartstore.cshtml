@@ -3,16 +3,15 @@
     ViewData["Title"] = "Smartstore E-Ticaret Entegrasyonu Ayarları";
 }
 
-<form asp-action="CommerceParameterSmartStore" id="ecommerce-setting-smartstore-form">
-    @Html.HiddenFor(m => m.IntegrationSystemId)
-    @Html.HiddenFor(m => m.CommerceType)
-    @Html.HiddenFor(m => m.IntegrationSystemTypeId)
-    @Html.HiddenFor(m => m.Id)
+<div class="flex-grow-1 container-p-y container-fluid">
+    <form asp-action="CommerceParameterSmartStore" id="ecommerce-setting-smartstore-form">
+        @Html.HiddenFor(m => m.IntegrationSystemId)
+        @Html.HiddenFor(m => m.CommerceType)
+        @Html.HiddenFor(m => m.IntegrationSystemTypeId)
+        @Html.HiddenFor(m => m.Id)
 
-    <div class="flex-grow-1 container-p-y container-fluid">
-        <div class="d-flex flex-column justify-content-center">
-            <h4 class="mb-3">@ViewData["Title"]</h4>
-        </div>
+
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> E-Ticaret Entegrasyon</h4>
         <div class="row">
             <div class="col-lg-9 col-12 mb-lg-0 mb-4">
                 <div class="card">
@@ -37,14 +36,15 @@
                         <button type="submit" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
                             <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
                         </button>
-                        <a href="/Settings/Commerce"  class="btn btn-label-secondary d-grid w-100 waves-effect">İptal Et</a>
+                        <a href="/Settings/Commerce" class="btn btn-label-secondary d-grid w-100 waves-effect">İptal Et</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="flex-grow-1 container-p-y container-fluid">
+       
+
+        <h4 class="fw-bold py-3 mb-4 mt-3"><span class="text-muted fw-light"></span> E-Ticaret Entegrasyon Ayarları</h4>
         <div class="row">
             <div class="col-lg-9 col-12 mb-lg-0 mb-4">
                 <div class="card">
@@ -67,10 +67,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
-</form>
-
-
-
+    </form>
+</div>

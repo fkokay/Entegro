@@ -25,18 +25,53 @@ namespace Entegro.Web.Controllers
         }
 
 
-
-        [HttpPost]
-        public async Task<IActionResult> Create(ModalCityModel model)
+        [HttpGet]
+        public async Task<IActionResult> CreateOrUpdateCity(int id, int countryId)
         {
-
-            if (ModelState.IsValid)
+            if (id == 0)
             {
-                var createDto = _mapper.Map<CreateCityDto>(model);
-                await _cityService.AddAsync(createDto);
+                CityModel model = new CityModel();
+                model.CountryId = countryId;
+                return PartialView("_CreateOrUpdateCityPartial", model);
+            }
+            var town = await _cityService.GetByIdAsync(id);
+            if (town == null)
+            {
+                return NotFound();
+            }
+
+            var mappedCity = _mapper.Map<CityModel>(town);
+            return PartialView("_CreateOrUpdateCityPartial", mappedCity);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateOrUpdateCity(CityModel model)
+        {
+            if (!ModelState.IsValid)
+                return PartialView("_CreateOrUpdateCityPartial", model);
+
+            if (model.Id == 0)
+            {
+                var createMappedCity = _mapper.Map<CreateCityDto>(model);
+                await _cityService.AddAsync(createMappedCity);
                 return RedirectToAction("List", "Countries");
             }
-            return View(model);
+
+            var mappedCity = _mapper.Map<UpdateCityDto>(model);
+            await _cityService.UpdateAsync(mappedCity);
+            return RedirectToAction("List", "Countries");
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteCity(int id)
+        {
+            try
+            {
+                await _cityService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

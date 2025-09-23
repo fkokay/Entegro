@@ -1,0 +1,24 @@
+﻿@model CityModel
+
+<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="text-center mb-4">
+    <h3 class="mb-2">Şehir Bilgileri</h3>
+</div>
+<form asp-action="CreateOrUpdateCity" asp-controller="City" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CountryId" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Adı</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="Published" class="form-check-input" />
+        <label asp-for="Published" class="form-check-label">Yayınlandı</label>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+</form>

@@ -1,11 +1,10 @@
-﻿
-@model EmailAccountModel
+﻿@model EmailAccountModel
 @{
     ViewData["Title"] = "Edit";
 }
 
-<form asp-action="Edit" id="emailaccount-form">
-    <div class="container-fluid flex-grow-1 container-p-y">
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Edit" id="emailaccount-form">
         <h4 class="fw-bold py-3 mb-4">Hesap Bilgilerini Düzenle</h4>
         <div class="row">
             <partial name="_CreateOrUpdate" />
@@ -30,8 +29,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 @section Scripts {
     <script src="/assets/js/entegro.mailaccount.js"></script>
@@ -112,5 +111,5 @@
             });
         });
     </script>
-   
+
 }

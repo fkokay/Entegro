@@ -1,12 +1,11 @@
-﻿
-@model CountryModel
+﻿@model CountryModel
 @{
     ViewData["Title"] = "Ülke Bilgilerini Düzenle - " + Model.Name;
 }
 
-<form asp-action="Edit" id="country-form">
-    <div class="container-fluid flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ayarlar/</span><span class="text-muted fw-light">Ülkeler /</span> Ülkeler billgilerini Düzenle</h4>
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Edit" id="country-form">
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ayarlar/</span><span class="text-muted fw-light">Ülkeler /</span> Ülke Bilgilerini Düzenle</h4>
 
         <div class="row">
             <partial name="_CreateOrUpdate" />
@@ -26,8 +25,6 @@
                                     <i class="ti ti-trash ti-xs me-1"></i>Sil
                                 </span>
                             </button>
-
-
                         }
                         <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
                             <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-cancel ti-xs me-1"></i>Vazgeç</span>
@@ -36,107 +33,41 @@
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
-<div class="modal fade" id="createCity" tabindex="-1" aria-hidden="true">
+
+<div class="modal fade" id="viewTownsModal" tabindex="-1" aria-labelledby="viewTownsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
         <div class="modal-content p-3 p-md-5">
             <div class="modal-body">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="text-center mb-4">
-                    <h3 class="mb-2">Şehir Bilgileri</h3>
+                    <h3 class="mb-2" id="viewTownsModalLabel">İlçeler</h3>
                 </div>
-                <form asp-action="Create" asp-controller="City" class="row g-3" >
-                    <input type="hidden" name="countryId" value="@Model.Id" />
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="cityName">Adı</label>
-                        <input type="text"
-                               id="cityName"
-                               name="CityName"
-                               class="form-control"
-                               placeholder="İstanbul" />
+                <div id="townsModalContent">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
                     </div>
-                    <div class="col-12 col-md-12 mt-3">
-                        <label class="form-label" for="displayOrder">Sıra</label>
-                        <input type="number"
-                               id="displayOrder"
-                               name="DisplayOrder"
-                               class="form-control"
-                               value="0" min="0" />
-                    </div>
-                    <div class="col-12 mt-3">
-                        <label class="switch">
-                            @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
-                            <span class="switch-toggle-slider">
-                                <span class="switch-on"></span>
-                                <span class="switch-off"></span>
-                            </span>
-                            <span class="switch-label">Yayınlandı</span>
-                        </label>
-                    </div>
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset"
-                                class="btn btn-label-secondary"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Kapat
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="createTown" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="createOrUpdateTownModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
         <div class="modal-content p-3 p-md-5">
             <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">İlçe Bilgileri</h3>
-                </div>
-                <form asp-action="Create" asp-controller="Town" id="createTownForm" class="row g-3">
-                    <div class="col-12 col-md-12">
-                        <input type="hidden" name="CityId" id="cityIdHidden" />
-
-                        <label class="form-label" for="townName">Adı</label>
-                        <input type="text"
-                               id="townName"
-                               name="TownName"
-                               class="form-control"
-                               placeholder="İlçe Adı"/>
-                    </div>
-                    <div class="col-12 col-md-12 mt-3">
-                        <label class="form-label" for="townDisplayOrder">Sıra</label>
-                        <input type="number"
-                               id="townDisplayOrder"
-                               name="TownDisplayOrder"
-                               class="form-control"
-                               value="0" min="0" />
-                    </div>
-                    <div class="col-12 mt-3">
-                        <label class="switch">
-                            @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
-                            <span class="switch-toggle-slider">
-                                <span class="switch-on"></span>
-                                <span class="switch-off"></span>
-                            </span>
-                            <span class="switch-label">Yayınlandı</span>
-                        </label>
-                    </div>
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset"
-                                class="btn btn-label-secondary"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="createOrUpdateCityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <div class="modal-body">
             </div>
         </div>
     </div>
@@ -161,10 +92,14 @@
             );
 
             Entegro.country.initIsPublishedCheckbox();
-            Entegro.country.initTownModal('.open-town-modal', '#cityIdHidden');
+            Entegro.country.initCityDelete('.delete-city-button');
+            Entegro.country.initTownViewModal('#viewTownsModal', '#townsModalContent');
+            Entegro.country.initTownDeleteInModal('#viewTownsModal');
+            Entegro.country.initTownCreateOrUpdateInModal('#createOrUpdateTownModal');
+            Entegro.country.initCityCreateOrUpdateInModal('#createOrUpdateCityModal');
         });
     </script>
 
-    
+
 
 }

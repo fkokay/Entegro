@@ -2,17 +2,14 @@
 @{
     ViewData["Title"] = "Netsis Erp Entegrasyonu Ayarları";
 }
+<div class="flex-grow-1 container-p-y container-fluid">
+    <form asp-action="ErpParameterNetsis" id="erp-setting-netsis-form">
+        @Html.HiddenFor(m => m.IntegrationSystemId)
+        @Html.HiddenFor(m => m.ErpType)
+        @Html.HiddenFor(m => m.IntegrationSystemTypeId)
+        @Html.HiddenFor(m => m.Id)
 
-<form asp-action="ErpParameterNetsis" id="erp-setting-netsis-form">
-    @Html.HiddenFor(m => m.IntegrationSystemId)
-    @Html.HiddenFor(m => m.ErpType)
-    @Html.HiddenFor(m => m.IntegrationSystemTypeId)
-    @Html.HiddenFor(m => m.Id)
-
-    <div class="flex-grow-1 container-p-y container-fluid">
-        <div class="d-flex flex-column justify-content-center">
-            <h4 class="mb-3">@ViewData["Title"]</h4>
-        </div>
+        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> @ViewData["Title"]</h4>
         <div class="row">
             <div class="col-lg-9 col-12 mb-lg-0 mb-4">
                 <div class="card">
@@ -42,9 +39,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="flex-grow-1 container-p-y container-fluid">
+        <h4 class="fw-bold py-3 mb-4 mt-3"><span class="text-muted fw-light"></span>Ayarlar</h4>
         <div class="row">
             <div class="col-lg-9 col-12 mb-lg-0 mb-4">
                 <div class="card">
@@ -69,8 +64,7 @@
             </div>
 
         </div>
-    </div>
-</form>
+        
+    </form>
 
-
-
+</div>

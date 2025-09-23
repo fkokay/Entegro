@@ -2,12 +2,11 @@
 @{
     ViewData["Title"] = "Kullanıcı Bilgilerini Düzenle";
 }
-<form asp-action="Edit" id="user-form">
-    <div class="flex-grow-1 container-p-y container-fluid">
+<div class="flex-grow-1 container-p-y container-fluid">
+    <form asp-action="Edit" id="user-form">
         <div class="d-flex flex-column justify-content-center">
             <h4 class="mb-3">@ViewData["Title"]</h4>
         </div>
-
         <div class="row">
             <partial name="_CreateOrUpdate" />
             <div class="col-lg-3 col-12 invoice-actions">
@@ -29,5 +28,5 @@
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>

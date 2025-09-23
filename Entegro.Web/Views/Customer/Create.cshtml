@@ -1,6 +1,6 @@
 ﻿@model CustomerModel
-<form asp-action="Create" id="customer-form">
-    <div class="container-fluid flex-grow-1 container-p-y">
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Create" id="customer-form">
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Müşteri Yönetimi /</span><span class="text-muted fw-light"> Müşteri /</span> Yeni Bir Müşteri Ekle</h4>
         <div class="row">
             <partial name="_CreateOrUpdate" model="Model" />
@@ -15,8 +15,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 @section Scripts {
     <script src="/assets/js/entegro.customer.js"></script>
     <script>

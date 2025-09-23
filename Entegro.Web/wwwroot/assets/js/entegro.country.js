@@ -113,7 +113,6 @@ Entegro.country = (function ($) {
             }
         });
     }
-
     function initDelete(deleteButtonSelector, deleteUrl, redirectUrl, countryId) {
         $(deleteButtonSelector).on('click', function () {
             Swal.fire({
@@ -180,7 +179,6 @@ Entegro.country = (function ($) {
             });
         });
     }
-
     function initIsPublishedCheckbox() {
         document.querySelector('form').addEventListener('submit', function (e) {
             var isChecked = document.querySelector('input[name="IsPublished"]').checked;
@@ -188,18 +186,214 @@ Entegro.country = (function ($) {
             console.log("Yayın Durumu:", isChecked);
         });
     }
+    function initCityDelete(buttonSelector) {
+        $(buttonSelector).on('click', function () {
+            const button = $(this);
+            const cityId = button.data('city-id');
+            const deleteUrl = button.data('delete-url');
 
-    function initTownModal(modalTriggerSelector, hiddenInputSelector) {
-        $(modalTriggerSelector).on('click', function () {
-            var cityId = $(this).data('city-id');
-            $(hiddenInputSelector).val(cityId);
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu şehir silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        data: { id: cityId },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'Şehir başarıyla silindi.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-success'
+                                    },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    location.reload(); 
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: 'Sunucu ile bağlantı kurulamadı.',
+                                confirmButtonText: 'Tamam',
+                                customClass: {
+                                    confirmButton: 'btn btn-danger'
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
         });
     }
+    function initTownViewModal(modalSelector, contentSelector) {
+        $(modalSelector).on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const cityId = button.data('city-id');
+            const url = button.data('url');
+
+            const content = $(this).find(contentSelector);
+            content.html(`
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+            `);
+
+            content.load(url); // AJAX'siz partial yükleme (sunucuya gider, sadece modal içeriği çeker)
+        });
+    }
+    function initTownDeleteInModal(modalSelector) {
+        $(modalSelector).on('click', '.btn-delete-town', function () {
+            const button = $(this);
+            const townId = button.data('town-id');
+            const deleteUrl = button.data('delete-url');
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu ilçe silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        data: { id: townId },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'İlçe başarıyla silindi.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-success'
+                                    },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata!',
+                                text: 'Sunucu ile bağlantı kurulamadı.',
+                                confirmButtonText: 'Tamam',
+                                customClass: {
+                                    confirmButton: 'btn btn-danger'
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+    function initTownCreateOrUpdateInModal(createOrUpdateTownModalSelector) {
+        $(document).on('click', '.btn-createorupdate-town', function () {
+            const createOrUpdateTownUrl = $(this).data('createorupdate-url');
+            const $createOrUpdateTownModal = $(createOrUpdateTownModalSelector);
+
+            $createOrUpdateTownModal.find('.modal-body').html(`
+            <div class="text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        `);
+
+            $createOrUpdateTownModal.modal('show');
+            $createOrUpdateTownModal.find('.modal-body').load(createOrUpdateTownUrl);
+        });
+    }
+    function initCityCreateOrUpdateInModal(createOrUpdateCityModalSelector) {
+        $(document).on('click', '.btn-createorupdate-city', function () {
+            const createOrUpdateCityUrl = $(this).data('createorupdate-url');
+
+            if (!createOrUpdateCityUrl) {
+                console.error("createOrUpdateCityUrl boş!", this);
+                return;
+            }
+
+            const $createOrUpdateCityModal = $(createOrUpdateCityModalSelector);
+
+            $createOrUpdateCityModal.find('.modal-body').html(`
+            <div class="text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        `);
+
+            $createOrUpdateCityModal.modal('show');
+            $createOrUpdateCityModal.find('.modal-body').load(createOrUpdateCityUrl);
+        });
+    }
+
+    // Init fonksiyonu çağrılmalı
+    Entegro.country = Entegro.country || {};
+    Entegro.country.initCityCreateOrUpdateInModal = initCityCreateOrUpdateInModal;
+    Entegro.country.initCityCreateOrUpdateInModal('#createOrUpdateCityModal');
 
     return {
         initValidation: initValidation,
         initDelete: initDelete,
         initIsPublishedCheckbox: initIsPublishedCheckbox,
-        initTownModal: initTownModal
+        initCityDelete: initCityDelete,
+        initTownViewModal: initTownViewModal,
+        initTownDeleteInModal: initTownDeleteInModal,
+        initTownCreateOrUpdateInModal: initTownCreateOrUpdateInModal,
+        initCityCreateOrUpdateInModal: initCityCreateOrUpdateInModal
     };
 })(jQuery);

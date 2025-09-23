@@ -70,7 +70,7 @@ namespace Entegro.Web.Controllers
                 var updateDto = _mapper.Map<UpdateUserDto>(model);
                 await _userService.UpdateUserAsync(updateDto);
 
-                return Json(new { success = true });
+                return RedirectToAction("List");
             }
             return View(model);
         }

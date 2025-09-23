@@ -1,11 +1,10 @@
-﻿
-@model EmailAccountModel
+﻿@model EmailAccountModel
 @{
     ViewData["Title"] = "Yeni bir Hesap Oluştur";
 }
 
-<form asp-action="Create" id="emailaccount-form">
-    <div class="container-fluid flex-grow-1 container-p-y">
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Create" id="emailaccount-form">
         <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Hesap Yönetimi /</span><span class="text-muted fw-light"> Hesap /</span> Yeni Bir Hesap Ekle</h4>
         <div class="row">
             <partial name="_CreateOrUpdate" model="Model" />
@@ -20,13 +19,13 @@
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 @section Scripts {
     <script src="/assets/js/entegro.mailaccount.js"></script>
     <script>
         $(function () {
-          
+
             Entegro.emailaccount.initCreateForm({
                 formSelector: '#emailaccount-form',
                 postUrl: '@Url.Action("Create", "EmailAccount")',
