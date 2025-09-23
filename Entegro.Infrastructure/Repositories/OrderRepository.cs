@@ -146,10 +146,10 @@ namespace Entegro.Infrastructure.Repositories
                     query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc == null));
                     break;
                 case 6: // Ödemesi Bekleniyor
-                    query = query.Where(o => o.PaymentStatus == Domain.Enums.PaymentStatus.Pending);
+                    query = query.Where(o => o.PaymentStatusId == (int)Domain.Enums.PaymentStatus.Pending);
                     break;
                 case 7: // İptal Edildi
-                    query = query.Where(o => o.OrderStatus == Domain.Enums.OrderStatus.Cancelled);
+                    query = query.Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Cancelled);
                     break;
             }
 
