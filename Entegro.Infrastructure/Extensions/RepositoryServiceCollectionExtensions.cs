@@ -44,6 +44,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();
             services.AddScoped<ISettingRepository, SettingRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<ICustomerAddressMappingRepository, CustomerAddressMappingRepository>();
             return services;
         }
     }

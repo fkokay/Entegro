@@ -1,0 +1,24 @@
+﻿@model AddressModel
+
+<form asp-action="CreateCustomerAddressMapping" method="get" id="addressForm">
+    <div class="form-group">
+        <label>Ad</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Soyad</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    @* Diğer alanları buraya ekle *@
+
+    <input type="hidden" asp-for="CostumerId" />
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+    </div>
+</form>

@@ -381,10 +381,6 @@ Entegro.country = (function ($) {
         });
     }
 
-    // Init fonksiyonu çağrılmalı
-    Entegro.country = Entegro.country || {};
-    Entegro.country.initCityCreateOrUpdateInModal = initCityCreateOrUpdateInModal;
-    Entegro.country.initCityCreateOrUpdateInModal('#createOrUpdateCityModal');
 
     return {
         initValidation: initValidation,

@@ -176,6 +176,8 @@ Entegro.customer = (function ($) {
             options.redirectUrl || '/Customer/List'
         );
     }
+   
+
 
     return {
         initCreateForm: initCreateForm,

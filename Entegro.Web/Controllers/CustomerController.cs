@@ -1,7 +1,10 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Address;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
+using Entegro.Application.DTOs.CustomerAddressMapping;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models;
+using Entegro.Web.Models.Common;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +13,15 @@ namespace Entegro.Web.Controllers
     public class CustomerController : Controller
     {
         private readonly ICustomerService _customerService;
+        private readonly ICustomerAddressMappingService _customerAddressMappingService;
+        private readonly IAddressService _addressService;
         private readonly IMapper _mapper;
-        public CustomerController(ICustomerService customerService, IMapper mapper)
+        public CustomerController(ICustomerService customerService, IMapper mapper, ICustomerAddressMappingService customerAddressMappingService, IAddressService addressService)
         {
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _customerAddressMappingService = customerAddressMappingService;
+            _addressService = addressService;
         }
         public IActionResult Index()
         {
@@ -71,6 +78,40 @@ namespace Entegro.Web.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CreateCustomerAddressMapping(int customerId)
+        {
+            if (customerId == 0)
+            {
+                return NotFound();
+            }
+            var customer = await _customerService.GetCustomerByIdAsync(customerId);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            AddressModel addressModel = new AddressModel();
+            addressModel.CostumerId = customerId;
+            return PartialView("_CreateCustomerAddressPartial", addressModel);
+        }
+        [HttpGet]
+        public async Task<IActionResult> CreateCustomerAddressMapping(AddressModel model)
+        {
+            if (!ModelState.IsValid)
+                return PartialView("_CreateCustomerAddressPartial", model);
+
+            var addressModel = _mapper.Map<CreateAddressDto>(model);
+            var createdModel = await _addressService.AddAsync(addressModel);
+
+            var costumerAddressModel = new CustomerAddressMappingModel
+            {
+                CustomerId = model.CostumerId.Value,
+                AddressId = createdModel.Id
+            };
+            var costumerAddressMappingModel = _mapper.Map<CreateCustomerAddressMappingDto>(costumerAddressModel);
+            await _customerAddressMappingService.AddAsync(costumerAddressMappingModel);
+            return RedirectToAction("List");
+        }
         [HttpPost]
         public async Task<IActionResult> CustomerList([FromBody] GridCommand gridCommand)
         {

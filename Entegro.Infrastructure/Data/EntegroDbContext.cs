@@ -69,6 +69,7 @@ namespace Entegro.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new UserMap());
             modelBuilder.ApplyConfiguration(new ImportProfileMap());
             modelBuilder.ApplyConfiguration(new SettingMap());
+            modelBuilder.ApplyConfiguration(new CustomerAddressMappingMap());
 
         }
 
@@ -111,5 +112,6 @@ namespace Entegro.Infrastructure.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ImportProfile> ImportProfiles { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<CustomerAddressMapping> CustomerAddressMappings { get; set; }
     }
 }

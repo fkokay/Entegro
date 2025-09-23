@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.City;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Country;
 using Entegro.Application.DTOs.Customer;
+using Entegro.Application.DTOs.CustomerAddressMapping;
 using Entegro.Application.DTOs.District;
 using Entegro.Application.DTOs.EmailAccount;
 using Entegro.Application.DTOs.ImportProfile;
@@ -182,6 +183,12 @@ namespace Entegro.Application.Mappings
             config.NewConfig<Notification, NotificationDto>().TwoWays();
             config.NewConfig<Notification, CreateNotificationDto>().TwoWays();
             config.NewConfig<Notification, UpdateNotificationDto>().TwoWays();
+
+            // ---------------- CustomerAddressMapping ----------------
+
+            config.NewConfig<CustomerAddressMapping, CustomerAddressMappingDto>().TwoWays();
+            config.NewConfig<CustomerAddressMapping, CreateCustomerAddressMappingDto>().TwoWays();
+            config.NewConfig<CustomerAddressMapping, UpdateNotificationDto>().TwoWays();
 
 
         }

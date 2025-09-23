@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities.Checkout
 {
@@ -34,5 +29,7 @@ namespace Entegro.Domain.Entities.Checkout
         public DateTime UpdatedOnUtc { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; } = new HashSet<Order>();
+        public virtual ICollection<CustomerAddressMapping> CustomerAddressMappings { get; set; } = new HashSet<CustomerAddressMapping>();
+
     }
 }

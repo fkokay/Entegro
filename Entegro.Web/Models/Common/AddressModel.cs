@@ -12,6 +12,7 @@
         public string? Company { get; set; }
         public int? CountryId { get; set; }
         public int? CityId { get; set; }
+        public int? CostumerId { get; set; }
         public int? TownId { get; set; }
         public int? DistrictId { get; set; }
         public string Address1 { get; set; }
