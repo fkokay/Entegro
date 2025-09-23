@@ -11,6 +11,7 @@ using Quartz;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 using File = System.IO.File;
 
 namespace Entegro.Api.Jobs
@@ -18,14 +19,13 @@ namespace Entegro.Api.Jobs
     [DisallowConcurrentExecution]
     public class FileDownloadJob : IJob
     {
+
         private readonly IImportProfileService _importProfileService;
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly IBrandService _brandService;
         private readonly IProductMediaFileMappingService _productImageMappingService;
         private readonly IProductCategoryService _productCategoryService;
-
-
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeValueService _productAttributeValueService;
         private readonly IProductVariantAttributeService _productVariantAttributeService;
@@ -33,7 +33,21 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
-        public FileDownloadJob(IImportProfileService importProfileService, IProductService productService, ICategoryService categoryService, IBrandService brandService, IProductMediaFileMappingService productImageMappingService, IProductCategoryService productCategoryService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
+        private readonly ILogger<FileDownloadJob> _logger;
+
+        public FileDownloadJob(
+            IImportProfileService importProfileService,
+            IProductService productService,
+            ICategoryService categoryService,
+            IBrandService brandService,
+            IProductMediaFileMappingService productImageMappingService,
+            IProductCategoryService productCategoryService,
+            IProductAttributeService productAttributeService,
+            IProductAttributeValueService productAttributeValueService,
+            IProductVariantAttributeService productVariantAttributeService,
+            IProductVariantAttributeValueService productVariantAttributeValueService,
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            ILogger<FileDownloadJob> logger)
         {
             _importProfileService = importProfileService;
             _productService = productService;
@@ -46,29 +60,46 @@ namespace Entegro.Api.Jobs
             _productVariantAttributeService = productVariantAttributeService;
             _productVariantAttributeValueService = productVariantAttributeValueService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _logger = logger;
         }
         public async Task Execute(IJobExecutionContext context)
         {
             try
             {
                 await LoadAttributeCacheAsync();
+
                 var profileId = context.JobDetail.JobDataMap.GetInt("ProfileId");
                 var profile = await _importProfileService.GetByIdAsync(profileId);
-                var mappingList = JsonConvert.DeserializeObject<List<XmlColumnMappingResult>>(profile.ColumnMapping);
-
                 if (profile == null)
                 {
-                    Console.WriteLine("Profil bulunamadı.");
+                    _logger.LogError("Profil bulunamadı.");
+                    return;
+                }
+
+                var mappings = JsonConvert.DeserializeObject<List<XmlColumnMappingResult>>(profile.ColumnMapping);
+                if (mappings == null)
+                {
+                    _logger.LogError("Xml eşleştirilmesi bulunamadı");
                     return;
                 }
 
                 #region dosya 
-                var xDoc = GetFile(profile);
+                var xDoc = GetDocument(profile);
                 #endregion
 
+                if (xDoc == null)
+                {
+                    Console.WriteLine("Xml dosyasu bulunamadı.");
+                    return;
+                }
+
+                if (xDoc.Result == null)
+                {
+
+                    return;
+                }
+
                 int productCount = xDoc.Result.Descendants("Product").Count();
-
-
 
                 List<CreateProductDto> createdProductList = new List<CreateProductDto>();
                 for (int i = 0; i < productCount; i += 1)
@@ -78,51 +109,51 @@ namespace Entegro.Api.Jobs
                     var productElement = xDoc.Result.Descendants("Product").ElementAtOrDefault(i);
 
 
-                    var xmlElementProductName = GetMappedXmlHeader(mappingList, "Name");
+                    var xmlElementProductName = GetMappedXmlHeader(mappings, "Name");
                     if (xmlElementProductName != null)
                     {
                         createProductDto.Name = productElement?.Element(xmlElementProductName)?.Value ?? "";
                     }
 
-                    var xmlElementProductCode = GetMappedXmlHeader(mappingList, "Code");
+                    var xmlElementProductCode = GetMappedXmlHeader(mappings, "Code");
                     if (xmlElementProductCode != null)
                     {
                         createProductDto.Code = $"{profileId}_" + (productElement?.Element(xmlElementProductCode)?.Value ?? "");
                     }
 
-                    var xmlElementDescription = GetMappedXmlHeader(mappingList, "Description");
+                    var xmlElementDescription = GetMappedXmlHeader(mappings, "Description");
                     if (xmlElementDescription != null)
                     {
                         createProductDto.Description = productElement?.Element(xmlElementDescription)?.Value ?? "";
                     }
 
-                    var xmlElementCurrency = GetMappedXmlHeader(mappingList, "Currency");
+                    var xmlElementCurrency = GetMappedXmlHeader(mappings, "Currency");
                     if (xmlElementCurrency != null)
                     {
                         createProductDto.Currency = productElement?.Element(xmlElementCurrency)?.Value ?? "";
                     }
 
-                    var xmlElementBarcode = GetMappedXmlHeader(mappingList, "Barcode");
+                    var xmlElementBarcode = GetMappedXmlHeader(mappings, "Barcode");
                     if (xmlElementBarcode != null)
                     {
                         createProductDto.Barcode = productElement?.Element(xmlElementBarcode)?.Value ?? "";
                     }
 
-                    var xmlHeaderPrice = GetMappedXmlHeader(mappingList, "Price");
+                    var xmlHeaderPrice = GetMappedXmlHeader(mappings, "Price");
                     if (xmlHeaderPrice != null)
                     {
                         var priceStr = productElement?.Element(xmlHeaderPrice)?.Value?.Replace(".", ",") ?? "0";
                         createProductDto.Price = decimal.TryParse(priceStr, out var price) ? price : 0m;
                     }
 
-                    var xmlHeaderVatRate = GetMappedXmlHeader(mappingList, "VatRate");
+                    var xmlHeaderVatRate = GetMappedXmlHeader(mappings, "VatRate");
                     if (xmlHeaderVatRate != null)
                     {
                         var vatRateStr = productElement?.Element(xmlHeaderVatRate)?.Value?.Replace(".", ",") ?? "0";
                         createProductDto.VatRate = decimal.TryParse(vatRateStr, out var vatRate) ? vatRate : 0m;
                     }
 
-                    var xmlHeaderStockQuantity = GetMappedXmlHeader(mappingList, "StockQuantity");
+                    var xmlHeaderStockQuantity = GetMappedXmlHeader(mappings, "StockQuantity");
                     if (xmlHeaderStockQuantity != null)
                     {
                         var stockQuantityStr = productElement?.Element(xmlHeaderStockQuantity)?.Value?.Replace(".", ",") ?? "0";
@@ -132,38 +163,38 @@ namespace Entegro.Api.Jobs
 
 
                     //varyantlar
-                    var xmlElementAttributeStockCode = GetMappedXmlHeader(mappingList, "AttributeStockCode");
+                    var xmlElementAttributeStockCode = GetMappedXmlHeader(mappings, "AttributeStockCode");
                     if (xmlElementAttributeStockCode != null)
                     {
                         var deger = productElement?.Element(xmlElementAttributeStockCode)?.Value ?? "";
                     }
 
-                    var xmlElementAttributePrice = GetMappedXmlHeader(mappingList, "AttributePrice");
+                    var xmlElementAttributePrice = GetMappedXmlHeader(mappings, "AttributePrice");
                     if (xmlElementAttributePrice != null)
                     {
                         var deger = productElement?.Element(xmlElementAttributePrice)?.Value ?? "";
                     }
 
-                    var xmlElementAttributeStockQuantity = GetMappedXmlHeader(mappingList, "AttributeStockQuantity");
+                    var xmlElementAttributeStockQuantity = GetMappedXmlHeader(mappings, "AttributeStockQuantity");
                     if (xmlElementAttributeStockQuantity != null)
                     {
                         var deger = productElement?.Element(xmlElementAttributeStockQuantity)?.Value ?? "";
                     }
 
-                    var xmlElementAttributeManufacturerPartNumber = GetMappedXmlHeader(mappingList, "AttributeManufacturerPartNumber");
+                    var xmlElementAttributeManufacturerPartNumber = GetMappedXmlHeader(mappings, "AttributeManufacturerPartNumber");
                     if (xmlElementAttributeManufacturerPartNumber != null)
                     {
                         var deger = productElement?.Element(xmlElementAttributeManufacturerPartNumber)?.Value ?? "";
                     }
 
-                    var xmlElementAttributeSpecifications = GetMappedXmlHeader(mappingList, "AttributeSpecifications");
+                    var xmlElementAttributeSpecifications = GetMappedXmlHeader(mappings, "AttributeSpecifications");
                     if (xmlElementAttributeSpecifications != null)
                     {
                         var deger = productElement?.Element(xmlElementAttributeSpecifications)?.Value ?? "";
                     }
 
 
-                    var xmlElementBrand = GetMappedXmlHeader(mappingList, "Brand");
+                    var xmlElementBrand = GetMappedXmlHeader(mappings, "Brand");
                     if (xmlElementBrand != null)
                     {
                         var brandValue = productElement?.Element(xmlElementBrand)?.Value ?? "";
@@ -197,7 +228,7 @@ namespace Entegro.Api.Jobs
                     #region Images
                     List<string> images = new();
                     HttpClient httpClient = new HttpClient();
-                    string imageMap = mappingList.FirstOrDefault(x => x.MappedName == "Images")?.XmlHeader ?? "";
+                    string imageMap = mappings.FirstOrDefault(x => x.MappedName == "Images")?.XmlHeader ?? "";
 
                     if (imageMap.Contains(","))
                     {
@@ -273,48 +304,30 @@ namespace Entegro.Api.Jobs
             return mappingList.FirstOrDefault(x => x?.MappedName == mappedName)?.XmlHeader;
         }
 
-        private async Task<XDocument?> GetFile(ImportProfileDto profile)
+        private async Task<XDocument?> GetDocument(ImportProfileDto profile)
         {
-            string fileName = $"{profile.Id}_{profile.ProfileName}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xml";
-            var url = profile.MediaFileUrl;
-            var folderName = "document";
-
-            if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(fileName))
+            try
             {
-                throw new ArgumentException("XmlUrl or UploadedFileName is missing.");
+                var url = profile.MediaFileUrl;
+
+                if (string.IsNullOrEmpty(url))
+                {
+                    throw new Exception("Dosya url boş");
+                }
+
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36");
+                var xmlContent = await httpClient.GetStringAsync(url);
+                using TextReader reader = new StringReader(xmlContent);
+                XDocument xDoc = XDocument.Load(reader);
+
+                return xDoc;
             }
-
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36");
-            var xmlContent = await httpClient.GetStringAsync(url);
-
-            var appDataPath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "App_Data",
-                "Media",
-                "Storage",
-                folderName
-            );
-
-            if (!Directory.Exists(appDataPath))
-                Directory.CreateDirectory(appDataPath);
-
-            var fullFilePath = Path.Combine(appDataPath, fileName);
-            await File.WriteAllTextAsync(fullFilePath, xmlContent);
-            Console.WriteLine($"XML file saved to: {fullFilePath}");
-
-            // XML dosyasını yükle ve işle
-            string filePattern = $"{profile.Id}_*.xml";
-            var files = Directory.GetFiles(appDataPath, filePattern);
-            if (files.Length == 0)
+            catch (Exception ex)
             {
-                Console.WriteLine("Dosya bulunamadı.");
+                _logger.LogError(ex,"Dosya indirlirken bir hata oluştu");
                 return null;
             }
-            string xmlFilePath = files[0];
-            XDocument xDoc = XDocument.Load(xmlFilePath);
-
-            return xDoc;
         }
 
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeModel> variantAttributes)
