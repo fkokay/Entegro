@@ -10,9 +10,5 @@ namespace Entegro.Application.Interfaces.Services.Commerce
 {
     public interface ICommerceBrandWriter
     {
-        Task<int> CreateBrandAsync(BrandDto brand);
-        Task UpdateBrandAsync(BrandDto brand, int id);
-        Task DeleteBrandAsync(int brandId);
-        Task<BrandDto?> BrandExistsAsync(string brandName);
     }
 }

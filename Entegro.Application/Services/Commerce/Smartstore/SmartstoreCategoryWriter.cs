@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -20,24 +21,24 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<CategoryDto?> CategoryExistsAsync(string categoryName)
+        public async Task<CategoryDto?> CategoryExistsAsync(SmartstoreApiContext context, string categoryName)
         {
-            return await _smartstoreClient.CategoryExistsAsync(categoryName);
+            return await _smartstoreClient.CategoryExistsAsync(context, categoryName);
         }
 
-        public async Task<int> CreateCategoryAsync(CategoryDto category)
+        public async Task<int> CreateCategoryAsync(SmartstoreApiContext context, CategoryDto category)
         {
-            return await _smartstoreClient.CreateCategoryAsync(category);
+            return await _smartstoreClient.CreateCategoryAsync(context, category);
         }
 
-        public Task DeleteCategoryAsync(int categoryId)
+        public Task DeleteCategoryAsync(SmartstoreApiContext context, int categoryId)
         {
-            return _smartstoreClient.DeleteCategoryAsync(categoryId);
+            return _smartstoreClient.DeleteCategoryAsync(context, categoryId);
         }
 
-        public Task UpdateCategoryAsync(CategoryDto category, int id)
+        public Task UpdateCategoryAsync(SmartstoreApiContext context, CategoryDto category, int id)
         {
-            return _smartstoreClient.UpdateCategoryAsync(category, id);
+            return _smartstoreClient.UpdateCategoryAsync(context, category, id);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
@@ -50,6 +51,8 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                 if (commerceType == "Smartstore")
                 {
+                    SmartstoreApiContext context = GetSmartstoreApiContext(productIntegration.IntegrationSystem);
+
                     object? customData = string.IsNullOrEmpty(productIntegration.Custom) ? null : JsonConvert.DeserializeObject<SmartstoreProductIntegrationCustomDto>(productIntegration.Custom);
 
                     var product = await _productService.GetProductByIdAsync(productIntegration.ProductId);
@@ -68,31 +71,57 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                         CustomData = customData
                     };
 
-                    await _smartstoreClient.UpsertProductAsync(request);
+                    await _smartstoreClient.UpsertProductAsync(context,request);
 
                     await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }
 
-        public async Task DeleteProductAsync(string sku)
+        public async Task DeleteProductAsync(SmartstoreApiContext context,string sku)
         {
-            await _smartstoreClient.DeleteProductAsync(sku);
+            await _smartstoreClient.DeleteProductAsync(context, sku);
         }
 
-        public async Task DeleteProductsAsync(IEnumerable<string> skus)
+        public async Task DeleteProductsAsync(SmartstoreApiContext context, IEnumerable<string> skus)
         {
-            await _smartstoreClient.DeleteProductsAsync(skus);
+            await _smartstoreClient.DeleteProductsAsync(context, skus);
         }
 
-        public async Task UpsertProductAsync(UpsertProductRequest request)
+        public async Task UpsertProductAsync(SmartstoreApiContext context, UpsertProductRequest request)
         {
-            await _smartstoreClient.UpsertProductAsync(request);
+            await _smartstoreClient.UpsertProductAsync(context, request);
         }
 
-        public async Task UpsertProductsAsync(IEnumerable<UpsertProductRequest> requests)
+        public async Task UpsertProductsAsync(SmartstoreApiContext context, IEnumerable<UpsertProductRequest> requests)
         {
-            await _smartstoreClient.UpsertProductsAsync(requests);
+            await _smartstoreClient.UpsertProductsAsync(context, requests);
+        }
+
+        private SmartstoreApiContext GetSmartstoreApiContext(IntegrationSystemDto item)
+        {
+            SmartstoreApiContext context = new SmartstoreApiContext();
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Smartstore ApiUrl Ayarlanmamış");
+            }
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Smartstore ApiUser Ayarlanmamış");
+            }
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Smartstore ApiPassword Ayarlanmamış");
+            }
+
+            context.BaseUrl = item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.ApiUser = item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.ApiPassword = item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "";
+
+            return context;
         }
     }
 }

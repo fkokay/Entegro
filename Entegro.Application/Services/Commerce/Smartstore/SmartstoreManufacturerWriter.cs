@@ -20,24 +20,24 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<BrandDto?> BrandExistsAsync(string brandName)
+        public async Task<BrandDto?> BrandExistsAsync(SmartstoreApiContext context, string brandName)
         {
-            return await _smartstoreClient.BrandExistsAsync(brandName);
+            return await _smartstoreClient.BrandExistsAsync(context, brandName);
         }
 
-        public Task<int> CreateBrandAsync(BrandDto brand)
+        public Task<int> CreateBrandAsync(SmartstoreApiContext context, BrandDto brand)
         {
-            return _smartstoreClient.CreateBrandAsync(brand);
+            return _smartstoreClient.CreateBrandAsync(context, brand);
         }
 
-        public Task DeleteBrandAsync(int brandId)
+        public Task DeleteBrandAsync(SmartstoreApiContext context, int brandId)
         {
-           return _smartstoreClient.DeleteBrandAsync(brandId);
+           return _smartstoreClient.DeleteBrandAsync(context, brandId);
         }
 
-        public Task UpdateBrandAsync(BrandDto brand,int id)
+        public Task UpdateBrandAsync(SmartstoreApiContext context, BrandDto brand,int id)
         {
-           return _smartstoreClient.UpdateBrandAsync(brand,id);
+           return _smartstoreClient.UpdateBrandAsync(context, brand, id);
         }
     }
 }

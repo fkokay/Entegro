@@ -23,7 +23,7 @@ using System.Collections.Concurrent;
 namespace Entegro.Api.Jobs
 {
     [DisallowConcurrentExecution]
-    public class ErpcJob : IJob
+    public class ErpJob : IJob
     {
         private readonly IErpService _erpService;
         private readonly IProductService _productService;
@@ -38,12 +38,12 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IMapper _mapper;
-        private readonly ILogger<ErpcJob> _logger;
+        private readonly ILogger<ErpJob> _logger;
 
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
 
-        public ErpcJob(
+        public ErpJob(
             IErpService erpService,
             IProductService productService,
             IOrderService orderService,
@@ -57,7 +57,7 @@ namespace Entegro.Api.Jobs
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IIntegrationSystemService integrationSystemService,
             IMapper mapper,
-            ILogger<ErpcJob> logger)
+            ILogger<ErpJob> logger)
         {
             _erpService = erpService ?? throw new ArgumentNullException(nameof(erpService));
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
