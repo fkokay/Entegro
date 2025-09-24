@@ -116,15 +116,15 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
-    q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
-    q.AddTrigger(opts => opts
-        .ForJob(xmlFileDownloadJob)
-        .WithIdentity("XmlFileDownloadJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInHours(1)
-            .RepeatForever())
-        );
+    //var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
+    //q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
+    //q.AddTrigger(opts => opts
+    //    .ForJob(xmlFileDownloadJob)
+    //    .WithIdentity("XmlFileDownloadJob-trigger")
+    //    .WithSimpleSchedule(x => x
+    //        .WithIntervalInHours(1)
+    //        .RepeatForever())
+    //    );
 
     //var orderReadJob = new JobKey("OrderReadJob");
 
@@ -162,17 +162,17 @@ builder.Services.AddQuartz(q =>
     //        .RepeatForever())
     //);
 
-    //var jobKeyErp = new JobKey("ErpDataSyncJob");
+    var jobKeyErp = new JobKey("ErpJob");
 
-    //q.AddJob<ErpDataSyncJob>(opts => opts.WithIdentity(jobKeyErp));
+    q.AddJob<ErpJob>(opts => opts.WithIdentity(jobKeyErp));
 
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeyErp)
-    //    .WithIdentity("ErpDataSyncJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(10)
-    //        .RepeatForever())
-    //    );
+    q.AddTrigger(opts => opts
+        .ForJob(jobKeyErp)
+        .WithIdentity("ErpJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(10)
+            .RepeatForever())
+        );
 });
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 #endregion

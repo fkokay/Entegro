@@ -3,6 +3,7 @@ using Entegro.Application.DTOs.Address;
 using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Customer;
+using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
@@ -82,6 +83,7 @@ namespace Entegro.Api.Jobs
             var productIntegrations = await _productIntegrationService.GetProductIntegrationAsync();
             foreach (var item in productIntegrations)
             {
+                var context = GetSmartstoreApiContext(item.IntegrationSystem);
                 var customData = getCustomData(item);
                 var product = await _productService.GetProductByIdAsync(item.ProductId);
                 if (product == null)
@@ -98,7 +100,7 @@ namespace Entegro.Api.Jobs
                     Product = product,
                     CustomData = customData
                 };
-                await _commerceProductWriter.UpsertProductAsync(request);
+                //await _commerceProductWriter.UpsertProductAsync(context,request);
             }
 
             _logger.LogInformation("Smartstore ürün yazma işlemi tamamlandı. Zaman: {Time}", DateTime.UtcNow);
@@ -193,5 +195,31 @@ namespace Entegro.Api.Jobs
 
         //    _logger.LogInformation("Smartstore ürün senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
         //}
+
+        private SmartstoreApiContext GetSmartstoreApiContext(IntegrationSystemDto item)
+        {
+            SmartstoreApiContext context = new SmartstoreApiContext();
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Smartstore ApiUrl Ayarlanmamış");
+            }
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Smartstore ApiUser Ayarlanmamış");
+            }
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Smartstore ApiPassword Ayarlanmamış");
+            }
+
+            context.BaseUrl = item.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.ApiUser = item.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.ApiPassword = item.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "";
+
+            return context;
+        }
     }
 }

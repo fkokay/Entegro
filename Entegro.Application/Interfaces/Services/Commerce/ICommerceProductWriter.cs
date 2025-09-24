@@ -10,21 +10,21 @@ namespace Entegro.Application.Interfaces.Services.Commerce
 {
     public interface ICommerceProductWriter
     {
-        Task UpsertProductAsync(UpsertProductRequest request);
+        //Task UpsertProductAsync(UpsertProductRequest request);
 
-        /// <summary>
-        /// Birden fazla ürünü toplu olarak ekler veya günceller.
-        /// </summary>
-        Task UpsertProductsAsync(IEnumerable<UpsertProductRequest> requests);
+        ///// <summary>
+        ///// Birden fazla ürünü toplu olarak ekler veya günceller.
+        ///// </summary>
+        //Task UpsertProductsAsync(IEnumerable<UpsertProductRequest> requests);
 
-        /// <summary>
-        /// Belirtilen SKU'ya sahip ürünü siler.
-        /// </summary>
-        Task DeleteProductAsync(string sku);
+        ///// <summary>
+        ///// Belirtilen SKU'ya sahip ürünü siler.
+        ///// </summary>
+        //Task DeleteProductAsync(string sku);
 
-        /// <summary>
-        /// Toplu ürün silme işlemi.
-        /// </summary>
-        Task DeleteProductsAsync(IEnumerable<string> skus);
+        ///// <summary>
+        ///// Toplu ürün silme işlemi.
+        ///// </summary>
+        //Task DeleteProductsAsync(IEnumerable<string> skus);
     }
 }

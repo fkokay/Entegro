@@ -10,9 +10,5 @@ namespace Entegro.Application.Interfaces.Services.Commerce
 {
     public interface ICommerceCategoryWriter
     {
-        Task<int> CreateCategoryAsync(CategoryDto category);
-        Task UpdateCategoryAsync(CategoryDto category, int id);
-        Task DeleteCategoryAsync(int categoryId);
-        Task<CategoryDto?> CategoryExistsAsync(string categoryName);
     }
 }
