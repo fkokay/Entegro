@@ -43,6 +43,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
             services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();
             services.AddScoped<ISettingRepository, SettingRepository>();
+            services.AddScoped<IDistrictRepository, DistrictRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<ICustomerAddressMappingRepository, CustomerAddressMappingRepository>();
             return services;

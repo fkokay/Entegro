@@ -137,7 +137,6 @@ Entegro.User = (function ($) {
         );
     }
 
-    // Kullanıcıyı silme işlemi
     function initDeleteUser(options) {
         const deleteButton = document.querySelector('#btnDeleteUser');
         if (!deleteButton) return;

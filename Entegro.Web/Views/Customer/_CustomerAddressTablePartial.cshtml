@@ -1,0 +1,73 @@
+﻿@model List<CustomerAddressMappingModel>
+
+
+<div class="flex-grow-1 container-p-y container-fluid">
+    <div class="card">
+        <div class="row card-header flex-column flex-md-row border-bottom mx-0 px-3">
+            <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0">
+                <h5 class="card-title mb-0 text-md-start text-center pb-md-0 pb-6">Müşteri Adresleri</h5>
+            </div>
+            <div class="d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0">
+                <button type="button"
+                        class="btn btn-primary btn-create-address"
+                        data-customer-id="@Model[0].CustomerId"
+                        data-address-id="0"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createAddressModal">
+                    Yeni Adres Oluştur
+                </button>
+
+            </div>
+        </div>
+
+        <table id="CustomerAddressTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Adres Başlığı</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr data-id="@item.Id">
+                            <td>@item.Id</td>
+                            <td>@item.Address.Title</td>
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-primary btn-create-address btn-sm"
+                                        data-customer-id="@item.CustomerId"
+                                        data-address-id="@item.AddressId"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createAddressModal">
+                                    Güncelle
+                                </button>
+
+                                <button type="button"
+                                         class="btn btn-danger btn-sm btn-delete-address"
+                                         data-id="@item.AddressId"
+                                         data-customer-id="@item.CustomerId">
+                                    Sil
+                                </button>
+
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center">Görüntülenecek değer yok.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+

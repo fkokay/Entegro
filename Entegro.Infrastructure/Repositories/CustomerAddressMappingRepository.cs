@@ -28,14 +28,14 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<bool> ExistsAsync(int customerId, int addressId)
         {
-            return await _context.CustomerAddressMappings.AnyAsync(cam => cam.CustomerId == customerId && cam.AddressId == addressId);
+            return await _context.CustomerAddressMappings.AsNoTracking().AnyAsync(cam => cam.CustomerId == customerId && cam.AddressId == addressId);
         }
 
         public async Task<CustomerAddressMapping?> GetAsync(int customerId, int addressId)
         {
             return await _context.CustomerAddressMappings
             .Include(cam => cam.Customer)
-            .Include(cam => cam.Address)
+            .Include(cam => cam.Address).AsNoTracking()
             .FirstOrDefaultAsync(cam => cam.CustomerId == customerId && cam.AddressId == addressId);
         }
 
@@ -43,7 +43,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.CustomerAddressMappings
            .Include(cam => cam.Address)
-           .Where(cam => cam.CustomerId == customerId)
+           .Where(cam => cam.CustomerId == customerId).AsNoTracking()
            .ToListAsync();
         }
 

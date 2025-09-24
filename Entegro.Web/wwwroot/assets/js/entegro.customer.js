@@ -177,11 +177,178 @@ Entegro.customer = (function ($) {
         );
     }
    
+    function initDeleteCustomer(options) {
+        const deleteButton = document.querySelector('#btnDeleteCustomer');
+        if (!deleteButton) return;
 
+        deleteButton.addEventListener('click', function () {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu müşteri silinecek.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Hayır, iptal et',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-2',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: options.deleteUrl || '/Customer/Delete',
+                        type: 'POST',
+                        data: { id: options.id || '@Model.Id' },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Silindi!',
+                                    text: 'Müşteri başarıyla silindi.',
+                                    icon: 'success',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-success'
+                                    },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    window.location.href = options.redirectUrl || '/User/List';
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                                icon: 'error',
+                                confirmButtonText: 'Tamam',
+                                customClass: { confirmButton: 'btn btn-danger' },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    function loadCustomerAddresses(customerId, targetSelector) {
+        if (!customerId || customerId <= 0) return;
+
+        const $target = $(targetSelector);
+        if ($target.length === 0) return;
+
+        $target.html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Yükleniyor...</span></div>');
+
+        $.ajax({
+            url: '/Customer/GetCustomerAddress', 
+            type: 'GET',
+            data: { customerId: customerId },
+            success: function (html) {
+                $target.html(html);
+            },
+            error: function () {
+                $target.html('<div class="alert alert-danger">Adresler yüklenirken bir hata oluştu.</div>');
+            }
+        });
+    }
+    function initDeleteAddress() {
+        $(document).on('click', '.btn-delete-address', function () {
+            var button = $(this);
+            var addressId = button.data('id');
+            var customerId = button.data('customer-id');
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu adres kalıcı olarak silinecek!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Customer/DeleteAddress',
+                        type: 'POST',
+                        data: {
+                            customerId: customerId,
+                            addressId: addressId
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                button.closest('tr').remove();
+                                Swal.fire(
+                                    'Silindi!',
+                                    'Adres başarıyla silindi.',
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Hata!',
+                                    response.message || 'Adres silinirken bir hata oluştu.',
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function () {
+                            Swal.fire(
+                                'Hata!',
+                                'Sunucuya bağlanırken hata oluştu.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    }
+    function initCreateAddressModal() {
+        $('#createAddressModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var customerId = button.data('customer-id');
+            var addressId = button.data('address-id');
+
+            var modalBody = $('#createAddressModalBody');
+            modalBody.html('<div class="text-center">Yükleniyor...</div>');
+
+            if (customerId) {
+                $.ajax({
+                    url: '/Customer/CreateCustomerAddressMapping',
+                    type: 'GET',
+                    data: { customerId: customerId,addressId:addressId },
+                    success: function (result) {
+                        modalBody.html(result);
+                    },
+                    error: function () {
+                        modalBody.html('<div class="text-danger text-center">Adres formu yüklenemedi.</div>');
+                    }
+                });
+            } else {
+                modalBody.html('<div class="text-danger text-center">Geçersiz müşteri ID.</div>');
+            }
+        });
+    }
 
     return {
         initCreateForm: initCreateForm,
-        initUpdateForm: initUpdateForm
+        initUpdateForm: initUpdateForm,
+        initDeleteCustomer: initDeleteCustomer,
+        loadCustomerAddresses: loadCustomerAddresses,
+        initDeleteAddress: initDeleteAddress,
+        initCreateAddressModal: initCreateAddressModal
     };
 
 })(jQuery);

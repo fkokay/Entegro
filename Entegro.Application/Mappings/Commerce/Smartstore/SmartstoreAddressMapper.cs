@@ -1,12 +1,6 @@
 ﻿using Entegro.Application.DTOs.Address;
-using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Commerce.Smartstore
 {
@@ -37,17 +31,17 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 address.FirstName = smartstoreAddress.FirstName;
                 address.LastName = smartstoreAddress.LastName;
                 address.PhoneNumber = smartstoreAddress.PhoneNumber;
-                address.CityId = smartstoreAddress.CityId;
-                address.DistrictId = smartstoreAddress.DistrictId;
-                address.TownId = smartstoreAddress.TownId;
-                address.CountryId = smartstoreAddress.CountryId;
+                address.City = "";
+                address.District = "";
+                address.Town = "";
+                address.Country = "";
                 address.Title = smartstoreAddress.Title;
                 address.Salutation = smartstoreAddress.Salutation;
                 address.TaxOffice = smartstoreAddress.TaxOffice;
                 address.TaxOfficeNumber = smartstoreAddress.TaxNumber;
                 address.FaxNumber = smartstoreAddress.FaxNumber;
-                address.CreatedOn = DateTime.UtcNow;
-                address.UpdatedOn = DateTime.UtcNow;
+                address.CreatedOnUtc = DateTime.UtcNow;
+                address.UpdatedOnUtc = DateTime.UtcNow;
                 return address;
             }
             catch (Exception ex)
@@ -76,10 +70,10 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreAddress.LastName = address.LastName;
                 smartstoreAddress.PhoneNumber = address.PhoneNumber;
                 smartstoreAddress.CreatedOnUtc = DateTime.Now;
-                smartstoreAddress.CountryId = address.CountryId;
-                smartstoreAddress.DistrictId = address.DistrictId;
-                smartstoreAddress.TownId = address.TownId;
-                smartstoreAddress.CityId = address.CityId;
+                smartstoreAddress.CountryId = null;
+                smartstoreAddress.DistrictId = null;
+                smartstoreAddress.TownId = null;
+                smartstoreAddress.CityId = null;
                 smartstoreAddress.StateProvinceId = null;
                 smartstoreAddress.FaxNumber = null;
                 smartstoreAddress.Salutation = null;
