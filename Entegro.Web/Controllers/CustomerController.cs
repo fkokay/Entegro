@@ -61,7 +61,6 @@ namespace Entegro.Web.Controllers
             }
 
             var model = _mapper.Map<CustomerModel>(customer);
-
             return View(model);
         }
 

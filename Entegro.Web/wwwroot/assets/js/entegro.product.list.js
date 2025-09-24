@@ -90,6 +90,12 @@ Entegro.product.list = (function ($) {
             confirmButtonText: 'Evet, uygula!',
             cancelButtonText: 'İptal',
             preConfirm: () => {
+                
+                Swal.close();
+
+              
+                window.showLoading("Lütfen bekleyiniz..");
+
                 return fetch('/Product/CreateOrUpdateIntegrationAll', {
                     method: 'POST',
                     headers: {
@@ -105,16 +111,24 @@ Entegro.product.list = (function ($) {
                     })
                     .catch(error => {
                         Swal.showValidationMessage(`Hata: ${error}`);
+                        // Loading ekranını gizle
+                        window.hideLoading();
                     });
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
+            
+            window.hideLoading();
+
             if (result.isConfirmed && result.value?.success) {
                 Swal.fire(
                     'Başarılı!',
                     result.value.message,
                     'success'
-                );
+                ).then(() => {
+                   
+                    window.location.reload();
+                });
             } else if (result.value && !result.value.success) {
                 Swal.fire(
                     'Hata!',
@@ -124,6 +138,8 @@ Entegro.product.list = (function ($) {
             }
         });
     }
+
+
     function editIntegration() {
         $(document).on('click', '.product-integration, .open-integration', function (e) {
             e.preventDefault();

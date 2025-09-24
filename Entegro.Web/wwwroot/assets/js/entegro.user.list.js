@@ -157,6 +157,8 @@ Entegro.User.List = (function ($) {
                 });
             }, 100);
 
+
+
             // Eğer özel filtre dropdown'ı eklenecekse
             function addFilterDropdown(column, containerSelector, placeholder, map) {
                 let select = document.createElement("select");

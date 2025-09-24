@@ -69,8 +69,7 @@ namespace Entegro.Web.Controllers
             {
                 var updateDto = _mapper.Map<UpdateUserDto>(model);
                 await _userService.UpdateUserAsync(updateDto);
-
-                return RedirectToAction("List");
+                return Json(new { success = true });
             }
             return View(model);
         }
@@ -82,7 +81,7 @@ namespace Entegro.Web.Controllers
             {
                 return Json(new { success = true });
             }
-            return Json(new { success = false, message = "Silinecek Marka Bulunamadı" });
+            return Json(new { success = false, message = "Silinecek Kullanıcı Bulunamadı" });
         }
 
         [HttpPost]
