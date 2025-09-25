@@ -1,8 +1,11 @@
 ﻿using Entegro.Application.DTOs.Brand;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
+using Entegro.Application.DTOs.ProductCategory;
+using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
@@ -31,6 +34,7 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
+        private readonly ISettingService _settingService;
         private readonly ILogger<FileDownloadJob> _logger;
 
         public FileDownloadJob(
@@ -45,6 +49,7 @@ namespace Entegro.Api.Jobs
             IProductVariantAttributeService productVariantAttributeService,
             IProductVariantAttributeValueService productVariantAttributeValueService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            ISettingService settingService,
             ILogger<FileDownloadJob> logger)
         {
             _importProfileService = importProfileService;
@@ -58,6 +63,7 @@ namespace Entegro.Api.Jobs
             _productVariantAttributeService = productVariantAttributeService;
             _productVariantAttributeValueService = productVariantAttributeValueService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _settingService = settingService;
             _logger = logger;
         }
         public async Task Execute(IJobExecutionContext context)
@@ -97,210 +103,116 @@ namespace Entegro.Api.Jobs
                     return;
                 }
 
+                var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                {
+                    _logger.LogError("SystemUrl tanımlı değil veya boş");
+                    return;
+                }
+
+                if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                {
+                    _logger.LogError("Geçersiz SystemUrl: {Url}", systemUrl.Value);
+                    return;
+                }
+
+                using var httpClient = new HttpClient
+                {
+                    BaseAddress = baseUri
+                };
+
+
                 int productCount = xDoc.Result.Descendants("Product").Count();
 
-                List<CreateProductDto> createdProductList = new List<CreateProductDto>();
                 for (int i = 0; i < productCount; i += 1)
                 {
-                    CreateProductDto createProductDto = new CreateProductDto();
-
-                    var productElement = xDoc.Result.Descendants("Product").ElementAtOrDefault(i);
-
-
-                    var xmlElementProductName = GetMappedXmlHeader(mappings, "Name");
-                    if (xmlElementProductName != null)
+                    try
                     {
-                        createProductDto.Name = productElement?.Element(xmlElementProductName)?.Value ?? "";
-                    }
-
-                    var xmlElementProductCode = GetMappedXmlHeader(mappings, "Code");
-                    if (xmlElementProductCode != null)
-                    {
-                        createProductDto.Code = $"{profileId}_" + (productElement?.Element(xmlElementProductCode)?.Value ?? "");
-                    }
-
-                    var xmlElementDescription = GetMappedXmlHeader(mappings, "Description");
-                    if (xmlElementDescription != null)
-                    {
-                        createProductDto.Description = productElement?.Element(xmlElementDescription)?.Value ?? "";
-                    }
-
-                    var xmlElementCurrency = GetMappedXmlHeader(mappings, "Currency");
-                    if (xmlElementCurrency != null)
-                    {
-                        createProductDto.Currency = productElement?.Element(xmlElementCurrency)?.Value ?? "";
-                    }
-
-                    var xmlElementBarcode = GetMappedXmlHeader(mappings, "Barcode");
-                    if (xmlElementBarcode != null)
-                    {
-                        createProductDto.Barcode = productElement?.Element(xmlElementBarcode)?.Value ?? "";
-                    }
-
-                    var xmlHeaderPrice = GetMappedXmlHeader(mappings, "Price");
-                    if (xmlHeaderPrice != null)
-                    {
-                        var priceStr = productElement?.Element(xmlHeaderPrice)?.Value?.Replace(".", ",") ?? "0";
-                        createProductDto.Price = decimal.TryParse(priceStr, out var price) ? price : 0m;
-                    }
-
-                    var xmlHeaderVatRate = GetMappedXmlHeader(mappings, "VatRate");
-                    if (xmlHeaderVatRate != null)
-                    {
-                        var vatRateStr = productElement?.Element(xmlHeaderVatRate)?.Value?.Replace(".", ",") ?? "0";
-                        createProductDto.VatRate = decimal.TryParse(vatRateStr, out var vatRate) ? vatRate : 0m;
-                    }
-
-                    var xmlHeaderStockQuantity = GetMappedXmlHeader(mappings, "StockQuantity");
-                    if (xmlHeaderStockQuantity != null)
-                    {
-                        var stockQuantityStr = productElement?.Element(xmlHeaderStockQuantity)?.Value?.Replace(".", ",") ?? "0";
-                        createProductDto.StockQuantity = int.TryParse(stockQuantityStr, out var stockQuantity) ? stockQuantity : 0;
-                    }
-
-
-
-                    //varyantlar
-                    var xmlElementAttributeStockCode = GetMappedXmlHeader(mappings, "AttributeStockCode");
-                    if (xmlElementAttributeStockCode != null)
-                    {
-                        var deger = productElement?.Element(xmlElementAttributeStockCode)?.Value ?? "";
-                    }
-
-                    var xmlElementAttributePrice = GetMappedXmlHeader(mappings, "AttributePrice");
-                    if (xmlElementAttributePrice != null)
-                    {
-                        var deger = productElement?.Element(xmlElementAttributePrice)?.Value ?? "";
-                    }
-
-                    var xmlElementAttributeStockQuantity = GetMappedXmlHeader(mappings, "AttributeStockQuantity");
-                    if (xmlElementAttributeStockQuantity != null)
-                    {
-                        var deger = productElement?.Element(xmlElementAttributeStockQuantity)?.Value ?? "";
-                    }
-
-                    var xmlElementAttributeManufacturerPartNumber = GetMappedXmlHeader(mappings, "AttributeManufacturerPartNumber");
-                    if (xmlElementAttributeManufacturerPartNumber != null)
-                    {
-                        var deger = productElement?.Element(xmlElementAttributeManufacturerPartNumber)?.Value ?? "";
-                    }
-
-                    var xmlElementAttributeSpecifications = GetMappedXmlHeader(mappings, "AttributeSpecifications");
-                    if (xmlElementAttributeSpecifications != null)
-                    {
-                        var deger = productElement?.Element(xmlElementAttributeSpecifications)?.Value ?? "";
-                    }
-
-
-                    var xmlElementBrand = GetMappedXmlHeader(mappings, "Brand");
-                    if (xmlElementBrand != null)
-                    {
-                        var brandValue = productElement?.Element(xmlElementBrand)?.Value ?? "";
-                        if (!string.IsNullOrEmpty(brandValue))
+                        var rootElement = xDoc.Result.Descendants("Product").ElementAtOrDefault(i);
+                        if (rootElement == null)
                         {
-                            var brand = await GetBrandId(brandValue);
-                            createProductDto.BrandId = brand.Id;
-                            createProductDto.Brand = brand;
+                            _logger.LogError("XML'de Product Alanı Bulunamadı");
+                            return;
                         }
-                    }
 
+                        CreateProductDto createProductDto = new CreateProductDto();
+                        createProductDto.Code = GetValue(rootElement, mappings, "Code", "");
+                        createProductDto.Name = GetValue(rootElement, mappings, "Name", "");
+                        createProductDto.Description = GetValue(rootElement, mappings, "Description", "");
+                        createProductDto.Barcode = GetValue(rootElement, mappings, "Barcode", "");
+                        createProductDto.Currency = GetValue(rootElement, mappings, "Currency", "TL");
+                        createProductDto.Price = GetDecimalValue(rootElement, mappings, "Price", 0);
+                        createProductDto.VatRate = GetDecimalValue(rootElement, mappings, "VatRate", 0);
+                        createProductDto.StockQuantity = GetIntegerValue(rootElement, mappings, "StockQuantity", 0);
+                        createProductDto.BrandId = await CreateOrUpdateBrand(GetValue(rootElement, mappings, "Brand", ""));
+                        createProductDto.ManufacturerPartNumber = GetValue(rootElement, mappings, "ManufacturerPartNumber", "");
+                        createProductDto.Unit = GetValue(rootElement, mappings, "Unit", "Adet");
+                        createProductDto.Gtin = GetValue(rootElement, mappings, "Gtin", "");
+                        createProductDto.OldPrice = 0;
+                        createProductDto.SpecialPrice = GetDecimalValue(rootElement, mappings, "SpecialPrice", 0);
+                        createProductDto.Weight = GetDecimalValue(rootElement, mappings, "Weight", 0);
+                        createProductDto.Length = GetDecimalValue(rootElement, mappings, "Length", 0);
+                        createProductDto.Height = GetDecimalValue(rootElement, mappings, "Height", 0);
+                        createProductDto.Width = GetDecimalValue(rootElement, mappings, "Width", 0);
+                        createProductDto.MetaDescription = GetValue(rootElement, mappings, "MetaDescription", "");
+                        createProductDto.MetaKeywords = GetValue(rootElement, mappings, "MetaKeywords", "");
+                        createProductDto.MetaTitle = GetValue(rootElement, mappings, "MetaTitle", "");
+                        createProductDto.Barcode = GetValue(rootElement, mappings, "Barcode", "");
+                        createProductDto.Published = false;
+                        createProductDto.Deleted = false;
 
-                    createProductDto.ManufacturerPartNumber = "";
-                    createProductDto.Unit = "Adet";
-                    createProductDto.Gtin = "";
-                    createProductDto.OldPrice = 0;
-                    createProductDto.SpecialPrice = 0;
-                    createProductDto.Weight = 0;
-                    createProductDto.Length = 0;
-                    createProductDto.Height = 0;
-                    createProductDto.Width = 0;
-                    createProductDto.MetaDescription = "";
-                    createProductDto.MetaKeywords = "";
-                    createProductDto.MetaTitle = "";
-                    createProductDto.Barcode = "";
-                    createProductDto.Published = false;
-                    createProductDto.Deleted = false;
-
-
-
-                    #region Images
-                    List<string> images = new();
-                    HttpClient httpClient = new HttpClient();
-                    string imageMap = mappings.FirstOrDefault(x => x.MappedName == "Images")?.XmlHeader ?? "";
-
-                    if (imageMap.Contains(","))
-                    {
-                        var imageFields = imageMap.Split(",");
-                        foreach (var item in imageFields)
+                        int productId = 0;
+                        if (await _productService.ExistsByCodeAsync(createProductDto.Code))
                         {
-                            var value = xDoc.Result.Descendants("Product").ElementAt(i)
-                                         .Descendants(item)
-                                         .Select(x => x.Value)
-                                         .FirstOrDefault();
 
-                            if (!string.IsNullOrEmpty(value))
+                        }
+                        else
+                        {
+                            var createdProduct = await _productService.CreateProductAsync(createProductDto);
+                            if (createdProduct != null)
                             {
-                                images.Add(value);
+                                productId = createdProduct.Id;
                             }
                         }
+
+                        var images = GetMultipleValues(rootElement, mappings, "Images");
+                        List<int> mediaFiles = await UploadImagesAsync(images, httpClient);
+                        foreach (var item in mediaFiles)
+                        {
+                            CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                            createProductMediaFile.MediaFileId = item;
+                            createProductMediaFile.ProductId = productId;
+
+                            await _productImageMappingService.AddAsync(createProductMediaFile);
+                        }
+
+                        var categories = GetMultipleValues(rootElement, mappings, "Categories");
+                        foreach (var item in categories)
+                        {
+                            var category =await CreateOrderUpdateCategory(item);
+                            if (category == null)
+                            {
+                                continue;
+                            }
+
+                            await CreateCategoryProduct(productId, category.Id);
+                        }
+
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        images = xDoc.Result.Descendants("Product").ElementAt(i)
-                                 .Descendants(imageMap)
-                                 .Select(x => x.Value)
-                                 .ToList();
+                        _logger.LogError(ex, "{i} sıralı ürün aktarımı sırasında hata oluştu", i);
                     }
-
-                    List<int> uploadedIds = await UploadImagesAsync(images, httpClient);
-
-                    foreach (var id in uploadedIds)
-                    {
-                        Console.WriteLine(id);
-                    }
-                    #endregion
-
-                    createdProductList.Add(createProductDto);
 
                 }
-
-                foreach (var item in createdProductList)
-                {
-
-
-                    Console.WriteLine($"---------  {item.Code} Kodlu Ürün Ürün ---------");
-                    Console.WriteLine($"ProductCode: {item.Code}");
-                    Console.WriteLine($"Name: {item.Name}");
-                    Console.WriteLine($"Brand: {item.Brand.Name}");
-                    Console.WriteLine($"Price: {item.Price}");
-                    Console.WriteLine($"Stock: {item.StockQuantity}");
-                    Console.WriteLine($"CurrencyType: {item.Currency}");
-                    Console.WriteLine($"Vergi: {item.VatRate}");
-                    Console.WriteLine($"Description: {item.Description}");
-
-
-                    Console.WriteLine("-", 40);
-                }
-
-
-                //job kodu.txt kodların yeri
-
-
-
-                Console.WriteLine($"Aktarım tamaMlandı");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error downloading or saving XML file: {ex.Message}");
+                _logger.LogError(ex, "Aktarım sırasında bir hata oluştur");
             }
         }
-        public static string GetMappedXmlHeader(List<XmlColumnMappingResult> mappingList, string mappedName)
-        {
-            if (mappingList == null || string.IsNullOrEmpty(mappedName))
-                return null;
 
-            return mappingList.FirstOrDefault(x => x?.MappedName == mappedName)?.XmlHeader;
-        }
+
 
         private async Task<XDocument?> GetDocument(ImportProfileDto profile)
         {
@@ -326,6 +238,145 @@ namespace Entegro.Api.Jobs
                 _logger.LogError(ex, "Dosya indirlirken bir hata oluştu");
                 return null;
             }
+        }
+        public string GetValue(XElement xElement, List<XmlColumnMappingResult> mappingList, string mappedName, string defaultValue)
+        {
+            if (mappingList == null)
+            {
+                _logger.LogError("Eşleştirlme yapılmamış");
+                return defaultValue;
+            }
+
+            if (string.IsNullOrEmpty(mappedName))
+            {
+                _logger.LogError("Alan adı boş");
+                return defaultValue;
+            }
+
+            if (!mappingList.Any(x => x?.MappedName == mappedName))
+            {
+                _logger.LogError("{MappedName} Eşleştirlme yapılmamış", mappedName);
+                return defaultValue;
+            }
+
+            var xName = mappingList.First(x => x?.MappedName == mappedName).XmlHeader;
+            var xFindElement = xElement.Element(xName);
+
+            if (xFindElement == null)
+            {
+                _logger.LogError("Xml'de {MappedName} alanı bulunamadı.", xName);
+                return defaultValue;
+            }
+
+
+            return xFindElement.Value;
+        }
+        public decimal GetDecimalValue(XElement xElement, List<XmlColumnMappingResult> mappingList, string mappedName, decimal defaultValue)
+        {
+            if (mappingList == null)
+            {
+                _logger.LogError("Eşleştirlme yapılmamış");
+                return defaultValue;
+            }
+
+            if (string.IsNullOrEmpty(mappedName))
+            {
+                _logger.LogError("Alan adı boş");
+                return defaultValue;
+            }
+
+            if (!mappingList.Any(x => x?.MappedName == mappedName))
+            {
+                _logger.LogError("{MappedName} Eşleştirlme yapılmamış", mappedName);
+                return defaultValue;
+            }
+
+            var xName = mappingList.First(x => x?.MappedName == mappedName).XmlHeader;
+            var xFindElement = xElement.Element(xName);
+
+            if (xFindElement == null)
+            {
+                _logger.LogError("Xml'de {MappedName} alanı bulunamadı.", xName);
+                return defaultValue;
+            }
+
+            return decimal.TryParse(xFindElement.Value.Replace(".", ","), out var vatRate) ? vatRate : defaultValue;
+        }
+        public int GetIntegerValue(XElement xElement, List<XmlColumnMappingResult> mappingList, string mappedName, int defaultValue)
+        {
+            if (mappingList == null)
+            {
+                _logger.LogError("Eşleştirlme yapılmamış");
+                return defaultValue;
+            }
+
+            if (string.IsNullOrEmpty(mappedName))
+            {
+                _logger.LogError("Alan adı boş");
+                return defaultValue;
+            }
+
+            if (!mappingList.Any(x => x?.MappedName == mappedName))
+            {
+                _logger.LogError("{MappedName} Eşleştirlme yapılmamış", mappedName);
+                return defaultValue;
+            }
+
+            var xName = mappingList.First(x => x?.MappedName == mappedName).XmlHeader;
+            var xFindElement = xElement.Element(xName);
+
+            if (xFindElement == null)
+            {
+                _logger.LogError("Xml'de {MappedName} alanı bulunamadı.", xName);
+                return defaultValue;
+            }
+
+            var value = int.TryParse(xFindElement.Value, out var price) ? price : defaultValue;
+            return value;
+        }
+        public List<string> GetMultipleValues(XElement xElement, List<XmlColumnMappingResult> mappingList, string mappedName)
+        {
+            List<string> values = new List<string>();
+
+            if (mappingList == null)
+            {
+                _logger.LogError("Eşleştirlme yapılmamış");
+                return values;
+            }
+
+            if (string.IsNullOrEmpty(mappedName))
+            {
+                _logger.LogError("Alan adı boş");
+                return values;
+            }
+
+            if (!mappingList.Any(x => x?.MappedName == mappedName))
+            {
+                _logger.LogError("{MappedName} Eşleştirlme yapılmamış", mappedName);
+                return values;
+            }
+
+            var xName = mappingList.First(x => x?.MappedName == mappedName).XmlHeader;
+
+            if (xName.Contains(","))
+            {
+                var xmlFields = xName.Split(",");
+                foreach (var xmlField in xmlFields)
+                {
+                    var value = xElement.Descendants(xmlField).Select(x => x.Value).FirstOrDefault();
+
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        values.Add(value);
+                    }
+                }
+            }
+            else
+            {
+                values = xElement.Descendants(xName).Select(x => x.Value).ToList();
+            }
+
+            return values;
         }
 
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeModel> variantAttributes)
@@ -396,68 +447,85 @@ namespace Entegro.Api.Jobs
                 _attributeValueCache.TryAdd((val.ProductAttributeId, val.Name), val.Id);
 
         }
-        private async Task<BrandDto> GetBrandId(string? brandTitle)
+        private async Task<int?> CreateOrUpdateBrand(string brand)
         {
-            BrandDto brand;
-            if (!string.IsNullOrWhiteSpace(brandTitle))
+            if (!string.IsNullOrWhiteSpace(brand))
             {
-                var existingBrand = await _brandService.GetByNameAsync(brandTitle);
+                var existingBrand = await _brandService.GetByNameAsync(brand);
 
                 if (existingBrand == null)
                 {
-                    brand = await _brandService.CreateAsync(new Application.DTOs.Brand.CreateBrandDto
+                    var createdBrand = await _brandService.CreateAsync(new Application.DTOs.Brand.CreateBrandDto
                     {
                         DisplayOrder = 0,
-                        Name = brandTitle,
+                        Name = brand,
                         Published = false
                     });
-                    return new BrandDto
-                    {
-                        Id = brand.Id,
-                        Name = brand.Name
-                    };
+
+                    return createdBrand.Id;
                 }
                 else
-                    return existingBrand;
-            }
-            return new BrandDto();
-        }
-        private async Task<int> GetCategoryId(string? categoryName)
-        {
-            if (string.IsNullOrWhiteSpace(categoryName))
-                return 0;
-            var existingCategory = await _categoryService.GetCategoryByNameAsync(categoryName);
-            if (existingCategory != null)
-                return existingCategory.Id;
-            var newCategory = await _categoryService.CreateCategoryAsync(new Application.DTOs.Category.CreateCategoryDto
-            {
-                Name = categoryName,
-                Description = "",
-                MetaDescription = "",
-                MetaKeywords = "",
-                MetaTitle = "",
-                ParentId = null,
-                Published = false,
-                DisplayOrder = 0,
-                MediaFileId = null
-            });
-            return newCategory.Id;
-        }
-        private async Task<int> CreateCategoryProduct(int productId, int categoryId)
-        {
-            if (productId == 0 && categoryId == 0)
-                return 0;
-            else
-            {
-                var newProductCategory = new Application.DTOs.ProductCategory.CreateProductCategoryDto
                 {
-                    ProductId = productId,
-                    CategoryId = categoryId
-                };
-                await _productCategoryService.CreateProductCategoryAsync(newProductCategory);
-                return 1;
+                    return existingBrand.Id;
+                }
             }
 
+            return null;
+        }
+        private async Task<CategoryDto?> CreateOrderUpdateCategory(string? categoryName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(categoryName))
+                {
+                    return null;
+                }
+
+                if (await _categoryService.ExistsByNameAsync(categoryName))
+                {
+                    var category = await _categoryService.GetCategoryByNameAsync(categoryName);
+                    return category;
+                }
+                else
+                {
+                    CreateCategoryDto createCategory = new CreateCategoryDto();
+                    createCategory.Name = categoryName;
+                    createCategory.Description = "";
+                    createCategory.MetaTitle = "";
+                    createCategory.MetaKeywords = "";
+                    createCategory.MetaDescription = "";
+                    createCategory.ParentId = null;
+                    createCategory.Published = true;
+                    createCategory.DisplayOrder = 0;
+                    createCategory.MediaFileId = null;
+
+                    var category = await _categoryService.CreateCategoryAsync(createCategory);
+
+                    return category;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        private async Task CreateCategoryProduct(int productId, int categoryId)
+        {
+            if (productId == 0)
+            {
+                _logger.LogError("Ürün Id 0");
+            }
+
+            if (categoryId == 0)
+            {
+                _logger.LogError("Category Id 0");
+            }
+
+            CreateProductCategoryDto createProductCategory = new CreateProductCategoryDto();
+            createProductCategory.ProductId = productId;
+            createProductCategory.CategoryId = categoryId;
+
+            await _productCategoryService.CreateProductCategoryAsync(createProductCategory);
         }
 
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
@@ -491,13 +559,12 @@ namespace Entegro.Api.Jobs
                     }
                 }
 
-                var uploadUrl = "https://localhost:4000/media/upload";
+                var uploadUrl = "media/upload";
                 var response = await httpClient.PostAsync(uploadUrl, multipartContent);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine("Resimler başarıyla yüklendi: " + result);
 
                     using var document = JsonDocument.Parse(result);
                     var root = document.RootElement;
@@ -526,7 +593,7 @@ namespace Entegro.Api.Jobs
                 }
                 else
                 {
-                    Console.WriteLine("Resim yükleme başarısız: " + response.StatusCode);
+                    throw new Exception("Resim yükleme başarısız oldu. Durum kodu:" + response.StatusCode);
                 }
             }
 
@@ -543,4 +610,5 @@ namespace Entegro.Api.Jobs
             public string MappedName { get; set; }
         }
     }
+
 }
