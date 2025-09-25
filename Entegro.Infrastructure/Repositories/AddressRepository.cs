@@ -3,6 +3,7 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Common;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace Entegro.Infrastructure.Repositories
 {
@@ -36,7 +37,7 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Addresses.AsNoTracking().OrderBy(a => a.Id).ToListAsync();
         }
 
-        public async Task<PagedResult<Address>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<Application.DTOs.Common.PagedResult<Address>> GetAllAsync(int pageNumber, int pageSize)
         {
             var query = _context.Addresses.AsNoTracking().OrderBy(a => a.Id);
 
@@ -46,7 +47,7 @@ namespace Entegro.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<Address>
+            return new Application.DTOs.Common.PagedResult<Address>
             {
                 Items = items,
                 TotalCount = totalCount,
@@ -58,6 +59,45 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Address?> GetByIdAsync(int id)
         {
             return await _context.Addresses.FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<Address>> GetPagedAsync(GridCommand gridCommand, int customerId)
+        {
+            var query = _context.Addresses.Include(x => x.CustomerAddressMappings.Where(c => c.CustomerId == customerId)).AsNoTracking();
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.Title.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var addresses = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<Address>
+            {
+                Items = addresses,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
         }
 
         public async Task UpdateAsync(Address address)

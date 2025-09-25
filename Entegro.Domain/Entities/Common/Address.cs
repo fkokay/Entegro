@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entegro.Domain.Entities.Checkout;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -35,5 +36,6 @@ namespace Entegro.Domain.Entities.Common
         public string? TaxOfficeNumber { get; set; }
         public DateTime CreatedOnUtc { get; set; }
         public DateTime UpdatedOnUtc { get; set; }
+        public virtual ICollection<CustomerAddressMapping> CustomerAddressMappings { get; set; } = new HashSet<CustomerAddressMapping>();
     }
 }

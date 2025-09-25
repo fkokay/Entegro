@@ -72,9 +72,16 @@ namespace Entegro.Application.Services
             return addressDtos;
         }
 
-        public Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand)
+        public async Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand, int customerId)
         {
-            throw new NotImplementedException();
+            var addresses = await _addressRepository.GetPagedAsync(gridCommand, customerId);
+            return new PagedResult<AddressDto>
+            {
+                Items = _mapper.Map<IEnumerable<AddressDto>>(addresses.Items),
+                TotalCount = addresses.TotalCount,
+                PageNumber = addresses.PageNumber,
+                PageSize = addresses.PageSize
+            };
         }
 
         public async Task<AddressDto> UpdateAsync(UpdateAddressDto address)

@@ -281,7 +281,7 @@ Entegro.customer = (function ($) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/Customer/DeleteAddress',
+                        url: '/Customer/DeleteCustomerAddress',
                         type: 'POST',
                         data: {
                             customerId: customerId,
@@ -315,7 +315,7 @@ Entegro.customer = (function ($) {
             });
         });
     }
-    function initCreateAddressModal() {
+    function initCreateOrUpdateCustomerAddressModal() {
         $('#createAddressModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var customerId = button.data('customer-id');
@@ -326,7 +326,7 @@ Entegro.customer = (function ($) {
 
             if (customerId) {
                 $.ajax({
-                    url: '/Customer/CreateCustomerAddressMapping',
+                    url: '/Customer/CreateOrUpdateCustomerAddressMapping',
                     type: 'GET',
                     data: { customerId: customerId,addressId:addressId },
                     success: function (result) {
@@ -348,7 +348,7 @@ Entegro.customer = (function ($) {
         initDeleteCustomer: initDeleteCustomer,
         loadCustomerAddresses: loadCustomerAddresses,
         initDeleteAddress: initDeleteAddress,
-        initCreateAddressModal: initCreateAddressModal
+        initCreateOrUpdateCustomerAddressModal: initCreateOrUpdateCustomerAddressModal
     };
 
 })(jQuery);
