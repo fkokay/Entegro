@@ -405,7 +405,7 @@ namespace Entegro.Api.Jobs
 
                 if (existingBrand == null)
                 {
-                    brand = await _brandService.CreateAsync(new Application.DTOs.Brand.CreateBrandDto
+                    brand = await _brandService.AddAsync(new Application.DTOs.Brand.CreateBrandDto
                     {
                         DisplayOrder = 0,
                         Name = brandTitle,
@@ -429,7 +429,7 @@ namespace Entegro.Api.Jobs
             var existingCategory = await _categoryService.GetCategoryByNameAsync(categoryName);
             if (existingCategory != null)
                 return existingCategory.Id;
-            var newCategory = await _categoryService.CreateCategoryAsync(new Application.DTOs.Category.CreateCategoryDto
+            var newCategory = await _categoryService.AddAsync(new Application.DTOs.Category.CreateCategoryDto
             {
                 Name = categoryName,
                 Description = "",
@@ -454,7 +454,7 @@ namespace Entegro.Api.Jobs
                     ProductId = productId,
                     CategoryId = categoryId
                 };
-                await _productCategoryService.CreateProductCategoryAsync(newProductCategory);
+                await _productCategoryService.AddAsync(newProductCategory);
                 return 1;
             }
 

@@ -45,7 +45,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var createDto = _mapper.Map<CreateCustomerDto>(model);
-                await _customerService.CreateCustomerAsync(createDto);
+                await _customerService.AddAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -70,7 +70,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var updateDto = _mapper.Map<UpdateCustomerDto>(model);
-                await _customerService.UpdateCustomerAsync(updateDto);
+                await _customerService.UpdateAsync(updateDto);
 
                 return Json(new { success = true });
             }
@@ -196,7 +196,7 @@ namespace Entegro.Web.Controllers
         {
             try
             {
-                await _customerService.DeleteCustomerAsync(id);
+                await _customerService.DeleteAsync(id);
                 return Json(new { success = true });
             }
             catch (Exception ex)

@@ -24,14 +24,14 @@ namespace Entegro.Application.Services
             _categoryService = categoryService;
             _categoryRepository = categoryRepository;
         }
-        public async Task<ProductCategoryDto> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategoryDto)
+        public async Task<ProductCategoryDto> AddAsync(CreateProductCategoryDto createProductCategoryDto)
         {
             var createProductCategory = _mapper.Map<ProductCategory>(createProductCategoryDto);
             await _productCategoryMappingRepository.AddAsync(createProductCategory);
             return _mapper.Map<ProductCategoryDto>(createProductCategory);
         }
 
-        public async Task DeleteProductCategoryAsync(int productCategoryId)
+        public async Task DeleteAsync(int productCategoryId)
         {
             var productCategory = await _productCategoryMappingRepository.GetByIdAsync(productCategoryId);
 
@@ -61,7 +61,7 @@ namespace Entegro.Application.Services
             return productCategoryDtos;
         }
 
-        public async Task<ProductCategoryDto> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory)
+        public async Task<ProductCategoryDto> UpdateAsync(UpdateProductCategoryDto updateProductCategory)
         {
             await _productCategoryMappingRepository.UpdateAsync(_mapper.Map<ProductCategory>(updateProductCategory));
             return _mapper.Map<ProductCategoryDto>(updateProductCategory);

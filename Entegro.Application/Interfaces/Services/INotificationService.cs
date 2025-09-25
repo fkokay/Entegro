@@ -14,7 +14,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<IEnumerable<NotificationDto>> GetAllAsync();
         Task<PagedResult<NotificationDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
         Task<PagedResult<NotificationDto>> GetPagedAsync(GridCommand gridCommand);
-        Task<NotificationDto> CreateAsync(CreateNotificationDto model);
+        Task<NotificationDto> AddAsync(CreateNotificationDto model);
         Task<NotificationDto> UpdateAsync(UpdateNotificationDto model);
         Task DeleteAsync(int id);
     }

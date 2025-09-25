@@ -96,7 +96,7 @@ namespace Entegro.Application.Services
             };
         }
 
-        public async Task<BrandDto> CreateAsync(CreateBrandDto model)
+        public async Task<BrandDto> AddAsync(CreateBrandDto model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));

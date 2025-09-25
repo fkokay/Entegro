@@ -1,9 +1,7 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
-using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Catalog.Brands;
-using Entegro.Web.Models.Content;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +13,7 @@ namespace Entegro.Web.Controllers
     {
         private readonly IBrandService _brandService;
         private readonly IMapper _mapper;
-        public BrandController(IBrandService brandService,IMapper mapper)
+        public BrandController(IBrandService brandService, IMapper mapper)
         {
             _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -45,7 +43,7 @@ namespace Entegro.Web.Controllers
             {
                 var createDto = _mapper.Map<CreateBrandDto>(model);
 
-                await _brandService.CreateAsync(createDto);
+                await _brandService.AddAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -70,7 +68,7 @@ namespace Entegro.Web.Controllers
             {
                 var updateDto = _mapper.Map<UpdateBrandDto>(model);
                 await _brandService.UpdateAsync(updateDto);
-                
+
                 return Json(new { success = true });
             }
             return View(model);

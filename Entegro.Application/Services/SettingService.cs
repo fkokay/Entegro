@@ -17,7 +17,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<SettingDto> CreateAsync(CreateSettingDto model)
+        public async Task<SettingDto> AddAsync(CreateSettingDto model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -28,7 +28,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<SettingDto>(setting);
         }
 
-        public async Task<SettingDto> CreateAsync(string key, string value)
+        public async Task<SettingDto> AddAsync(string key, string value)
         {
             Setting setting = new Setting();
             setting.Key = key;

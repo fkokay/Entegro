@@ -38,7 +38,7 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SpecificationAttributeCreate([FromBody] SpecificationAttributeModel model)
         {
-            await _specificationAttributeService.CreateAsync(new CreateSpecificationAttributeDto
+            await _specificationAttributeService.AddAsync(new CreateSpecificationAttributeDto
             {
                 Name = model.Name
             });
@@ -100,7 +100,7 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SpecificationAttributeOptionCreate([FromBody] SpecificationAttributeOptionModel model)
         {
-            await _specificationAttributeOptionService.CreateAsync(new CreateSpecificationAttributeOptionDto
+            await _specificationAttributeOptionService.AddAsync(new CreateSpecificationAttributeOptionDto
             {
                 DisplayOrder = model.DisplayOrder,
                 Name = model.Name,

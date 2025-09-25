@@ -165,7 +165,7 @@ namespace Entegro.Web.Controllers
                     MediaFileType = "excel",
                     ColumnMapping = mappedJson,
                 };
-                await _importProfileService.CreateAsync(createDto);
+                await _importProfileService.AddAsync(createDto);
             }
             catch (Exception ex)
             {
@@ -272,7 +272,7 @@ namespace Entegro.Web.Controllers
                 })
             };
 
-            var profile = await _importProfileService.CreateAsync(createModel);
+            var profile = await _importProfileService.AddAsync(createModel);
             var dataElements = xmlDoc.Root?.Elements();
 
             if (dataElements != null)

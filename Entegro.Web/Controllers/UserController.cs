@@ -44,7 +44,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var createDto = _mapper.Map<CreateUserDto>(model);
-                await _userService.CreateUserAsync(createDto);
+                await _userService.AddAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -68,7 +68,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var updateDto = _mapper.Map<UpdateUserDto>(model);
-                await _userService.UpdateUserAsync(updateDto);
+                await _userService.UpdateAsync(updateDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -76,7 +76,7 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var isSuccess = await _userService.DeleteUserAsync(id);
+            var isSuccess = await _userService.DeleteAsync(id);
             if (isSuccess)
             {
                 return Json(new { success = true });

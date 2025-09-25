@@ -17,7 +17,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<NotificationDto> CreateAsync(CreateNotificationDto model)
+        public async Task<NotificationDto> AddAsync(CreateNotificationDto model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));

@@ -31,7 +31,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createCategory)
+        public async Task<CategoryDto> AddAsync(CreateCategoryDto createCategory)
         {
             var category = _mapper.Map<Category>(createCategory);
             await _categoryRepository.AddAsync(category);
@@ -39,7 +39,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<CategoryDto>(category);
         }
 
-        public async Task<CategoryDto> UpdateCategoryAsync(UpdateCategoryDto updateCategory)
+        public async Task<CategoryDto> UpdateAsync(UpdateCategoryDto updateCategory)
         {
             var category = await _categoryRepository.GetByAsync(m => m.Id == updateCategory.Id);
             if (category == null)

@@ -7,7 +7,6 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
-using System.ComponentModel.Design;
 
 namespace Entegro.Application.Services
 {
@@ -25,7 +24,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
         }
-        public async Task<ProductIntegrationDto> CreateProductIntegrationAsync(CreateProductIntegrationDto createProductIntegration)
+        public async Task<ProductIntegrationDto> AddAsync(CreateProductIntegrationDto createProductIntegration)
         {
             var productIntegration = _mapper.Map<ProductIntegration>(createProductIntegration);
             await _productIntegrationRepository.AddAsync(productIntegration);
@@ -36,7 +35,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<ProductIntegrationDto>(productIntegration);
         }
 
-        public async Task DeleteProductIntegrationAsync(int productIntegrationId)
+        public async Task DeleteAsync(int productIntegrationId)
         {
             ProductIntegration? productIntegration = await _productIntegrationRepository.GetByIdAsync(productIntegrationId);
 
@@ -104,7 +103,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<PagedResult<ProductIntegrationDto>>(await _productIntegrationRepository.GetAllAsync(pageNumber, pageSize));
         }
 
-        public async Task<ProductIntegrationDto> UpdateProductIntegrationAsync(UpdateProductIntegrationDto updateProductIntegration)
+        public async Task<ProductIntegrationDto> UpdateAsync(UpdateProductIntegrationDto updateProductIntegration)
         {
             await _productIntegrationRepository.UpdateAsync(_mapper.Map<ProductIntegration>(updateProductIntegration));
 

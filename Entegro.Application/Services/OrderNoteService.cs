@@ -17,14 +17,14 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<OrderNoteDto> CreateOrderNoteAsync(CreateOrderNoteDto orderNote)
+        public async Task<OrderNoteDto> AddAsync(CreateOrderNoteDto orderNote)
         {
             var orderNoteDto = _mapper.Map<OrderNote>(orderNote);
             await _orderNoteRepository.AddAsync(orderNoteDto);
             return _mapper.Map<OrderNoteDto>(orderNoteDto);
         }
 
-        public async Task DeleteOrderNoteAsync(int orderNoteId)
+        public async Task DeleteAsync(int orderNoteId)
         {
             var orderNote = await _orderNoteRepository.GetByAsync(m => m.Id == orderNoteId);
             if (orderNote == null)
@@ -51,7 +51,7 @@ namespace Entegro.Application.Services
             };
         }
 
-        public async Task<OrderNoteDto> UpdateOrderNoteAsync(UpdateOrderNoteDto orderNote)
+        public async Task<OrderNoteDto> UpdateAsync(UpdateOrderNoteDto orderNote)
         {
             var orderNoteDto = _mapper.Map<OrderNote>(orderNote);
             await _orderNoteRepository.UpdateAsync(orderNoteDto);

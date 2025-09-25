@@ -11,9 +11,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Mappings.Erp;
-using Entegro.Application.Services;
 using Entegro.Domain.Enums;
-using Mapster;
 using MapsterMapper;
 using Newtonsoft.Json;
 using Polly;
@@ -89,7 +87,7 @@ namespace Entegro.Api.Jobs
 
                 await ProductSync(apiContext);
             }
-     
+
         }
 
         private async Task ProductSync(ErpApiContext apiContext)
@@ -154,7 +152,7 @@ namespace Entegro.Api.Jobs
                             {
                                 var createBrand = _mapper.Map<CreateBrandDto>(product.Brand);
 
-                                var brandResult = await _brandService.CreateAsync(createBrand);
+                                var brandResult = await _brandService.AddAsync(createBrand);
                                 product.BrandId = brandResult.Id;
                                 product.Brand = null;
                             }
@@ -170,7 +168,7 @@ namespace Entegro.Api.Jobs
                         }
 
                         var createProduct = _mapper.Map<CreateProductDto>(product);
-                        var productDTO = await _productService.CreateProductAsync(createProduct);
+                        var productDTO = await _productService.AddAsync(createProduct);
 
                         var erpProduct = erpProducts.First(m => m.Code == product.Code);
                         foreach (var variant in erpProduct.ProductVariantAttributes)
@@ -288,13 +286,13 @@ namespace Entegro.Api.Jobs
                 var existing = await _categoryService.GetCategoryByNameAsync(categoryDto.Name);
                 var updatedCategory = _mapper.Map<UpdateCategoryDto>(existing);
 
-                await _categoryService.UpdateCategoryAsync(updatedCategory);
+                await _categoryService.UpdateAsync(updatedCategory);
 
                 return existing.Id;
             }
 
             var createCategory = _mapper.Map<CreateCategoryDto>(categoryDto);
-            var createCategoryModel = await _categoryService.CreateCategoryAsync(createCategory);
+            var createCategoryModel = await _categoryService.AddAsync(createCategory);
 
             foreach (var subCategoryDto in categoryDto.SubCategories)
             {

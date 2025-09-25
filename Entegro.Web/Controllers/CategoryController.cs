@@ -43,7 +43,7 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> Create(CategoryModel model)
         {
             var createDto = _mapper.Map<CreateCategoryDto>(model);
-            await _categoryService.CreateCategoryAsync(createDto);
+            await _categoryService.AddAsync(createDto);
 
             return Json(new { success = true });
         }
@@ -66,7 +66,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var updateDto = _mapper.Map<UpdateCategoryDto>(model);
-                await _categoryService.UpdateCategoryAsync(updateDto);
+                await _categoryService.UpdateAsync(updateDto);
                 return Json(new { success = true });
             }
             return View(model);

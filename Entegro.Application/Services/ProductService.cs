@@ -40,7 +40,7 @@ namespace Entegro.Application.Services
             _mapper = mapper;
             _eventPublisher = eventPublisher;
         }
-        public async Task<ProductDto> CreateProductAsync(CreateProductDto createProduct)
+        public async Task<ProductDto> AddAsync(CreateProductDto createProduct)
         {
 
             if (createProduct == null)
@@ -60,7 +60,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<ProductDto>(product);
         }
 
-        public async Task<ProductDto> UpdateProductAsync(UpdateProductDto updateProduct)
+        public async Task<ProductDto> UpdateAsync(UpdateProductDto updateProduct)
         {
             if (updateProduct == null)
                 throw new ArgumentNullException(nameof(updateProduct));
@@ -100,7 +100,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<ProductDto>(existingProduct);
         }
 
-        public async Task DeleteProductAsync(int productId)
+        public async Task DeleteAsync(int productId)
         {
 
             if (productId <= 0)

@@ -12,7 +12,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<IEnumerable<SpecificationAttributeDto>> GetAllAsync();
         Task<PagedResult<SpecificationAttributeDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
         Task<PagedResult<SpecificationAttributeDto>> GetPagedAsync(GridCommand gridCommand);
-        Task<SpecificationAttributeDto> CreateAsync(CreateSpecificationAttributeDto model);
+        Task<SpecificationAttributeDto> AddAsync(CreateSpecificationAttributeDto model);
         Task<SpecificationAttributeDto> UpdateAsync(UpdateSpecificationAttributeDto model);
         Task DeleteAsync(int id);
     }

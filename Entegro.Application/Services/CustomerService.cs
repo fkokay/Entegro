@@ -1,16 +1,9 @@
-﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Collections;
 using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services
 {
@@ -24,7 +17,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<CustomerDto> CreateCustomerAsync(CreateCustomerDto createCustomer)
+        public async Task<CustomerDto> AddAsync(CreateCustomerDto createCustomer)
         {
             var customer = _mapper.Map<Customer>(createCustomer);
             await _customerRepository.AddAsync(customer);
@@ -32,7 +25,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<CustomerDto>(customer);
         }
 
-        public async Task<bool> DeleteCustomerAsync(int customerId)
+        public async Task<bool> DeleteAsync(int customerId)
         {
             var customer = await _customerRepository.GetByIdAsync(customerId);
 
@@ -107,7 +100,7 @@ namespace Entegro.Application.Services
             };
         }
 
-        public async Task<bool> UpdateCustomerAsync(UpdateCustomerDto updateCustomer)
+        public async Task<bool> UpdateAsync(UpdateCustomerDto updateCustomer)
         {
             await _customerRepository.UpdateAsync(_mapper.Map<Customer>(updateCustomer));
             return true;
