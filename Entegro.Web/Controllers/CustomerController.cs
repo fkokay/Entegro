@@ -118,22 +118,23 @@ namespace Entegro.Web.Controllers
                 var createdAddress = await _addressService.GetByIdAsync(model.Id);
                 var mappedAddress = _mapper.Map<UpdateAddressDto>(model);
                 await _addressService.UpdateAsync(mappedAddress);
-                return RedirectToAction("Edit", "Customer", new { id = model.CustomerId });
+                return Json(new { success = true });
             }
-
 
             var addressModel = _mapper.Map<CreateAddressDto>(model);
             var createdModel = await _addressService.AddAsync(addressModel);
-            int customerId = model.CustomerId.Value;
+
             var costumerAddressModel = new CustomerAddressMappingModel
             {
                 CustomerId = model.CustomerId.Value,
                 AddressId = createdModel.Id
             };
+
             var costumerAddressMappingModel = _mapper.Map<CreateCustomerAddressMappingDto>(costumerAddressModel);
             await _customerAddressMappingService.AddAsync(costumerAddressMappingModel);
-            return RedirectToAction("Edit", "Customer", new { id = model.CustomerId });
+            return Json(new { success = true });
         }
+
         [HttpGet]
         public async Task<IActionResult> GetCustomerAddress(int customerId)
         {
@@ -158,6 +159,19 @@ namespace Entegro.Web.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CustomerAddressList([FromBody] GridCommand gridCommand, int customerId)
+        {
+            var result = await _addressService.GetPagedAsync(gridCommand, customerId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
         }
         #endregion
 

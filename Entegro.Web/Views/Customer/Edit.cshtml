@@ -52,27 +52,34 @@
     <script src="/assets/js/entegro.customer.js"></script>
     <script>
         $(function () {
+            var customerId = @Html.Raw(Json.Serialize(Model.Id));
             Entegro.customer.initUpdateForm({
                 formSelector: '#customer-form',
                 postUrl: '/Customer/Edit',
-                redirectUrl: '/Customer/List'
+                redirectUrl: `/Customer/Edit?id=${customerId}`
             });
 
-             Entegro.customer.initDeleteCustomer({
+            Entegro.customer.initDeleteCustomer({
                 deleteUrl: '/Customer/Delete',
                 redirectUrl: '/Customer/List',
-                id: '@Model.Id'
+                id: @Html.Raw(Json.Serialize(Model.Id))
             });
 
-       
-           var customerId = @Model.Id;
-             if (customerId > 0) {
-                 Entegro.customer.loadCustomerAddresses(customerId, '#customer-address-container');
-             }
-
-              Entegro.customer.initDeleteAddress();
-             Entegro.customer.initCreateOrUpdateCustomerAddressModal();
+            Entegro.customer.initDeleteAddress();
+            Entegro.customer.initCreateOrUpdateCustomerAddressModal();
+            Entegro.customer.initCreateOrUpdateCustomerAddressForm();
+           
+            $('button[data-bs-toggle="tab"][data-bs-target="#customer-address"]').on('shown.bs.tab', function () {
+                var customerId = @Html.Raw(Json.Serialize(Model.Id));
+                if (customerId && customerId > 0) {
+                    Entegro.customer.initCustomerAddressTable(customerId);
+                }
+            });
         });
+    </script>
 
-    </script>    
+
+    
+
+
 }

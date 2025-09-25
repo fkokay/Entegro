@@ -63,7 +63,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<Address>> GetPagedAsync(GridCommand gridCommand, int customerId)
         {
-            var query = _context.Addresses.Include(x => x.CustomerAddressMappings.Where(c => c.CustomerId == customerId)).AsNoTracking();
+            var query = _context.CustomerAddressMappings.Where(cam => cam.CustomerId == customerId).Select(cam => cam.Address).AsNoTracking().AsQueryable();
 
             if (gridCommand.Search != null)
             {
