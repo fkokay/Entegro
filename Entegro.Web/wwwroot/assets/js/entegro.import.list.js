@@ -67,7 +67,7 @@ Entegro.import.list = (function ($) {
                     className: "text-center",
                     render: (data, type, row) => `
                         <div class="d-inline-block text-nowrap">
-                            <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
+                            <a href="/Import/Xml?profileId=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
                             <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
