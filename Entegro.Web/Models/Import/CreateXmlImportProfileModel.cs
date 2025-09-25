@@ -2,6 +2,7 @@
 {
     public class CreateXmlImportProfileModel
     {
+
         public string? MediaFileUrl { get; set; }
         public string ProfileName { get; set; } = null!;
         public string? MediaFileType { get; set; }

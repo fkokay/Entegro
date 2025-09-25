@@ -211,7 +211,6 @@ namespace Entegro.Web.Controllers
                 return View(CreateErrorModel("İndirme/parse hatası: " + ex.Message, model.MediaFileUrl));
             }
         }
-
         public IActionResult XmlMapping(XmlImportProfileModel model)
         {
             CreateXmlImportProfileModel createModel = new CreateXmlImportProfileModel()
@@ -290,6 +289,7 @@ namespace Entegro.Web.Controllers
 
             return RedirectToAction("List");
         }
+
         public async Task<IActionResult> ImportAllProductsFromXml(int profileId)
         {
             var setting = await _settingService.GetByKeyAsync("SystemApiUrl");
@@ -308,7 +308,6 @@ namespace Entegro.Web.Controllers
 
             return View();
         }
-
         private async Task<XDocument> ReadXml(string url)
         {
             using var httpClient = new HttpClient();
@@ -494,8 +493,20 @@ namespace Entegro.Web.Controllers
             };
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteProfile(int id)
+        {
+            try
+            {
+                await _importProfileService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
         #endregion
-
         [HttpPost]
         public async Task<IActionResult> ImportProfileList([FromBody] GridCommand gridCommand)
         {

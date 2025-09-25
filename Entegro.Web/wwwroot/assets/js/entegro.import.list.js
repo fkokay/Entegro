@@ -24,13 +24,13 @@ Entegro.import.list = (function ($) {
                 }
             },
             columns: [
-                { data: 'Id', orderable: false },          // 0: checkbox
-                { data: 'Id', visible: false },            // 1: gizli id
+                { data: 'Id', orderable: false },         
+                { data: 'Id', visible: false },            
                
-                { data: 'ProfileName' },                    // 3: Profil Adı
-                { data: 'MediaFileType' },                  // 5: Medya Türü
-                { data: 'MediaFileUrl' },                   // 6: Kaynak Linki
-                { data: 'Id' }                              // 7: İşlemler
+                { data: 'ProfileName' },                    
+                { data: 'MediaFileType' },                  
+                { data: 'MediaFileUrl' },                   
+                { data: 'Id' }                              
             ],
             columnDefs: [
                 {
