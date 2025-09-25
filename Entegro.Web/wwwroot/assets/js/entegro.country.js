@@ -381,6 +381,29 @@ Entegro.country = (function ($) {
         });
     }
 
+    function initDistrictCreateOrUpdateInModal(createOrUpdateDistrictModalSelector) {
+        $(document).on('click', '.btn-createorupdate-district', function () {
+            const createOrUpdateDistrictUrl = $(this).data('createorupdate-url');
+
+            if (!createOrUpdateDistrictUrl) {
+                console.error("createOrUpdateDistrictUrl boş!", this);
+                return;
+            }
+
+            const $createOrUpdateDistrictModal = $(createOrUpdateDistrictModalSelector);
+
+            $createOrUpdateDistrictModal.find('.modal-body').html(`
+            <div class="text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+            </div>
+        `);
+
+            $createOrUpdateDistrictModal.modal('show');
+            $createOrUpdateDistrictModal.find('.modal-body').load(createOrUpdateDistrictUrl); 
+        });
+    }
 
     return {
         initValidation: initValidation,
@@ -390,6 +413,7 @@ Entegro.country = (function ($) {
         initTownViewModal: initTownViewModal,
         initTownDeleteInModal: initTownDeleteInModal,
         initTownCreateOrUpdateInModal: initTownCreateOrUpdateInModal,
-        initCityCreateOrUpdateInModal: initCityCreateOrUpdateInModal
+        initCityCreateOrUpdateInModal: initCityCreateOrUpdateInModal,
+        initDistrictCreateOrUpdateInModal: initDistrictCreateOrUpdateInModal
     };
 })(jQuery);

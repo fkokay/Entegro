@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities.Common
 {
@@ -13,7 +8,7 @@ namespace Entegro.Domain.Entities.Common
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
-  
+
         }
     }
 
@@ -27,10 +22,10 @@ namespace Entegro.Domain.Entities.Common
         public string? LastName { get; set; }
         public string? Email { get; set; }
         public string? Company { get; set; }
-        public int? CountryId { get; set; }
-        public int? CityId { get; set; }
-        public int? TownId { get; set; }
-        public int? DistrictId { get; set; }
+        public string? Country { get; set; }
+        public string? City { get; set; }
+        public string? Town { get; set; }
+        public string? District { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
         public string? ZipPostalCode { get; set; }

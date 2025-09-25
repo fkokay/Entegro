@@ -24,6 +24,18 @@
                         </td>
                         <td>
                             <button type="button"
+                                    class="btn btn-warning btn-createorupdate-district"
+                                    data-district-id="0"
+                                    data-createorupdate-url="@Url.Action("CreateOrUpdateDistrict", "District", new { id = 0, townId = town.Id })"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#createOrUpdateDistrictModal">
+                                <span class="d-flex justify-content-center text-nowrap">
+                                    <i class="ti ti-edit ti-xs me-1"></i>
+                                </span>
+                            </button>
+
+                           
+                            <button type="button"
                                     class="btn btn-warning btn-createorupdate-town"
                                     data-town-id="@town.Id"
                                     data-createorupdate-url="@Url.Action("CreateOrUpdateTown", "Town", new { id = town.Id,cityId=town.CityId })"

@@ -82,6 +82,7 @@ namespace Entegro.Web.Controllers
             return Json(new { success = false, message = "Silinecek Ülke Bulunamadı" });
         }
 
+
         [HttpPost]
         public async Task<IActionResult> CountryList([FromBody] GridCommand model)
         {

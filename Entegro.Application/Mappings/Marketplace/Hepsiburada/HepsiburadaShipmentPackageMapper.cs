@@ -1,13 +1,7 @@
 ﻿using Entegro.Application.DTOs.Marketplace.Hepsiburada;
-using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Shipment;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
 {
@@ -37,8 +31,8 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
             order.OrderDateUtc = hepsiburadaShipmentPackage.OrderDate;
             order.Deleted = false;
             order.IsTransient = false;
-            order.OrderStatus =  Domain.Enums.OrderStatus.Pending;
-            order.PaymentStatus =  Domain.Enums.PaymentStatus.Paid;
+            order.OrderStatus = Domain.Enums.OrderStatus.Pending;
+            order.PaymentStatus = Domain.Enums.PaymentStatus.Paid;
             order.ShippingMethod = hepsiburadaShipmentPackage.CargoCompany;
             order.ShippingStatus = Domain.Enums.ShippingStatus.Shipped;
             order.DueDateUtc = hepsiburadaShipmentPackage.DueDate;
@@ -61,10 +55,10 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
                 Address1 = hepsiburadaShipmentPackage.BillingAddress,
                 Address2 = "",
                 AddressType = "Fatura Adresi",
-                CityId = 0,
+                City = "",
                 Company = hepsiburadaShipmentPackage.CompanyName,
-                CountryId = 0,
-                DistrictId = 0,
+                Country = "",
+                District = "",
                 Email = hepsiburadaShipmentPackage.Email,
                 FaxNumber = "",
                 FirstName = "",
@@ -73,7 +67,7 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
                 Salutation = hepsiburadaShipmentPackage.CompanyName,
                 TaxOffice = hepsiburadaShipmentPackage.TaxOffice,
                 TaxOfficeNumber = hepsiburadaShipmentPackage.TaxNumber + hepsiburadaShipmentPackage.IdentityNo,
-                TownId = 0,
+                Town = "",
                 Title = hepsiburadaShipmentPackage.CompanyName,
                 ZipPostalCode = hepsiburadaShipmentPackage.BillingPostalCode,
             };
@@ -82,10 +76,10 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
                 Address1 = hepsiburadaShipmentPackage.ShippingAddressDetail,
                 Address2 = "",
                 AddressType = "Fatura Adresi",
-                CityId = 0,
+                City = "",
                 Company = hepsiburadaShipmentPackage.CompanyName,
-                CountryId = 0,
-                DistrictId = 0,
+                Country = "",
+                District = "",
                 Email = hepsiburadaShipmentPackage.Email,
                 FaxNumber = "",
                 FirstName = "",
@@ -94,27 +88,27 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
                 Salutation = hepsiburadaShipmentPackage.CompanyName,
                 TaxOffice = hepsiburadaShipmentPackage.TaxOffice,
                 TaxOfficeNumber = hepsiburadaShipmentPackage.TaxNumber + hepsiburadaShipmentPackage.IdentityNo,
-                TownId = 0,
+                Town = "",
                 Title = hepsiburadaShipmentPackage.CompanyName,
                 ZipPostalCode = "",
             };
             order.OrderItems = hepsiburadaShipmentPackage.Items.Select(m => new DTOs.OrderItem.OrderItemDto()
             {
-                 Product = new DTOs.Product.ProductDto()
-                 {
-                      Code = m.MerchantSku,
-                 },
-                 Quantity = m.Quantity,
-                 Price = m.MerchantTotalPrice.Amount,
-                 UnitPrice = m.MerchantUnitPrice.Amount,
-                 TaxRate = m.Vat,
-                 DiscountAmount = m.TotalMerchantDiscount.Amount,
-                 IntegrationSku = m.MerchantSku,
-                 IntegrationProductName = m.ProductName,
-                 ItemWeight = 0,
-                 AttributesXml = "",
-                 ProductCost = 0,
-                 Sku = m.MerchantSku,
+                Product = new DTOs.Product.ProductDto()
+                {
+                    Code = m.MerchantSku,
+                },
+                Quantity = m.Quantity,
+                Price = m.MerchantTotalPrice.Amount,
+                UnitPrice = m.MerchantUnitPrice.Amount,
+                TaxRate = m.Vat,
+                DiscountAmount = m.TotalMerchantDiscount.Amount,
+                IntegrationSku = m.MerchantSku,
+                IntegrationProductName = m.ProductName,
+                ItemWeight = 0,
+                AttributesXml = "",
+                ProductCost = 0,
+                Sku = m.MerchantSku,
             }).ToList();
 
             ShipmentDto shipmentDto = new ShipmentDto();
@@ -128,7 +122,7 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
             shipmentDto.DeliveryDateUtc = null;
             shipmentDto.CreatedOnUtc = DateTime.UtcNow;
 
-            order.Shipments.Add(shipmentDto);   
+            order.Shipments.Add(shipmentDto);
 
 
 

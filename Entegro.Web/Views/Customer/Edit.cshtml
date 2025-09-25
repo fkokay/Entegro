@@ -34,6 +34,19 @@
     </form>
 </div>
 
+<div class="modal fade" id="createAddressModal" tabindex="-1" aria-labelledby="createAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center">Yeni Adres Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body" id="createAddressModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script src="/assets/js/entegro.customer.js"></script>
@@ -44,74 +57,25 @@
                 postUrl: '/Customer/Edit',
                 redirectUrl: '/Customer/List'
             });
-        });
-    </script>
 
-    <script>
-        $(document).ready(function () {
-            $('#btnDeleteCustomer').on('click', function () {
-                Swal.fire({
-                    title: 'Emin misiniz?',
-                    text: "Bu kayıt silinecek.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Evet, sil!',
-                    cancelButtonText: 'Hayır, iptal et',
-                    customClass: {
-                        confirmButton: 'btn btn-danger me-2',
-                        cancelButton: 'btn btn-secondary'
-                    },
-                    buttonsStyling: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '@Url.Action("Delete", "Customer")',
-                            type: 'POST',
-                            data: { id: @Model.Id },
-                            success: function (response) {
-                                if (response.success) {
-                                    Swal.fire({
-                                        title: 'Silindi!',
-                                        text: 'Kayıt başarıyla silindi.',
-                                        icon: 'success',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: {
-                                            confirmButton: 'btn btn-success'
-                                        },
-                                        buttonsStyling: false
-                                    }).then(() => {
-                                        window.location.href = '@Url.Action("List", "Customer")';
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: 'Hata!',
-                                        text: response.message || 'Silme işlemi başarısız oldu.',
-                                        icon: 'error',
-                                        confirmButtonText: 'Tamam',
-                                        customClass: {
-                                            confirmButton: 'btn btn-danger'
-                                        },
-                                        buttonsStyling: false
-                                    });
-                                }
-                            },
-                            error: function (xhr) {
-                                Swal.fire({
-                                    title: 'Hata!',
-                                    text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
-                                    icon: 'error',
-                                    confirmButtonText: 'Tamam',
-                                    customClass: {
-                                        confirmButton: 'btn btn-danger'
-                                    },
-                                    buttonsStyling: false
-                                });
-                            }
-                        });
-                    }
-                });
+             Entegro.customer.initDeleteCustomer({
+                deleteUrl: '/Customer/Delete',
+                redirectUrl: '/Customer/List',
+                id: '@Model.Id'
             });
-        });
-    </script>
 
+       
+           var customerId = @Model.Id;
+             if (customerId > 0) {
+                 Entegro.customer.loadCustomerAddresses(customerId, '#customer-address-container');
+             }
+
+              Entegro.customer.initDeleteAddress();
+             Entegro.customer.initCreateAddressModal();
+        });
+
+    </script>
+   
+
+    
 }
