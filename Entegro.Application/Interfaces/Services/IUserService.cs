@@ -9,9 +9,9 @@ namespace Entegro.Application.Interfaces.Services
         Task<IEnumerable<UserDto>> GetUsersAsync();
         Task<PagedResult<UserDto>> GetUsersAsync(int pageNumber, int pageSize);
         Task<PagedResult<UserDto>> GetPagedAsync(GridCommand gridCommand);
-        Task<int> CreateUserAsync(CreateUserDto createUser);
-        Task<bool> UpdateUserAsync(UpdateUserDto updateUser);
-        Task<bool> DeleteUserAsync(int userId);
+        Task<int> AddAsync(CreateUserDto createUser);
+        Task<bool> UpdateAsync(UpdateUserDto updateUser);
+        Task<bool> DeleteAsync(int userId);
 
         Task<UserDto?> GetByEmailAndPasswordAsync(string email, string password);
     }

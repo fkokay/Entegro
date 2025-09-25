@@ -56,7 +56,7 @@ namespace Entegro.Api.Jobs
         private async Task CategoryAttributeSync()
         {
             TrendyolApiContext context = new TrendyolApiContext();
-            var result = await _trendyolService.GetCategoryAttibutesAsync(context,411);
+            var result = await _trendyolService.GetCategoryAttibutesAsync(context, 411);
         }
 
         private async Task BrandSync()
@@ -145,7 +145,7 @@ namespace Entegro.Api.Jobs
                     await retryPolicy.ExecuteAsync(async () =>
                     {
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        await _orderService.AddAsync(createOrder);
                         _logger.LogInformation("'{OrderNumber}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                     });
                 }
@@ -216,7 +216,7 @@ namespace Entegro.Api.Jobs
                     await retryPolicy.ExecuteAsync(async () =>
                     {
                         var createProduct = _mapper.Map<CreateProductDto>(product);
-                        var productDto = await _productService.CreateProductAsync(createProduct);
+                        var productDto = await _productService.AddAsync(createProduct);
 
                         CreateProductIntegrationDto productIntegration = new CreateProductIntegrationDto();
                         productIntegration.ProductId = productDto.Id;
@@ -225,7 +225,7 @@ namespace Entegro.Api.Jobs
                         productIntegration.Price = createProduct.Price;
                         productIntegration.IntegrationCode = product.Code;
 
-                        await _productIntegrationService.CreateProductIntegrationAsync(productIntegration);
+                        await _productIntegrationService.AddAsync(productIntegration);
 
                         _logger.LogInformation("'{Name}' adlı ürün başarıyla kaydedildi.", product.Name);
                     });

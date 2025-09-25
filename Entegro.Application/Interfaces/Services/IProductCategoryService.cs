@@ -6,9 +6,9 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<ProductCategoryDto> GetProductCategoryByIdAsync(int productCategoryId);
         Task<IEnumerable<ProductCategoryDto>> GetProductCategorysAsync();
-        Task<ProductCategoryDto> CreateProductCategoryAsync(CreateProductCategoryDto createProductCategory);
-        Task<ProductCategoryDto> UpdateProductCategoryAsync(UpdateProductCategoryDto updateProductCategory);
+        Task<ProductCategoryDto> AddAsync(CreateProductCategoryDto createProductCategory);
+        Task<ProductCategoryDto> UpdateAsync(UpdateProductCategoryDto updateProductCategory);
         Task<List<ProductCategoryDto>> GetByProductWithCategoryAsync(int productId);
-        Task DeleteProductCategoryAsync(int productCategoryId);
+        Task DeleteAsync(int productCategoryId);
     }
 }

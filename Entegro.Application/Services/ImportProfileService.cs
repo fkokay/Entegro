@@ -17,7 +17,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<ImportProfileDto> CreateAsync(CreateImportProfileDto model)
+        public async Task<ImportProfileDto> AddAsync(CreateImportProfileDto model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));

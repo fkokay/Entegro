@@ -1,19 +1,13 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Domain.Entities.Checkout;
-using Entegro.Web.Models;
-using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Checkout.Orders;
-using Entegro.Web.Models.Common;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
-using System.Threading.Tasks;
 
 namespace Entegro.Web.Controllers
 {
@@ -55,7 +49,7 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> List()
         {
-           
+
 
             var orderPage = await _orderService.GetOrderPageAsync();
             var model = _mapper.Map<OrderListModel>(orderPage);
@@ -151,7 +145,7 @@ namespace Entegro.Web.Controllers
             createProductIntegration.Active = true;
             createProductIntegration.LastSyncDate = null;
 
-            await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+            await _productIntegrationService.AddAsync(createProductIntegration);
 
             var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(integrationCode);
             foreach (var orderItem in orderItems)
@@ -173,7 +167,7 @@ namespace Entegro.Web.Controllers
 
                 await _orderItemService.UpdateAsync(updateOrderItem);
             }
-           
+
 
             return Json(new { success = true });
         }

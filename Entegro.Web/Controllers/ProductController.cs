@@ -166,7 +166,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var createDto = _mapper.Map<CreateProductDto>(model);
-                await _productService.CreateProductAsync(createDto);
+                await _productService.AddAsync(createDto);
 
                 return Json(new { success = true });
             }
@@ -210,7 +210,7 @@ namespace Entegro.Web.Controllers
                     AssignedPictureIds = m.AssignedPictureIds,
                 }).ToList();
 
-                await _productService.UpdateProductAsync(updateDto);
+                await _productService.UpdateAsync(updateDto);
 
                 var productVariantAttributes = await _productVariantAttributeService.GetAllAsync(model.Id);
 
@@ -250,7 +250,7 @@ namespace Entegro.Web.Controllers
         {
             try
             {
-                await _productService.DeleteProductAsync(productId);
+                await _productService.DeleteAsync(productId);
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -303,7 +303,7 @@ namespace Entegro.Web.Controllers
             {
                 var createDto = _mapper.Map<CreateProductCategoryDto>(model);
 
-                await _productCategoryMappingService.CreateProductCategoryAsync(createDto);
+                await _productCategoryMappingService.AddAsync(createDto);
                 return Json(new { success = true });
             }
             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
@@ -314,7 +314,7 @@ namespace Entegro.Web.Controllers
         {
             try
             {
-                await _productCategoryMappingService.DeleteProductCategoryAsync(id);
+                await _productCategoryMappingService.DeleteAsync(id);
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -510,7 +510,7 @@ namespace Entegro.Web.Controllers
                 var productIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.Id, integrationSystemId);
                 if (productIntegration == null)
                 {
-                    await _productIntegrationService.CreateProductIntegrationAsync(new CreateProductIntegrationDto
+                    await _productIntegrationService.AddAsync(new CreateProductIntegrationDto
                     {
                         IntegrationCode = product.Code,
                         Price = product.Price,
@@ -1299,7 +1299,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1314,7 +1314,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1379,7 +1379,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1395,7 +1395,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1460,7 +1460,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1476,7 +1476,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1541,7 +1541,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1557,7 +1557,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1622,7 +1622,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1638,7 +1638,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1703,7 +1703,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1719,7 +1719,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1791,7 +1791,7 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-                    await _productIntegrationService.CreateProductIntegrationAsync(createProductIntegration);
+                    await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
                 {
@@ -1807,7 +1807,7 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
 
-                    await _productIntegrationService.UpdateProductIntegrationAsync(updateProductIntegration);
+                    await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 return Json(new { success = true });
@@ -1825,7 +1825,7 @@ namespace Entegro.Web.Controllers
         {
             try
             {
-                await _productIntegrationService.DeleteProductIntegrationAsync(id);
+                await _productIntegrationService.DeleteAsync(id);
                 return Json(new { success = true });
             }
             catch (Exception ex)

@@ -1,6 +1,5 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
-using Entegro.Application.DTOs.Setting;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models.Integration;
@@ -49,7 +48,7 @@ namespace Entegro.Web.Controllers
             }
             else
             {
-                await _settingService.CreateAsync("SystemUrl", model.SystemUrl);
+                await _settingService.AddAsync("SystemUrl", model.SystemUrl);
             }
 
             var systemApiUrlExists = await _settingService.ExistsByKeyAsync("SystemApiUrl");
@@ -59,7 +58,7 @@ namespace Entegro.Web.Controllers
             }
             else
             {
-                await _settingService.CreateAsync("SystemApiUrl", model.SystemApiUrl);
+                await _settingService.AddAsync("SystemApiUrl", model.SystemApiUrl);
             }
 
             return RedirectToAction("GeneralCommon");

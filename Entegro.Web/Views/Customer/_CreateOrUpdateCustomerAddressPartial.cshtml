@@ -1,88 +1,73 @@
 ﻿@model AddressModel
 
 
-<form asp-action="CreateCustomerAddressMapping" method="post" id="createAddressForm">
+<form asp-action="CreateOrUpdateCustomerAddressMapping" method="post" id="createAddressForm">
     <input type="hidden" name="CustomerId" value="@ViewBag.CustomerId" />
     <input type="hidden" asp-for="Id" />
 
     <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="Title" class="form-label">Adres Başlığı</label>
             <input asp-for="Title" class="form-control" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="Salutation" class="form-label">Hitap</label>
             <input asp-for="Salutation" class="form-control" />
         </div>
+        <div class="col-md-4">
+            <label asp-for="AddressType" class="form-label">Adres Türü</label>
+            @Html.DropDownListFor(m => m.AddressType, new SelectList(new[] {
+            new { Value = 0, Text = "Bireysel" },
+                        new { Value = 1, Text = "Kurumsal" }
+                        }, "Value", "Text"), new { @class = "form-control", @id = "AddressType" })
+        </div>
     </div>
 
     <div class="row mb-3">
-        <div class="col-md-6">
-            <label asp-for="AddressType" class="form-label">Adres Türü</label>
-            <input asp-for="AddressType" class="form-control" />
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="FirstName" class="form-label">Ad</label>
             <input asp-for="FirstName" class="form-control" />
         </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="LastName" class="form-label">Soyad</label>
             <input asp-for="LastName" class="form-control" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="Email" class="form-label">E-posta</label>
             <input asp-for="Email" type="email" class="form-control" />
         </div>
     </div>
 
+   
+
     <div class="row mb-3">
-        <div class="col-md-6">
-            <label asp-for="Company" class="form-label">Şirket</label>
-            <input asp-for="Company" class="form-control" />
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="Country" class="form-label">Ülke</label>
             <input asp-for="Country" class="form-control" />
         </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="City" class="form-label">Şehir</label>
             <input asp-for="City" class="form-control" />
         </div>
-        <div class="col-md-6">
-            <label asp-for="Town" class="form-label">Kasaba</label>
+        <div class="col-md-4">
+            <label asp-for="Town" class="form-label">İlçe</label>
             <input asp-for="Town" class="form-control" />
         </div>
     </div>
 
     <div class="row mb-3">
-        <div class="col-md-6">
-            <label asp-for="District" class="form-label">İlçe</label>
+        <div class="col-md-4">
+            <label asp-for="District" class="form-label">Mahalle</label>
             <input asp-for="District" class="form-control" />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="ZipPostalCode" class="form-label">Posta Kodu</label>
             <input asp-for="ZipPostalCode" class="form-control" />
         </div>
-    </div>
-
-    <div class="row mb-3">
-
-        <div class="col-md-6">
-            <label asp-for="Address1" class="form-label">Adres 1</label>
-            <input asp-for="Address1" class="form-control" required />
+        <div class="col-md-4">
+            <label asp-for="Company" class="form-label">Şirket</label>
+            <input asp-for="Company" class="form-control" />
         </div>
-
-        <div class="col-md-6">
-            <label asp-for="Address2" class="form-label">Adres 2</label>
-            <input asp-for="Address2" class="form-control" required/>
-        </div>
-        
     </div>
 
     <div class="row mb-3">
@@ -106,7 +91,17 @@
             <input asp-for="TaxOfficeNumber" class="form-control" />
         </div>
     </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label asp-for="Address1" class="form-label">Adres 1</label>
+            <textarea class="form-control" asp-for="Address1" rows="3" required></textarea>
+        </div>
 
+        <div class="col-md-6">
+            <label asp-for="Address2" class="form-label">Adres 2</label>
+            <textarea class="form-control" asp-for="Address2" rows="3" required></textarea>
+        </div>
+    </div>
     <div class="text-end">
         <button type="submit" class="btn btn-primary">Kaydet</button>
     </div>

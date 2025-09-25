@@ -19,7 +19,8 @@ namespace Entegro.Web.Controllers
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly IBrandService _brandService;
-        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService)
+        private readonly ISettingService _settingService;
+        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService)
         {
             _mediaFileService = mediaFileService;
             _webHostEnvironment = webHostEnvironment;
@@ -28,6 +29,7 @@ namespace Entegro.Web.Controllers
             _productService = productService;
             _categoryService = categoryService;
             _brandService = brandService;
+            _settingService = settingService;
         }
 
 
@@ -165,7 +167,7 @@ namespace Entegro.Web.Controllers
                     MediaFileType = "excel",
                     ColumnMapping = mappedJson,
                 };
-                await _importProfileService.CreateAsync(createDto);
+                await _importProfileService.AddAsync(createDto);
             }
             catch (Exception ex)
             {
@@ -274,7 +276,7 @@ namespace Entegro.Web.Controllers
                 })
             };
 
-            var profile = await _importProfileService.CreateAsync(createModel);
+            var profile = await _importProfileService.AddAsync(createModel);
             var dataElements = xmlDoc.Root?.Elements();
 
             if (dataElements != null)
@@ -292,7 +294,12 @@ namespace Entegro.Web.Controllers
         }
         public async Task<IActionResult> ImportAllProductsFromXml(int profileId)
         {
-            var response = await _client.PostAsync($"https://localhost:7095/api/Job/run?profileId={profileId}", null);
+            var setting = await _settingService.GetByKeyAsync("SystemApiUrl");
+            if (setting == null)
+            {
+                throw new Exception($"Ayar Bulunamadı");
+            }
+            var response = await _client.PostAsync($"{setting.Value}/api/Job/run?profileId={profileId}", null);
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();

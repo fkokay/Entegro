@@ -1,6 +1,5 @@
 ﻿
 using Entegro.Application.DTOs.Address;
-using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Order;
@@ -22,10 +21,10 @@ namespace Entegro.Application.Services
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
         public OrderService(
-            IOrderRepository orderRepository, 
-            ICustomerService customerService, 
+            IOrderRepository orderRepository,
+            ICustomerService customerService,
             IMediaFileService medaFileService,
-            IMapper mapper, 
+            IMapper mapper,
             ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
@@ -35,7 +34,7 @@ namespace Entegro.Application.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<OrderDto> CreateOrderAsync(CreateOrderDto createOrder)
+        public async Task<OrderDto> AddAsync(CreateOrderDto createOrder)
         {
             var order = _mapper.Map<Order>(createOrder);
 
@@ -44,7 +43,7 @@ namespace Entegro.Application.Services
             return _mapper.Map<OrderDto>(order);
         }
 
-        public async Task DeleteOrderAsync(int orderId)
+        public async Task DeleteAsync(int orderId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
 
@@ -76,7 +75,7 @@ namespace Entegro.Application.Services
             return orderPage;
         }
 
-        public async Task<OrderPrintDto> GetOrderPrintByIdAsync(int orderId,string packageNo)
+        public async Task<OrderPrintDto> GetOrderPrintByIdAsync(int orderId, string packageNo)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
             if (order == null)
@@ -121,9 +120,9 @@ namespace Entegro.Application.Services
             return orderDtos;
         }
 
-        public async Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand,int orderStatus)
+        public async Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, int orderStatus)
         {
-            var orders = await _orderRepository.GetPagedAsync(gridCommand,orderStatus);
+            var orders = await _orderRepository.GetPagedAsync(gridCommand, orderStatus);
 
             var items = await orders.Items.SelectAwait(async x =>
             {
@@ -143,7 +142,7 @@ namespace Entegro.Application.Services
             };
         }
 
-        public async Task<OrderDto> UpdateOrderAsync(UpdateOrderDto updateOrder)
+        public async Task<OrderDto> UpdateAsync(UpdateOrderDto updateOrder)
         {
             await _orderRepository.UpdateAsync(_mapper.Map<Order>(updateOrder));
             return _mapper.Map<OrderDto>(updateOrder);

@@ -16,7 +16,7 @@ namespace Entegro.Application.Services
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        public async Task<int> CreateUserAsync(CreateUserDto createUser)
+        public async Task<int> AddAsync(CreateUserDto createUser)
         {
             var user = _mapper.Map<User>(createUser);
             await _userRepository.AddAsync(user);
@@ -24,7 +24,7 @@ namespace Entegro.Application.Services
             return user.Id;
         }
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task<bool> DeleteAsync(int userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
 
@@ -86,7 +86,7 @@ namespace Entegro.Application.Services
             return userDtos;
         }
 
-        public async Task<bool> UpdateUserAsync(UpdateUserDto updateUser)
+        public async Task<bool> UpdateAsync(UpdateUserDto updateUser)
         {
             await _userRepository.UpdateAsync(_mapper.Map<User>(updateUser));
             return true;

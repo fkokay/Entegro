@@ -45,7 +45,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var createDto = _mapper.Map<CreateCustomerDto>(model);
-                await _customerService.CreateCustomerAsync(createDto);
+                await _customerService.AddAsync(createDto);
                 return Json(new { success = true });
             }
             return View(model);
@@ -70,15 +70,17 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var updateDto = _mapper.Map<UpdateCustomerDto>(model);
-                await _customerService.UpdateCustomerAsync(updateDto);
+                await _customerService.UpdateAsync(updateDto);
 
                 return Json(new { success = true });
             }
             return View(model);
         }
 
+
+        #region CustomerAddressMapping
         [HttpGet]
-        public async Task<IActionResult> CreateCustomerAddressMapping(int customerId, int addressId)
+        public async Task<IActionResult> CreateOrUpdateCustomerAddressMapping(int customerId, int addressId)
         {
 
             if (customerId == 0 && addressId == 0)
@@ -99,38 +101,38 @@ namespace Entegro.Web.Controllers
                 var customerAddress = await _addressService.GetByIdAsync(addressId);
                 var customerAddressMap = _mapper.Map<AddressModel>(customerAddress);
                 ViewBag.CustomerId = customerId;
-                return PartialView("_CreateCustomerAddressPartial", customerAddressMap);
+                return PartialView("_CreateOrUpdateCustomerAddressPartial", customerAddressMap);
             }
 
             ViewBag.CustomerId = customerId;
-            return PartialView("_CreateCustomerAddressPartial", addressModel);
+            return PartialView("_CreateOrUpdateCustomerAddressPartial", addressModel);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateCustomerAddressMapping(AddressModel model)
+        public async Task<IActionResult> CreateOrUpdateCustomerAddressMapping(AddressModel model)
         {
             if (!ModelState.IsValid)
-                return PartialView("_CreateCustomerAddressPartial", model);
+                return PartialView("_CreateOrUpdateCustomerAddressPartial", model);
 
             if (model.Id > 0)
             {
                 var createdAddress = await _addressService.GetByIdAsync(model.Id);
                 var mappedAddress = _mapper.Map<UpdateAddressDto>(model);
                 await _addressService.UpdateAsync(mappedAddress);
-                return RedirectToAction("List");
+                return Json(new { success = true });
             }
-
 
             var addressModel = _mapper.Map<CreateAddressDto>(model);
             var createdModel = await _addressService.AddAsync(addressModel);
-            int customerId = model.CustomerId.Value;
+
             var costumerAddressModel = new CustomerAddressMappingModel
             {
                 CustomerId = model.CustomerId.Value,
                 AddressId = createdModel.Id
             };
+
             var costumerAddressMappingModel = _mapper.Map<CreateCustomerAddressMappingDto>(costumerAddressModel);
             await _customerAddressMappingService.AddAsync(costumerAddressMappingModel);
-            return RedirectToAction("List");
+            return Json(new { success = true });
         }
 
         [HttpGet]
@@ -142,8 +144,37 @@ namespace Entegro.Web.Controllers
             }
             var customerAddressMapping = await _customerAddressMappingService.GetByCustomerIdAsync(customerId);
             var map = _mapper.Map<List<CustomerAddressMappingModel>>(customerAddressMapping);
+            ViewBag.CustomerId = customerId;
             return PartialView("_CustomerAddressTablePartial", map);
         }
+        [HttpPost]
+        public async Task<IActionResult> DeleteCustomerAddress(int customerId, int addressId)
+        {
+            try
+            {
+                await _customerAddressMappingService.DeleteAsync(customerId, addressId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CustomerAddressList([FromBody] GridCommand gridCommand, int customerId)
+        {
+            var result = await _addressService.GetPagedAsync(gridCommand, customerId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
+        #endregion
+
 
         [HttpPost]
         public async Task<IActionResult> CustomerList([FromBody] GridCommand gridCommand)
@@ -165,7 +196,7 @@ namespace Entegro.Web.Controllers
         {
             try
             {
-                await _customerService.DeleteCustomerAsync(id);
+                await _customerService.DeleteAsync(id);
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -174,18 +205,6 @@ namespace Entegro.Web.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeleteAddress(int customerId, int addressId)
-        {
-            try
-            {
-                await _customerAddressMappingService.DeleteAsync(customerId, addressId);
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
+
     }
 }

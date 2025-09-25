@@ -18,7 +18,7 @@ namespace Entegro.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<SpecificationAttributeDto> CreateAsync(CreateSpecificationAttributeDto model)
+        public async Task<SpecificationAttributeDto> AddAsync(CreateSpecificationAttributeDto model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));

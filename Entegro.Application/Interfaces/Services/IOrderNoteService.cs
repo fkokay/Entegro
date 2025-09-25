@@ -7,8 +7,8 @@ namespace Entegro.Application.Interfaces.Services
     {
         Task<OrderNoteDto?> GetOrderNoteByIdAsync(int orderNoteId);
         Task<PagedResult<OrderNoteDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
-        Task<OrderNoteDto> CreateOrderNoteAsync(CreateOrderNoteDto orderNote);
-        Task<OrderNoteDto> UpdateOrderNoteAsync(UpdateOrderNoteDto orderNote);
-        Task DeleteOrderNoteAsync(int orderNoteId);
+        Task<OrderNoteDto> AddAsync(CreateOrderNoteDto orderNote);
+        Task<OrderNoteDto> UpdateAsync(UpdateOrderNoteDto orderNote);
+        Task DeleteAsync(int orderNoteId);
     }
 }

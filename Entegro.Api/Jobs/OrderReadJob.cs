@@ -8,7 +8,6 @@ using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
-using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.Interfaces.Services;
@@ -20,10 +19,6 @@ using Entegro.Application.Mappings.Marketplace.Hepsiburada;
 using Entegro.Application.Mappings.Marketplace.N11;
 using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
-using Entegro.Application.Services;
-using Entegro.Application.Services.Commerce;
-using Entegro.Domain.Entities.Catalog;
-using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 using Quartz;
 
@@ -228,7 +223,7 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
@@ -355,7 +350,7 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
@@ -479,7 +474,7 @@ namespace Entegro.Api.Jobs
                                 else
                                 {
                                     orderItem.Product = null;
-                                    orderItem.ProductId = null; 
+                                    orderItem.ProductId = null;
                                 }
                             }
                         }
@@ -487,7 +482,7 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
@@ -624,7 +619,7 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        var createdOrder = await _orderService.CreateOrderAsync(createOrder);
+                        var createdOrder = await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
@@ -781,7 +776,7 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
@@ -925,7 +920,7 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.CreateOrderAsync(createOrder);
+                        await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
@@ -973,7 +968,7 @@ namespace Entegro.Api.Jobs
         private async Task<CustomerDto> CreateCustomer(CreateCustomerDto createCustomer)
         {
             createCustomer.CustomerType = 1;
-            var customer = await _customerService.CreateCustomerAsync(createCustomer);
+            var customer = await _customerService.AddAsync(createCustomer);
 
             return customer;
         }
