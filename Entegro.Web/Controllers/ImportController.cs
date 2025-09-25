@@ -185,6 +185,7 @@ namespace Entegro.Web.Controllers
             XmlImportProfileModel model = new XmlImportProfileModel();
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Xml(XmlImportProfileModel model)
         {
@@ -244,6 +245,7 @@ namespace Entegro.Web.Controllers
             ViewBag.PreviewXml = model.PreviewXml;
             return View(createModel);
         }
+
         [HttpPost]
         public async Task<IActionResult> XmlMapping(CreateXmlImportProfileModel model, string SelectedImagePaths, string SelectedAttributeSpecifications, int VariantCount)
         {
@@ -367,12 +369,15 @@ namespace Entegro.Web.Controllers
                         }
 
                         var xpath = string.Join("/", xpathParts);
-                        var element = item.XPathSelectElement(xpath);
-
-                        if (element != null)
+                        if (!string.IsNullOrEmpty(xpath))
                         {
-                            Console.WriteLine($"- {header}: {element.Value}");
-                            foundAny = true;
+                            var element = item.XPathSelectElement(xpath);
+
+                            if (element != null)
+                            {
+                                Console.WriteLine($"- {header}: {element.Value}");
+                                foundAny = true;
+                            } 
                         }
                     }
 
