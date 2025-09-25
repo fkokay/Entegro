@@ -168,7 +168,7 @@ namespace Entegro.Api.Jobs
                         }
                         else
                         {
-                            var createdProduct = await _productService.CreateProductAsync(createProductDto);
+                            var createdProduct = await _productService.AddAsync(createProductDto);
                             if (createdProduct != null)
                             {
                                 productId = createdProduct.Id;
@@ -300,7 +300,7 @@ namespace Entegro.Api.Jobs
                 return defaultValue;
             }
 
-            return decimal.TryParse(xFindElement.Value.Replace(".", ","), out var vatRate) ? vatRate : defaultValue;
+            return decimal.TryParse(xFindElement.Value, out var vatRate) ? vatRate : defaultValue;
         }
         public int GetIntegerValue(XElement xElement, List<XmlColumnMappingResult> mappingList, string mappedName, int defaultValue)
         {
@@ -455,12 +455,17 @@ namespace Entegro.Api.Jobs
 
                 if (existingBrand == null)
                 {
-                    var createdBrand = await _brandService.CreateAsync(new Application.DTOs.Brand.CreateBrandDto
-                    {
-                        DisplayOrder = 0,
-                        Name = brand,
-                        Published = false
-                    });
+                    var createBrand = new CreateBrandDto();
+                    createBrand.Name = brand;
+                    createBrand.DisplayOrder = 0;
+                    createBrand.Published = true;
+                    createBrand.Description = "";
+                    createBrand.MediaFileId = null;
+                    createBrand.MetaTitle = brand;
+                    createBrand.MetaDescription = "";
+                    createBrand.MetaKeywords = "";
+                  
+                    var createdBrand = await _brandService.AddAsync(createBrand);
 
                     return createdBrand.Id;
                 }
@@ -499,7 +504,7 @@ namespace Entegro.Api.Jobs
                     createCategory.DisplayOrder = 0;
                     createCategory.MediaFileId = null;
 
-                    var category = await _categoryService.CreateCategoryAsync(createCategory);
+                    var category = await _categoryService.AddAsync(createCategory);
 
                     return category;
                 }
@@ -525,7 +530,7 @@ namespace Entegro.Api.Jobs
             createProductCategory.ProductId = productId;
             createProductCategory.CategoryId = categoryId;
 
-            await _productCategoryService.CreateProductCategoryAsync(createProductCategory);
+            await _productCategoryService.AddAsync(createProductCategory);
         }
 
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)

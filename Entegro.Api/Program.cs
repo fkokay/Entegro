@@ -118,6 +118,11 @@ builder.Services.AddQuartz(q =>
 {
     var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
     q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
+    q.AddTrigger(opts => opts
+        .ForJob(xmlFileDownloadJob)
+        .WithIdentity("XmlFileDownloadJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(1)));
 
     //var orderReadJob = new JobKey("OrderReadJob");
 
