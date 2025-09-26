@@ -18,6 +18,7 @@ using Serilog;
 using Serilog.Extensions.Logging;
 using Serilog.Sinks.Graylog;
 using Serilog.Sinks.Graylog.Core.Transport;
+using Serilog.Sinks.MSSqlServer;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -36,16 +37,24 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 });
 
 #region Logging
+var columnOptions = new ColumnOptions();
+var sinkOptions = new MSSqlServerSinkOptions
+{
+    TableName = "Log",             // tablo adý
+    AutoCreateSqlTable = true,      // tablo yoksa oluþtur
+    BatchPostingLimit = 50,         // her seferinde 50 log gönder
+    BatchPeriod = TimeSpan.FromSeconds(5) // 5 saniyede bir batch gönder
+};
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
-    .WriteTo.Graylog(new GraylogSinkOptions
-    {
-        HostnameOrAddress = "127.0.0.1",
-        Port = 12201,
-        Facility = "EntegroWebApp",
-        TransportType = TransportType.Udp
-    })
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: sinkOptions,
+        columnOptions: columnOptions,
+        appConfiguration: builder.Configuration
+    )
+    .Enrich.FromLogContext()
     .CreateLogger();
 
 builder.Host.UseSerilog();

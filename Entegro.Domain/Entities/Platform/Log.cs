@@ -19,10 +19,11 @@ namespace Entegro.Domain.Entities.Platform
     [Table("Log")]
     public class Log :BaseEntity
     {
-        public int LogLevelId { get; set; }
-        public string ShortMessage { get; set; }
-        public string FullMessage { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public string Logger { get; set; }
+        public string? Message { get; set; }
+        public string? MessageTemplate { get; set; }
+        public DateTimeOffset TimeStamp { get; set; }
+        public string? Exception { get; set; }
+        public string? Properties { get; set; }
+        public string? LogEvent { get; set; }
     }
 }

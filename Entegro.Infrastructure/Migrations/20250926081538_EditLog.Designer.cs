@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250926081538_EditLog")]
+    partial class EditLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1416,6 +1419,7 @@ namespace Entegro.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ColumnMapping")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOnUtc")
