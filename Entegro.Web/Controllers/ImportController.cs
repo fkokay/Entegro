@@ -5,6 +5,7 @@ using Entegro.Application.Interfaces.Services;
 using Entegro.Web.Models.Import;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using System.Xml.Linq;
 
 namespace Entegro.Web.Controllers
@@ -208,6 +209,39 @@ namespace Entegro.Web.Controllers
                 model.PreviewXml = GeneratePreviewXml(startNode);
                 model.Paths = GetDistinctPaths(startNode);
 
+                var mappings = JsonConvert.DeserializeObject<List<XmlColumnMappingResult>>(profileModel.ColumnMapping);
+                model.ProductImport.Name = mappings.FirstOrDefault(m => m.MappedName == "Name")?.XmlHeader;
+                model.ProductImport.Brand = mappings.FirstOrDefault(m => m.MappedName == "Brand")?.XmlHeader;
+                model.ProductImport.Code = mappings.FirstOrDefault(m => m.MappedName == "Code")?.XmlHeader;
+                model.ProductImport.Barcode = mappings.FirstOrDefault(m => m.MappedName == "Barcode")?.XmlHeader;
+                model.ProductImport.ManufacturerPartNumber = mappings.FirstOrDefault(m => m.MappedName == "ManufacturerPartNumber")?.XmlHeader;
+                model.ProductImport.Gtin = mappings.FirstOrDefault(m => m.MappedName == "Gtin")?.XmlHeader;
+                model.ProductImport.Price = mappings.FirstOrDefault(m => m.MappedName == "Price")?.XmlHeader;
+                model.ProductImport.Currency = mappings.FirstOrDefault(m => m.MappedName == "Currency")?.XmlHeader;
+                model.ProductImport.Unit = mappings.FirstOrDefault(m => m.MappedName == "VatRate")?.XmlHeader;
+                model.ProductImport.VatInc = mappings.FirstOrDefault(m => m.MappedName == "VatInc")?.XmlHeader;
+                model.ProductImport.StockQuantity = mappings.FirstOrDefault(m => m.MappedName == "StockQuantity")?.XmlHeader;
+                model.ProductImport.Weight = mappings.FirstOrDefault(m => m.MappedName == "Weight")?.XmlHeader;
+                model.ProductImport.Length = mappings.FirstOrDefault(m => m.MappedName == "Length")?.XmlHeader;
+                model.ProductImport.Width = mappings.FirstOrDefault(m => m.MappedName == "Width")?.XmlHeader;
+                model.ProductImport.Height = mappings.FirstOrDefault(m => m.MappedName == "Height")?.XmlHeader;
+                model.ProductImport.MetaKeywords = mappings.FirstOrDefault(m => m.MappedName == "MetaKeywords")?.XmlHeader;
+                model.ProductImport.MetaDescription = mappings.FirstOrDefault(m => m.MappedName == "MetaDescription")?.XmlHeader;
+                model.ProductImport.MetaTitle = mappings.FirstOrDefault(m => m.MappedName == "MetaTitle")?.XmlHeader;
+                model.ProductImport.Description = mappings.FirstOrDefault(m => m.MappedName == "Description")?.XmlHeader;
+                //model.ProductImport.Images = mappings.FirstOrDefault(m => m.MappedName == "Images")?.XmlHeader;
+                //model.ProductImport.Categories = mappings.FirstOrDefault(m => m.MappedName == "Categories")?.XmlHeader;
+
+
+                var xmlPathsSelectItems = model.Paths.Select(m => new SelectListItem()
+                {
+                    Text = m,
+                    Value = m
+                }).ToList();
+
+                xmlPathsSelectItems.Insert(0, new SelectListItem("Seçiniz", null));
+                ViewBag.XmlPathsSelectList = xmlPathsSelectItems;
+
                 var variantIndices = model.Paths.SelectMany(path =>
                 {
                     var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
@@ -253,6 +287,49 @@ namespace Entegro.Web.Controllers
                 model.PreviewXml = GeneratePreviewXml(startNode);
                 model.Paths = GetDistinctPaths(startNode);
 
+                //if (model.Id == 0)
+                //{
+                //    CreateXmlImportProfileModel createModel = new CreateXmlImportProfileModel()
+                //    {
+                //        MediaFileUrl = model.MediaFileUrl,
+                //        ProfileName = model.ProfileName,
+                //        MediaFileType = model.MediaFileType,
+                //        Enable = model.Enable,
+                //    };
+
+                //    UpdateVariantMappedProperties(model, VariantCount);
+                //    UpdateImagesAndSpecifications(model, SelectedImagePaths, SelectedAttributeSpecifications, VariantCount);
+
+                //    var headerMaps = GetHeaderMappings(model);
+                //    PrintHeaderMapsJson(headerMaps);
+
+                //    var xmlDoc = await ReadXml(model.MediaFileUrl);
+                //    Console.WriteLine("📄 Header Map JSON:");
+
+
+                //    var createModel = new Application.DTOs.ImportProfile.CreateImportProfileDto
+                //    {
+                //        ProfileName = model.ProfileName,
+                //        ApplyPriceAdjustment = model.CreateXmlProduct.ApplyPriceAdjustment,
+                //        PriceAdjustmentType = model.CreateXmlProduct.PriceAdjustmentType,
+                //        MediaFileType = "xml",
+                //        OptionalExtraAmount = model.CreateXmlProduct.OptionalExtraAmount,
+                //        PriceAdjustmentAmount = model.CreateXmlProduct.PriceAdjustmentAmount,
+                //        MediaFileUrl = model.MediaFileUrl,
+                //        Enable = true,
+                //        ColumnMapping = System.Text.Json.JsonSerializer.Serialize(headerMaps, new System.Text.Json.JsonSerializerOptions
+                //        {
+                //            WriteIndented = true
+                //        })
+                //    };
+
+                //    var profile = await _importProfileService.AddAsync(createModel);
+                //}
+
+                //else
+                //{
+
+                //}
                 return RedirectToAction("Xml", model);
             }
             catch (Exception ex)

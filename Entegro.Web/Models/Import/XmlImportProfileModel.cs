@@ -26,6 +26,9 @@
         public string? RowAttribute { get; set; }
         public string? AssignedMediaFileIds { get; set; } = "string";
 
+        public string? SelectedImagePaths { get; set; }
+        public string? SelectedAttributeSpecifications { get; set; }
+        public int VariantCount { get; set; }
 
         public CreateXmlProductImportProfileModel ProductImport { get; set; } = new();
     }
