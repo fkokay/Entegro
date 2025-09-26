@@ -415,8 +415,20 @@ Entegro.product.list = (function ($) {
 
                 if (row.data().ProductIntegrations?.length) {
                     row.data().ProductIntegrations.forEach(pi => {
-                        let paramValue = pi.IntegrationSystem.IntegrationSystemParameters?.[0]?.Value;
-                        let logoSrc = Entegro.product.list.getIntegrationLogo(paramValue);
+
+                        var typeValue = "";
+                        switch (pi.IntegrationSystem.IntegrationSystemType) {
+
+                            case "Commerce":
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.FirstOrDefault(p => p.Name == "CommerceType");
+                                break;
+                            case "Marketplace":
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.FirstOrDefault(p => p.Name == "MarketplaceType");
+                                break;
+                            default:
+                        }
+
+                        let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
 
                         integrationHtml += `
                                 <div class="col-2 mb-2">

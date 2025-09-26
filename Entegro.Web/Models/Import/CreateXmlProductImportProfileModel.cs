@@ -22,8 +22,8 @@
         public string? MetaDescription { get; set; }
         public string? MetaTitle { get; set; }
         public string? Description { get; set; }
-        public string? Images { get; set; }
-        public string? Categories { get; set; }
+        public string[] Images { get; set; }
+        public string[] Categories { get; set; }
 
     }
 }
