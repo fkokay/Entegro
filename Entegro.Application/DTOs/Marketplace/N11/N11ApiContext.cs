@@ -8,7 +8,7 @@ namespace Entegro.Application.DTOs.Marketplace.N11
 {
     public class N11ApiContext
     {
-        public string BaseUrl = " https://api.n11.com/ms/";
+        public string BaseUrl = " https://api.n11.com/";
         public string AppKey { get; set; }
         public string AppSecret { get; set; }
     }

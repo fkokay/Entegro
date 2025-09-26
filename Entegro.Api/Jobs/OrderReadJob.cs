@@ -107,7 +107,7 @@ namespace Entegro.Api.Jobs
             switch (marketPlaceType)
             {
                 case "N11":
-                    //await N11OrderSync(item);
+                    await N11OrderSync(item);
                     break;
                 case "Hepsiburada":
                     await HepsiburadaOrderSync(item);
@@ -227,6 +227,8 @@ namespace Entegro.Api.Jobs
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
+
+
                     }
                     catch (Exception ex)
                     {
@@ -482,9 +484,28 @@ namespace Entegro.Api.Jobs
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.AddAsync(createOrder);
+                        var createdOrder = await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
+                        #endregion
+
+                        #region Shipment
+                        foreach (var shipment in order.Shipments)
+                        {
+                            shipment.OrderId = createdOrder.Id;
+
+                            foreach (var orderItem in createdOrder.OrderItems)
+                            {
+                                ShipmentItemDto createShipmentItem = new ShipmentItemDto();
+                                createShipmentItem.OrderItemId = orderItem.Id;
+                                createShipmentItem.Quantity = orderItem.Quantity;
+
+                                shipment.ShipmentItems.Add(createShipmentItem);
+                            }
+
+                            var createShipment = _mapper.Map<CreateShipmentDto>(shipment);
+                            var createdShipment = await _shipmentService.AddAsync(createShipment);
+                        }
                         #endregion
                     }
                     catch (Exception ex)
