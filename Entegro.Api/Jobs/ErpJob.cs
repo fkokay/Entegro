@@ -1,6 +1,7 @@
 ﻿
 using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Erp;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
@@ -173,7 +174,7 @@ namespace Entegro.Api.Jobs
                         var erpProduct = erpProducts.First(m => m.Code == product.Code);
                         foreach (var variant in erpProduct.ProductVariantAttributes)
                         {
-                            var variantAttributes = new List<ProductVariantAttributeModel>();
+                            var variantAttributes = new List<ProductVariantAttributeSelection>();
 
                             await AddVariantAttributeAsync(productDTO.Id, variant.Variant1Name, variant.Variant1Value, variantAttributes);
                             await AddVariantAttributeAsync(productDTO.Id, variant.Variant2Name, variant.Variant2Value, variantAttributes);
@@ -204,7 +205,7 @@ namespace Entegro.Api.Jobs
             _logger.LogInformation("{erpType} ürün senkronizasyonu tamamlandı. Zaman: {Time}", apiContext.ErpType, DateTime.UtcNow);
         }
 
-        private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeModel> variantAttributes)
+        private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeSelection> variantAttributes)
         {
             if (string.IsNullOrEmpty(attributeName) || string.IsNullOrEmpty(attributeValue)) return;
 
@@ -227,7 +228,7 @@ namespace Entegro.Api.Jobs
                 ProductVariantAttributeId = variantId
             })).Id;
 
-            variantAttributes.Add(new ProductVariantAttributeModel
+            variantAttributes.Add(new ProductVariantAttributeSelection
             {
                 ProductVariantAttributeId = variantId,
                 ProductVariantAttributeValueId = variantValueId
@@ -304,9 +305,4 @@ namespace Entegro.Api.Jobs
         }
     }
 
-    public class ProductVariantAttributeModel
-    {
-        public int ProductVariantAttributeId { get; set; }
-        public int ProductVariantAttributeValueId { get; set; }
-    }
 }

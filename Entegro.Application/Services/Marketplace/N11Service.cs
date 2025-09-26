@@ -134,7 +134,7 @@ namespace Entegro.Application.Services.Marketplace
         public async Task UpdatePriceAndStockAsync(N11ApiContext context,N11PriceAndStockUpdatePayload payload)
         {
             using var client = CreateHttpClient(context);
-            var url = $"product/tasks/price-stock-update";
+            var url = $"ms/product/tasks/price-stock-update";
             var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -150,7 +150,7 @@ namespace Entegro.Application.Services.Marketplace
         public async Task<N11ProductDto?> GetProductWithN11CodeAsync(N11ApiContext context,string n11Code)
         {
             using var client = CreateHttpClient(context);
-            var url = $"product-query?id={n11Code}";
+            var url = $"ms/product-query?id={n11Code}";
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
@@ -171,7 +171,7 @@ namespace Entegro.Application.Services.Marketplace
         public async Task<N11ProductDto?> GetProductWithStockCodeAsync(N11ApiContext context,string stockCode)
         {
             using var client = CreateHttpClient(context);
-            var url = $"product-query?stockCode={stockCode}";
+            var url = $"ms/product-query?stockCode={stockCode}";
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
@@ -192,7 +192,7 @@ namespace Entegro.Application.Services.Marketplace
         public async Task<IEnumerable<N11ProductDto>> GetProductsAsync(N11ApiContext context,int pageSize = 50)
         {
             using var client = CreateHttpClient(context);
-            var url = $"product-query";
+            var url = $"ms/product-query";
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
@@ -210,9 +210,25 @@ namespace Entegro.Application.Services.Marketplace
             return data.Content.ToList();
         }
 
-        public Task<IEnumerable<N11ShipmentPackageDto>> GetShipmentPackagesAsync(N11ApiContext context,int pageSize = 50)
+        public async Task<IEnumerable<N11ShipmentPackageDto>> GetShipmentPackagesAsync(N11ApiContext context,int pageSize = 50)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context);
+            var url = $"rest/delivery/v1/shipmentPackages";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<N11Response<N11ShipmentPackageDto>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.Content.ToList();
         }
     }
 }

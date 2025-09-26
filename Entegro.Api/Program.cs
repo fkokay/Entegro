@@ -116,25 +116,25 @@ builder.Services.AddSwaggerGen();
 #region Jobs
 builder.Services.AddQuartz(q =>
 {
-    var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
-    q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
-    q.AddTrigger(opts => opts
-        .ForJob(xmlFileDownloadJob)
-        .WithIdentity("XmlFileDownloadJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(1)));
-
-    //var orderReadJob = new JobKey("OrderReadJob");
-
-    //q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
-
+    //var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
+    //q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
     //q.AddTrigger(opts => opts
-    //    .ForJob(orderReadJob)
-    //    .WithIdentity("OrderReadJob-trigger")
+    //    .ForJob(xmlFileDownloadJob)
+    //    .WithIdentity("XmlFileDownloadJob-trigger")
     //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(1)
-    //        .RepeatForever())
-    //    );
+    //        .WithIntervalInMinutes(1)));
+
+    var orderReadJob = new JobKey("OrderReadJob");
+
+    q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
+
+    q.AddTrigger(opts => opts
+        .ForJob(orderReadJob)
+        .WithIdentity("OrderReadJob-trigger")
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(1)
+            .RepeatForever())
+        );
 
     //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
 

@@ -73,7 +73,7 @@ namespace Entegro.Application.DTOs.Marketplace.N11
         public int Quantity { get; set; }
 
         [JsonPropertyName("attributes")]
-        public List<N11Attribute> Attributes { get; set; }
+        public List<N11AttributeDto> Attributes { get; set; }
 
         [JsonPropertyName("imageUrls")]
         public List<string> ImageUrls { get; set; }
