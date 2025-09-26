@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string ProfileName { get; set; } = null!;
-        public string ColumnMapping { get; set; } = null!;
+        public string? ColumnMapping { get; set; }
         public string? MediaFileType { get; set; }
         public string? MediaFileUrl { get; set; }
         public int? MediaFileId { get; set; }

@@ -24,7 +24,7 @@
         public string? AttributeStockQuantity { get; set; }
         public string? AttributeSpecifications { get; set; }
         public string? RowAttribute { get; set; }
-        public string? AssignedMediaFileIds { get; set; } = "string";
+        public string? AssignedMediaFileIds { get; set; } = "";
 
         public string? SelectedImagePaths { get; set; }
         public string? SelectedAttributeSpecifications { get; set; }
