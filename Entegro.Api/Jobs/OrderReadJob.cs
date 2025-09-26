@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Marketplace.CicekSepeti;
 using Entegro.Application.DTOs.Marketplace.Hepsiburada;
+using Entegro.Application.DTOs.Marketplace.Idefix;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
@@ -20,6 +21,7 @@ using Entegro.Application.Mappings.Marketplace.N11;
 using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using MapsterMapper;
+using Polly;
 using Quartz;
 
 namespace Entegro.Api.Jobs
@@ -116,13 +118,13 @@ namespace Entegro.Api.Jobs
                     await TrendyolOrderSync(item);
                     break;
                 case "CicekSepeti":
-                    //await CicekSepetiOrderSync(item);
+                    await CicekSepetiOrderSync(item);
                     break;
                 case "Pazarama":
-                    //await PazaramaOrderSync(item);
+                    await PazaramaOrderSync(item);
                     break;
                 case "Idefix":
-                    // IdefixOrderSync(item);
+                    await IdefixOrderSync(item);
                     break;
                 default:
                     _logger.LogError("{0} pazaryerine ait sipariş çekme işlemi bulunamadı", marketPlaceType);
@@ -132,7 +134,27 @@ namespace Entegro.Api.Jobs
 
         private async Task IdefixOrderSync(IntegrationSystemDto item)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogInformation("İdefix sipariş senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
+
+                IdefixApiContext context = GetIdefixApiContext(item);
+
+                _logger.LogInformation("Pazarama sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
+        }
+
+        private IdefixApiContext GetIdefixApiContext(IntegrationSystemDto item)
+        {
+            IdefixApiContext context = new IdefixApiContext();
+            context.Token = item.IntegrationSystemParameters.Where(m => m.Key == "Token").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.Secret = item.IntegrationSystemParameters.Where(m => m.Key == "Secret").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.SellerId = item.IntegrationSystemParameters.Where(m => m.Key == "SellerId").Select(m => m.Value).FirstOrDefault() ?? "";
+            return context;
         }
 
         private async Task PazaramaOrderSync(IntegrationSystemDto item)

@@ -180,9 +180,36 @@ namespace Entegro.Application.Services.Marketplace
             response.EnsureSuccessStatusCode();
         }
 
-        public Task<IEnumerable<CicekSepetiOrderDto>> GetOrdersAsync(CicekSepetiApiContext context)
+        public async Task<IEnumerable<CicekSepetiOrderDto>> GetOrdersAsync(CicekSepetiApiContext context)
         {
-            throw new NotImplementedException();
+            using var client = CreateHttpClient(context);
+
+            var request = new
+            {
+                startDate = DateTime.Now.AddDays(-14).ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                endDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                pageSize=100,
+                page=0,
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync($"Order/GetOrders", content);
+
+            var json = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+            var data = JsonSerializer.Deserialize<CicekSepetiOrderResponse>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return data.SupplierOrderListWithBranch;
         }
     }
 }

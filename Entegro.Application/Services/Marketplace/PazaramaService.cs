@@ -252,9 +252,36 @@ namespace Entegro.Application.Services.Marketplace
             response.EnsureSuccessStatusCode();
         }
 
-        public Task<IEnumerable<PazaramaOrderDto>> GetOrdersAsync(PazaramaApiContext context)
+        public async Task<IEnumerable<PazaramaOrderDto>> GetOrdersAsync(PazaramaApiContext context)
         {
-            throw new NotImplementedException();
+            var token = await GetToken(context);
+
+            using var client = CreateHttpClientWithToken(context, token.AccessToken);
+            var url = $"order/getOrdersForApi";
+            var request = new
+            {
+                pageSize = 100,
+                pageNumber = 1,
+                startDate = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd"),
+                endDate = DateTime.Now.ToString("yyyy-MM-dd")
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(request),Encoding.UTF8,"application/json");
+            var response = await client.PostAsync(url,content);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var jsonData = JsonSerializer.Deserialize<PazaramaResponse<List<PazaramaOrderDto>>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (jsonData == null)
+            {
+                return null;
+            }
+
+            return jsonData.Data.ToList();
         }
     }
 }
