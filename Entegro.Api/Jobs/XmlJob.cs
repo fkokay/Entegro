@@ -18,7 +18,7 @@ using System.Xml.Linq;
 namespace Entegro.Api.Jobs
 {
     [DisallowConcurrentExecution]
-    public class FileDownloadJob : IJob
+    public class XmlJob : IJob
     {
 
         private readonly IImportProfileService _importProfileService;
@@ -35,9 +35,9 @@ namespace Entegro.Api.Jobs
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
         private readonly ISettingService _settingService;
-        private readonly ILogger<FileDownloadJob> _logger;
+        private readonly ILogger<XmlJob> _logger;
 
-        public FileDownloadJob(
+        public XmlJob(
             IImportProfileService importProfileService,
             IProductService productService,
             ICategoryService categoryService,
@@ -50,7 +50,7 @@ namespace Entegro.Api.Jobs
             IProductVariantAttributeValueService productVariantAttributeValueService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             ISettingService settingService,
-            ILogger<FileDownloadJob> logger)
+            ILogger<XmlJob> logger)
         {
             _importProfileService = importProfileService;
             _productService = productService;

@@ -84,7 +84,7 @@ namespace Entegro.Scheduling
         /// <summary>
         /// Gets info about the last (or current) execution.
         /// </summary>
-        public virtual TaskExecutionInfo LastExecution { get; set; }
+        public TaskExecutionInfo? LastExecution { get; set; }
         /// <summary>
         /// Gets infos about all past executions.
         /// </summary>

@@ -23,7 +23,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<TaskDescriptor>> GetPagedAsync(GridCommand gridCommand)
         {
-            var query = _context.TaskDescriptors.Include(m => m.LastExecution).AsNoTracking();
+            var query = _context.TaskDescriptors.AsNoTracking();
 
             if (gridCommand.Search != null)
             {

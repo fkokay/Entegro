@@ -49,7 +49,8 @@ namespace Entegro.Scheduling
                 DayOfWeekStartIndexZero = true,
                 ThrowExceptionOnParseError = true,
                 Verbose = false,
-                Use24HourTimeFormat = Thread.CurrentThread.CurrentUICulture.DateTimeFormat.AMDesignator.IsEmpty()
+                Use24HourTimeFormat = Thread.CurrentThread.CurrentUICulture.DateTimeFormat.AMDesignator.IsEmpty(),
+                Locale = "TR"
             };
 
             if (expression.HasValue())

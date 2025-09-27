@@ -3,6 +3,7 @@ using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.TaskDescriptor;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Scheduling;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace Entegro.Application.Services
             var items = await taskDescriptors.Items.SelectAwait(async x =>
             {
                 var model = _mapper.Map<TaskDescriptorDto>(x);
+                model.CronDescription = CronExpression.GetFriendlyDescription(x.CronExpression);
                 return model;
             }).AsyncToList();
 

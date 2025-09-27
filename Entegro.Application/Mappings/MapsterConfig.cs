@@ -32,6 +32,8 @@ using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
+using Entegro.Application.DTOs.TaskDescriptor;
+using Entegro.Application.DTOs.TaskExecutionInfo;
 using Entegro.Application.DTOs.Town;
 using Entegro.Application.DTOs.User;
 using Entegro.Domain.Entities.Catalog;
@@ -43,6 +45,7 @@ using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform.Identity;
 using Entegro.Domain.Entities.Platform.Messaging;
 using Entegro.Domain.Entities.Setttings;
+using Entegro.Scheduling;
 using Mapster;
 using Order = Entegro.Domain.Entities.Checkout.Order;
 
@@ -190,7 +193,13 @@ namespace Entegro.Application.Mappings
             config.NewConfig<CustomerAddressMapping, CreateCustomerAddressMappingDto>().TwoWays();
             config.NewConfig<CustomerAddressMapping, UpdateNotificationDto>().TwoWays();
 
+            // ---------------- TaskDescriptorMapping ----------------
 
+            config.NewConfig<TaskDescriptor, TaskDescriptorDto>().TwoWays();
+
+            // ---------------- TaskExecutionInfoMapping ----------------
+
+            config.NewConfig<TaskExecutionInfo, TaskExecutionInfoDto>().TwoWays();
         }
     }
 }

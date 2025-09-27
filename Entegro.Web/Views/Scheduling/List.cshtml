@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Zamanlanmış Görevler";
+}
+
+<div class="flex-grow-1 container-p-y container-fluid">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="mb-3">@ViewData["Title"]</h4>
+    </div>
+    <div class="card">
+        <div class="card-datatable table-responsive">
+            <table id="SchedulingTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Ad</th>
+                        <th>Unix Komutu</th>
+                        <th>Aktif</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/assets/js/entegro.scheduling.list.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            Entegro.scheduling.list.init();
+        });
+    </script>
+}

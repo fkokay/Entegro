@@ -16,6 +16,7 @@ namespace Entegro.Application.DTOs.TaskDescriptor
         public string Name { get; set; }
         public string Alias { get; set; }
         public string CronExpression { get; set; }
+        public string CronDescription { get; set; }
         public string Type { get; set; }
         public bool Enabled { get; set; }
         public TaskPriority Priority { get; set; } = TaskPriority.Normal;
