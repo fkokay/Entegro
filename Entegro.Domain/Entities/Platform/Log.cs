@@ -19,6 +19,7 @@ namespace Entegro.Domain.Entities.Platform
     [Table("Log")]
     public class Log :BaseEntity
     {
+        public string? Level { get; set; }
         public string? Message { get; set; }
         public string? MessageTemplate { get; set; }
         public DateTimeOffset TimeStamp { get; set; }

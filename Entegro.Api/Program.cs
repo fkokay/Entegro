@@ -57,6 +57,12 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .CreateLogger();
 
+Serilog.Debugging.SelfLog.Enable(msg =>
+{
+    Console.WriteLine("Serilog Error: " + msg);
+});
+
+
 builder.Host.UseSerilog();
 #endregion
 
