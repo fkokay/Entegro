@@ -164,6 +164,7 @@
                             <div data-i18n="Ülkeler">Ülkeler</div>
                         </a>
                     </li>
+                    <li class="divider"></li>
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="Erp" class="menu-link">
                             <div data-i18n="ERP Entegrasyonu">ERP Entegrasyonu</div>
@@ -187,6 +188,20 @@
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="EInvoice" class="menu-link">
                             <div data-i18n="E-Fatura Entegrasyonu">E-Fatura Entegrasyonu</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons ti ti-database"></i>
+                    <div data-i18n="Sistem">Sistem</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item">
+                        <a asp-controller="Settings" asp-action="GeneralCommon" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-clock"></i>
+                            <div data-i18n="Zamanlanmış Görevler">Zamanlanmış Görevler</div>
                         </a>
                     </li>
                 </ul>

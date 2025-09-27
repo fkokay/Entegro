@@ -16,8 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Serilog;
 using Serilog.Extensions.Logging;
-using Serilog.Sinks.Graylog;
-using Serilog.Sinks.Graylog.Core.Transport;
 using Serilog.Sinks.MSSqlServer;
 using System.Globalization;
 using System.Reflection;
