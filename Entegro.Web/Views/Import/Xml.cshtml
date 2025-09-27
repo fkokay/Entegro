@@ -1,6 +1,5 @@
 ﻿@model XmlImportProfileModel
 @{
-    var paths = ViewBag.XmlPaths as List<string>;
     int variantCount = ViewBag.VariantCount != null ? (int)ViewBag.VariantCount : 0;
     var variantPaths = ViewBag.VariantPaths as List<string> ?? new List<string>();
 }
@@ -58,15 +57,13 @@
                 </div>
             </div>
         </form>
+
+
     }
     else
     {
         <div class="container-fluid flex-grow-1 container-p-y">
-            <form asp-action="XmlMapping" asp-controller="Import" method="post" onsubmit="return validateForm();">
-
-                <input type="hidden" id="SelectedImagePaths" asp-for="SelectedImagePaths" />
-                <input type="hidden" id="SelectedAttributeSpecifications" asp-for="SelectedAttributeSpecifications" />
-                <input type="hidden" name="VariantCount" value="@variantCount" />
+            <form asp-action="Xml" asp-controller="Import" method="post" onsubmit="return validateForm();">
                 <input type="hidden" asp-for="ProfileName" />
                 <input type="hidden" asp-for="MediaFileUrl" />
                 <input type="hidden" asp-for="Id" />
@@ -109,36 +106,51 @@
                                 <div class="row">
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Name" class="form-label">Ürün Adı *</label>
-                                        <select asp-for="ProductImport.Name" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"  required></select>
+                                        <select asp-for="ProductImport.Name" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Brand" class="form-label">Marka</label>
-                                        <select asp-for="ProductImport.Brand" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.Brand" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Barcode" class="form-label">Barkod *</label>
-                                        <select asp-for="ProductImport.Barcode" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required></select>
+                                        <select asp-for="ProductImport.Barcode" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.ManufacturerPartNumber" class="form-label">Üretici Numarası</label>
-                                        <select asp-for="ProductImport.ManufacturerPartNumber" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.ManufacturerPartNumber" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Gtin" class="form-label">Gtin </label>
-                                        <select asp-for="ProductImport.Gtin" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.Gtin" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Height" class="form-label">Ağırlık </label>
                                         <select asp-for="ProductImport.Height" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Unit" class="form-label">Birim </label>
-                                        <select asp-for="ProductImport.Unit" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.Unit" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Description" class="form-label">Açıklama </label>
-                                        <select asp-for="ProductImport.Description" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.Description" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -152,11 +164,15 @@
                                 <div class="row">
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Code" class="form-label">Stok Kodu *</label>
-                                        <select asp-for="ProductImport.Code" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required></select>
+                                        <select asp-for="ProductImport.Code" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.StockQuantity" class="form-label">Stok Adedi *</label>
-                                        <select asp-for="ProductImport.StockQuantity" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required></select>
+                                        <select asp-for="ProductImport.StockQuantity" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -170,17 +186,16 @@
                                 <div class="row">
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Price" class="form-label">Mağaza Satış Fiyatı *</label>
-                                        <select asp-for="ProductImport.Price" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required></select>
-                                    </div>
-
-                                    <div class="col-md-6 mt-1">
-                                        <label for="piyasaFiyat" class="form-label">Piyasa Satış Fiyatı *</label>
-                                        <select id="piyasaFiyat" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required></select>
+                                        <select asp-for="ProductImport.Price" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
+                                            <option value=""></option>
+                                        </select>
                                     </div>
 
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Currency" class="form-label">Para Birimi</label>
-                                        <select asp-for="ProductImport.Currency" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.Currency" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
 
                                     <div class="col-md-6 mt-1">
@@ -194,7 +209,9 @@
 
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.VatRate" class="form-label">KDV Oranı</label>
-                                        <select asp-for="ProductImport.VatRate" asp-items="ViewBag.XmlPathsSelectList"  class="form-select select2"></select>
+                                        <select asp-for="ProductImport.VatRate" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
 
 
@@ -214,11 +231,7 @@
 
                                         <!-- Fiyat Artışı Uygulanmadan Devam Et -->
                                         <div class="form-check mt-2">
-                                            <input class="form-check-input"
-                                                   type="radio"
-                                                   asp-for="ApplyPriceAdjustment"
-                                                   value="devam"
-                                                   id="fiyatArtisiUygulama" checked />
+                                            <input class="form-check-input" type="radio" asp-for="ApplyPriceAdjustment" value="devam" id="fiyatArtisiUygulama" checked />
                                             <label class="form-check-label" for="fiyatArtisiUygulama">
                                                 Fiyat Artışı Uygulamadan Devam Et
                                             </label>
@@ -259,7 +272,9 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label asp-for="ProductImport.Images" class="form-label">Ürün Görselleri (birden fazla seçilebilir)</label>
-                                        <select asp-for="ProductImport.Images" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" multiple="multiple"></select>
+                                        <select asp-for="ProductImport.Images" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" multiple="multiple">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -271,7 +286,9 @@
                                 <div class="row">
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.Categories" class="form-label">Kategoriler</label>
-                                        <select asp-for="ProductImport.Categories" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.Categories" asp-items="ViewBag.XmlPathsSelectList"  class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -302,6 +319,7 @@
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="AttributeStockCode" class="form-label">Varyant Ürün Kodu</label>
                                         <select asp-for="AttributeStockCode" class="form-select select2">
+                                            <option value=""></option>
                                             @foreach (var item in variantPaths)
                                             {
                                                 <option value="@item">@item</option>
@@ -311,6 +329,7 @@
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="AttributeManufacturerPartNumber" class="form-label">Varyant Üretici Numarası</label>
                                         <select asp-for="AttributeManufacturerPartNumber" class="form-select select2">
+                                            <option value=""></option>
                                             @foreach (var item in variantPaths)
                                             {
                                                 <option value="@item">@item</option>
@@ -320,7 +339,7 @@
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="AttributeGtin" class="form-label">Varyant Gtin </label>
                                         <select asp-for="AttributeGtin" class="form-select select2">
-                                            <option value="">Seçiniz</option>
+                                            <option value=""></option>
                                             @foreach (var item in variantPaths)
                                             {
                                                 <option value="@item">@item</option>
@@ -330,7 +349,7 @@
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="AttributePrice" class="form-label">Varyant Fiyat </label>
                                         <select asp-for="AttributePrice" class="form-select select2" id="variantPrice">
-                                            <option value="">Seçiniz</option>
+                                            <option value=""></option>
                                             @foreach (var item in variantPaths)
                                             {
                                                 <option value="@item">@item</option>
@@ -340,7 +359,7 @@
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="AttributeStockQuantity" class="form-label">Varyant Stok Miktarı </label>
                                         <select asp-for="AttributeStockQuantity" class="form-select select2" id="variantStockQuantity">
-                                            <option value="">Seçiniz</option>
+                                            <option value=""></option>
                                             @foreach (var item in variantPaths)
                                             {
                                                 <option value="@item">@item</option>
@@ -350,6 +369,7 @@
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="AttributeSpecifications" class="form-label">Varyant Stok Özellikler (birden fazla seçilebilir)</label>
                                         <select asp-for="AttributeSpecifications" class="form-select select2" multiple="multiple">
+                                            <option value=""></option>
                                             @foreach (var item in variantPaths)
                                             {
                                                 <option value="@item">@item</option>
@@ -366,15 +386,21 @@
                                 <div class="row">
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.MetaTitle" class="form-label">Meta Başlık</label>
-                                        <select asp-for="ProductImport.MetaTitle" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.MetaTitle" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.MetaKeywords" class="form-label">Anahtar Kelimeler</label>
-                                        <select asp-for="ProductImport.MetaKeywords" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.MetaKeywords" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                     <div class="col-md-6 mt-1">
                                         <label asp-for="ProductImport.MetaDescription" class="form-label">Meta Açıklama</label>
-                                        <select asp-for="ProductImport.MetaDescription" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2"></select>
+                                        <select asp-for="ProductImport.MetaDescription" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
+                                            <option value=""></option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -403,197 +429,11 @@
 </div>
 
 
+
 @section Scripts {
-
-    @*     xml kaydederken *@
+    <script src="/assets/js/entegro.import.js"></script>
     <script>
-        document.getElementById("importFormXml").addEventListener("submit", function (e) {
-            const profileNameInput = document.querySelector('input[name="ProfileName"]');
-            const urlInput = document.querySelector('input[name="MediaFileUrl"]');
-
-
-            if (!profileNameInput || !profileNameInput.value.trim()) {
-                e.preventDefault();
-                alert("Lütfen profil adı giriniz.");
-                if (profileNameInput) {
-                    profileNameInput.classList.add("is-invalid");
-                    profileNameInput.focus();
-                }
-                return;
-            } else {
-                profileNameInput.classList.remove("is-invalid");
-            }
-
-
-            const urlValue = urlInput.value.trim();
-            const urlPattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@@!$&'()*+,;=]*)?$/;
-
-            if (!urlValue) {
-                e.preventDefault();
-                alert("Lütfen bir URL giriniz.");
-                urlInput.classList.add("is-invalid");
-                urlInput.focus();
-                return;
-            } else if (!urlPattern.test(urlValue)) {
-                e.preventDefault();
-                alert("Lütfen geçerli bir URL giriniz (örn: https://example.com).");
-                urlInput.classList.add("is-invalid");
-                urlInput.focus();
-                return;
-            } else {
-                urlInput.classList.remove("is-invalid");
-            }
-        });
-    </script>
-
-
-    @* xml kaydettikten sonra *@
-
-    <script>
-          $(document).ready(function () {
-              $('.select2').select2({
-                  language:"tr",
-                  placeholder: "Bir seçenek seçin",
-                  allowClear: true,
-                  width: '100%'
-              });
-          });
-
-            function validateForm() {
-            // Genel Bilgiler
-            const barcode = $('[name="ProductImport.Barcode"]').val();
-            const productName = $('[name="ProductImport.Name"]').val();
-
-            if (!barcode) {
-                alert("Lütfen Genel Bilgiler bölümündeki Barkod alanını doldurun.");
-                return false;
-            }
-
-            if (!productName) {
-                alert("Lütfen Genel Bilgiler bölümündeki Ürün Adı alanını doldurun.");
-                return false;
-            }
-
-            // Stok Bilgileri
-            const stockCode = $('[name="ProductImport.Code"]').val();
-            const stockQuantity = $('[name="ProductImport.StockQuantity"]').val();
-
-            if (!stockCode || !stockQuantity) {
-                alert("Lütfen Stok Bilgileri bölümündeki Stok Kodu ve Stok Adedi alanlarını doldurun.");
-                return false;
-            }
-
-            // Fiyat Bilgileri
-            const price = $('[name="ProductImport.Price"]').val();
-            const marketPrice = $('#piyasaFiyat').val();
-
-            if (!price) {
-                alert("Lütfen Fiyat Bilgileri bölümündeki Mağaza Satış Fiyatı alanını doldurun.");
-                return false;
-            }
-
-            if (!marketPrice) {
-                alert("Lütfen Fiyat Bilgileri bölümündeki Piyasa Satış Fiyatı alanını doldurun.");
-                return false;
-            }
-
-            // Fiyat Artışı Kontrolü
-            const applyPriceAdjustment = $('[name="ApplyPriceAdjustment"]:checked').val();
-            if (applyPriceAdjustment === "uygula") {
-                const priceAdjustmentType = $('[name="PriceAdjustmentType"]').val();
-                const priceAdjustmentAmount = $('[name="PriceAdjustmentAmount"]').val();
-
-                if (!priceAdjustmentType || !priceAdjustmentAmount) {
-                    alert("Lütfen Fiyat Artışı işlem türü ve işlem tutarı alanlarını doldurun.");
-                    return false;
-                }
-            }
-
-            // Varyantlı Ürün Kontrolü
-            const isVariantProduct = $('input[name="IsVariantProduct"]:checked').val();
-            if (isVariantProduct === "yes") {
-                const variantPrice = $('[name="AttributePrice"]').val();
-                const variantStockQty = $('[name="AttributeStockQuantity"]').val();
-
-                if (!variantPrice || !variantStockQty) {
-                    alert("Lütfen Varyant Fiyat ve Varyant Stok Miktarı alanlarını doldurun.");
-                    return false;
-                }
-            }
-
-            // Ürün Görselleri
-            const selectedImages = $('[name="ProductImport.Images"]').val();
-            $('[name="SelectedImagePaths"]').val(selectedImages && selectedImages.length > 0 ? selectedImages.join(',') : '');
-
-            // Varyant Özellikleri (birden fazla seçilebilir)
-            const selectedAttributeSpecifications = $('[name="AttributeSpecifications"]').val();
-            $('[name="SelectedAttributeSpecifications"]').val(selectedAttributeSpecifications && selectedAttributeSpecifications.length > 0 ? selectedAttributeSpecifications.join(',') : '');
-
-            return true;
-        }
-
-
-    </script>
-    <script>
-         document.addEventListener("DOMContentLoaded", function () {
-            const islemTuruAlanlari = document.getElementById("islemTuruAlanlari");
-            const islemTuru = document.querySelector('[name="PriceAdjustmentType"]');
-            const islemTutari = document.querySelector('[name="PriceAdjustmentAmount"]');
-
-            const fiyatArtisiRadioButtons = document.querySelectorAll('input[name="ApplyPriceAdjustment"]');
-
-            function toggleIslemTuru() {
-                const selectedValue = document.querySelector('input[name="ApplyPriceAdjustment"]:checked')?.value;
-
-                if (selectedValue === "uygula") {
-                    islemTuruAlanlari.style.display = "flex";
-                    islemTuru?.setAttribute("required", "required");
-                    islemTutari?.setAttribute("required", "required");
-                } else {
-                    islemTuruAlanlari.style.display = "none";
-                    islemTuru?.removeAttribute("required");
-                    islemTutari?.removeAttribute("required");
-                }
-            }
-
-            toggleIslemTuru();
-
-            fiyatArtisiRadioButtons.forEach(radio => {
-                radio.addEventListener("change", toggleIslemTuru);
-            });
-        });
-
-
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const variantFieldsRow = document.getElementById("variantFieldsRow");
-            const variantRadios = document.querySelectorAll('input[name="IsVariantProduct"]');
-            const attrStockQuantity = document.getElementById("variantStockQuantity");
-            const attrPrice = document.getElementById("variantPrice");
-
-            function toggleVariantFields() {
-                const selected = document.querySelector('input[name="IsVariantProduct"]:checked').value;
-
-                if (selected === "yes") {
-                    variantFieldsRow.style.display = "flex";
-                    attrStockQuantity?.setAttribute("required", "required");
-                    attrPrice?.setAttribute("required", "required");
-                } else {
-                    variantFieldsRow.style.display = "none";
-                    attrStockQuantity?.removeAttribute("required");
-                    attrPrice?.removeAttribute("required");
-                }
-            }
-
-            // Sayfa yüklendiğinde başlat
-            toggleVariantFields();
-
-            variantRadios.forEach(radio => {
-                radio.addEventListener("change", toggleVariantFields);
-            });
-        });
-
+        Entegro.import.validateXmlProductForm();
+        Entegro.import.initSelect2();
     </script>
 }
-
