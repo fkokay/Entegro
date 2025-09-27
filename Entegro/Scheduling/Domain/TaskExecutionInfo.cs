@@ -58,16 +58,10 @@ namespace Entegro.Scheduling
         /// </summary>
         public string ProgressMessage { get; set; }
 
-
-        private TaskDescriptor _task;
         /// <summary>
         /// Gets or sets the task descriptor associated with this execution info.
         /// </summary>
-        public TaskDescriptor Task
-        {
-            get => _task ?? LazyLoader.Load(this, ref _task);
-            set => _task = value;
-        }
+        public virtual TaskDescriptor Task { get; set; }
 
         object ICloneable.Clone()
             => Clone();

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entegro.Domain.Entities.Platform
+namespace Entegro.Domain.Entities.Platform.Logging
 {
     public class LogMap : IEntityTypeConfiguration<Log>
     {

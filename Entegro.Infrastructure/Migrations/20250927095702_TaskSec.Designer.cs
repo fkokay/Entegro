@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250927095702_TaskSec")]
+    partial class TaskSec
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1567,64 +1570,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.Platform.Logging.ActivityLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActivityLogTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActivityLogTypeId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex(new[] { "CreatedOnUtc" }, "IX_ActivityLog_CreatedOnUtc");
-
-                    b.ToTable("ActivityLog", (string)null);
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Platform.Logging.ActivityLogType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("SystemKeyword")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ActivityLogType");
-                });
-
             modelBuilder.Entity("Entegro.Domain.Entities.Platform.Logging.Log", b =>
                 {
                     b.Property<int>("Id")
@@ -2251,25 +2196,6 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("IntegrationSystem");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Platform.Logging.ActivityLog", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.Platform.Logging.ActivityLogType", "ActivityLogType")
-                        .WithMany()
-                        .HasForeignKey("ActivityLogTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Platform.Identity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ActivityLogType");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Entegro.Scheduling.TaskExecutionInfo", b =>

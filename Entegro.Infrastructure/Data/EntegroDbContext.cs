@@ -6,10 +6,12 @@ using Entegro.Domain.Entities.Common;
 using Entegro.Domain.Entities.Content;
 using Entegro.Domain.Entities.Import;
 using Entegro.Domain.Entities.Integration;
-using Entegro.Domain.Entities.Platform;
 using Entegro.Domain.Entities.Platform.Identity;
+using Entegro.Domain.Entities.Platform.Logging;
 using Entegro.Domain.Entities.Platform.Messaging;
+using Entegro.Domain.Entities.Platform.Scheduling;
 using Entegro.Domain.Entities.Setttings;
+using Entegro.Scheduling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Entegro.Infrastructure.Data
@@ -70,7 +72,10 @@ namespace Entegro.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ImportProfileMap());
             modelBuilder.ApplyConfiguration(new SettingMap());
             modelBuilder.ApplyConfiguration(new CustomerAddressMappingMap());
-
+            modelBuilder.ApplyConfiguration(new TaskDescriptorMap());
+            modelBuilder.ApplyConfiguration(new TaskExecutionInfoMap());
+            modelBuilder.ApplyConfiguration(new ActivityLogMap());
+            modelBuilder.ApplyConfiguration(new TaskExecutionInfoMap());
         }
 
         public DbSet<User> Users { get; set; }
@@ -113,5 +118,9 @@ namespace Entegro.Infrastructure.Data
         public DbSet<ImportProfile> ImportProfiles { get; set; }
         public DbSet<Setting> Settings { get; set; }
         public DbSet<CustomerAddressMapping> CustomerAddressMappings { get; set; }
+        public DbSet<TaskDescriptor> TaskDescriptors { get; set; }
+        public DbSet<TaskExecutionInfo> TaskExecutionInfos { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
+        public DbSet<ActivityLogType> ActivityLogTypes { get; set; }
     }
 }

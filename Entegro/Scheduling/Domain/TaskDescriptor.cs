@@ -84,18 +84,12 @@ namespace Entegro.Scheduling
         /// <summary>
         /// Gets info about the last (or current) execution.
         /// </summary>
-        public TaskExecutionInfo LastExecution { get; set; }
-
-        private ICollection<TaskExecutionInfo> _executionHistory;
+        public virtual TaskExecutionInfo LastExecution { get; set; }
         /// <summary>
         /// Gets infos about all past executions.
         /// </summary>
         [IgnoreDataMember]
-        public ICollection<TaskExecutionInfo> ExecutionHistory
-        {
-            get => _executionHistory ?? LazyLoader.Load(this, ref _executionHistory) ?? (_executionHistory ??= new HashSet<TaskExecutionInfo>());
-            protected set => _executionHistory = value;
-        }
+        public virtual ICollection<TaskExecutionInfo> ExecutionHistory { get; set; }
 
         object ICloneable.Clone()
             => Clone();

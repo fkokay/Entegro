@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250927100246_ActivityEdit")]
+    partial class ActivityEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1596,7 +1599,7 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasIndex(new[] { "CreatedOnUtc" }, "IX_ActivityLog_CreatedOnUtc");
 
-                    b.ToTable("ActivityLog", (string)null);
+                    b.ToTable("ActivityLogs");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Platform.Logging.ActivityLogType", b =>
@@ -1622,7 +1625,7 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityLogType");
+                    b.ToTable("ActivityLogTypes");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Platform.Logging.Log", b =>
