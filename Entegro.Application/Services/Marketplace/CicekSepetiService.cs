@@ -9,7 +9,6 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Application.Notifications;
 using Entegro.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -27,12 +26,20 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductService _productService;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
-        public CicekSepetiService(IHttpClientFactory httpClientFactory, IProductService productService, IProductIntegrationService productIntegrationService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
+        private readonly INotificationService _notificationService;
+        public CicekSepetiService(
+            IHttpClientFactory httpClientFactory, 
+            IProductService productService, 
+            IProductIntegrationService productIntegrationService, 
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            INotificationService notificationService
+            )
         {
             _httpClientFactory = httpClientFactory;
             _productService = productService;
             _productIntegrationService = productIntegrationService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _notificationService = notificationService;
         }
 
         private HttpClient CreateHttpClient(CicekSepetiApiContext context)
@@ -103,7 +110,8 @@ namespace Entegro.Application.Services.Marketplace
 
                     await UpdatePriceAndStockAsync(apiContext, request);
 
-                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"ÇiçekSepeti {product.Name} stok ve fiyat güncellendi");
+
+                    await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"ÇiçekSepeti {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

@@ -6,7 +6,6 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Commerce;
-using Entegro.Application.Notifications;
 using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -24,16 +23,19 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         private readonly SmartstoreClient _smartstoreClient;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductService _productService;
+        private readonly INotificationService _notificationService;
         private readonly ILogger<SmartstoreProductWriter> _logger;
         public SmartstoreProductWriter(
             SmartstoreClient smartstoreClient,
             IProductIntegrationService productIntegrationService,
             IProductService productService,
+            INotificationService notificationService,
             ILogger<SmartstoreProductWriter> logger)
         {
             _smartstoreClient = smartstoreClient;
             _productIntegrationService = productIntegrationService;
             _productService = productService;
+            _notificationService = notificationService;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -73,7 +75,8 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                     await _smartstoreClient.UpsertProductAsync(context,request);
 
-                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
+
+                    await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

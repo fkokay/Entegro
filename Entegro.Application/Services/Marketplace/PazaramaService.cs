@@ -8,7 +8,6 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Application.Notifications;
 using Entegro.Domain.Enums;
 using Entegro.Imaging.Barcodes;
 using System;
@@ -28,12 +27,20 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductService _productService;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
-        public PazaramaService(IHttpClientFactory httpClientFactory, IProductService productService, IProductIntegrationService productIntegrationService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
+        private readonly INotificationService _notificationService;
+        public PazaramaService(
+            IHttpClientFactory httpClientFactory, 
+            IProductService productService, 
+            IProductIntegrationService productIntegrationService, 
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            INotificationService notificationService
+            )
         {
             _httpClientFactory = httpClientFactory;
             _productService = productService;
             _productIntegrationService = productIntegrationService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _notificationService = notificationService;
         }
 
         private HttpClient CreateHttpClient(PazaramaApiContext context)
@@ -125,7 +132,7 @@ namespace Entegro.Application.Services.Marketplace
 
                     await UpdateStockAsync(apiContext, stockRequest);
 
-                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"Pazarama {product.Name} stok ve fiyat güncellendi");
+                    await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Pazarama {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

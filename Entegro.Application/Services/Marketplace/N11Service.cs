@@ -8,7 +8,6 @@ using Entegro.Application.Events;
 using Entegro.Application.Interfaces;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Application.Notifications;
 using Entegro.Domain.Enums;
 using Mapster;
 using System;
@@ -28,12 +27,19 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductService _productService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
-        public N11Service(IHttpClientFactory httpClientFactory,IProductIntegrationService productIntegrationService, IProductService productService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
+        private readonly INotificationService _notificationService;
+        public N11Service(
+            IHttpClientFactory httpClientFactory,
+            IProductIntegrationService productIntegrationService, 
+            IProductService productService, 
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            INotificationService notificationService)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
             _productService = productService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _notificationService = notificationService;
         }
 
         private HttpClient CreateHttpClient(N11ApiContext context)
@@ -110,7 +116,7 @@ namespace Entegro.Application.Services.Marketplace
 
                     await UpdatePriceAndStockAsync(apiContext, request);
 
-                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"N11 {product.Name} stok ve fiyat güncellendi");
+                    await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"N11 {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

@@ -3,17 +3,21 @@ using Entegro.Application.DTOs.Notification;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Common;
+using Entegro.Domain.Enums;
 using MapsterMapper;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Entegro.Application.Services
 {
     public class NotificationService : INotificationService
     {
         private readonly INotificationRepository _notificationRepository;
+        private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
-        public NotificationService(INotificationRepository notificationRepository, IMapper mapper)
+        public NotificationService(INotificationRepository notificationRepository,ISettingService settingService, IMapper mapper)
         {
             _notificationRepository = notificationRepository ?? throw new ArgumentNullException(nameof(notificationRepository));
+            _settingService = settingService;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -153,6 +157,21 @@ namespace Entegro.Application.Services
                 PageNumber = notifications.PageNumber,
                 PageSize = notifications.PageSize
             };
+        }
+
+        public async Task SendNotification(NotificationType notificationType, string title, string message)
+        {
+            var systemUrl = _settingService.GetByKeyAsync("SystemUrl");
+
+            var connection = new HubConnectionBuilder()
+              .WithUrl(systemUrl+"notificationHub")
+              .Build();
+
+            await connection.StartAsync();
+
+            await connection.InvokeAsync("SendNotification", notificationType, title, message);
+
+            await connection.StopAsync();
         }
 
         public async Task<NotificationDto> UpdateAsync(UpdateNotificationDto model)

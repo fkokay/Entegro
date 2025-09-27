@@ -1,5 +1,7 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Notification;
+using Entegro.Domain.Enums;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Entegro.Application.Interfaces.Services
 {
@@ -17,5 +19,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<NotificationDto> AddAsync(CreateNotificationDto model);
         Task<NotificationDto> UpdateAsync(UpdateNotificationDto model);
         Task DeleteAsync(int id);
+       Task SendNotification(NotificationType notificationType, string title, string message);
+        
     }
 }

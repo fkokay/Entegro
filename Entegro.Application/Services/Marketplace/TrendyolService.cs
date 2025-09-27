@@ -10,7 +10,6 @@ using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
-using Entegro.Application.Notifications;
 using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
@@ -31,6 +30,7 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductService _productService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        private readonly INotificationService _notificationService;
         private readonly ILogger<TrendyolService> _logger;
 
         public TrendyolService(
@@ -38,12 +38,14 @@ namespace Entegro.Application.Services.Marketplace
             IProductIntegrationService productIntegrationService, 
             IProductService productService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            INotificationService notificationService,
             ILogger<TrendyolService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
             _productService = productService;
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _notificationService = notificationService;
             _logger = logger;
         }
 
@@ -122,7 +124,7 @@ namespace Entegro.Application.Services.Marketplace
                     await UpdatePriceAndStockAsync(apiContext,request);
 
 
-                    await EntegroNotification.SendNotification(NotificationType.Info, "Bildirim", $"Trendyol {product.Name} stok ve fiyat güncellendi");
+                    await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Trendyol {product.Name} stok ve fiyat güncellendi");
 
                 }
             }
