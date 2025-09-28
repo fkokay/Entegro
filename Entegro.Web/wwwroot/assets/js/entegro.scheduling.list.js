@@ -27,6 +27,8 @@ Entegro.scheduling.list = (function ($) {
                 { data: 'Id', visible: false },
                 { data: 'Name' },
                 { data: 'CronExpression' },
+                { data: 'Id' },
+                { data: 'NextRun' },
                 { data: 'Enabled' },
                 { data: 'Id' }
             ],
@@ -39,6 +41,56 @@ Entegro.scheduling.list = (function ($) {
                                           <h6 class="mb-0">${row.CronExpression}</h6>
                                           <small class="text-truncate">${row.CronDescription || ""}</small>
                                       </div>`;
+                    }
+                }, 
+                {
+                    targets: 3,
+                    className: "text-center",
+                    render: (data, type, row) => {
+                        if (row.LastExecution == null) {
+                            return `<div class="d-flex flex-column">
+                               <h6 class="mb-0">Asla</h6>
+                            </div>`;
+                        }
+                        return `
+                            <div class="d-flex flex-column">
+                                <h6 class="mb-0">
+                                    ${moment(row.LastExecution.StartedOn).format("DD.MM.YYYY HH:mm")}
+                                </h6>
+                                <small class="text-truncate">
+                                    ${timeAgo(row.LastExecution.FinishedOn) || ""}
+                                </small>
+                                <small class="text-truncate">
+                                    <b>Süre:</b> ${formatDuration(row.LastExecution.StartedOn, row.LastExecution.FinishedOn)}
+                                </small>
+                                ${row.LastExecution.Error
+                                ? `<div class="text-danger mt-2">
+                                               <strong class="font-weight-medium">Hata:</strong> 
+                                               <span>${row.LastExecution.Error}</span>
+                                           </div>`
+                                : ""
+                            }
+                            </div>`;
+                    }
+                },
+                {
+                    targets: 4,
+                    className: "text-center",
+                    render: (data, type, row) => {
+                        if (row.NextRun == null) {
+                            return `<div class="d-flex flex-column">
+                               <h6 class="mb-0">Asla</h6>
+                            </div>`;
+                        }
+                        return `
+                            <div class="d-flex flex-column">
+                                <h6 class="mb-0">
+                                    ${moment(row.NextRun).format("DD.MM.YYYY HH:mm")}
+                                </h6>
+                                <small class="text-truncate">
+                                    ${timeAgoOrAfter(row.NextRun) || ""}
+                                </small>
+                            </div>`;
                     }
                 },
                 {
@@ -115,6 +167,70 @@ Entegro.scheduling.list = (function ($) {
             });
         }, 100);
     }
+
+    function timeAgo(date) {
+        const now = new Date();
+        const ts = (now - new Date(date)) / 1000; // saniye farkı
+
+        if (ts < 60) {
+            return `${Math.floor(ts)} saniye önce`;
+        }
+        if (ts < 3600) {
+            return `${Math.floor(ts / 60)} dakika önce`;
+        }
+        if (ts < 86400) {
+            return `${Math.floor(ts / 3600)} saat önce`;
+        }
+        if (ts < 2592000) {
+            return `${Math.floor(ts / 86400)} gün önce`;
+        }
+        if (ts < 31536000) {
+            return `${Math.floor(ts / 2592000)} ay önce`;
+        }
+        return `${Math.floor(ts / 31536000)} yıl önce`;
+    }
+
+    function timeAgoOrAfter(date) {
+        const now = new Date();
+        const target = new Date(date);
+        const diffSec = Math.floor((target - now) / 1000);
+
+        const absSec = Math.abs(diffSec);
+
+        if (absSec < 60) {
+            return diffSec >= 0 ? `${absSec} saniye sonra` : `${absSec} saniye önce`;
+        }
+        if (absSec < 3600) {
+            const min = Math.floor(absSec / 60);
+            return diffSec >= 0 ? `${min} dakika sonra` : `${min} dakika önce`;
+        }
+        if (absSec < 86400) {
+            const hrs = Math.floor(absSec / 3600);
+            return diffSec >= 0 ? `${hrs} saat sonra` : `${hrs} saat önce`;
+        }
+        if (absSec < 2592000) {
+            const days = Math.floor(absSec / 86400);
+            return diffSec >= 0 ? `${days} gün sonra` : `${days} gün önce`;
+        }
+        if (absSec < 31536000) {
+            const months = Math.floor(absSec / 2592000);
+            return diffSec >= 0 ? `${months} ay sonra` : `${months} ay önce`;
+        }
+        const years = Math.floor(absSec / 31536000);
+        return diffSec >= 0 ? `${years} yıl sonra` : `${years} yıl önce`;
+    }
+
+    function formatDuration(start, end) {
+        const diffMs = new Date(end) - new Date(start);
+
+        let ms = diffMs % 1000;
+        let sec = Math.floor((diffMs / 1000) % 60);
+        let min = Math.floor((diffMs / (1000 * 60)) % 60);
+        let hrs = Math.floor(diffMs / (1000 * 60 * 60));
+
+        return `${hrs}:${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")},${ms}`;
+    }
+
 
     return {
         init: initList

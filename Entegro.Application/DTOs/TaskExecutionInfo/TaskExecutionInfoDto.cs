@@ -13,12 +13,11 @@ namespace Entegro.Application.DTOs.TaskExecutionInfo
         public int TaskDescriptorId { get; set; }
         public bool IsRunning { get; set; }
         public string MachineName { get; set; }
-        public DateTime StartedOnUtc { get; set; }
-        public DateTime? FinishedOnUtc { get; set; }
-        public DateTime? SucceededOnUtc { get; set; }
+        public DateTime StartedOn { get; set; }
+        public DateTime? FinishedOn { get; set; }
+        public DateTime? SucceededOn { get; set; }
         public string Error { get; set; }
         public int? ProgressPercent { get; set; }
         public string ProgressMessage { get; set; }
-        public TaskDescriptorDto Task { get; set; }
     }
 }

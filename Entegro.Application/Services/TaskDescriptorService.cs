@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.TaskDescriptor;
+using Entegro.Application.DTOs.TaskExecutionInfo;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Scheduling;
@@ -17,7 +18,7 @@ namespace Entegro.Application.Services
     {
         private readonly ITaskDescriptorRepository _taskDescriptorRepository;
         private readonly IMapper _mapper;
-        public TaskDescriptorService(ITaskDescriptorRepository taskDescriptorRepository,IMapper mapper)
+        public TaskDescriptorService(ITaskDescriptorRepository taskDescriptorRepository, IMapper mapper)
         {
             _taskDescriptorRepository = taskDescriptorRepository;
             _mapper = mapper;
@@ -31,6 +32,15 @@ namespace Entegro.Application.Services
             {
                 var model = _mapper.Map<TaskDescriptorDto>(x);
                 model.CronDescription = CronExpression.GetFriendlyDescription(x.CronExpression);
+                model.NextRun = x.NextRunUtc.ToLocalTime();
+                model.LastExecution = x.ExecutionHistory.Any() ? _mapper.Map<TaskExecutionInfoDto>(x.ExecutionHistory.Last()) : null;
+                if (model.LastExecution != null)
+                {
+                    model.LastExecution.StartedOn = x.ExecutionHistory.Last().StartedOnUtc.ToLocalTime();
+                    model.LastExecution.FinishedOn = x.ExecutionHistory.Last().FinishedOnUtc.ToLocalTime();
+                    model.LastExecution.SucceededOn = x.ExecutionHistory.Last().SucceededOnUtc.ToLocalTime();
+                }
+
                 return model;
             }).AsyncToList();
 
