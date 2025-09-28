@@ -35,7 +35,7 @@ namespace Entegro.Api.Services
             context.MergedJobDataMap["ExecutionInfoId"] = execInfo.Id;
         }
 
-        public async Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException, CancellationToken cancellationToken = default)
+        public async Task JobWasExecuted(IJobExecutionContext context, JobExecutionException? jobException, CancellationToken cancellationToken = default)
         {
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<EntegroDbContext>();

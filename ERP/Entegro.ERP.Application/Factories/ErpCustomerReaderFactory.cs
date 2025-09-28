@@ -17,9 +17,9 @@ namespace Entegro.ERP.Application.Factories
         {
             return erpType.ToLower() switch
             {
-                "logo" => new LogoCustomerReader(connectionString),
-                "netsis" => new NetsisCustomerReader(connectionString),
-                "opak" => new OpakCustomerReader(connectionString),
+                "Logo" => new LogoCustomerReader(connectionString),
+                "Netsis" => new NetsisCustomerReader(connectionString),
+                "Opak" => new OpakCustomerReader(connectionString),
                 _ => throw new ArgumentException($"ERP type not supported: {erpType}")
             };
         }

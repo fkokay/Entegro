@@ -41,7 +41,7 @@ namespace Entegro.Application.Services.Erp
 
             while (moreData)
             {
-                var url = $"{context.ErpType}/products?pageSize={pageSize}&page={page}";
+                var url = $"api/{context.ErpType}/products?pageSize={pageSize}&page={page}";
                 var response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 

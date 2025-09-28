@@ -115,15 +115,9 @@ Entegro.scheduling.list = (function ($) {
                             <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
-                            <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                            <button type="button" onclick="Entegro.scheduling.list.runJob('${row.Type}',${row.Id})" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Şimdi Çalıştır">
+                                <i class="icon-base ti ti-player-play icon-22px"></i>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end m-0">
-                                <a href="Details?id=${row.Id}" class="dropdown-item">Detaylar</a>
-                                <a href="Archive?id=${row.Id}" class="dropdown-item">Arşiv</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Marka Sil</a>
-                            </div>
                         </div>`
                 }
             ],
@@ -231,9 +225,35 @@ Entegro.scheduling.list = (function ($) {
         return `${hrs}:${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")},${ms}`;
     }
 
+    function runJob(type, taskId) {
+        if (!type) {
+            toastr.error("Geçersiz job tipi.");
+            return;
+        }
+
+        $.ajax({
+            url: '/Scheduling/Run',
+            type: 'POST',
+            data: { type: type, taskId: taskId },
+            success: function (res) {
+                if (res.success) {
+                    toastr.success(type + " job başarıyla çalıştırıldı.");
+                    $('#SchedulingTable').DataTable().ajax.reload(null, false);
+                } else {
+                    toastr.error(res.error || "İşlem başarısız.");
+                }
+            },
+            error: function (xhr) {
+                const msg = xhr.responseText || "Bilinmeyen hata.";
+                toastr.error("Hata: " + msg);
+            }
+        });
+    }
+
 
     return {
-        init: initList
+        init: initList,
+        runJob: runJob
     };
 
 })(jQuery);

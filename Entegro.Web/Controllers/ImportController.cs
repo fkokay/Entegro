@@ -579,6 +579,7 @@ namespace Entegro.Web.Controllers
             }
         }
         #endregion
+
         [HttpPost]
         public async Task<IActionResult> ImportProfileList([FromBody] GridCommand gridCommand)
         {

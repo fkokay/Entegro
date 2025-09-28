@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <Folder Include="App_Data\Media\Storage\document\" />
+    <Folder Include="Models\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

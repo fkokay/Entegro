@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Quartz.Impl;
 using System;
+using System.Reflection;
 using CronExpression = Entegro.Scheduling.CronExpression;
 
 namespace Entegro.Api.Services
@@ -54,10 +55,18 @@ namespace Entegro.Api.Services
                         if (await _scheduler.CheckExists(jobKey, stoppingToken))
                             continue;
 
-                        var type = Type.GetType(task.Type);
-                        if (type == null || !typeof(IJob).IsAssignableFrom(type))
+                        var executingJobs = await _scheduler.GetCurrentlyExecutingJobs();
+                        if (executingJobs.Any(j => j.JobDetail.Key.Equals(jobKey)))
                         {
-                            _logger.LogWarning("Task {Name} için type bulunamadı veya IJob değil: {Type}", task.Name, task.Type);
+                            _logger.LogError("{Type} job zaten çalışıyor.", task.Type);
+                            continue;
+                        }
+
+                        var type = Assembly.GetExecutingAssembly().GetTypes()
+                        .FirstOrDefault(t => (t.Name == task.Type || t.FullName == task.Type) && typeof(IJob).IsAssignableFrom(t));
+                        if (type == null)
+                        {
+                            _logger.LogError("Task {Name} için type bulunamadı veya IJob değil: {Type}", task.Name, task.Type);
                             continue;
                         }
 

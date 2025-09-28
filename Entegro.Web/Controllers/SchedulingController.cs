@@ -8,9 +8,13 @@ namespace Entegro.Web.Controllers
     public class SchedulingController : Controller
     {
         private readonly ITaskDescriptorService _taskDescriptorService;
-        public SchedulingController(ITaskDescriptorService taskDescriptorService) 
+        private readonly ISettingService _settingService;
+        private readonly HttpClient _client;
+        public SchedulingController(ITaskDescriptorService taskDescriptorService, ISettingService settingService, HttpClient client)
         {
             _taskDescriptorService = taskDescriptorService;
+            _settingService = settingService;
+            _client = client;
         }
 
         public IActionResult Index()
@@ -21,6 +25,32 @@ namespace Entegro.Web.Controllers
         public IActionResult List()
         {
             return View();
+        }
+
+        public async Task<IActionResult> RunAsync(string type,int taskId)
+        {
+
+            if (string.IsNullOrWhiteSpace(type))
+                return Json(new { success = false, error = "Type parametresi boş olamaz." });
+
+            var setting = await _settingService.GetByKeyAsync("SystemApiUrl");
+            if (setting == null || string.IsNullOrEmpty(setting.Value))
+            {
+                throw new Exception("SystemApiUrl ayarı bulunamadı");
+            }
+
+            _client.BaseAddress = new Uri(setting.Value);
+
+            // Type parametresini query string ile gönderiyoruz
+            var response = await _client.PostAsync($"api/job/run?type={type}&taskId={taskId}", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, error });
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            return Json(new { success = true, data = result });
         }
 
         [HttpPost]
