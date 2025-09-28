@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities.Common
 {
-    [Table("Notifications")]
+    [Table("Notification")]
     public class Notification : BaseEntity
     {
         public NotificationType Type { get; set; }

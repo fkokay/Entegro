@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20250927233422_EditNotificationName")]
+    partial class EditNotificationName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1790,6 +1793,7 @@ namespace Entegro.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Error")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("FinishedOnUtc")
@@ -1804,6 +1808,7 @@ namespace Entegro.Infrastructure.Migrations
                         .HasColumnType("nvarchar(400)");
 
                     b.Property<string>("ProgressMessage")
+                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 

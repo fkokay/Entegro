@@ -46,7 +46,7 @@ namespace Entegro.Scheduling
         /// <summary>
         /// The last error message.
         /// </summary>
-        public string Error { get; set; }
+        public string? Error { get; set; }
 
         /// <summary>
         /// The current percentual progress for a running task.
@@ -56,7 +56,7 @@ namespace Entegro.Scheduling
         /// <summary>
         /// The current progress message for a running task.
         /// </summary>
-        public string ProgressMessage { get; set; }
+        public string? ProgressMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the task descriptor associated with this execution info.

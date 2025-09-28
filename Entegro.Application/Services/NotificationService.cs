@@ -161,10 +161,10 @@ namespace Entegro.Application.Services
 
         public async Task SendNotification(NotificationType notificationType, string title, string message)
         {
-            var systemUrl = _settingService.GetByKeyAsync("SystemUrl");
+            var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
 
             var connection = new HubConnectionBuilder()
-              .WithUrl(systemUrl+"notificationHub")
+              .WithUrl(systemUrl.Value+"notificationHub")
               .Build();
 
             await connection.StartAsync();

@@ -32,15 +32,6 @@ Entegro.notification.list = (function ($) {
             columns: [
                 { data: 'Id', orderable: false },
                 { data: 'Id', visible: false },
-                { data: 'Title' },
-                { data: 'Message' },
-                {
-                    data: 'NotificationDate',
-                    render: function (data, type) {
-                        if (type === "sort" || type === "type") return data;
-                        return moment(data).format("DD.MM.yyyy HH:mm");
-                    }
-                },
                 {
                     data: 'Type',
                     render: function (data) {
@@ -52,6 +43,15 @@ Entegro.notification.list = (function ($) {
                         };
                         const type = types[data] || { text: 'Bilinmiyor', class: 'badge bg-secondary' };
                         return `<span class="${type.class}">${type.text}</span>`;
+                    }
+                },
+                { data: 'Title' },
+                { data: 'Message' },
+                {
+                    data: 'NotificationDate',
+                    render: function (data, type) {
+                        if (type === "sort" || type === "type") return data;
+                        return moment(data).format("DD.MM.yyyy HH:mm");
                     }
                 },
                 {
@@ -82,7 +82,75 @@ Entegro.notification.list = (function ($) {
                 style: "multi",
                 selector: "td:nth-child(1)"
             },
-            displayLength: 10
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: {
+                            menu: [10, 25, 50, 100],
+                            text: "_MENU_"
+                        },
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                        <i class="icon-base ti ti-upload icon-xs"></i>
+                                        <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                                      </span>`,
+                                buttons: [
+                                    {
+                                        extend: "print",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-printer me-1"></i> Print</span>`,
+                                        exportOptions: { columns: [2, 3, 4] }
+                                    },
+                                    {
+                                        extend: "csv",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file me-1"></i> Csv</span>`,
+                                        exportOptions: { columns: [2, 3, 4] }
+                                    },
+                                    {
+                                        extend: "excel",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-upload me-1"></i> Excel</span>`,
+                                        exportOptions: { columns: [2, 3, 4] }
+                                    },
+                                    {
+                                        extend: "pdf",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-text me-1"></i> Pdf</span>`,
+                                        exportOptions: { columns: [2, 3, 4] }
+                                    },
+                                    {
+                                        extend: "copy",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-copy me-1"></i> Copy`,
+                                        exportOptions: { columns: [2, 3, 4] }
+                                    }
+                                ]
+                            }
+                        ]
+                    }]
+                },
+                bottomStart: {
+                    rowClass: "row mx-3 justify-content-between",
+                    features: ["info"]
+                },
+                bottomEnd: "paging"
+            }
         });
 
         // Silme işlemi

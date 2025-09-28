@@ -2,6 +2,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
 using Entegro.Api.Jobs;
+using Entegro.Api.Services;
 using Entegro.Application.Mappings;
 using Entegro.Engine;
 using Entegro.Infrastructure.Data;
@@ -127,65 +128,11 @@ builder.Services.AddSwaggerGen();
 #endregion
 
 #region Jobs
-builder.Services.AddQuartz(q =>
-{
-    //var xmlFileDownloadJob = new JobKey("XmlFileDownloadJob");
-    //q.AddJob<FileDownloadJob>(opts => opts.WithIdentity(xmlFileDownloadJob));
-    //q.AddTrigger(opts => opts
-    //    .ForJob(xmlFileDownloadJob)
-    //    .WithIdentity("XmlFileDownloadJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(1)));
-
-    var orderReadJob = new JobKey("OrderReadJob");
-
-    q.AddJob<OrderReadJob>(opts => opts.WithIdentity(orderReadJob));
-
-    q.AddTrigger(opts => opts
-        .ForJob(orderReadJob)
-        .WithIdentity("OrderReadJob-trigger")
-        .WithSimpleSchedule(x => x
-            .WithIntervalInMinutes(1)
-            .RepeatForever())
-        );
-
-    //var jobKeySmartstore = new JobKey("SmartstoreDataSyncJob");
-
-    //q.AddJob<SmartstoreDataSyncJob>(opts => opts.WithIdentity(jobKeySmartstore));
-
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeySmartstore)
-    //    .WithIdentity("SmartstoreDataSyncJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(1)
-    //        .RepeatForever())
-    //    );
-
-    //var jobKeyTrendyol = new JobKey("TrendyolDataSyncJob");
-
-    //q.AddJob<TrendyolDataSyncJob>(opts => opts.WithIdentity(jobKeyTrendyol));
-
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeyTrendyol)
-    //    .WithIdentity("TrendyolDataSyncJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(10)
-    //        .RepeatForever())
-    //);
-
-    //var jobKeyErp = new JobKey("ErpJob");
-
-    //q.AddJob<ErpJob>(opts => opts.WithIdentity(jobKeyErp));
-
-    //q.AddTrigger(opts => opts
-    //    .ForJob(jobKeyErp)
-    //    .WithIdentity("ErpJob-trigger")
-    //    .WithSimpleSchedule(x => x
-    //        .WithIntervalInMinutes(10)
-    //        .RepeatForever())
-    //    );
-});
+builder.Services.AddQuartz();
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+builder.Services.AddHostedService<QuartzSchedulerService>();
+//builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 #endregion
 
 #region App Services
