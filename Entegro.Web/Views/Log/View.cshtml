@@ -41,7 +41,9 @@
                         </dd>
 
                         <dt class="col-sm-3">Mesaj</dt>
-                        <dd class="col-sm-9 text-break">@Model.Message</dd>
+                        <dd class="col-sm-9 text-break">
+                            <pre class="bg-light border p-3 text-danger" style="white-space:pre-wrap">@Model.Message</pre>
+                        </dd>
 
                         @if (!string.IsNullOrEmpty(Model.MessageTemplate))
                         {
@@ -91,10 +93,13 @@
     {
         return level?.ToLower() switch
         {
-            "error" => "danger",
-            "warning" => "warning",
-            "info" => "info",
+            "trace" => "dark",
             "debug" => "secondary",
+            "information" => "info",
+            "warning" => "warning",
+            "error" => "danger",
+            "critical" => "danger",
+            "none" => "danger",
             _ => "dark"
         };
     }
