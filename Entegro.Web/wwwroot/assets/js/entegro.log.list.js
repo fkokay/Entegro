@@ -6,11 +6,22 @@ Entegro.log.list = (function ($) {
     function getLevelBadge(level) {
         if (!level) return '<span class="badge bg-secondary">Unknown</span>';
         switch (level.toLowerCase()) {
-            case "error": return '<span class="badge bg-danger">Error</span>';
-            case "warning": return '<span class="badge bg-warning text-dark">Warning</span>';
-            case "info": return '<span class="badge bg-info text-dark">Info</span>';
-            case "debug": return '<span class="badge bg-secondary">Debug</span>';
-            default: return `<span class="badge bg-dark">${level}</span>`;
+            case "trace":
+                return `<span class="badge bg-dark">İzleme</span>`;
+            case "debug":
+                return '<span class="badge bg-secondary">Hata Ayıklama</span>';
+            case "information":
+                return '<span class="badge bg-info text-dark">Bilgi</span>';
+            case "warning":
+                return '<span class="badge bg-warning text-dark">Uyarı</span>';
+            case "error":
+                return '<span class="badge bg-danger">Hata</span>';
+            case "critical":
+                return '<span class="badge bg-danger">Kritik</span>';
+            case "none":
+                return '<span class="badge bg-danger">Yok</span>';
+            default:
+                return `<span class="badge bg-dark">${level}</span>`;
         }
     }
 
@@ -128,20 +139,10 @@ Entegro.log.list = (function ($) {
                     }
                 },
                 {
-                    data: 'MessageTemplate'
-                },
-                {
                     data: 'TimeStamp',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.yyyy HH:mm:ss");
-                    }
-                },
-                {
-                    data: 'Exception',
-                    render: function (data, type, row) {
-                        if (!data) return '-';
-                        return `<span class="text-danger" title="${data}">Hata Mevcut</span>`;
                     }
                 },
                 { data: 'Id' }
@@ -283,6 +284,24 @@ Entegro.log.list = (function ($) {
                         }
                     });
                 }
+            },
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    if (this.dataSrc() === "Level") {
+                        var items = [
+                            { title: "İzleme", id: "Trace" },
+                            { title: "Hata Ayıklama", id: "Debug" },
+                            { title: "Bilgi", id: "Information" },
+                            { title: "Uyarı", id: "Warning" },
+                            { title: "Hata", id: "Error" },
+                            { title: "Kritik", id: "Critical" },
+                            { title: "Yok", id: "None" }
+                        ];
+                    
+                        Entegro.log.list.addFilterDropdown(this, ".filterLevel", "Seviye", items);
+                    }
+                });
+
             }
         });
 
