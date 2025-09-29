@@ -29810,7 +29810,7 @@ body:not(.modal-open) .layout-content-navbar .layout-navbar {
         display: block;
         background-color: currentcolor;
         content: "";
-        margin-block-end: -3px;
+        margin-block-end: -12px;
         mask-image: var(--svg);
         mask-repeat: no-repeat;
         mask-size: 100% 100%;

@@ -1,171 +1,181 @@
 {
-  "pages": [
-    {
-      "name": "Dashboard",
-      "icon": "ti-smart-home",
-      "url": "Home/Index"
-    },
-    {
-      "name": "Katalog Yönetimi",
-      "icon": "ti-package",
-      "children": [
-        {
-          "name": "Ürünler",
-          "icon": "ti-package",
-          "url": "Product/List"
-        },
-        {
-          "name": "Kategoriler",
-          "icon": "ti-category",
-          "url": "Category/List"
-        },
-        {
-          "name": "Markalar",
-          "icon": "ti-brand-asana",
-          "url": "Brand/List"
-        },
-        {
-          "name": "Varyantlar",
-          "icon": "ti-versions",
-          "url": "ProductAttribute/List"
-        },
-        {
-          "name": "Varyant Değerleri",
-          "icon": "ti-list-details",
-          "url": "ProductAttributeValue/List"
-        },
-        {
-          "name": "Ürün Özellikleri",
-          "icon": "ti-spacing-vertical",
-          "url": "SpecificationAttribute/List"
-        }
-      ]
-    },
-    {
-      "name": "Sipariş Yönetimi",
-      "icon": "ti-truck",
-      "children": [
-        {
-          "name": "Siparişler",
-          "icon": "ti-truck",
-          "url": "Order/List"
-        },
-        {
-          "name": "iadeler",
-          "icon": "ti-truck-return",
-          "url": "ReturnRequest/List"
-        }
-      ]
-    },
-    {
-      "name": "Fatura Yönetimi",
-      "icon": "ti-receipt",
-      "children": [
-        {
-          "name": "Faturalar",
-          "icon": "ti-receipt",
-          "url": "Invoice/List"
-        }
-      ]
-    },
-    {
-      "name": "Müşteri Yönetimi",
-      "icon": "ti-users",
-      "children": [
-        {
-          "name": "Müşteriler",
-          "icon": "ti-users",
-          "url": "Customer/List"
-        }
-      ]
-    },
-    {
-      "name": "Bildirimler",
-      "icon": "ti-bell",
-      "url": "Notification/List"
-    },
-    {
-      "name": "Toplu İşlemeler",
-      "icon": "ti-database-import",
-      "children": [
-        {
-          "name": "Liste",
-          "icon": "ti-table",
-          "url": "Import/List"
-        },
-        {
-          "name": "Excel İşlemleri",
-          "icon": "ti-file-spreadsheet",
-          "url": "Import/Excel"
-        },
-        {
-          "name": "Xml İşlemleri",
-          "icon": "ti-file-info",
-          "url": "Import/Xml"
-        }
-      ]
-    },
-    {
-      "name": "Raporlar",
-      "icon": "ti-chart-pie"
-    },
-    {
-      "name": "Ayarlar",
-      "icon": "ti-settings",
-      "children": [
-        {
-          "name": "Genel Ayarlar",
-          "url": "Settings/GeneralCommon"
-        },
-        {
-          "name": "Kullanıcılar",
-          "url": "User/List"
-        },
-        {
-          "name": "Mail Entegrasyonu",
-          "url": "EmailAccount/List"
-        },
-        {
-          "name": "Ülkeler",
-          "url": "Countries/List"
-        },
-        {
-          "name": "ERP Entegrasyonu",
-          "url": "Settings/Erp"
-        },
-        {
-          "name": "Pazaryeri Entegrasyonu",
-          "url": "Settings/Marketplace"
-        },
-        {
-          "name": "E-Ticaret Entegrasyonu",
-          "url": "Settings/Commerce"
-        },
-        {
-          "name": "Kargo Entegrasyonu",
-          "url": "Settings/Cargo"
-        },
-        {
-          "name": "E-Fatura Entegrasyonu",
-          "url": "Settings/EInvoice"
-        }
-      ]
-    },
-    {
-      "name": "Sistem",
-      "icon": "ti-database",
-      "children": [
-        {
-          "name": "Zamanlanmış Görevler",
-          "icon": "ti-clock",
-          "url": "Scheduling/List"
-        },
-        {
-          "name": "Hata Kayıtları",
-          "icon": "ti-logic-nand",
-          "url": "Log/List"
-        }
-      ]
-    }
-  ]
+  "navigation": {
+    "Dashboards": [
+      {
+        "name": "Dashboard",
+        "icon": "ti-smart-home",
+        "url": "/Home/Index"
+      }
+    ],
+    "Katalog Yönetimi": [
+      {
+        "name": "Ürünler",
+        "icon": "ti-package",
+        "url": "/Product/List"
+      },
+      {
+        "name": "Kategoriler",
+        "icon": "ti-category",
+        "url": "/Category/List"
+      },
+      {
+        "name": "Markalar",
+        "icon": "ti-brand-asana",
+        "url": "/Brand/List"
+      },
+      {
+        "name": "Varyantlar",
+        "icon": "ti-versions",
+        "url": "/ProductAttribute/List"
+      },
+      {
+        "name": "Varyant Değerleri",
+        "icon": "ti-list-details",
+        "url": "/ProductAttributeValue/List"
+      },
+      {
+        "name": "Ürün Özellikleri",
+        "icon": "ti-spacing-vertical",
+        "url": "/SpecificationAttribute/List"
+      }
+    ],
+    "Sipariş Yönetimi": [
+      {
+        "name": "Siparişler",
+        "icon": "ti-truck",
+        "url": "/Order/List"
+      },
+      {
+        "name": "İadeler",
+        "icon": "ti-truck-return",
+        "url": "/ReturnRequest/List"
+      }
+    ],
+    "Fatura Yönetimi": [
+      {
+        "name": "Faturalar",
+        "icon": "ti-receipt",
+        "url": "/Invoice/List"
+      }
+    ],
+    "Müşteri Yönetimi": [
+      {
+        "name": "Müşteriler",
+        "icon": "ti-users",
+        "url": "/Customer/List"
+      }
+    ],
+    "Bildirimler": [
+      {
+        "name": "Bildirimler",
+        "icon": "ti-bell",
+        "url": "/Notification/List"
+      }
+    ],
+    "Toplu İşlemeler": [
+      {
+        "name": "Liste",
+        "icon": "ti-table",
+        "url": "/Import/List"
+      },
+      {
+        "name": "Excel İşlemleri",
+        "icon": "ti-file-spreadsheet",
+        "url": "/Import/Excel"
+      },
+      {
+        "name": "Xml İşlemleri",
+        "icon": "ti-file-info",
+        "url": "/Import/Xml"
+      }
+    ],
+    "Raporlar": [
+    ],
+    "Ayarlar": [
+      {
+        "name": "Genel Ayarlar",
+        "url": "/Settings/GeneralCommon"
+      },
+      {
+        "name": "Kullanıcılar",
+        "url": "/User/List"
+      },
+      {
+        "name": "Mail Entegrasyonu",
+        "url": "/EmailAccount/List"
+      },
+      {
+        "name": "Ülkeler",
+        "url": "/Countries/List"
+      },
+      {
+        "name": "ERP Entegrasyonu",
+        "url": "/Settings/Erp"
+      },
+      {
+        "name": "Pazaryeri Entegrasyonu",
+        "url": "/Settings/Marketplace"
+      },
+      {
+        "name": "E-Ticaret Entegrasyonu",
+        "url": "/Settings/Commerce"
+      },
+      {
+        "name": "Kargo Entegrasyonu",
+        "url": "/Settings/Cargo"
+      },
+      {
+        "name": "E-Fatura Entegrasyonu",
+        "url": "/Settings/EInvoice"
+      }
+    ],
+    "Sistem": [
+      {
+        "name": "Zamanlanmış Görevler",
+        "icon": "ti-clock",
+        "url": "/Scheduling/List"
+      },
+      {
+        "name": "Hata Kayıtları",
+        "icon": "ti-logic-nand",
+        "url": "/Log/List"
+      }
+    ]
+  },
+  "suggestions": {
+    "Sık Kullanılanlar": [
+      {
+        "name": "Ürünler",
+        "icon": "ti-package",
+        "url": "/Product/List"
+      },
+      {
+        "name": "Siparişler",
+        "icon": "ti-truck",
+        "url": "/Order/List"
+      }
+    ],
+    "Entegrasyonlar": [
+      {
+        "name": "ERP Entegrasyonu",
+        "url": "/Settings/Erp"
+      },
+      {
+        "name": "Pazaryeri Entegrasyonu",
+        "url": "/Settings/Marketplace"
+      },
+      {
+        "name": "E-Ticaret Entegrasyonu",
+        "url": "/Settings/Commerce"
+      },
+      {
+        "name": "Kargo Entegrasyonu",
+        "url": "/Settings/Cargo"
+      },
+      {
+        "name": "E-Fatura Entegrasyonu",
+        "url": "/Settings/EInvoice"
+      }
+    ]
+  }
 }
