@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewData["Title"] = "View";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Hata Kaydı</h3>
+    <div class="card">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID</dt>
+                <dd class="col-sm-9">@Model.Id</dd>
+
+                <dt class="col-sm-3">Seviye</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-@GetLevelColor(Model.Level)">
+                        @Model.Level
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3">Mesaj</dt>
+                <dd class="col-sm-9 text-break">@Model.Message</dd>
+
+                @if (!string.IsNullOrEmpty(Model.MessageTemplate))
+                {
+                    <dt class="col-sm-3">Mesaj Şablonu</dt>
+                    <dd class="col-sm-9 text-break">@Model.MessageTemplate</dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Exception))
+                {
+                    <dt class="col-sm-3">Hata</dt>
+                    <dd class="col-sm-9">
+                        <pre class="bg-light border p-3 text-danger" style="white-space:pre-wrap">@Model.Exception</pre>
+                    </dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Properties))
+                {
+                    <dt class="col-sm-3">Özellikler</dt>
+                    <dd class="col-sm-9">
+                        <pre class="bg-light border p-3 text-muted" style="white-space:pre-wrap">@Model.Properties</pre>
+                    </dd>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.LogEvent))
+                {
+                    <dt class="col-sm-3">Log Event</dt>
+                    <dd class="col-sm-9 text-break">@Model.LogEvent</dd>
+                }
+
+                <dt class="col-sm-3">Zaman</dt>
+                <dd class="col-sm-9">@Model.TimeStamp.ToString("dd.MM.yyyy HH:mm:ss")</dd>
+            </dl>
+
+        </div>
+    </div>
+
+    <a asp-action="List" asp-controller="Log" class="btn btn-secondary mt-4">Geri Dön</a>
+</div>
+
+@functions {
+    string GetLevelColor(string level)
+    {
+        return level?.ToLower() switch
+        {
+            "error" => "danger",
+            "warning" => "warning",
+            "info" => "info",
+            "debug" => "secondary",
+            _ => "dark"
+        };
+    }
+}
