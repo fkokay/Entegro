@@ -98,7 +98,7 @@ Entegro.log.list = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[3, 'desc']], // TimeStamp sütunu index 3, azalan
+            order: [[4, 'asc']], // TimeStamp sütunu index 3, azalan
             ajax: {
                 url: '/Log/LogList',
                 type: 'POST',
