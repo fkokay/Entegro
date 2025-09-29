@@ -1,6 +1,6 @@
-﻿namespace Entegro.Application.DTOs.TaskExecutionInfo
+﻿namespace Entegro.Web.Models.Platform.Scheduling
 {
-    public class TaskExecutionInfoDto
+    public class TaskExecutionInfoViewModel
     {
         public int Id { get; set; }
         public int TaskDescriptorId { get; set; }

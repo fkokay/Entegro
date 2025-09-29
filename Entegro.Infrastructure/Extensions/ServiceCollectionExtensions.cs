@@ -1,7 +1,9 @@
 ﻿using Entegro.Application.Interfaces;
+using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Application.Services;
 using Entegro.Infrastructure.Messaging;
+using Entegro.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Entegro.Infrastructure.Extensions
@@ -47,6 +49,8 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<ICustomerAddressMappingService, CustomerAddressMappingService>();
             services.AddScoped<IDistrictService, DistrictService>();
+            services.AddScoped<ITaskExecutionInfoService, TaskExecutionInfoService>();
+            services.AddScoped<ITaskExecutionInfoRepository, TaskExecutionInfoRepository>();
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IEventPublisher, EventBus>();
             services.AddScoped<ITaskDescriptorService, TaskDescriptorService>();
