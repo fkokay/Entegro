@@ -46,6 +46,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IDistrictRepository, DistrictRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<ICustomerAddressMappingRepository, CustomerAddressMappingRepository>();
+            services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<ITaskDescriptorRepository, TaskDescriptorRepository>();
             return services;
         }

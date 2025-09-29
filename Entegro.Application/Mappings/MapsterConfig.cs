@@ -12,6 +12,7 @@ using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemLog;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
+using Entegro.Application.DTOs.Log;
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.MediaFolder;
 using Entegro.Application.DTOs.Notification;
@@ -43,6 +44,7 @@ using Entegro.Domain.Entities.Content;
 using Entegro.Domain.Entities.Import;
 using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Entities.Platform.Identity;
+using Entegro.Domain.Entities.Platform.Logging;
 using Entegro.Domain.Entities.Platform.Messaging;
 using Entegro.Domain.Entities.Setttings;
 using Entegro.Scheduling;
@@ -186,6 +188,11 @@ namespace Entegro.Application.Mappings
             config.NewConfig<Notification, NotificationDto>().TwoWays();
             config.NewConfig<Notification, CreateNotificationDto>().TwoWays();
             config.NewConfig<Notification, UpdateNotificationDto>().TwoWays();
+            // ---------------- Log ----------------
+
+            config.NewConfig<Log, LogDto>().TwoWays();
+            config.NewConfig<Log, CreateLogDto>().TwoWays();
+            config.NewConfig<Log, UpdateLogDto>().TwoWays();
 
             // ---------------- CustomerAddressMapping ----------------
 

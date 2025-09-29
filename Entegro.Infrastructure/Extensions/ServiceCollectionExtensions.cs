@@ -47,6 +47,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<ICustomerAddressMappingService, CustomerAddressMappingService>();
             services.AddScoped<IDistrictService, DistrictService>();
+            services.AddScoped<ILogService, LogService>();
             services.AddScoped<IEventPublisher, EventBus>();
             services.AddScoped<ITaskDescriptorService, TaskDescriptorService>();
             services.AddHttpClient();
