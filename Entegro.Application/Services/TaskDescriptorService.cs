@@ -1,16 +1,10 @@
-﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.TaskDescriptor;
 using Entegro.Application.DTOs.TaskExecutionInfo;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Scheduling;
 using MapsterMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services
 {
@@ -22,6 +16,22 @@ namespace Entegro.Application.Services
         {
             _taskDescriptorRepository = taskDescriptorRepository;
             _mapper = mapper;
+        }
+
+        public async Task<TaskDescriptorDto?> GetByIdAsync(int id)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(id));
+            }
+
+            var taskDescriptor = await _taskDescriptorRepository.GetByIdAsync(id);
+            if (taskDescriptor == null)
+            {
+                return null;
+            }
+            var taskDescriptorDto = _mapper.Map<TaskDescriptorDto>(taskDescriptor);
+            return taskDescriptorDto;
         }
 
         public async Task<PagedResult<TaskDescriptorDto>> GetPagedAsync(GridCommand gridCommand)
@@ -51,6 +61,21 @@ namespace Entegro.Application.Services
                 PageNumber = taskDescriptors.PageNumber,
                 PageSize = taskDescriptors.PageSize
             };
+        }
+
+        public async Task<TaskDescriptorDto> UpdateAsync(UpdateTaskDescriptorDto taskDescriptor)
+        {
+            if (taskDescriptor == null)
+                throw new ArgumentNullException(nameof(taskDescriptor));
+
+            var existingTaskDescriptor = await _taskDescriptorRepository.GetByIdAsync(taskDescriptor.Id);
+            if (existingTaskDescriptor == null)
+                throw new KeyNotFoundException($"ID {taskDescriptor.Id} ile TaskDescriptor bulunamadı.");
+
+            _mapper.Map(taskDescriptor, existingTaskDescriptor);
+            await _taskDescriptorRepository.UpdateAsync(existingTaskDescriptor);
+
+            return _mapper.Map<TaskDescriptorDto>(existingTaskDescriptor);
         }
     }
 }

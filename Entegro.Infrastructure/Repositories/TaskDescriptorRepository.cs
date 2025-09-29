@@ -1,24 +1,23 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Entegro.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Infrastructure.Repositories
 {
     public class TaskDescriptorRepository : ITaskDescriptorRepository
     {
         private readonly EntegroDbContext _context;
-        public TaskDescriptorRepository(EntegroDbContext context) 
+        public TaskDescriptorRepository(EntegroDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<TaskDescriptor?> GetByIdAsync(int id)
+        {
+            return await _context.TaskDescriptors.Include(b => b.ExecutionHistory).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<Application.DTOs.Common.PagedResult<TaskDescriptor>> GetPagedAsync(GridCommand gridCommand)
@@ -58,6 +57,12 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = gridCommand.Start + 1,
                 PageSize = gridCommand.Length
             };
+        }
+
+        public async Task UpdateAsync(TaskDescriptor taskDescriptor)
+        {
+            _context.TaskDescriptors.Update(taskDescriptor);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -203,6 +203,7 @@ namespace Entegro.Application.Mappings
             // ---------------- TaskDescriptorMapping ----------------
 
             config.NewConfig<TaskDescriptor, TaskDescriptorDto>().TwoWays();
+            config.NewConfig<TaskDescriptor, UpdateTaskDescriptorDto>().TwoWays();
 
             // ---------------- TaskExecutionInfoMapping ----------------
 

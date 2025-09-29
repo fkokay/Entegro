@@ -1,6 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
@@ -26,8 +25,12 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> Edit(int id)
+        {
 
-        public async Task<IActionResult> RunAsync(string type,int taskId)
+            return View();
+        }
+        public async Task<IActionResult> RunAsync(string type, int taskId)
         {
 
             if (string.IsNullOrWhiteSpace(type))
