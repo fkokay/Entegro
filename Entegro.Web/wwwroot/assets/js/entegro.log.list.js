@@ -3,6 +3,17 @@ Entegro.log = Entegro.log || {};
 
 Entegro.log.list = (function ($) {
 
+    function getLevelBadge(level) {
+        if (!level) return '<span class="badge bg-secondary">Unknown</span>';
+        switch (level.toLowerCase()) {
+            case "error": return '<span class="badge bg-danger">Error</span>';
+            case "warning": return '<span class="badge bg-warning text-dark">Warning</span>';
+            case "info": return '<span class="badge bg-info text-dark">Info</span>';
+            case "debug": return '<span class="badge bg-secondary">Debug</span>';
+            default: return `<span class="badge bg-dark">${level}</span>`;
+        }
+    }
+
     function initList() {
         const table = $('#LogTable').DataTable({
             language: {
@@ -15,7 +26,7 @@ Entegro.log.list = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[4, 'desc']],
+            order: [[3, 'desc']], // TimeStamp sütunu index 3, azalan
             ajax: {
                 url: '/Log/LogList',
                 type: 'POST',
@@ -27,17 +38,27 @@ Entegro.log.list = (function ($) {
             columns: [
                 { data: 'Id', orderable: false },
                 { data: 'Id', visible: false },
-                { data: 'Level' },
                 {
-                    data: 'Message',
+                    data: 'Level',
                     render: function (data, type, row) {
-                        if (type === "display") {
-                            return `<a href="javascript:void(0);" class="view-log-detail" data-log='${JSON.stringify(row)}'>${data}</a>`;
+                        if (type === "display" || type === "filter") {
+                            return getLevelBadge(data);
                         }
                         return data;
                     }
                 },
-                { data: 'MessageTemplate' },
+                {
+                    data: 'Message',
+                    render: function (data, type, row) {
+                        if (type === "display") {
+                            return `<a href="/Log/View?logId=${row.Id}" class="text-decoration-underline text-primary">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    data: 'MessageTemplate'
+                },
                 {
                     data: 'TimeStamp',
                     render: function (data, type) {
@@ -45,14 +66,21 @@ Entegro.log.list = (function ($) {
                         return moment(data).format("DD.MM.yyyy HH:mm:ss");
                     }
                 },
-                { data: 'Exception' }
+                {
+                    data: 'Exception',
+                    render: function (data, type, row) {
+                        if (!data) return '-';
+                        return `<span class="text-danger" title="${data}">Hata Mevcut</span>`;
+                    }
+                },
+                { data: 'Id' }
             ],
             columnDefs: [
                 {
                     targets: 0,
                     orderable: false,
                     searchable: false,
-                    responsivePriority: 1,
+                    responsivePriority: 3,
                     checkboxes: {
                         selectAllRender: '<input type="checkbox" class="form-check-input">'
                     },
@@ -60,15 +88,13 @@ Entegro.log.list = (function ($) {
                 },
                 {
                     targets: -1,
-                    title: 'İşlem',
+                    title: 'İşlemler',
                     searchable: false,
                     orderable: false,
-                    render: function (data, type, row) {
-                        return `
-                            <button class="btn btn-text-danger btn-icon delete-log" title="Sil" data-id="${row.Id}">
-                                <i class="icon-base ti ti-trash icon-22px"></i>
-                            </button>`;
-                    }
+                    render: (data, type, row) => `
+                        <button class="btn btn-text-danger rounded-pill waves-effect btn-icon delete-log" data-id="${row.Id}" title="Sil">
+                            <i class="icon-base ti ti-trash icon-22px"></i>
+                        </button>`
                 }
             ],
             select: {
@@ -82,7 +108,7 @@ Entegro.log.list = (function ($) {
                     features: [{
                         search: {
                             className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
-                            placeholder: "Log ara...",
+                            placeholder: "Log ara..",
                             text: "_INPUT_"
                         }
                     }]
@@ -100,7 +126,7 @@ Entegro.log.list = (function ($) {
                                 className: "btn btn-label-secondary dropdown-toggle me-4",
                                 text: `<span class="d-flex align-items-center gap-1">
                                         <i class="icon-base ti ti-upload icon-xs"></i>
-                                        <span class="d-none d-sm-inline-block">Dışa Aktar</span>
+                                        <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
                                       </span>`,
                                 buttons: [
                                     {
@@ -136,13 +162,12 @@ Entegro.log.list = (function ($) {
                                 ]
                             },
                             {
-                                text: `<i class="icon-base ti ti-trash icon-16px me-0 me-sm-1"></i>
-                                       <span class="d-none d-sm-inline-block">Tümünü Sil</span>`,
+                                text: `<i class="icon-base ti ti-trash me-1"></i> Tamamını Sil`,
                                 className: "btn btn-danger delete-all-logs",
                                 action: function () {
                                     Swal.fire({
                                         title: 'Emin misiniz?',
-                                        text: 'Tüm loglar kalıcı olarak silinecek!',
+                                        text: 'Tüm loglar silinecek!',
                                         icon: 'warning',
                                         showCancelButton: true,
                                         confirmButtonText: 'Evet, sil!',
@@ -192,7 +217,7 @@ Entegro.log.list = (function ($) {
             }
         });
 
-        // Görsel düzeltmeler
+        // Görsel sınıf düzeltmeler
         setTimeout(() => {
             const adjustments = [
                 { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -213,7 +238,7 @@ Entegro.log.list = (function ($) {
             });
         }, 100);
 
-        // Tek log sil
+        // Tek log silme işlemi
         $(document).on('click', '.delete-log', function () {
             const logId = $(this).data('id');
             Swal.fire({
@@ -257,27 +282,6 @@ Entegro.log.list = (function ($) {
             });
         });
 
-        // Detay göster
-        $(document).on('click', '.view-log-detail', function () {
-            const log = $(this).data('log');
-            const detailHtml = `
-                <div class="text-start">
-                    <p><strong>Mesaj:</strong> ${log.Message}</p>
-                    <p><strong>Şablon:</strong> ${log.MessageTemplate || '-'}</p>
-                    <p><strong>Exception:</strong><br><pre>${log.Exception || '-'}</pre></p>
-                    <p><strong>Özellikler:</strong><br><pre>${log.Properties || '-'}</pre></p>
-                    <p><strong>Log Event:</strong> ${log.LogEvent || '-'}</p>
-                </div>
-            `;
-            Swal.fire({
-                title: `Log Detayı (ID: ${log.Id})`,
-                html: detailHtml,
-                width: '60%',
-                confirmButtonText: 'Kapat',
-                customClass: { confirmButton: 'btn btn-secondary' },
-                buttonsStyling: false
-            });
-        });
     }
 
     return {

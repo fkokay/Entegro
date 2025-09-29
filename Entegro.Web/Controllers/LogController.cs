@@ -1,5 +1,7 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Web.Models.Platform.Logging;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers
@@ -7,10 +9,12 @@ namespace Entegro.Web.Controllers
     public class LogController : Controller
     {
         private readonly ILogService _logService;
+        private readonly IMapper _mapper;
 
-        public LogController(ILogService logService)
+        public LogController(ILogService logService, IMapper mapper)
         {
             _logService = logService;
+            _mapper = mapper;
         }
 
         public IActionResult Index()
@@ -22,7 +26,16 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
-
+        public async Task<IActionResult> View(int logId)
+        {
+            var log = await _logService.GetByIdAsync(logId);
+            if (log == null)
+            {
+                return NotFound();
+            }
+            var mapLog = _mapper.Map<LogViewModel>(log);
+            return View(mapLog);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
