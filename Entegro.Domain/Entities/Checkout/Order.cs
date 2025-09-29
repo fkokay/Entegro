@@ -107,6 +107,7 @@ namespace Entegro.Domain.Entities.Checkout
             get => (ShippingStatus)ShippingStatusId;
             set => ShippingStatusId = (int)value;
         }
+        public string? InvoiceLink { get; set; }
 
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
         public virtual ICollection<OrderNote> OrderNotes { get; set; } = new HashSet<OrderNote>();
