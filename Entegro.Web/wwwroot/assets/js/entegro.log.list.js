@@ -11,9 +11,9 @@ Entegro.log.list = (function ($) {
             case "debug":
                 return '<span class="badge bg-secondary">Hata Ayıklama</span>';
             case "information":
-                return '<span class="badge bg-info text-dark">Bilgi</span>';
+                return '<span class="badge bg-info">Bilgi</span>';
             case "warning":
-                return '<span class="badge bg-warning text-dark">Uyarı</span>';
+                return '<span class="badge bg-warning">Uyarı</span>';
             case "error":
                 return '<span class="badge bg-danger">Hata</span>';
             case "critical":
