@@ -26,11 +26,22 @@ namespace Entegro.Application.Services
             }
 
             var taskDescriptor = await _taskDescriptorRepository.GetByIdAsync(id);
+
             if (taskDescriptor == null)
             {
                 return null;
             }
+
             var taskDescriptorDto = _mapper.Map<TaskDescriptorDto>(taskDescriptor);
+            taskDescriptorDto.CronDescription = CronExpression.GetFriendlyDescription(taskDescriptor.CronExpression);
+            taskDescriptorDto.NextRun = taskDescriptor.NextRunUtc.ToLocalTime();
+            taskDescriptorDto.LastExecution = taskDescriptor.ExecutionHistory.Any() ? _mapper.Map<TaskExecutionInfoDto>(taskDescriptor.ExecutionHistory.Last()) : null;
+            if (taskDescriptor.LastExecution != null)
+            {
+                taskDescriptorDto.LastExecution.StartedOn = taskDescriptor.ExecutionHistory.Last().StartedOnUtc.ToLocalTime();
+                taskDescriptorDto.LastExecution.FinishedOn = taskDescriptor.ExecutionHistory.Last().FinishedOnUtc.ToLocalTime();
+                taskDescriptorDto.LastExecution.SucceededOn = taskDescriptor.ExecutionHistory.Last().SucceededOnUtc.ToLocalTime();
+            }
             return taskDescriptorDto;
         }
 

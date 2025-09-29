@@ -1,6 +1,10 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.TaskDescriptor;
 using Entegro.Application.Interfaces.Services;
+using Entegro.Web.Models.Platform.Scheduling;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Entegro.Web.Controllers
 {
@@ -9,11 +13,15 @@ namespace Entegro.Web.Controllers
         private readonly ITaskDescriptorService _taskDescriptorService;
         private readonly ISettingService _settingService;
         private readonly HttpClient _client;
-        public SchedulingController(ITaskDescriptorService taskDescriptorService, ISettingService settingService, HttpClient client)
+        private readonly IMapper _mapper;
+        private readonly ITaskExecutionInfoService _taskExecutionInfoService;
+        public SchedulingController(ITaskDescriptorService taskDescriptorService, ISettingService settingService, HttpClient client, IMapper mapper, ITaskExecutionInfoService taskExecutionInfoService)
         {
             _taskDescriptorService = taskDescriptorService;
             _settingService = settingService;
             _client = client;
+            _mapper = mapper;
+            _taskExecutionInfoService = taskExecutionInfoService;
         }
 
         public IActionResult Index()
@@ -25,11 +33,44 @@ namespace Entegro.Web.Controllers
         {
             return View();
         }
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            var schedule = await _taskDescriptorService.GetByIdAsync(id);
+            if (schedule == null)
+            {
+                return NotFound();
+            }
+            var mapSchedule = _mapper.Map<TaskDescriptorViewModel>(schedule);
+            ViewBag.Priorities = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Düşük", Value = "-1" },
+                new SelectListItem { Text = "Normal", Value = "0" },
+                new SelectListItem { Text = "Yüksek", Value = "1" },
+            };
 
-            return View();
+            return View(mapSchedule);
         }
+        [HttpPost]
+        public async Task<IActionResult> Edit(TaskDescriptorViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var updateDto = _mapper.Map<UpdateTaskDescriptorDto>(model);
+                await _taskDescriptorService.UpdateAsync(updateDto);
+
+                return RedirectToAction("Edit", new { id = updateDto.Id });
+            }
+
+            ViewBag.Priorities = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Düşük", Value = "-1" },
+                new SelectListItem { Text = "Normal", Value = "0" },
+                new SelectListItem { Text = "Yüksek", Value = "1" },
+            };
+            return View(model);
+        }
+
         public async Task<IActionResult> RunAsync(string type, int taskId)
         {
 
@@ -56,6 +97,19 @@ namespace Entegro.Web.Controllers
             return Json(new { success = true, data = result });
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> TaskExecutionInfoList([FromBody] GridCommand gridCommand, int taskDescriptorId)
+        {
+            var result = await _taskExecutionInfoService.GetPagedAsync(gridCommand, taskDescriptorId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
         [HttpPost]
         public async Task<IActionResult> SchedulingListAsync([FromBody] GridCommand gridCommand)
         {

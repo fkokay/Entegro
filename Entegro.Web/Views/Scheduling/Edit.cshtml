@@ -1,0 +1,180 @@
+﻿@model TaskDescriptorViewModel
+@{
+    ViewData["Title"] = "Edit";
+}
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Edit" id="Schedule-form">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
+            <div class="d-flex flex-column justify-content-center">
+                <h4 class="mb-1">Görevi Düzenle - @Model.Name</h4>
+                <p class="mb-0">Görevi Düzenle - @Model.Name</p>
+            </div>
+            <div class="d-flex align-content-center flex-wrap gap-4">
+                <div class="d-flex gap-4">
+                    <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                        <span class="d-flex justify-content-center text-nowrap">
+                            <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
+                        </span>
+                    </a>
+                    @* <button type="button" id="btnDeleteSchedule" class="btn btn-danger d-grid w-100 waves-effect waves-light">
+                        <span class="d-flex justify-content-center text-nowrap">
+                            <i class="ti ti-trash ti-xs me-1"></i> Sil
+                        </span>
+                    </button> *@
+                </div>
+                <button type="submit" class="btn btn-primary waves-effect waves-light">
+                    <span class="d-flex justify-content-center text-nowrap">
+                        <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mb-lg-0 mb-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="product-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" type="button" role="tab">Genel</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-history-btn" data-bs-toggle="tab" data-bs-target="#form-tabs-history" type="button" role="tab">
+                                    Geçmiş
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
+                            <div class="row g-3 ">
+                                <input type="hidden" value="@Model.Id" asp-for="Id" />
+                                <input type="hidden" value="@Model.Type" asp-for="Type" />
+                                <input type="hidden" value="@Model.Alias" asp-for="Alias" />
+                                <input type="hidden" value="@Model.CronDescription" asp-for="CronDescription" />
+                                <input type="hidden" value="@Model.CronExpression" asp-for="CronExpression" />
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="Name">Ad</label>
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="RunPerMachine">Makine başına çalıştır</label>
+                                    @Html.TextBox("RunPerMachineDisplay", Model.RunPerMachine ? "Evet" : "Hayır", new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="CronExpression">Unix Komutu</label>
+                                    @Html.TextBox("CronExpressionDisplay", Model.CronExpression, new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+                               
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="LastExecution">Son Çalıştırma</label>
+                                    @Html.TextBox("LastExecutionDisplay",
+                                    Model.LastExecution == null
+                                    ? "Asla"
+                                    : Model.LastExecution.StartedOn.ToString("dd.MM.yyyy HH:mm:ss"),
+                                                                        new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="NextRun">Sonraki Çalıştırma</label>
+                                    @Html.TextBox("NextRunDisplay",
+                                                                        Model.NextRun.HasValue
+                                                                        ? Model.NextRun.Value.ToString("dd.MM.yyyy HH:mm:ss")
+                                                                        : "Asla",
+                                                                        new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="Priority">Öncelik</label>
+                                    <select asp-for="Priority" asp-items="ViewBag.Priorities" class="form-select">
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-sm-start" asp-for="LastExecution.Error">Hata</label>
+                                    <pre class="bg-light border p-3 text-danger" style="white-space:pre-wrap">@Model.LastExecution?.Error</pre>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-sm-start" for="Published">Etkin</label>
+                                    <div class="d-flex" style="height:38px;">
+                                        <label class="switch switch-lg">
+                                            @Html.CheckBoxFor(m => m.Enabled, new { @class = "switch-input" })
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on">Evet</span>
+                                                <span class="switch-off">Hayır</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label text-sm-start" asp-for="StopOnError">Hata durumunda devre dışı bırak</label>
+                                    <div class="d-flex" style="height:38px;">
+                                        <label class="switch switch-lg">
+                                            @Html.CheckBoxFor(m => m.StopOnError, new { @class = "switch-input" })
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on">Evet</span>
+                                                <span class="switch-off">Hayır</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="form-tabs-history" role="tabpanel" data-loaded="false">
+
+                            @if (Model.Id > 0)
+                            {
+                                <div class="flex-grow-1 container-p-y container-fluid">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h4 class="mb-3">Geçmiş</h4>
+                                    </div>
+                                    <table id="HistoryTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Id</th>
+                                                <th>Makine Adı</th>
+                                                <th>Uygulama Başlama Tarihi</th>
+                                                <th>Tamamlanma Tarihi</th>
+                                                <th>Durum</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger">
+                                    Geçmiş Bulunamadı
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+@section Scripts {
+    <script src="/assets/js/entegro.scheduling.js"></script>
+    <script>
+        $(function () {
+            $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-history"]').on('shown.bs.tab', function () {
+                var id = @Html.Raw(Json.Serialize(Model.Id));
+                if (id && id > 0) {
+                    Entegro.scheduling.initHistoryTable(id);
+                }
+            });
+        });
+    </script>
+
+}
