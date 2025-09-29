@@ -101,7 +101,7 @@ Entegro.scheduling.list = (function ($) {
                         const titleText = data ? "Yayında" : "Yayında Değil";
                         return `
                                 <div class="form-check d-inline-flex justify-content-center">
-                                    <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
+                                    <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
                                 </div>`;
                     }
                 },

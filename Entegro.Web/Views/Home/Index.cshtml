@@ -3,6 +3,17 @@
 }
 
 <div class="flex-grow-1 container-p-y container-fluid">
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="--bs-toast-zindex:9999;">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto toast-title"></strong>
+                <small class="toast-date"></small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-message">
+            </div>
+        </div>
+    </div>
     <div class="row">
         <!-- View sales -->
         @await Component.InvokeAsync("Dashboard", new { dashboardType = "ViewSales" })
@@ -46,5 +57,5 @@
 
 @section Scripts {
     <script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script>
-    <script src="/assets/js/dashboards-ecommerce.js"></script>
+@*     <script src="/assets/js/dashboards-ecommerce.js"></script> *@
 }
