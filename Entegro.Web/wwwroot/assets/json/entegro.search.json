@@ -6,11 +6,11 @@
       "url": "Home/Index"
     },
     {
-      "name": "Katalog Yönetimi",
+      "name": "Katalog YÃ¶netimi",
       "icon": "ti-package",
       "children": [
         {
-          "name": "Ürünler",
+          "name": "ÃœrÃ¼nler",
           "icon": "ti-package",
           "url": "Product/List"
         },
@@ -30,35 +30,35 @@
           "url": "ProductAttribute/List"
         },
         {
-          "name": "Varyant Deðerleri",
+          "name": "Varyant DeÄŸerleri",
           "icon": "ti-list-details",
           "url": "ProductAttributeValue/List"
         },
         {
-          "name": "Ürün Özellikleri",
+          "name": "ÃœrÃ¼n Ã–zellikleri",
           "icon": "ti-spacing-vertical",
           "url": "SpecificationAttribute/List"
         }
       ]
     },
     {
-      "name": "Sipariþ Yönetimi",
+      "name": "SipariÅŸ YÃ¶netimi",
       "icon": "ti-truck",
       "children": [
         {
-          "name": "Sipariþler",
+          "name": "SipariÅŸler",
           "icon": "ti-truck",
           "url": "Order/List"
         },
         {
-          "name": "Ýadeler",
+          "name": "iadeler",
           "icon": "ti-truck-return",
           "url": "ReturnRequest/List"
         }
       ]
     },
     {
-      "name": "Fatura Yönetimi",
+      "name": "Fatura YÃ¶netimi",
       "icon": "ti-receipt",
       "children": [
         {
@@ -69,11 +69,11 @@
       ]
     },
     {
-      "name": "Müþteri Yönetimi",
+      "name": "MÃ¼ÅŸteri YÃ¶netimi",
       "icon": "ti-users",
       "children": [
         {
-          "name": "Müþteriler",
+          "name": "MÃ¼ÅŸteriler",
           "icon": "ti-users",
           "url": "Customer/List"
         }
@@ -85,7 +85,7 @@
       "url": "Notification/List"
     },
     {
-      "name": "Toplu Ýþlemeler",
+      "name": "Toplu Ä°ÅŸlemeler",
       "icon": "ti-database-import",
       "children": [
         {
@@ -94,12 +94,12 @@
           "url": "Import/List"
         },
         {
-          "name": "Excel Ýþlemleri",
+          "name": "Excel Ä°ÅŸlemleri",
           "icon": "ti-file-spreadsheet",
           "url": "Import/Excel"
         },
         {
-          "name": "Xml Ýþlemleri",
+          "name": "Xml Ä°ÅŸlemleri",
           "icon": "ti-file-info",
           "url": "Import/Xml"
         }
@@ -118,7 +118,7 @@
           "url": "Settings/GeneralCommon"
         },
         {
-          "name": "Kullanýcýlar",
+          "name": "KullanÄ±cÄ±lar",
           "url": "User/List"
         },
         {
@@ -126,7 +126,7 @@
           "url": "EmailAccount/List"
         },
         {
-          "name": "Ülkeler",
+          "name": "Ãœlkeler",
           "url": "Countries/List"
         },
         {
@@ -156,12 +156,12 @@
       "icon": "ti-database",
       "children": [
         {
-          "name": "Zamanlanmýþ Görevler",
+          "name": "ZamanlanmÄ±ÅŸ GÃ¶revler",
           "icon": "ti-clock",
           "url": "Scheduling/List"
         },
         {
-          "name": "Hata Kayýtlarý",
+          "name": "Hata KayÄ±tlarÄ±",
           "icon": "ti-logic-nand",
           "url": "Log/List"
         }
