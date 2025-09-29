@@ -162,6 +162,7 @@
         },
         {
           "name": "Hata Kayýtlarý",
+          "icon": "ti-logic-nand",
           "url": "Log/List"
         }
       ]
