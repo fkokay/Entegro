@@ -50,31 +50,30 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.Brands.AsNoTracking().AnyAsync(o => o.Name == name);
         }
 
-        public async Task<List<Brand>> GetAllAsync()
+        public async Task<Application.DTOs.Common.PagedResult<Brand>> GetAllAsync(int page, string term)
         {
-            return await _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().OrderBy(b => b.Id).ToListAsync();
-        }
-
-        public async Task<Application.DTOs.Common.PagedResult<Brand>> GetAllAsync(int pageNumber, int pageSize)
-        {
-            var query = _context.Brands
-                .Include(m => m.MediaFile).ThenInclude(m => m.Folder)
-                .AsNoTracking()
-                .OrderBy(b => b.Id);
+            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking();
+            if (!string.IsNullOrEmpty(term))
+            {
+                query = query.Where(b =>b.Name.Contains(term)).AsQueryable();
+            }
 
             var totalCount = await query.CountAsync();
-            var brands = await query
-                .Skip(pageNumber * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var items = await query.Skip((page * 7) - 7)
+                .Take(7).ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<Brand>
             {
-                Items = brands,
+                Items = items,
                 TotalCount = totalCount,
-                PageNumber = pageNumber,
-                PageSize = pageSize
+                PageNumber = page,
+                PageSize = 7
             };
+        }
+
+        public async Task<List<Brand>> GetAllAsync()
+        {
+            return await _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking().ToListAsync();
         }
 
         public async Task<Brand?> GetByIdAsync(int id)
@@ -143,5 +142,6 @@ namespace Entegro.Infrastructure.Repositories
             _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
         }
+
     }
 }

@@ -63,37 +63,11 @@ namespace Entegro.Application.Services
             return brandDto;
         }
 
-        public async Task<IEnumerable<BrandDto>> GetAllAsync()
+        public async Task<PagedResult<BrandDto>> GetBrandsAsync(int page, string term)
         {
-            var brands = await _brandRepository.GetAllAsync();
-            var brandDtos = _mapper.Map<IEnumerable<BrandDto>>(brands);
-            return brandDtos;
-        }
-
-        public async Task<PagedResult<BrandDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
-        {
-            if (pageNumber < 0)
-                throw new ArgumentOutOfRangeException(nameof(pageNumber));
-            if (pageSize <= 0)
-                throw new ArgumentOutOfRangeException(nameof(pageSize));
-
-
-            var brands = await _brandRepository.GetAllAsync(pageNumber, pageSize);
-            var items = await brands.Items.SelectAwait(async x =>
-            {
-                var model = _mapper.Map<BrandDto>(x);
-                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
-                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
-                return model;
-            }).AsyncToList();
-
-            return new PagedResult<BrandDto>
-            {
-                Items = items,
-                TotalCount = brands.TotalCount,
-                PageNumber = brands.PageNumber,
-                PageSize = brands.PageSize
-            };
+            var products = await _brandRepository.GetAllAsync(page, term);
+            var productDtos = _mapper.Map<PagedResult<BrandDto>>(products);
+            return productDtos;
         }
 
         public async Task<BrandDto> AddAsync(CreateBrandDto model)
@@ -153,6 +127,12 @@ namespace Entegro.Application.Services
                 PageNumber = brands.PageNumber,
                 PageSize = brands.PageSize
             };
+        }
+
+        public async Task<List<BrandDto>> GetAllBrandsAsync()
+        {
+            var brands = await _brandRepository.GetAllAsync();
+            return _mapper.Map<List<BrandDto>>(brands);
         }
     }
 }

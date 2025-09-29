@@ -121,10 +121,6 @@ Entegro.scheduling.list = (function ($) {
                         </div>`
                 }
             ],
-            select: {
-                style: "multi",
-                selector: "td:nth-child(1)"
-            },
             displayLength: 10,
             layout: {
                 topStart: {

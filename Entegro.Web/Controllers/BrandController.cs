@@ -19,6 +19,26 @@ namespace Entegro.Web.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AllBrand([FromForm] int page = 1, [FromForm] string term = "")
+        {
+            var brands = await _brandService.GetBrandsAsync(page, term);
+
+            var query = brands.Items.Select(c => new
+            {
+                id = c.Id.ToString(),
+                text = c.Name,
+            });
+
+            var mainList = query.ToList();
+
+            return Json(new
+            {
+                results = mainList,
+                pagination = new { more = brands.HasNextPage }
+            });
+        }
+
         public IActionResult Index()
         {
             return List();

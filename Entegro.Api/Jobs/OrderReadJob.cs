@@ -43,6 +43,7 @@ namespace Entegro.Api.Jobs
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IShipmentService _shipmentService;
         private readonly IShipmentItemService _shipmentItemService;
+        private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
         private readonly ILogger<OrderReadJob> _logger;
         public OrderReadJob(
@@ -60,6 +61,7 @@ namespace Entegro.Api.Jobs
             IProductIntegrationService productIntegrationService,
             IShipmentService shipmentService,
             IShipmentItemService shipmentItemService,
+            INotificationService notificationService,
             IMapper mapper,
             ILogger<OrderReadJob> logger)
         {
@@ -77,6 +79,7 @@ namespace Entegro.Api.Jobs
             _productIntegrationService = productIntegrationService;
             _shipmentService = shipmentService;
             _shipmentItemService = shipmentItemService;
+            _notificationService = notificationService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -967,6 +970,8 @@ namespace Entegro.Api.Jobs
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
+
+                        await _notificationService.SendNotification(Domain.Enums.NotificationType.Success, "Yeni Sipariş", $"{item.Name} mağazasından {order.OrderTotal.ToString("n2")} tutarında bir sipariş alındı.");
                     }
                     catch (Exception ex)
                     {

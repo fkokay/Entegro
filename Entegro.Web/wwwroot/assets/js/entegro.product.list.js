@@ -19,7 +19,6 @@ Entegro.product.list = (function ($) {
             }
         });
     }
-
     function getIntegrationLogo(value) {
         switch (value) {
             case "Smartstore": return "/assets/img/brandicons/smartstore.png";
@@ -60,25 +59,75 @@ Entegro.product.list = (function ($) {
                     `;
         }).join("");
     }
-    function addFilterDropdown(column, containerSelector, placeholder, map) {
+    function addFilterDropdown(column, containerSelector, placeholder, map = null) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
         let select = document.createElement("select");
-        select.className = "form-select text-capitalize";
+        select.className = "form-select select2 text-capitalize";
         select.innerHTML = `<option value="">${placeholder}</option>`;
-        document.querySelector(containerSelector).appendChild(select);
+        container.appendChild(select);
 
-        select.addEventListener("change", function () {
-            const val = select.value ? `^${select.value}$` : "";
-            column.search(val, true, false).draw();
-        });
-
-        column.data().unique().sort().each(function (value) {
-            const item = map.find(x => x.id === value);
-            if (item) {
+        if (map && Array.isArray(map)) {
+            map.forEach(item => {
                 let option = document.createElement("option");
                 option.value = item.id;
                 option.textContent = item.title;
                 select.appendChild(option);
-            }
+            });
+        } else {
+            column.data().unique().sort().each(function (value) {
+                if (value !== null && value !== undefined && value !== "") {
+                    let option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        if (window.jQuery && $(select).select2) {
+            $(select).select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: "resolve"
+            });
+
+
+            $(select).on("change", function () {
+                const val = this.value || "";
+                column.search(val, false, false).draw();
+            });
+        } else {
+            select.addEventListener("change", function () {
+                const val = select.value ? `^${select.value}$` : "";
+                column.search(val, true, false).draw();
+            });
+        }
+
+    }
+    function addFilterText(column, containerSelector, placeholder) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
+        // input elementini oluştur
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control";
+        input.placeholder = placeholder;
+
+        container.appendChild(input);
+
+        // her yazımda filtre uygula (debounce ile optimize edebilirsin)
+        input.addEventListener("keyup", function () {
+            const val = input.value || "";
+            column.search(val, false, true).draw();
         });
     }
     function productIntegration(integrationSystemId) {
@@ -138,8 +187,6 @@ Entegro.product.list = (function ($) {
             }
         });
     }
-
-
     function editIntegration() {
         $(document).on('click', '.product-integration, .open-integration', function (e) {
             e.preventDefault();
@@ -251,8 +298,25 @@ Entegro.product.list = (function ($) {
                     orderable: false,
                     render: DataTable.render.select()
                 },
+                { data: 'Code', visible: false },
                 { data: 'BrandId', visible: false },
-                { data: 'Name' },
+                {
+                    data: 'Name',
+                    render: (data, type, row) => {
+                        const image = row.MainPicture ? `<img src="${row.MainPicture.Url}" class="rounded">` : "";
+                        return `
+                        <div class="d-flex align-items-center product-name">
+                          <div class="avatar-wrapper">
+                            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">${image}</div>
+                          </div>
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0">${row.Name}</h6>
+                            <small class="text-truncate">${row.Code || ""}</small>
+                            <small class="text-truncate">${row.Brand?.Name || ""}</small>
+                          </div>
+                        </div>`;
+                    }
+                },
                 { data: 'Barcode' },
                 {
                     data: 'Price',
@@ -266,8 +330,51 @@ Entegro.product.list = (function ($) {
                         return moment(data).format("DD.MM.YYYY HH:mm");
                     }
                 },
-                { data: 'Published' },
-                { data: 'Id' },
+                {
+                    data: 'Published',
+                    render: data => {
+                        const checked = data ? "checked" : "";
+                        const titleText = data ? "Yayında" : "Yayında Değil";
+                        return `
+                        <div class="form-check d-inline-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
+                        </div>`;
+                    }
+                },
+                {
+                    data: null,
+                    title: "İşlemler",
+                    orderable: false,
+                    searchable: false,
+                    render: (data, type, row) => {
+                        let eTicaretLinks = Entegro.product.list.createDropdownLinks(window.commerces, row, "commerce");
+                        let pazarYeriLinks = Entegro.product.list.createDropdownLinks(window.marketPlaces, row, "marketplace");
+
+                        return `
+                        <div class="d-inline-block text-nowrap">
+                          <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill btn-icon">
+                            <i class="icon-base ti ti-pencil icon-22px"></i>
+                          </a>
+                          <button class="btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
+                                  data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                            <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end m-0">
+                            <li><a href="Edit?id=${row.Id}" class="dropdown-item">Düzenle</a></li>
+                            <li><a href="javascript:void(0);" class="dropdown-item text-danger" onclick="Entegro.product.list.deleteProduct(${row.Id})">Sil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="dropend">
+                              <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">E-Ticaret Bağlantıları</a>
+                              <ul class="dropdown-menu">${eTicaretLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
+                            </li>
+                            <li class="dropend">
+                              <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">Pazaryeri Bağlantıları</a>
+                              <ul class="dropdown-menu">${pazarYeriLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
+                            </li>
+                          </ul>
+                        </div>`;
+                    }
+                }
             ],
             columnDefs: [
                 {
@@ -284,72 +391,6 @@ Entegro.product.list = (function ($) {
                     checkboxes: { selectAllRender: '<input type="checkbox" class="form-check-input">' },
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 },
-                {
-                    targets: 3,
-                    responsivePriority: 1,
-                    render: (data, type, row) => {
-                        const image = row.MainPicture ? `<img src="${row.MainPicture.Url}" class="rounded">` : "";
-                        return `
-                                  <div class="d-flex align-items-center product-name">
-                                      <div class="avatar-wrapper">
-                                          <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                                              ${image}
-                                          </div>
-                                      </div>
-                                      <div class="d-flex flex-column">
-                                          <h6 class="mb-0">${row.Name}</h6>
-                                          <small class="text-truncate">${row.Code || ""}</small>
-                                          <small class="text-truncate">${row.Brand?.Name || ""}</small>
-                                      </div>
-                                  </div>`;
-                    }
-                },
-                {
-                    targets: -2,
-                    className: "text-center",
-                    render: data => {
-                        const checked = data ? "checked" : "";
-                        const titleText = data ? "Yayında" : "Yayında Değil";
-                        return `
-                                <div class="form-check d-inline-flex justify-content-center">
-                                    <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
-                                </div>`;
-                    }
-                },
-                {
-                    targets: -1,
-                    title: "İşlemler",
-                    searchable: false,
-                    orderable: false,
-                    render: (data, type, row) => {
-                        let eTicaretLinks = Entegro.product.list.createDropdownLinks(window.commerces, row, "commerce");
-                        let pazarYeriLinks = Entegro.product.list.createDropdownLinks(window.marketPlaces, row, "marketplace");
-
-                        return `
-                                <div class="d-inline-block text-nowrap">
-                                    <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill btn-icon">
-                                        <i class="icon-base ti ti-pencil icon-22px"></i>
-                                    </a>
-                                    <button class="btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
-                                            data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                        <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end m-0">
-                                        <li><a href="Edit?id=${row.Id}" class="dropdown-item">Düzenle</a></li>
-                                        <li><a href="javascript:void(0);" class="dropdown-item text-danger" onclick="Entegro.product.list.deleteProduct(${row.Id})">Sil</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li class="dropend">
-                                            <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">E-Ticaret Bağlantıları</a>
-                                            <ul class="dropdown-menu">${eTicaretLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
-                                        </li>
-                                        <li class="dropend">
-                                            <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">Pazaryeri Bağlantıları</a>
-                                            <ul class="dropdown-menu">${pazarYeriLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
-                                        </li>
-                                    </ul>
-                                </div>`;
-                    }
-                }
             ],
             select: { style: "multi", selector: "td:nth-child(2)" },
             order: [3, "asc"],
@@ -402,9 +443,50 @@ Entegro.product.list = (function ($) {
                 bottomEnd: "paging"
             },
             initComplete: function () {
-                this.api().columns(2).every(function () {
-                    Entegro.product.list.addFilterDropdown(this, ".productFilterBrand", "Marka", [{ title: "mevababy", id: 83 }]);
+                this.api().columns().every(function () {
+                    if (this.dataSrc() === "Code") {
+                        Entegro.product.list.addFilterText(this,".productFilterCode", "Ürün Kodu");
+                    } else if (this.dataSrc() === "Name") {
+                        Entegro.product.list.addFilterText(this, ".productFilterName", "Ürün Adı");
+                    } else if (this.dataSrc() === "Barcode") {
+                        Entegro.product.list.addFilterText(this, ".productFilterBarcode", "Ürün Barkodu");
+                    } else if (this.dataSrc() === "Published") {
+                        Entegro.product.list.addFilterDropdown(this, ".productFilterPublished", "Durum", [{ title: "Yayınlandı", id: true }, { title: "Yayınlanmadı", id: false }]);
+                    } else if (this.dataSrc() === "BrandId") {
+                        var column = this;
+
+                        $('<select id="brandFilter" style="width:200px"></select>')
+                            .appendTo(".productFilterBrand")
+                            .on("change", function () {
+                                const val = $(this).val();
+                                column.search(val ? "^" + val + "$" : "", true, false).draw();
+                            });
+
+                        $('#brandFilter').select2({
+                            placeholder: "Marka seçin",
+                            allowClear: true,
+                            ajax: {
+                                url: '/Brand/AllBrand',
+                                type: 'POST',
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        term: params.term || "",
+                                        page: params.page || 1
+                                    };
+                                },
+                                processResults: function (data, params) {
+                                    return {
+                                        results: data.results,
+                                        pagination: { more: data.pagination.more }
+                                    };
+                                }
+                            }
+                        });
+                    }
                 });
+
             }
         });
 
@@ -418,12 +500,13 @@ Entegro.product.list = (function ($) {
 
                         var typeValue = "";
                         switch (pi.IntegrationSystem.IntegrationSystemType) {
-
-                            case "Commerce":
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.FirstOrDefault(p => p.Name == "CommerceType");
+                            //Commerce
+                            case 2:
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "CommerceType").Value;
                                 break;
-                            case "Marketplace":
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.FirstOrDefault(p => p.Name == "MarketplaceType");
+                            //Marketplace
+                            case 3:
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "MarketplaceType").Value;
                                 break;
                             default:
                         }
@@ -607,6 +690,7 @@ Entegro.product.list = (function ($) {
         getIntegrationLogo: getIntegrationLogo,
         createDropdownLinks: createDropdownLinks,
         addFilterDropdown: addFilterDropdown,
+        addFilterText: addFilterText,
         productIntegration: productIntegration,
         editIntegration: editIntegration,
         initList: initList,

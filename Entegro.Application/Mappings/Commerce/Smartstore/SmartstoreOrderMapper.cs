@@ -40,6 +40,11 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
             orderDto.OrderGuid = smartstoreOrder.OrderGuid;
             orderDto.ShippingMethod = smartstoreOrder.ShippingMethod;
             orderDto.PaymentMethod = smartstoreOrder.PaymentMethodSystemName;
+            orderDto.PaymentStatus = Domain.Enums.PaymentStatus.Pending;
+            orderDto.OrderStatus = Domain.Enums.OrderStatus.Pending;
+            orderDto.ShippingStatus = Domain.Enums.ShippingStatus.Shipped;
+
+
 
             orderDto.OrderItems.AddRange(SmartstoreOrderItemMapper.ToDtoList(smartstoreOrder.OrderItems));
             orderDto.OrderNotes.AddRange(SmartstoreOrderNoteMapper.ToDtoList(smartstoreOrder.OrderNotes));
