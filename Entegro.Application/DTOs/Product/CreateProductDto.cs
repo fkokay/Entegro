@@ -35,8 +35,8 @@ namespace Entegro.Application.DTOs.Product
         public MediaFileDto? MainPicture { get; set; }
         public bool Published { get; set; }
         public bool Deleted { get; set; }
-        public DateTime CreatedOnUtc { get; set; }
-        public DateTime UpdatedOnUtc { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
         public List<ProductMediaFileDto> ProductMediaFiles { get; set; } = new List<ProductMediaFileDto>();
         public List<ProductCategoryDto> ProductCategories { get; set; } = new List<ProductCategoryDto>();
     }

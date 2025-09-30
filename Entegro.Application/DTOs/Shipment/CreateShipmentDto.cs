@@ -15,7 +15,7 @@ namespace Entegro.Application.DTOs.Shipment
         public decimal? TotalWeight { get; set; }
         public DateTime? ShippedDateUtc { get; set; }
         public DateTime? DeliveryDateUtc { get; set; }
-        public DateTime CreatedOnUtc { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         public List<CreateShipmentItemDto> ShipmentItems { get; set; } = new List<CreateShipmentItemDto>();
     }

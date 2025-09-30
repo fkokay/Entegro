@@ -14,6 +14,6 @@
         public decimal? OptionalExtraAmount { get; set; }
         public string? PriceAdjustmentType { get; set; }
         public bool Enable { get; set; }
-        public DateTime CreatedOnUtc { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 }

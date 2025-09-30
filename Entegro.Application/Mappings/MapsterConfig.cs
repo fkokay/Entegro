@@ -12,6 +12,7 @@ using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemLog;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
+using Entegro.Application.DTOs.Invoice;
 using Entegro.Application.DTOs.Log;
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.MediaFolder;
@@ -182,6 +183,12 @@ namespace Entegro.Application.Mappings
             config.NewConfig<Setting, SettingDto>().TwoWays();
             config.NewConfig<Setting, CreateSettingDto>().TwoWays();
             config.NewConfig<Setting, UpdateSettingDto>().TwoWays();
+
+
+            // ---------------- Invoice ----------------
+            config.NewConfig<Invoice, InvoiceDto>().TwoWays();
+            config.NewConfig<Invoice, CreateInvoiceDto>().TwoWays();
+            config.NewConfig<Invoice, UpdateInvoiceDto>().TwoWays();
 
             // ---------------- Notification ----------------
 

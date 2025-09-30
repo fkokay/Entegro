@@ -85,6 +85,14 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<ImportProfileDto>> GetPagedAsync(GridCommand gridCommand)
         {
             var importProfile = await _importProfileRepository.GetPagedAsync(gridCommand);
+
+            var items = await importProfile.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ImportProfileDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
             return new PagedResult<ImportProfileDto>
             {
                 Items = _mapper.Map<IEnumerable<ImportProfileDto>>(importProfile.Items),

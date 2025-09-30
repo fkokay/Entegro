@@ -86,13 +86,13 @@ namespace Entegro.Application.Services
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
 
 
-            var brands = await _shipmentRepository.GetAllAsync(pageNumber, pageSize);
+            var shipments = await _shipmentRepository.GetAllAsync(pageNumber, pageSize);
             return new PagedResult<ShipmentDto>
             {
-                Items = _mapper.Map<IEnumerable<ShipmentDto>>(brands.Items),
-                TotalCount = brands.TotalCount,
-                PageNumber = brands.PageNumber,
-                PageSize = brands.PageSize
+                Items = _mapper.Map<IEnumerable<ShipmentDto>>(shipments.Items),
+                TotalCount = shipments.TotalCount,
+                PageNumber = shipments.PageNumber,
+                PageSize = shipments.PageSize
             };
         }
 
@@ -150,6 +150,16 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<ShipmentDto>> GetPagedAsync(GridCommand gridCommand)
         {
             var shipment = await _shipmentRepository.GetPagedAsync(gridCommand);
+
+            var items = await shipment.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ShipmentDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.ShippedDate = x.ShippedDateUtc.ToLocalTime();
+                model.DeliveryDate = x.DeliveryDateUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
             return new PagedResult<ShipmentDto>
             {
                 Items = _mapper.Map<IEnumerable<ShipmentDto>>(shipment.Items),

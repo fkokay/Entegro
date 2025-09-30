@@ -39,6 +39,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IShipmentRepository, ShipmentRepository>();
             services.AddScoped<IShipmentItemRepository, ShipmentItemRepository>();
+            services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddScoped<IImportProfileRepository, ImportProfileRepository>();
             services.AddScoped<ITreeNodeRepository<Category>, TreeNodeRepository<Category>>();
             services.AddScoped<IProductSpecificationAttributeMappingRepository, ProductSpecificationAttributeMappingRepository>();

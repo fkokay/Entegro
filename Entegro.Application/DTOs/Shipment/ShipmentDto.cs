@@ -1,5 +1,4 @@
-﻿using Entegro.Application.DTOs.Order;
-using Entegro.Application.DTOs.ShipmentItem;
+﻿using Entegro.Application.DTOs.ShipmentItem;
 
 namespace Entegro.Application.DTOs.Shipment
 {
@@ -12,9 +11,9 @@ namespace Entegro.Application.DTOs.Shipment
         public string? TrackingNumber { get; set; }
         public string? TrackingUrl { get; set; }
         public decimal? TotalWeight { get; set; }
-        public DateTime? ShippedDateUtc { get; set; }
-        public DateTime? DeliveryDateUtc { get; set; }
-        public DateTime CreatedOnUtc { get; set; }
+        public DateTime? ShippedDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+        public DateTime CreatedOn { get; set; }
         public virtual ICollection<ShipmentItemDto> ShipmentItems { get; set; } = new HashSet<ShipmentItemDto>();
     }
 }

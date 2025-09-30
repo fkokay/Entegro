@@ -75,9 +75,17 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<AddressDto>> GetPagedAsync(GridCommand gridCommand, int customerId)
         {
             var addresses = await _addressRepository.GetPagedAsync(gridCommand, customerId);
+
+            var items = await addresses.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<AddressDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
             return new PagedResult<AddressDto>
             {
-                Items = _mapper.Map<IEnumerable<AddressDto>>(addresses.Items),
+                Items = items,
                 TotalCount = addresses.TotalCount,
                 PageNumber = addresses.PageNumber,
                 PageSize = addresses.PageSize

@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Entegro.Application.DTOs.Order;
 
-namespace Entegro.Domain.Entities.Checkout
+namespace Entegro.Application.DTOs.Invoice
 {
-    [Table("Invoice")]
-    public class Invoice : BaseEntity
+    public class CreateInvoiceDto
     {
+        public int Id { get; set; }
         public string InvoiceNumber { get; set; }
         public DateTime InvoiceDate { get; set; }
         public DateTime DueDate { get; set; }
@@ -16,9 +16,7 @@ namespace Entegro.Domain.Entities.Checkout
         public string CustomerName { get; set; }
         public string CustomerEmail { get; set; }
         public string Status { get; set; }
-        // Navigation property
         public int OrderId { get; set; }
-        public virtual Order Order { get; set; }
-        public virtual ICollection<InvoiceItem> InvoiceItems { get; set; } = new HashSet<InvoiceItem>();
+        public OrderDto Order { get; set; }
     }
 }
