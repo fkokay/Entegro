@@ -1,8 +1,9 @@
 ﻿var Entegro = Entegro || {};
 Entegro.scheduling = Entegro.scheduling || {};
-Entegro.scheduling.history = (function ($) {
 
-    function init(taskDescriptorId) {
+Entegro.scheduling = (function ($) {
+
+    function initHistoryTable(taskDescriptorId) {
         if (!taskDescriptorId) return;
 
         const table = $('#HistoryTable').DataTable({
@@ -16,7 +17,7 @@ Entegro.scheduling.history = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[3, 'desc']],
+            order: [[3, 'desc']], 
             ajax: {
                 url: '/Scheduling/TaskExecutionInfoList?taskDescriptorId=' + taskDescriptorId,
                 type: 'POST',
@@ -33,25 +34,60 @@ Entegro.scheduling.history = (function ($) {
                     data: 'StartedOn',
                     name: 'StartedOnUtc',
                     title: 'Uygulama Başlama Tarihi',
-                    render: function (data, type) {
-                        if (type === "sort" || type === "type") return data;
-                        return data ? moment(data).format("DD.MM.yyyy HH:mm") : "-";
+                    render: function (data) {
+                        if (!data) return '-';
+                        const date = new Date(data);
+                        const timeAgo = moment(date).fromNow();
+                        return `
+                <div class="d-flex flex-column">
+                    <span>${date.toLocaleString("tr-TR")}</span>
+                    <small class="text-muted">${timeAgo}</small>
+                </div>`;
                     }
                 },
                 {
                     data: 'FinishedOn',
                     name: 'FinishedOnUtc',
                     title: 'Tamamlanma Tarihi',
-                    render: function (data, type) {
-                        if (type === "sort" || type === "type") return data;
-                        return data ? moment(data).format("DD.MM.yyyy HH:mm") : "-";
+                    render: function (data) {
+                        if (!data) return '-';
+                        const date = new Date(data);
+                        const timeAgo = moment(date).fromNow();
+                        return `
+                <div class="d-flex flex-column">
+                    <span>${date.toLocaleString("tr-TR")}</span>
+                    <small class="text-muted">${timeAgo}</small>
+                </div>`;
+                    }
+                },
+                {
+                    data: null,
+                    title: 'Süre',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (!row.StartedOn || !row.FinishedOn) return '-';
+
+                        const start = moment(row.StartedOn);
+                        const end = moment(row.FinishedOn);
+                        const duration = moment.duration(end.diff(start));
+
+                        const hours = duration.hours();
+                        const minutes = duration.minutes();
+                        const seconds = duration.seconds();
+
+                        const parts = [];
+                        if (hours) parts.push(`${hours} saat`);
+                        if (minutes) parts.push(`${minutes} dakika`);
+                        if (seconds || parts.length === 0) parts.push(`${seconds} saniye`);
+
+                        return `<span>${parts.join(' ')}</span>`;
                     }
                 },
                 {
                     data: 'Error',
                     title: 'Hata Mesajı',
                     orderable: false,
-                    render: function (data) {
+                    render: function (data, type, row) {
                         if (!data) {
                             return '<span class="text-muted">-</span>';
                         }
@@ -93,10 +129,8 @@ Entegro.scheduling.history = (function ($) {
                 },
                 bottomEnd: "paging"
             }
-
         });
 
-        // Görsel sınıf düzeltmeleri
         setTimeout(() => {
             const adjustments = [
                 { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -116,19 +150,27 @@ Entegro.scheduling.history = (function ($) {
                 });
             });
         }, 100);
-
         return table;
     }
-
     function timeAgo(date) {
         const now = new Date();
-        const ts = (now - new Date(date)) / 1000;
+        const ts = (now - new Date(date)) / 1000; // saniye farkı
 
-        if (ts < 60) return `${Math.floor(ts)} saniye önce`;
-        if (ts < 3600) return `${Math.floor(ts / 60)} dakika önce`;
-        if (ts < 86400) return `${Math.floor(ts / 3600)} saat önce`;
-        if (ts < 2592000) return `${Math.floor(ts / 86400)} gün önce`;
-        if (ts < 31536000) return `${Math.floor(ts / 2592000)} ay önce`;
+        if (ts < 60) {
+            return `${Math.floor(ts)} saniye önce`;
+        }
+        if (ts < 3600) {
+            return `${Math.floor(ts / 60)} dakika önce`;
+        }
+        if (ts < 86400) {
+            return `${Math.floor(ts / 3600)} saat önce`;
+        }
+        if (ts < 2592000) {
+            return `${Math.floor(ts / 86400)} gün önce`;
+        }
+        if (ts < 31536000) {
+            return `${Math.floor(ts / 2592000)} ay önce`;
+        }
         return `${Math.floor(ts / 31536000)} yıl önce`;
     }
 
@@ -136,9 +178,12 @@ Entegro.scheduling.history = (function ($) {
         const now = new Date();
         const target = new Date(date);
         const diffSec = Math.floor((target - now) / 1000);
+
         const absSec = Math.abs(diffSec);
 
-        if (absSec < 60) return diffSec >= 0 ? `${absSec} saniye sonra` : `${absSec} saniye önce`;
+        if (absSec < 60) {
+            return diffSec >= 0 ? `${absSec} saniye sonra` : `${absSec} saniye önce`;
+        }
         if (absSec < 3600) {
             const min = Math.floor(absSec / 60);
             return diffSec >= 0 ? `${min} dakika sonra` : `${min} dakika önce`;
@@ -160,7 +205,6 @@ Entegro.scheduling.history = (function ($) {
     }
 
     function formatDuration(start, end) {
-        if (!start || !end) return "-";
         const diffMs = new Date(end) - new Date(start);
 
         let ms = diffMs % 1000;
@@ -170,9 +214,8 @@ Entegro.scheduling.history = (function ($) {
 
         return `${hrs}:${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")},${ms}`;
     }
-
     return {
-        init: init
+        initHistoryTable: initHistoryTable
     };
 
 })(jQuery);
