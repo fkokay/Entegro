@@ -234,8 +234,14 @@ namespace Entegro.Web.Controllers
                     model.ProductImport.Description = mappings.FirstOrDefault(m => m.MappedName == "Description")?.XmlHeader;
                     model.ProductImport.Images = mappings.FirstOrDefault(m => m.MappedName == "Images")?.XmlHeader?.Split(',');
                     model.ProductImport.Categories = mappings.FirstOrDefault(m => m.MappedName == "Categories")?.XmlHeader?.Split(',');
-                }
+                    model.AttributeStockCode = mappings.FirstOrDefault(m => m.MappedName == "AttributeStockCode")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
+                    model.AttributePrice = mappings.FirstOrDefault(m => m.MappedName == "AttributePrice")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
+                    model.AttributeGtin = mappings.FirstOrDefault(m => m.MappedName == "AttributeGtin")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
+                    model.AttributeManufacturerPartNumber = mappings.FirstOrDefault(m => m.MappedName == "AttributeManufacturerPartNumber")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
+                    model.AttributeSpecifications = mappings.FirstOrDefault(m => m.MappedName == "AttributeSpecifications")?.XmlHeader;
+                    model.AttributeStockQuantity = mappings.FirstOrDefault(m => m.MappedName == "AttributeStockQuantity")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
 
+                }
                 ViewBag.XmlPathsSelectList = model.Paths.Select(m => new SelectListItem()
                 {
                     Text = m,
@@ -258,7 +264,7 @@ namespace Entegro.Web.Controllers
                     return parts.Contains(targetIndex.ToString());
                 }).ToList();
 
-                ViewBag.VariantCount = variantCount;
+                model.VariantCount = variantCount;
                 ViewBag.VariantPaths = variantPaths;
                 ViewBag.XmlPaths = model.Paths;
                 ViewBag.PreviewXml = model.PreviewXml;
@@ -283,7 +289,6 @@ namespace Entegro.Web.Controllers
                 createProfile.MediaFileUrl = model.MediaFileUrl;
                 createProfile.ProfileName = model.ProfileName;
                 createProfile.Enable = model.Enable;
-
                 var profile = await _importProfileService.AddAsync(createProfile);
 
                 return RedirectToAction("Xml", new { profileId = profile.Id });
@@ -291,7 +296,9 @@ namespace Entegro.Web.Controllers
             else
             {
                 Type[] allowedTypes = { typeof(string), typeof(string[]) };
+                UpdateVariantMappedProperties(model);
 
+                var headerMaps = GetHeaderMappings(model);
                 var maps = model.ProductImport.GetType()
                 .GetProperties()
                 .Where(p => allowedTypes.Contains(p.PropertyType))
@@ -328,6 +335,7 @@ namespace Entegro.Web.Controllers
                 })
                 .Where(h => !string.IsNullOrWhiteSpace(h.XmlHeader))
                 .ToList();
+
 
                 var columnMapping = System.Text.Json.JsonSerializer.Serialize(maps);
 

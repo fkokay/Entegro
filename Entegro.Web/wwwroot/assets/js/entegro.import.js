@@ -108,9 +108,7 @@ Entegro.import = (function ($) {
 
         const selectedAttributeSpecifications = $('[name="AttributeSpecifications"]').val();
         $('#SelectedAttributeSpecifications').val(selectedAttributeSpecifications && selectedAttributeSpecifications.length > 0 ? selectedAttributeSpecifications.join(',') : '');
-        // Dinamik alanlar init
-        initPriceAdjustmentToggle();
-        initVariantToggle();
+       
         return true;
     }
    
@@ -171,7 +169,9 @@ Entegro.import = (function ($) {
     return {
         validateXmlProductForm: validateXmlProductForm,
         initXmlImportFormValidation: initXmlImportFormValidation,
-        initSelect2: initSelect2
+        initSelect2: initSelect2,
+        initPriceAdjustmentToggle: initPriceAdjustmentToggle,
+        initVariantToggle: initVariantToggle
     };
 
 })(jQuery);
