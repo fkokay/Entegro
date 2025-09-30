@@ -171,7 +171,7 @@
             $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-history"]').on('shown.bs.tab', function () {
                 var id = @Html.Raw(Json.Serialize(Model.Id));
                 if (id && id > 0) {
-                    Entegro.scheduling.initHistoryTable(id);
+                    Entegro.scheduling.history.init(id);
                 }
             });
         });
