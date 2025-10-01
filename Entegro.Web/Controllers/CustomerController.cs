@@ -2,7 +2,7 @@
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.CustomerAddressMapping;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models;
 using Entegro.Web.Models.Common;
 using MapsterMapper;

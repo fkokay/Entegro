@@ -2,7 +2,7 @@
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.MediaFile;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Import;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

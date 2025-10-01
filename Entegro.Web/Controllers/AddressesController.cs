@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 

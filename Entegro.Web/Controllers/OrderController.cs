@@ -2,7 +2,7 @@
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Checkout.Orders;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;

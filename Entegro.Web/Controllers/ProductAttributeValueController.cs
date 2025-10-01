@@ -1,7 +1,7 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Web.Models.Catalog.Attributes;
 using MapsterMapper;

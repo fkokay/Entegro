@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductAttribute;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Catalog.Attributes;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;

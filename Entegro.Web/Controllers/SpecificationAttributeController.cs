@@ -1,7 +1,7 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Catalog.SpecificationAttributeOptions;
 using Entegro.Web.Models.Catalog.SpecificationAttributes;
 using Microsoft.AspNetCore.Mvc;

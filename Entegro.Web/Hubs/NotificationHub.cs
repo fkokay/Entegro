@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.Notification;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Enums;
 using Microsoft.AspNetCore.SignalR;
 

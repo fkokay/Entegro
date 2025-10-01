@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.Events;
-using Entegro.Application.Interfaces;
+using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Services.Commerce;

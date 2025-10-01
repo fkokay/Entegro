@@ -1,0 +1,98 @@
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.Interfaces.Repositories;
+using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Domain.Entities.Catalog;
+using MapsterMapper;
+
+namespace Entegro.Application.Services.Base
+{
+    public class ProductAttributeService : IProductAttributeService
+    {
+        private readonly IProductAttributeRepository _productAttributeRepository;
+        private readonly IMapper _mapper;
+
+        public ProductAttributeService(IProductAttributeRepository productAttributeRepository, IMapper mapper)
+        {
+            _productAttributeRepository = productAttributeRepository ?? throw new ArgumentNullException(nameof(productAttributeRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<ProductAttributeDto> AddAsync(CreateProductAttributeDto productAttribute)
+        {
+            var model = _mapper.Map<ProductAttribute>(productAttribute);
+            await _productAttributeRepository.AddAsync(model);
+            return _mapper.Map<ProductAttributeDto>(model);
+        }
+
+        public async Task DeleteAsync(int productAttributeId)
+        {
+            var productAttribute = await _productAttributeRepository.GetByIdAsync(productAttributeId);
+
+            if (productAttribute == null)
+            {
+                throw new KeyNotFoundException($"ProductAttribute with ID {productAttributeId} not found.");
+            }
+            await _productAttributeRepository.DeleteAsync(productAttribute);
+
+        }
+
+        public async Task<List<ProductAttributeDto>> GetAllAsync()
+        {
+            var productAttributes = await _productAttributeRepository.GetAllAsync();
+            var productAttributeDtos = _mapper.Map<IEnumerable<ProductAttributeDto>>(productAttributes);
+            return productAttributeDtos.ToList();
+        }
+
+        public async Task<PagedResult<ProductAttributeDto>> GetPagedAsync(int pageNumber, int pageSize)
+        {
+            var productAttributes = await _productAttributeRepository.GetAllAsync(pageNumber, pageSize);
+            var productAttributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(productAttributes);
+            return productAttributeDtos;
+        }
+
+        public async Task<ProductAttributeDto?> GetByIdAsync(int id)
+        {
+            var productAttribute = await _productAttributeRepository.GetByIdAsync(id);
+            if (productAttribute == null)
+            {
+                throw new KeyNotFoundException($"ProductAttribute with ID {id} not found.");
+            }
+
+            var productAttributeDto = _mapper.Map<ProductAttributeDto>(productAttribute);
+            return productAttributeDto;
+        }
+
+        public async Task<ProductAttributeDto?> GetByNameAsync(string name)
+        {
+            var productAttribute = await _productAttributeRepository.GetByNameAsync(name);
+            if (productAttribute == null)
+            {
+                return null;
+            }
+
+            var productAttributeDto = _mapper.Map<ProductAttributeDto>(productAttribute);
+            return productAttributeDto;
+        }
+
+        public async Task<ProductAttributeDto> UpdateAsync(UpdateProductAttributeDto productAttribute)
+        {
+            await _productAttributeRepository.UpdateAsync(_mapper.Map<ProductAttribute>(productAttribute));
+            return _mapper.Map<ProductAttributeDto>(productAttribute);
+        }
+
+        public async Task<PagedResult<ProductAttributeDto>> GetPagedAsync(GridCommand gridCommand)
+        {
+            var productAttributes = await _productAttributeRepository.GetPagedAsync(gridCommand);
+            var productAttributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(productAttributes);
+            return productAttributeDtos;
+        }
+
+        public async Task<PagedResult<ProductAttributeDto>> GetProductAttributeAsync(int page, string term)
+        {
+            var attributes = await _productAttributeRepository.GetAllAsync(page, term);
+            var attributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(attributes);
+            return attributeDtos;
+        }
+    }
+}

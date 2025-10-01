@@ -1,6 +1,6 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Cargo;
@@ -1693,7 +1693,7 @@ namespace Entegro.Web.Controllers
             }
             switch (eInvoiceType.Value)
             {
-                case "TrendyolEfaturam":
+                case "TrendyolEFaturam":
                     var id = integrationSystemEinvoice.Id;
                     var name = integrationSystemEinvoice.Name;
                     var description = integrationSystemEinvoice.Description;
@@ -1712,7 +1712,9 @@ namespace Entegro.Web.Controllers
                     model.ApiUser = apiUser?.Value;
                     model.ApiPassword = apiPassword?.Value;
 
-                    return View($"EInvoice.TrendyolEfaturam", model);
+                    return View($"EInvoice.TrendyolEFaturam", model);
+                case "QNB E-Finans":
+                    return View($"EInvoice.EFinans");
             }
             return NotFound();
         }

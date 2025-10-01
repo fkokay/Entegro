@@ -9,7 +9,7 @@ using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Erp;
 using Entegro.Application.Mappings.Erp;
 using Entegro.Domain.Enums;

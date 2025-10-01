@@ -1,7 +1,7 @@
-﻿using Entegro.Application.Interfaces;
+﻿using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Application.Interfaces.Services;
-using Entegro.Application.Services;
+using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Application.Services.Base;
 using Entegro.Infrastructure.Messaging;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;

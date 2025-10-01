@@ -1,4 +1,4 @@
-﻿using Entegro.Application.Interfaces;
+﻿using Entegro.Application.Interfaces.Event;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

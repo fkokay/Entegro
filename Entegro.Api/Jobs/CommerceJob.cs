@@ -3,7 +3,7 @@ using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Quartz;

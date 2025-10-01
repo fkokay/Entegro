@@ -10,7 +10,7 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Products;

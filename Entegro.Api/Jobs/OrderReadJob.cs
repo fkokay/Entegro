@@ -11,7 +11,7 @@ using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Commerce;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Commerce.Smartstore;

@@ -3,7 +3,7 @@ using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using MapsterMapper;

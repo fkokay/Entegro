@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Entegro.Web.Controllers

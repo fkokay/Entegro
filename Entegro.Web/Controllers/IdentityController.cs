@@ -1,4 +1,4 @@
-﻿using Entegro.Application.Interfaces.Services;
+﻿using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Platform.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;

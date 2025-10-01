@@ -8,7 +8,7 @@ using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Newtonsoft.Json;
 using Quartz;
 using System.Collections.Concurrent;

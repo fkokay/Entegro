@@ -1,4 +1,4 @@
-﻿using Entegro.Application.Services;
+﻿using Entegro.Application.Services.Base;
 using Entegro.Caching;
 using Entegro.Collections;
 using Entegro.Data;

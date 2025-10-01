@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using Entegro.Application.Interfaces.Services;
 using System.Threading.Tasks;
 using MapsterMapper;
+using Entegro.Application.Interfaces.Services.Base;
 
 namespace Entegro.Web.Components
 {

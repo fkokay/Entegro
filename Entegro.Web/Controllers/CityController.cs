@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.City;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Common;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;

@@ -1,5 +1,5 @@
 ﻿using Entegro.Application.DTOs.MediaFolder;
-using Entegro.Application.Interfaces.Services;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Mvc;
