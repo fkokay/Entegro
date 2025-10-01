@@ -49,9 +49,18 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<TaskExecutionInfoDto>> GetPagedAsync(GridCommand gridCommand, int taskDescriptorId)
         {
             var info = await _taskExecutionInfoRepository.GetPagedAsync(gridCommand, taskDescriptorId);
+
+            var items = await info.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<TaskExecutionInfoDto>(x);
+                model.StartedOn = x.StartedOnUtc.ToLocalTime();
+                model.FinishedOn = x.FinishedOnUtc.ToLocalTime();
+                model.SucceededOn = x.SucceededOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
             return new PagedResult<TaskExecutionInfoDto>
             {
-                Items = _mapper.Map<IEnumerable<TaskExecutionInfoDto>>(info.Items),
+                Items = items,
                 TotalCount = info.TotalCount,
                 PageNumber = info.PageNumber,
                 PageSize = info.PageSize

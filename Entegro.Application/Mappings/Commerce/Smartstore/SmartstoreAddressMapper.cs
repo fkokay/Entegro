@@ -40,8 +40,8 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 address.TaxOffice = smartstoreAddress.TaxOffice;
                 address.TaxOfficeNumber = smartstoreAddress.TaxNumber;
                 address.FaxNumber = smartstoreAddress.FaxNumber;
-                address.CreatedOnUtc = DateTime.UtcNow;
-                address.UpdatedOnUtc = DateTime.UtcNow;
+                address.CreatedOn = DateTime.UtcNow;
+                address.UpdatedOn = DateTime.UtcNow;
                 return address;
             }
             catch (Exception ex)

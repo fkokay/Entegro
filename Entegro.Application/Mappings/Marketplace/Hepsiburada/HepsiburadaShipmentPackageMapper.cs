@@ -118,9 +118,9 @@ namespace Entegro.Application.Mappings.Marketplace.Hepsiburada
             shipmentDto.TrackingNumber = hepsiburadaShipmentPackage.Barcode;
             shipmentDto.TrackingUrl = "";
             shipmentDto.TotalWeight = 0;
-            shipmentDto.ShippedDateUtc = null;
-            shipmentDto.DeliveryDateUtc = null;
-            shipmentDto.CreatedOnUtc = DateTime.UtcNow;
+            shipmentDto.ShippedDate = null;
+            shipmentDto.DeliveryDate = null;
+            shipmentDto.CreatedOn = DateTime.UtcNow;
 
             order.Shipments.Add(shipmentDto);
 

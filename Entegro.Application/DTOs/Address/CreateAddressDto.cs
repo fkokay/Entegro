@@ -20,7 +20,7 @@
         public string? FaxNumber { get; set; }
         public string? TaxOffice { get; set; }
         public string? TaxOfficeNumber { get; set; }
-        public DateTime CreatedOnUtc { get; set; }
-        public DateTime UpdatedOnUtc { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
     }
 }

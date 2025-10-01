@@ -1,14 +1,7 @@
-﻿using Entegro.Application.DTOs.Commerce.Smartstore;
-using Entegro.Application.DTOs.Marketplace.Trendyol;
+﻿using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Shipment;
-using Entegro.Application.Mappings.Commerce.Smartstore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Marketplace.Trendyol
 {
@@ -59,7 +52,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
                 Street = "",
                 TaxOffice = trendyolShipmentPackage.InvoiceAddress.TaxOffice,
                 Town = "",
-                Name = trendyolShipmentPackage.CustomerFirstName+" "+trendyolShipmentPackage.CustomerLastName,
+                Name = trendyolShipmentPackage.CustomerFirstName + " " + trendyolShipmentPackage.CustomerLastName,
             };
             order.BillingAddress = new DTOs.Address.AddressDto()
             {
@@ -112,9 +105,9 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             shipmentDto.TrackingNumber = trendyolShipmentPackage.CargoTrackingNumber.ToString();
             shipmentDto.TrackingUrl = trendyolShipmentPackage.CargoTrackingLink;
             shipmentDto.TotalWeight = trendyolShipmentPackage.CargoDeci;
-            shipmentDto.ShippedDateUtc = null;
-            shipmentDto.DeliveryDateUtc = null;
-            shipmentDto.CreatedOnUtc = DateTime.UtcNow;
+            shipmentDto.ShippedDate = null;
+            shipmentDto.DeliveryDate = null;
+            shipmentDto.CreatedOn = DateTime.UtcNow;
 
             order.Shipments.Add(shipmentDto);
 

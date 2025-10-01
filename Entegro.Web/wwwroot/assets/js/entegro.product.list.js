@@ -324,7 +324,8 @@ Entegro.product.list = (function ($) {
                 },
                 { data: 'StockQuantity'},
                 {
-                    data: 'UpdatedOnUtc',
+                    data: 'UpdatedOn',
+                    name: 'UpdatedOnUtc',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.YYYY HH:mm");

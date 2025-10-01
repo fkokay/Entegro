@@ -35,7 +35,14 @@ Entegro.scheduling = (function ($) {
                     name: 'StartedOnUtc',
                     title: 'Uygulama Başlama Tarihi',
                     render: function (data) {
-                        return data ? new Date(data).toLocaleString("tr-TR") : "-";
+                        if (!data) return '-';
+                        const date = new Date(data);
+                        const timeAgo = moment(date).fromNow();
+                        return `
+                <div class="d-flex flex-column">
+                    <span>${date.toLocaleString("tr-TR")}</span>
+                    <small class="text-muted">${timeAgo}</small>
+                </div>`;
                     }
                 },
                 {
@@ -43,7 +50,37 @@ Entegro.scheduling = (function ($) {
                     name: 'FinishedOnUtc',
                     title: 'Tamamlanma Tarihi',
                     render: function (data) {
-                        return data ? new Date(data).toLocaleString("tr-TR") : "-";
+                        if (!data) return '-';
+                        const date = new Date(data);
+                        const timeAgo = moment(date).fromNow();
+                        return `
+                <div class="d-flex flex-column">
+                    <span>${date.toLocaleString("tr-TR")}</span>
+                    <small class="text-muted">${timeAgo}</small>
+                </div>`;
+                    }
+                },
+                {
+                    data: null,
+                    title: 'Süre',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (!row.StartedOn || !row.FinishedOn) return '-';
+
+                        const start = moment(row.StartedOn);
+                        const end = moment(row.FinishedOn);
+                        const duration = moment.duration(end.diff(start));
+
+                        const hours = duration.hours();
+                        const minutes = duration.minutes();
+                        const seconds = duration.seconds();
+
+                        const parts = [];
+                        if (hours) parts.push(`${hours} saat`);
+                        if (minutes) parts.push(`${minutes} dakika`);
+                        if (seconds || parts.length === 0) parts.push(`${seconds} saniye`);
+
+                        return `<span>${parts.join(' ')}</span>`;
                     }
                 },
                 {
@@ -85,6 +122,7 @@ Entegro.scheduling = (function ($) {
                         }
                     }]
                 },
+                topEnd: null,
                 bottomStart: {
                     rowClass: "row mx-3 justify-content-between",
                     features: ["info"]
@@ -114,7 +152,68 @@ Entegro.scheduling = (function ($) {
         }, 100);
         return table;
     }
+    function timeAgo(date) {
+        const now = new Date();
+        const ts = (now - new Date(date)) / 1000; // saniye farkı
 
+        if (ts < 60) {
+            return `${Math.floor(ts)} saniye önce`;
+        }
+        if (ts < 3600) {
+            return `${Math.floor(ts / 60)} dakika önce`;
+        }
+        if (ts < 86400) {
+            return `${Math.floor(ts / 3600)} saat önce`;
+        }
+        if (ts < 2592000) {
+            return `${Math.floor(ts / 86400)} gün önce`;
+        }
+        if (ts < 31536000) {
+            return `${Math.floor(ts / 2592000)} ay önce`;
+        }
+        return `${Math.floor(ts / 31536000)} yıl önce`;
+    }
+
+    function timeAgoOrAfter(date) {
+        const now = new Date();
+        const target = new Date(date);
+        const diffSec = Math.floor((target - now) / 1000);
+
+        const absSec = Math.abs(diffSec);
+
+        if (absSec < 60) {
+            return diffSec >= 0 ? `${absSec} saniye sonra` : `${absSec} saniye önce`;
+        }
+        if (absSec < 3600) {
+            const min = Math.floor(absSec / 60);
+            return diffSec >= 0 ? `${min} dakika sonra` : `${min} dakika önce`;
+        }
+        if (absSec < 86400) {
+            const hrs = Math.floor(absSec / 3600);
+            return diffSec >= 0 ? `${hrs} saat sonra` : `${hrs} saat önce`;
+        }
+        if (absSec < 2592000) {
+            const days = Math.floor(absSec / 86400);
+            return diffSec >= 0 ? `${days} gün sonra` : `${days} gün önce`;
+        }
+        if (absSec < 31536000) {
+            const months = Math.floor(absSec / 2592000);
+            return diffSec >= 0 ? `${months} ay sonra` : `${months} ay önce`;
+        }
+        const years = Math.floor(absSec / 31536000);
+        return diffSec >= 0 ? `${years} yıl sonra` : `${years} yıl önce`;
+    }
+
+    function formatDuration(start, end) {
+        const diffMs = new Date(end) - new Date(start);
+
+        let ms = diffMs % 1000;
+        let sec = Math.floor((diffMs / 1000) % 60);
+        let min = Math.floor((diffMs / (1000 * 60)) % 60);
+        let hrs = Math.floor(diffMs / (1000 * 60 * 60));
+
+        return `${hrs}:${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")},${ms}`;
+    }
     return {
         initHistoryTable: initHistoryTable
     };

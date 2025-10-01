@@ -189,8 +189,23 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<ProductDto>> GetPagedAsync(GridCommand gridCommand)
         {
             var products = await _productRepository.GetPagedAsync(gridCommand);
-            var productDtos = _mapper.Map<PagedResult<ProductDto>>(products);
-            return productDtos;
+
+            var items = await products.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ProductDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<ProductDto>
+            {
+                Items = items,
+                TotalCount = products.TotalCount,
+                PageNumber = products.PageNumber,
+                PageSize = products.PageSize
+            };
+
         }
 
         public async Task<ProductDto?> GetProductByBarcodeAsync(string productBarcode)
