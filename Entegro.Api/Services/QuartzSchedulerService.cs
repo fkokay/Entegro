@@ -30,9 +30,9 @@ namespace Entegro.Api.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _scheduler = await _schedulerFactory.GetScheduler(stoppingToken);
+            _scheduler = await _schedulerFactory.GetScheduler(CancellationToken.None);
             _scheduler.ListenerManager.AddJobListener(new TaskExecutionListener(_scopeFactory));
-            await _scheduler.Start(stoppingToken);
+            await _scheduler.Start(CancellationToken.None);
 
             _logger.LogInformation("QuartzSchedulerService başlatıldı.");
 

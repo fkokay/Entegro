@@ -129,10 +129,7 @@ builder.Services.AddSwaggerGen();
 
 #region Jobs
 builder.Services.AddQuartz();
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
 builder.Services.AddHostedService<QuartzSchedulerService>();
-//builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 #endregion
 
 #region App Services
