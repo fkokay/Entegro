@@ -42,6 +42,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductAttributeFormatter _productAttributeFormatter;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
         private readonly ICategoryService _categoryService;
         private readonly ITrendyolService _trenyolService;
         private readonly IN11Service _n11Service;
@@ -66,7 +67,8 @@ namespace Entegro.Web.Controllers
             IN11Service n11Service,
             IPazaramaService pazaramaService,
             IHepsiburadaService hepsiburadaService,
-            IMapper mapper)
+            IMapper mapper,
+            IProductVariantAttributeValueService productVariantAttributeValueService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -85,6 +87,7 @@ namespace Entegro.Web.Controllers
             _pazaramaService = pazaramaService;
             _hepsiburadaService = hepsiburadaService;
             _mapper = mapper;
+            _productVariantAttributeValueService = productVariantAttributeValueService;
         }
 
         #region Product list / create / edit / delete
@@ -1858,8 +1861,50 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+
+
         #endregion
 
+
+        #region ProductVariantAttribute
+
+
+        [HttpPost]
+        public async Task<IActionResult> ProductVariantAttributeList([FromBody] GridCommand gridCommand, int productId)
+        {
+            var result = await _productVariantAttributeService.GetPagedAsync(gridCommand, productId);
+
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
+        [HttpGet]
+        public IActionResult ProductVariantAttributeValues(int productVariantAttributeId)
+        {
+            ViewBag.ProductVariantAttributeId = productVariantAttributeId;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProductVariantAttributeValueList([FromBody] GridCommand gridCommand, int productVariantAttributeId)
+        {
+            var result = await _productVariantAttributeValueService.GetPagedAsync(gridCommand, productVariantAttributeId);
+
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
+
+        #endregion
         private async Task PrepareProductModel(ProductModel model, ProductDto? product)
         {
             if (product != null)

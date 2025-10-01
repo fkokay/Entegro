@@ -1,5 +1,4 @@
-﻿
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -86,6 +85,24 @@ namespace Entegro.Application.Services
             var productAttributeMapping = await _productAttributeMappingRepository.GetAllAsync(productId);
             var ProductAttributeMappingDto = _mapper.Map<IEnumerable<ProductVariantAttributeDto>>(productAttributeMapping);
             return ProductAttributeMappingDto.ToList();
+        }
+
+        public async Task<PagedResult<ProductVariantAttributeDto>> GetPagedAsync(GridCommand gridCommand, int productId)
+        {
+            var variantAttributes = await _productAttributeMappingRepository.GetPagedAsync(gridCommand, productId);
+            var items = await variantAttributes.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ProductVariantAttributeDto>(x);
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<ProductVariantAttributeDto>
+            {
+                Items = items,
+                TotalCount = variantAttributes.TotalCount,
+                PageNumber = variantAttributes.PageNumber,
+                PageSize = variantAttributes.PageSize
+            };
         }
     }
 }

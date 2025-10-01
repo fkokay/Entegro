@@ -1,10 +1,9 @@
-﻿
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
 using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
-using System.Xml.Linq;
 
 namespace Entegro.Application.Services
 {
@@ -25,6 +24,8 @@ namespace Entegro.Application.Services
             await _productVariantAttributeValueRepository.AddAsync(model);
             return _mapper.Map<ProductVariantAttributeValueDto>(model);
         }
+
+
 
         public async Task<ProductVariantAttributeValueDto?> GetByIdAsync(int id)
         {
@@ -48,6 +49,25 @@ namespace Entegro.Application.Services
 
             var productAttributeValueDto = _mapper.Map<ProductVariantAttributeValueDto>(productAttributeValue);
             return productAttributeValueDto;
+        }
+
+        public async Task<PagedResult<ProductVariantAttributeValueDto>> GetPagedAsync(GridCommand gridCommand, int productVariantAttributeId)
+        {
+            var values = await _productVariantAttributeValueRepository.GetPagedAsync(gridCommand, productVariantAttributeId);
+
+            var items = await values.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ProductVariantAttributeValueDto>(x);
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<ProductVariantAttributeValueDto>
+            {
+                Items = items,
+                TotalCount = values.TotalCount,
+                PageNumber = values.PageNumber,
+                PageSize = values.PageSize
+            };
         }
     }
 }

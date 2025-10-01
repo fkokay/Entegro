@@ -62,6 +62,8 @@ Entegro.product = (function ($) {
                         });
                     }
                 }
+
+
             });
         });
     }
@@ -593,6 +595,196 @@ Entegro.product = (function ($) {
         });
     }
 
+
+    function initAttributesTable(productId) {
+        if (!productId) return;
+
+        const table = $('#AttributesTable').DataTable({
+            language: {
+                paginate: {
+                    next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                },
+                url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
+            },
+            serverSide: true,
+            order: [[2, 'asc']],
+            ajax: {
+                url: '/Product/ProductVariantAttributeList?productId=' + productId,
+                type: 'POST',
+                contentType: 'application/json',
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            columns: [
+                { data: 'Id', visible: false }, // ID görünmesin
+                {
+                    data: 'ProductAttribute.Name',
+                },
+                {
+                    data: 'AttributeControlTypeId',
+                    title: 'Kontrol Türü',
+                    render: function (data, type, row) {
+                        // Burada enum ya da açıklama gerekiyorsa dönüşüm yapılabilir
+                        const types = {
+                            1: 'Textbox',
+                            2: 'Dropdown',
+                            3: 'Checkbox',
+                            // Diğer kontrol türlerini ekle
+                        };
+                        return types[data] || 'Bilinmiyor';
+                    }
+                },
+                {
+                    data: 'IsRequried',
+                    render: function (data) {
+                        return data ? 'Evet' : 'Hayır';
+                    }
+                },
+                {
+                    data: 'ProductVariantAttributeValues',
+                    title: 'Görüntülenme Sayısı',
+                    render: function (data) {
+                        return data?.length || 0;
+                    }
+                },
+                {
+                    data: 'Id',
+                    title: 'Opsiyonlar',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                         <div class="d-inline-block text-nowrap">
+                             <button type="button"
+                                     class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-edit-attribute"
+                                     data-id="${row.Id}"
+                                     title="Güncelle">
+                                 <i class="icon-base ti ti-pencil icon-22px"></i>
+                             </button>
+
+                             <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow"
+                                     data-bs-toggle="dropdown">
+                                 <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                             </button>
+
+                             <div class="dropdown-menu dropdown-menu-end m-0">
+                                 <button type="button"
+                                         class="dropdown-item text-danger btn-delete-attribute"
+                                         data-id="${row.Id}">
+                                     Sil
+                                 </button>
+                                 <button type="button"
+                                         class="dropdown-item text-primary btn-view-values"
+                                         data-id="${row.Id}">
+                                     Özellik Değerlerini Gör
+                                 </button>
+                             </div>
+                         </div>`;
+                    }
+                }
+
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    checkboxes: {
+                        selectAllRender: '<input type="checkbox" class="form-check-input">'
+                    },
+                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                }
+            ],
+            select: {
+                style: "multi",
+                selector: "td:nth-child(1)"
+            },
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: {
+                            menu: [10, 25, 50, 100],
+                            text: "_MENU_"
+                        },
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                    <i class="icon-base ti ti-upload icon-xs"></i>
+                                    <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                                  </span>`,
+                                buttons: [
+                                    { extend: "print", className: "dropdown-item", text: "Print", exportOptions: { columns: [2] } },
+                                    { extend: "csv", className: "dropdown-item", text: "CSV", exportOptions: { columns: [2] } },
+                                    { extend: "excel", className: "dropdown-item", text: "Excel", exportOptions: { columns: [2] } },
+                                    { extend: "pdf", className: "dropdown-item", text: "PDF", exportOptions: { columns: [2] } },
+                                    { extend: "copy", className: "dropdown-item", text: "Copy", exportOptions: { columns: [2] } }
+                                ]
+                            },
+                            {
+                                text: `<button type="button"
+                                        class="btn btn-primary btn-create-address"
+                                        data-customer-id="${productId}"
+                                        data-address-id="0"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createAddressModal">
+                                        <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                                        <span class="d-none d-sm-inline-block">Ürüne Geri Dön</span>
+                                    </button>`,
+                                className: "p-0 border-0 bg-transparent"
+                            }
+                        ]
+                    }]
+                },
+                bottomStart: {
+                    rowClass: "row mx-3 justify-content-between",
+                    features: ["info"]
+                },
+                bottomEnd: "paging"
+            }
+        });
+
+    
+        setTimeout(() => {
+            const adjustments = [
+                { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
+                { selector: ".dt-buttons.btn-group", classToAdd: "mb-md-0 mb-6" },
+                { selector: ".dt-search .form-control", classToRemove: "form-control-sm", classToAdd: "ms-0" },
+                { selector: ".dt-search", classToAdd: "mb-0 mb-md-6" },
+                { selector: ".dt-length .form-select", classToRemove: "form-select-sm" },
+                { selector: ".dt-layout-end", classToAdd: "gap-md-2 gap-0 mt-0" },
+                { selector: ".dt-layout-start", classToAdd: "mt-0" },
+                { selector: ".dt-layout-table", classToRemove: "row mt-2" },
+                { selector: ".dt-layout-full", classToRemove: "col-md col-12", classToAdd: "table-responsive" }
+            ];
+            adjustments.forEach(({ selector, classToRemove, classToAdd }) => {
+                document.querySelectorAll(selector).forEach(el => {
+                    if (classToRemove) classToRemove.split(" ").forEach(cls => el.classList.remove(cls));
+                    if (classToAdd) classToAdd.split(" ").forEach(cls => el.classList.add(cls));
+                });
+            });
+        }, 100);
+
+        return table;
+    }
     function FocusFieldAndShowTab(fieldEl) {
         const tabPane = fieldEl.closest('.tab-pane');
         if (tabPane) {
@@ -630,6 +822,7 @@ Entegro.product = (function ($) {
         Init: Init,
         TabsInit: TabsInit,
         DescriptionEditor: DescriptionEditor,
+        initAttributesTable: initAttributesTable,
         ProductCategoryCreatePopup: ProductCategoryCreatePopup,
         ProductVariantAttributeCombinationRepeaterInit: ProductVariantAttributeCombinationRepeaterInit,
         Validation: Validation,

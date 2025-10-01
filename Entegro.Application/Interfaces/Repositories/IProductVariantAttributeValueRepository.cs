@@ -1,4 +1,5 @@
-﻿using Entegro.Domain.Entities.Catalog;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities.Catalog;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
@@ -6,6 +7,7 @@ namespace Entegro.Application.Interfaces.Repositories
     {
         Task<ProductVariantAttributeValue?> GetByIdAsync(int id);
         Task<ProductVariantAttributeValue?> GetByNameAsync(int productVariantAttributeId, string name);
+        Task<PagedResult<ProductVariantAttributeValue>> GetPagedAsync(GridCommand gridCommand, int productVariantAttributeId);
         Task AddAsync(ProductVariantAttributeValue data);
     }
 }
