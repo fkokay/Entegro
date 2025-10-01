@@ -109,13 +109,13 @@ namespace Entegro.Application.Services
                 throw new ArgumentOutOfRangeException(nameof(pageSize));
 
 
-            var brands = await _specificationAttributeOptionRepository.GetAllAsync(pageNumber, pageSize);
+            var attributes = await _specificationAttributeOptionRepository.GetAllAsync(pageNumber, pageSize);
             return new PagedResult<SpecificationAttributeOptionDto>
             {
-                Items = _mapper.Map<IEnumerable<SpecificationAttributeOptionDto>>(brands.Items),
-                TotalCount = brands.TotalCount,
-                PageNumber = brands.PageNumber,
-                PageSize = brands.PageSize
+                Items = _mapper.Map<IEnumerable<SpecificationAttributeOptionDto>>(attributes.Items),
+                TotalCount = attributes.TotalCount,
+                PageNumber = attributes.PageNumber,
+                PageSize = attributes.PageSize
             };
         }
 

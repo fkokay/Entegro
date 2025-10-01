@@ -18,5 +18,6 @@ namespace Entegro.Application.Interfaces.Services
         Task<ProductDto> UpdateAsync(UpdateProductDto updateProduct);
         Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId);
         Task DeleteAsync(int productId);
+        Task<int> GetProductCountAsync();
     }
 }

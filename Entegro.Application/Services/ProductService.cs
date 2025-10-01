@@ -214,5 +214,10 @@ namespace Entegro.Application.Services
             var productDto = product == null ? null : _mapper.Map<ProductDto>(product);
             return productDto;
         }
+
+        public async Task<int> GetProductCountAsync()
+        {
+            return await _productRepository.GetProductCountAsync();
+        }
     }
 }

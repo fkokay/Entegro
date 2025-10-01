@@ -99,7 +99,7 @@ namespace Entegro.Web.Controllers
             createShipment.DeliveryDateUtc = null;
             createShipment.ShippedDateUtc = null;
             createShipment.OrderId = orderPackages[0].OrderId;
-            createShipment.CreatedOnUtc = DateTime.UtcNow;
+            createShipment.CreatedOn = DateTime.UtcNow;
             createShipment.ShipmentItems = orderPackages.Where(m => m.IsPackage).Select(m => new Application.DTOs.ShipmentItem.CreateShipmentItemDto()
             {
                 OrderItemId = m.OrderItemId,

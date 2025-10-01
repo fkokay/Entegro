@@ -42,9 +42,15 @@ namespace Entegro.Application.Services
         public async Task<PagedResult<OrderNoteDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7)
         {
             var orderNotes = await _orderNoteRepository.GetAllAsync("", pageNumber, pageSize);
+            var items = await orderNotes.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<OrderNoteDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
             return new PagedResult<OrderNoteDto>
             {
-                Items = _mapper.Map<IEnumerable<OrderNoteDto>>(orderNotes.Items),
+                Items = items,
                 TotalCount = orderNotes.TotalCount,
                 PageNumber = orderNotes.PageNumber,
                 PageSize = orderNotes.PageSize

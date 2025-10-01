@@ -1,11 +1,6 @@
 ﻿using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.OrderNote;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Commerce.Smartstore
 {
@@ -30,7 +25,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 orderNote.Id = 0;
                 orderNote.OrderId = smartstoreOrderNote.OrderId;
                 orderNote.Note = smartstoreOrderNote.Note;
-                orderNote.CreatedOnUtc = smartstoreOrderNote.CreatedOnUtc;
+                orderNote.CreatedOn = smartstoreOrderNote.CreatedOnUtc;
 
 
                 return orderNote;

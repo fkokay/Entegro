@@ -87,9 +87,19 @@ namespace Entegro.Application.Services
 
 
             var shipments = await _shipmentRepository.GetAllAsync(pageNumber, pageSize);
+
+            var items = await shipments.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ShipmentDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.ShippedDate = x.ShippedDateUtc.ToLocalTime();
+                model.DeliveryDate = x.DeliveryDateUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
             return new PagedResult<ShipmentDto>
             {
-                Items = _mapper.Map<IEnumerable<ShipmentDto>>(shipments.Items),
+                Items = items,
                 TotalCount = shipments.TotalCount,
                 PageNumber = shipments.PageNumber,
                 PageSize = shipments.PageSize

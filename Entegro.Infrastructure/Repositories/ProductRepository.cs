@@ -1,6 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Collections;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +58,7 @@ namespace Entegro.Infrastructure.Repositories
             return product;
         }
 
-        public async Task<Application.DTOs.Common.PagedResult<Product>> GetAllAsync(int page,string term)
+        public async Task<Application.DTOs.Common.PagedResult<Product>> GetAllAsync(int page, string term)
         {
             var query = IncludeAllProperties(_context.Products.AsNoTracking());
             if (!string.IsNullOrEmpty(term))
@@ -189,6 +188,11 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = gridCommand.Start / gridCommand.Length,
                 PageSize = gridCommand.Length
             };
+        }
+
+        public async Task<int> GetProductCountAsync()
+        {
+            return await _context.Products.CountAsync(x => x.Published);
         }
     }
 }
