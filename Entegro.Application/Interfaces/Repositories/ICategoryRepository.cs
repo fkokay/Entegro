@@ -11,6 +11,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<List<Category>> GetManyAsync(IEnumerable<int> ids, bool tracked = false);
         Task<List<Category>> GetAllAsync(bool includeHidden = false);
         Task<PagedResult<Category>> GetAllAsync(string term, int pageNumber, int pageSize);
+        Task<PagedResult<Category>> GetPagedAsync(GridCommand gridCommand);
         Task AddAsync(Category category);
         Task UpdateAsync(Category category);
         Task DeleteAsync(Category category);

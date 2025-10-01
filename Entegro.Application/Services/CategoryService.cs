@@ -148,9 +148,26 @@ namespace Entegro.Application.Services
             };
         }
 
-        public Task<PagedResult<CategoryDto>> GetPagedAsync(GridCommand gridCommand)
+        public async Task<PagedResult<CategoryDto>> GetPagedAsync(GridCommand gridCommand)
         {
-            throw new NotImplementedException();
+            var categories = await _categoryRepository.GetPagedAsync(gridCommand);
+
+            var items = await categories.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<CategoryDto>(x);
+                model.Breadcrumb = await GetCategoryPathAsync(x, "<small class='text-muted d-none d-sm-block'>{0}</small>");
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<CategoryDto>
+            {
+                Items = items,
+                TotalCount = categories.TotalCount,
+                PageNumber = categories.PageNumber,
+                PageSize = categories.PageSize
+            };
         }
 
 

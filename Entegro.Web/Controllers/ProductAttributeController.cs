@@ -28,6 +28,26 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AllProductAttribute([FromForm] int page = 1, [FromForm] string term = "")
+        {
+            var productAttributes = await _productAttributeService.GetProductAttributeAsync(page, term);
+
+            var query = productAttributes.Items.Select(c => new
+            {
+                id = c.Id.ToString(),
+                text = c.Name,
+            });
+
+            var mainList = query.ToList();
+
+            return Json(new
+            {
+                results = mainList,
+                pagination = new { more = productAttributes.HasNextPage }
+            });
+        }
+
         public async Task<IActionResult> CreateOrUpdate(int id)
         {
             if (id == 0)

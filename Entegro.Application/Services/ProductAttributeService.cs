@@ -1,5 +1,4 @@
-﻿
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services;
@@ -87,6 +86,13 @@ namespace Entegro.Application.Services
             var productAttributes = await _productAttributeRepository.GetPagedAsync(gridCommand);
             var productAttributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(productAttributes);
             return productAttributeDtos;
+        }
+
+        public async Task<PagedResult<ProductAttributeDto>> GetProductAttributeAsync(int page, string term)
+        {
+            var attributes = await _productAttributeRepository.GetAllAsync(page, term);
+            var attributeDtos = _mapper.Map<PagedResult<ProductAttributeDto>>(attributes);
+            return attributeDtos;
         }
     }
 }

@@ -4,6 +4,77 @@ Entegro.AttributeValue = Entegro.AttributeValue || {};
 Entegro.AttributeValue.List = (function ($) {
     'use strict';
 
+    function addFilterDropdown(column, containerSelector, placeholder, map = null) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
+        let select = document.createElement("select");
+        select.className = "form-select select2 text-capitalize";
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        container.appendChild(select);
+
+        if (map && Array.isArray(map)) {
+            map.forEach(item => {
+                let option = document.createElement("option");
+                option.value = item.id;
+                option.textContent = item.title;
+                select.appendChild(option);
+            });
+        } else {
+            column.data().unique().sort().each(function (value) {
+                if (value !== null && value !== undefined && value !== "") {
+                    let option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        if (window.jQuery && $(select).select2) {
+            $(select).select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: "resolve"
+            });
+
+
+            $(select).on("change", function () {
+                const val = this.value || "";
+                column.search(val, false, false).draw();
+            });
+        } else {
+            select.addEventListener("change", function () {
+                const val = select.value ? `^${select.value}$` : "";
+                column.search(val, true, false).draw();
+            });
+        }
+
+    }
+    function addFilterText(column, containerSelector, placeholder) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
+        // input elementini oluştur
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control";
+        input.placeholder = placeholder;
+
+        container.appendChild(input);
+
+        // her yazımda filtre uygula (debounce ile optimize edebilirsin)
+        input.addEventListener("keyup", function () {
+            const val = input.value || "";
+            column.search(val, false, true).draw();
+        });
+    }
     const init = function () {
         $(function () {
             const dt = $('#ProductAttributeValueTable').DataTable({
@@ -26,6 +97,7 @@ Entegro.AttributeValue.List = (function ($) {
                 columns: [
                     { data: 'Id' },
                     { data: 'Id', orderable: false, render: DataTable.render.select() },
+                    { data: 'ProductAttributeId' },
                     { data: 'ProductAttributeName' },
                     { data: 'Name' },
                     { data: 'DisplayOrder' },
@@ -61,6 +133,11 @@ Entegro.AttributeValue.List = (function ($) {
                                     <a href="javascript:void(0);" class="dropdown-item text-danger delete-attributeValue" data-id="${row.Id}">Sil</a>
                                 </div>
                             </div>`
+                    },
+                    {
+                        targets: 2, // ProductAttributeId kolonu
+                        visible: false,
+                        searchable: false
                     }
                 ],
                 select: {
@@ -121,6 +198,42 @@ Entegro.AttributeValue.List = (function ($) {
                     },
                     bottomStart: { rowClass: "row mx-3 justify-content-between", features: ["info"] },
                     bottomEnd: "paging"
+                },
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        
+                        if (this.dataSrc() === "ProductAttributeId") {
+                            var column = this;
+                            $('<select id="productAttributeFilter" style="width:200px"></select>')
+                                .appendTo(".variantAttributeFilterVariant")
+                                .on("change", function () {
+                                    const val = $(this).val();
+                                    column.search(val ? "^" + val + "$" : "", true, false).draw();
+                                });
+                            $('#productAttributeFilter').select2({
+                                placeholder: "Varyant seçin",
+                                allowClear: true,
+                                ajax: {
+                                    url: '/ProductAttribute/AllProductAttribute',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function (params) {
+                                        return {
+                                            term: params.term || "",
+                                            page: params.page || 1
+                                        };
+                                    },
+                                    processResults: function (data, params) {
+                                        return {
+                                            results: data.results,
+                                            pagination: { more: data.pagination.more }
+                                        };
+                                    }
+                                }
+                            });
+                        } else { }
+                    });
                 }
             });
 
@@ -185,6 +298,8 @@ Entegro.AttributeValue.List = (function ($) {
     };
 
     return {
+        addFilterText: addFilterText,
+        addFilterDropdown: addFilterDropdown,
         init
     };
 

@@ -55,7 +55,7 @@ namespace Entegro.Infrastructure.Repositories
             var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking();
             if (!string.IsNullOrEmpty(term))
             {
-                query = query.Where(b =>b.Name.Contains(term)).AsQueryable();
+                query = query.Where(b => b.Name.Contains(term)).AsQueryable();
             }
 
             var totalCount = await query.CountAsync();
@@ -99,13 +99,50 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<Brand>> GetPagedAsync(GridCommand gridCommand)
         {
-            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).AsNoTracking();
+            var query = _context.Brands.Include(m => m.MediaFile).ThenInclude(m => m.Folder).OrderBy(b => b.Id).AsNoTracking();
+
+
+            if (gridCommand.Columns != null)
+            {
+                foreach (var col in gridCommand.Columns)
+                {
+                    if (!string.IsNullOrEmpty(col.Search?.Value))
+                    {
+                        var searchVal = col.Search.Value.Trim('^', '$');
+
+                        // ilgili property’nin tipini bul
+                        var prop = typeof(Brand).GetProperty(col.Data);
+                        if (prop == null) continue;
+
+                        if (prop.PropertyType == typeof(string))
+                        {
+                            query = query.Where($"{col.Data}.Contains(@0)", searchVal);
+                        }
+                        else if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
+                        {
+                            if (int.TryParse(searchVal, out var intVal))
+                                query = query.Where($"{col.Data} == @0", intVal);
+                        }
+                        else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
+                        {
+                            if (bool.TryParse(searchVal, out var boolVal))
+                                query = query.Where($"{col.Data} == @0", boolVal);
+                        }
+                        else if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+                        {
+                            if (DateTime.TryParse(searchVal, out var dt))
+                                query = query.Where($"{col.Data}.Date == @0", dt.Date);
+                        }
+                    }
+                }
+            }
 
             if (gridCommand.Search != null)
             {
                 if (!string.IsNullOrEmpty(gridCommand.Search.Value))
                 {
-                    query = query.Where(b => b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                    query = query.Where(b =>
+                    b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
             }
 
@@ -122,16 +159,19 @@ namespace Entegro.Infrastructure.Repositories
             }
 
             var totalCount = await query.CountAsync();
+
             var brands = await query
-            .Skip(gridCommand.Start)
-            .Take(gridCommand.Length)
-            .ToListAsync();
+                .Skip(gridCommand.Start)
+                .Take(gridCommand.Length)
+                .AsNoTracking()
+                .AsSplitQuery()
+                .ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<Brand>
             {
                 Items = brands,
                 TotalCount = totalCount,
-                PageNumber = gridCommand.Start + 1,
+                PageNumber = gridCommand.Start / gridCommand.Length,
                 PageSize = gridCommand.Length
             };
         }

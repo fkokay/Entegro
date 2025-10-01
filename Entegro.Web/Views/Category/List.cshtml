@@ -10,8 +10,9 @@
         <div class="card-header border-bottom">
             <h5 class="card-title mb-0">Filtreler</h5>
             <div class="row pt-4 gap-6 gap-md-0 g-md-6">
+                <div class="col-md-2 categoryFilterName"></div>
                 <div class="col-md-2 categoryFilterPublished"></div>
-                <div class="col-md-4 categoryFilterParent"></div>
+                <div class="col-md-2 categoryFilterParent"></div>
             </div>
         </div>
 
@@ -22,6 +23,7 @@
                         <th></th>
                         <th></th>
                         <th>Id</th>
+                        <th>ParentId</th>
                         <th>Kategori adı</th>
                         <th>Görüntüleme sırası</th>
                         <th>Güncellenme tarihi</th>
@@ -38,7 +40,7 @@
     <script src="/assets/js/entegro.category.list.js" asp-append-version="true"></script>
     <script>
         $(function() {
-             Entegro.Category.List.init();
+             Entegro.category.list.init();
         });
     </script>
 }

@@ -43,6 +43,7 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> Create(CategoryModel model)
         {
             var createDto = _mapper.Map<CreateCategoryDto>(model);
+            createDto.ParentId = model.ParentCategoryId;
             await _categoryService.AddAsync(createDto);
 
             return Json(new { success = true });
@@ -66,6 +67,7 @@ namespace Entegro.Web.Controllers
             if (ModelState.IsValid)
             {
                 var updateDto = _mapper.Map<UpdateCategoryDto>(model);
+                updateDto.ParentId = model.ParentCategoryId;
                 await _categoryService.UpdateAsync(updateDto);
                 return Json(new { success = true });
             }
@@ -86,19 +88,14 @@ namespace Entegro.Web.Controllers
             }
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CategoryList([FromBody] GridCommand model)
+        public async Task<IActionResult> CategoryList([FromBody] GridCommand gridCommand)
         {
-            int pageNumber = model.Start / model.Length;
-            int pageSize = model.Length;
-
-
-            var result = await _categoryService.GetPagedAsync(pageNumber, model.Length);
+            var result = await _categoryService.GetPagedAsync(gridCommand);
 
             return Json(new
             {
-                draw = model.Draw,
+                draw = gridCommand.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items

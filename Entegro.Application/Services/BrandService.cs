@@ -65,9 +65,9 @@ namespace Entegro.Application.Services
 
         public async Task<PagedResult<BrandDto>> GetBrandsAsync(int page, string term)
         {
-            var products = await _brandRepository.GetAllAsync(page, term);
-            var productDtos = _mapper.Map<PagedResult<BrandDto>>(products);
-            return productDtos;
+            var brands = await _brandRepository.GetAllAsync(page, term);
+            var brandDtos = _mapper.Map<PagedResult<BrandDto>>(brands);
+            return brandDtos;
         }
 
         public async Task<BrandDto> AddAsync(CreateBrandDto model)

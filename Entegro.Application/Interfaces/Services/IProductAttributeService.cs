@@ -9,6 +9,7 @@ namespace Entegro.Application.Interfaces.Services
         Task<ProductAttributeDto?> GetByNameAsync(string name);
         Task<List<ProductAttributeDto>> GetAllAsync();
         Task<PagedResult<ProductAttributeDto>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<PagedResult<ProductAttributeDto>> GetProductAttributeAsync(int page, string term);
         Task<PagedResult<ProductAttributeDto>> GetPagedAsync(GridCommand gridCommand);
         Task<ProductAttributeDto> AddAsync(CreateProductAttributeDto productAttribute);
         Task<ProductAttributeDto> UpdateAsync(UpdateProductAttributeDto productAttribute);

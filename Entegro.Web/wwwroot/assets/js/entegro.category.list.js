@@ -1,7 +1,7 @@
 ﻿var Entegro = Entegro || {};
-Entegro.Category = Entegro.Category || {};
+Entegro.category = Entegro.category || {};
 
-Entegro.Category.List = (function () {
+Entegro.category.list = (function () {
 
     function addFilterDropdown(column, containerSelector, placeholder, map = null) {
         const container = document.querySelector(containerSelector);
@@ -95,24 +95,25 @@ Entegro.Category.List = (function () {
                 }
             },
             columns: [
-                { data: 'Id' },
+                { data: 'Id' }, // 0 - control
                 {
                     data: 'Id',
                     orderable: false,
                     render: DataTable.render.select()
-                },
-                { data: 'Id', visible: false },
-                { data: 'Name' },
-                { data: 'DisplayOrder' },
+                }, // 1 - checkbox
+                { data: 'Id', visible: false }, // 2 - Id
+                { data: 'ParentId', visible: false }, // 3 - ParentId (gizli)
+                { data: 'Name' }, // 4
+                { data: 'DisplayOrder' }, // 5
                 {
                     data: 'UpdatedOn',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.yyyy HH:mm");
                     }
-                },
-                { data: 'Published' },
-                { data: 'Id' }
+                }, // 6
+                { data: 'Published' }, // 7
+                { data: 'Id' } // 8 - işlemler
             ],
             columnDefs: [
                 {
@@ -127,28 +128,28 @@ Entegro.Category.List = (function () {
                     targets: 1,
                     orderable: false,
                     searchable: false,
-                    responsivePriority: 3,
+                    responsivePriority: 4,
                     checkboxes: {
                         selectAllRender: '<input type="checkbox" class="form-check-input">'
                     },
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 },
                 {
-                    targets: 3,
+                    targets: 4,
                     responsivePriority: 1,
                     render: (data, type, row) => {
                         const image = row.MediaFile == null ? '' : `<img src="${row.MediaFile.Url}" class="rounded">`;
 
                         return `<div class="d-flex justify-content-start align-items-center product-name">
-                             <div class="avatar-wrapper">
-                                 <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                                     ${image}
-                                 </div>
+                           <div class="avatar-wrapper">
+                             <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                               ${image}
                              </div>
-                             <div class="d-flex flex-column">
-                                 <h6 class="text-nowrap mb-0">${row.Name}</h6>
-                                 ${row.Breadcrumb}
-                             </div>
+                           </div>
+                           <div class="d-flex flex-column">
+                             <h6 class="text-nowrap mb-0">${row.Name}</h6>
+                             ${row.Breadcrumb}
+                           </div>
                          </div>`;
                     }
                 },
@@ -160,7 +161,7 @@ Entegro.Category.List = (function () {
                         const titleText = data ? "Yayında" : "Yayında Değil";
                         return `
                                 <div class="form-check d-inline-flex justify-content-center">
-                                    <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
+                                  <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
                                 </div>`;
                     }
                 },
@@ -170,22 +171,28 @@ Entegro.Category.List = (function () {
                     searchable: false,
                     orderable: false,
                     render: (data, type, row) => `
-                      <div class="d-inline-block text-nowrap">
-                        <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
-                          <i class="icon-base ti ti-pencil icon-22px"></i>
-                        </a>
-                        <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end m-0">
-                          <a href="Details?id=${row.Id}" class="dropdown-item">Detaylar</a>
-                          <a href="Archive?id=${row.Id}" class="dropdown-item">Arşiv</a>
-                          <div class="dropdown-divider"></div>
-                          <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Kategori Sil</a>
-                        </div>
-                      </div>`
+                                <div class="d-inline-block text-nowrap">
+                                  <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
+                                    <i class="icon-base ti ti-pencil icon-22px"></i>
+                                  </a>
+                                  <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                                  </button>
+                                  <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="Details?id=${row.Id}" class="dropdown-item">Detaylar</a>
+                                    <a href="Archive?id=${row.Id}" class="dropdown-item">Arşiv</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Kategori Sil</a>
+                                  </div>
+                                </div>`
+                },
+                {
+                    targets: 3, // ParentId kolonunu gizliyoruz
+                    visible: false,
+                    searchable: false
                 }
             ],
+
             select: {
                 style: "multi",
                 selector: "td:nth-child(2)"
@@ -269,22 +276,61 @@ Entegro.Category.List = (function () {
                 bottomEnd: "paging"
             },
             initComplete: function () {
-                const api = this.api();
-
                 this.api().columns().every(function () {
-                    if (this.dataSrc() === "Published") {
-                        Entegro.product.list.addFilterDropdown(this, ".categoryFilterPublished", "Durum", [{ title: "Yayınlandı", id: true }, { title: "Yayınlanmadı", id: false }]);
+                    ; if (this.dataSrc() === "Name") {
+                        Entegro.category.list.addFilterText(this, ".categoryFilterName", "Kategori Adı");
+                    } else if (this.dataSrc() === "Published") {
+                        Entegro.category.list.addFilterDropdown(this, ".categoryFilterPublished", "Durum", [{ title: "Yayınlandı", id: true }, { title: "Yayınlanmadı", id: false }]);
+                    } else if (this.dataSrc() === "ParentId") {
+                        var column = this;
+
+                        $('<select id="categoryFilter" style="width:200px"></select>')
+                            .appendTo(".categoryFilterParent")
+                            .on("change", function () {
+                                const val = $(this).val();
+                                column.search(val ? "^" + val + "$" : "", true, false).draw();
+                            });
+
+                        $('#categoryFilter').select2({
+                            width: '100%',
+                            placeholder: 'Kategori seçiniz',
+                            allowClear: true,
+                            dropdownParent: $('#categoryFilter').parent(),
+                            minimumInputLength: 0,
+                            language: {
+                                inputTooShort: () => 'Daha fazla karakter yazın',
+                                searching: () => 'Aranıyor...',
+                                noResults: () => 'Sonuç bulunamadı'
+                            },
+                            ajax: {
+                                url: '/category/AllCategory',
+                                type: 'POST',
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        term: params.term || '',
+                                        page: params.page || 1
+                                    };
+                                },
+                                processResults: function (data, params) {
+                                    params.page = params.page || 1;
+
+                                    return {
+                                        results: Array.isArray(data.results) ? data.results : [],
+                                        pagination: { more: !!(data.pagination && data.pagination.more) }
+                                    };
+                                },
+                                cache: true
+                            },
+                            templateResult: item => item.text || '',
+                            templateSelection: item => item.text || '',
+                            escapeMarkup: m => m
+                        });
+
+
                     } else { }
                 });
-
-                
-                const parentMap = [
-                    // { id: 0, title: "Kök" },
-                    // { id: 12, title: "Elektronik" },
-                ];
-
-                // Kolon sıralamasına göre değiştirin (ParentCategoryId varsa)
-                 addFilterDropdown(api.column(2), ".categoryFilterParent", "Üst Kategori", parentMap);
             }
         });
 
@@ -382,30 +428,12 @@ Entegro.Category.List = (function () {
             });
         });
 
-        function addFilterDropdown(column, containerSelector, placeholder, map) {
-            let select = document.createElement("select");
-            select.className = "form-select text-capitalize";
-            select.innerHTML = `<option value="">${placeholder}</option>`;
-            document.querySelector(containerSelector).appendChild(select);
-
-            select.addEventListener("change", function () {
-                const val = select.value ? `^${select.value}$` : "";
-                column.search(val, true, false).draw();
-            });
-
-            column.data().unique().sort().each(function (value) {
-                const item = map.find(x => x.id === value);
-                if (item) {
-                    let option = document.createElement("option");
-                    option.value = item.id;
-                    option.textContent = item.title;
-                    select.appendChild(option);
-                }
-            });
-        }
     }
 
     return {
+        addFilterText: addFilterText,
+        addFilterDropdown: addFilterDropdown,
         init: init
+
     };
 })(jQuery);
