@@ -25,10 +25,10 @@ Entegro.productvariantattributevalue.list = (function ($) {
                 }
             },
             columns: [
-                { data: 'Id', orderable: false },
-                { data: 'Id', visible: false },
+                { data: 'Id', orderable: false }, // checkbox kolonu
+                { data: 'Id', visible: false },   // id kolonunu gizle
                 { data: 'Name' },
-                { data: 'Id' }
+                { data: 'Id'}
             ],
             columnDefs: [
                 {
@@ -46,17 +46,27 @@ Entegro.productvariantattributevalue.list = (function ($) {
                     orderable: false,
                     render: function (data, type, row) {
                         return `
-                            <div class="d-inline-block text-nowrap">
-                                <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
-                                    <i class="icon-base ti ti-pencil icon-22px"></i>
+                        <div class="d-inline-block text-nowrap">
+                            <a 
+                               class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-create-attribute-value" 
+                                data-attribute-id="${row.productVariantAttributeId}"
+                                data-table-id="${row.Id}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createOrUpdateProductVariantAttributeValueModal"
+                               title="Düzenle">
+                                <i class="icon-base ti ti-pencil icon-22px"></i>
+                            </a>
+
+                         
+                            <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end m-0">
+                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">
+                                    Deðer Sil
                                 </a>
-                                <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                    <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end m-0">
-                                    <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Deðer Sil</a>
-                                </div>
-                            </div>`;
+                            </div>
+                        </div>`;
                     }
                 }
             ],
@@ -64,8 +74,84 @@ Entegro.productvariantattributevalue.list = (function ($) {
                 style: "multi",
                 selector: "td:nth-child(1)"
             },
-            displayLength: 10
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: {
+                            menu: [10, 25, 50, 100],
+                            text: "_MENU_"
+                        },
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                <i class="icon-base ti ti-upload icon-xs"></i>
+                                <span class="d-none d-sm-inline-block">Dýþarý Aktar</span>
+                              </span>`,
+                                buttons: [
+                                    { extend: "print", className: "dropdown-item", text: "Print", exportOptions: { columns: [2] } },
+                                    { extend: "csv", className: "dropdown-item", text: "CSV", exportOptions: { columns: [2] } },
+                                    { extend: "excel", className: "dropdown-item", text: "Excel", exportOptions: { columns: [2] } },
+                                    { extend: "pdf", className: "dropdown-item", text: "PDF", exportOptions: { columns: [2] } },
+                                    { extend: "copy", className: "dropdown-item", text: "Copy", exportOptions: { columns: [2] } }
+                                ]
+                            },
+                            {
+                                text: `<button type="button"
+                                        class="btn btn-primary btn-create-attribute-value"
+                                        data-attribute-id="${productVariantAttributeId}"
+                                        data-table-id="0"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createOrUpdateProductVariantAttributeValueModal">
+                                    <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                                    <span class="d-none d-sm-inline-block">Yeni Deðer Ekle</span>
+                                </button>`,
+                                className: "p-0 border-0 bg-transparent"
+                            }
+                        ]
+                    }]
+                },
+                bottomStart: {
+                    rowClass: "row mx-3 justify-content-between",
+                    features: ["info"]
+                },
+                bottomEnd: "paging"
+            }
         });
+
+        // Class düzenlemeleri
+        setTimeout(() => {
+            const adjustments = [
+                { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
+                { selector: ".dt-buttons.btn-group", classToAdd: "mb-md-0 mb-6" },
+                { selector: ".dt-search .form-control", classToRemove: "form-control-sm", classToAdd: "ms-0" },
+                { selector: ".dt-search", classToAdd: "mb-0 mb-md-6" },
+                { selector: ".dt-length .form-select", classToRemove: "form-select-sm" },
+                { selector: ".dt-layout-end", classToAdd: "gap-md-2 gap-0 mt-0" },
+                { selector: ".dt-layout-start", classToAdd: "mt-0" },
+                { selector: ".dt-layout-table", classToRemove: "row mt-2" },
+                { selector: ".dt-layout-full", classToRemove: "col-md col-12", classToAdd: "table-responsive" }
+            ];
+            adjustments.forEach(({ selector, classToRemove, classToAdd }) => {
+                document.querySelectorAll(selector).forEach(el => {
+                    if (classToRemove) classToRemove.split(" ").forEach(cls => el.classList.remove(cls));
+                    if (classToAdd) classToAdd.split(" ").forEach(cls => el.classList.add(cls));
+                });
+            });
+        }, 100);
 
         // Silme iþlemi
         $(document).on('click', '.delete-record', function () {
@@ -85,7 +171,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/ProductVariantAttributeValue/Delete',
+                        url: '/Product/DeleteProductVariantAttributeValue',
                         type: 'POST',
                         data: { id: valueId },
                         success: function (response) {
@@ -125,10 +211,38 @@ Entegro.productvariantattributevalue.list = (function ($) {
                 }
             });
         });
+
+        return table;
     }
 
+    function initCreateOrUpdateProductVariantAttributeValueModal() {
+        $('#createOrUpdateProductVariantAttributeValueModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var attributeId = button.data('attribute-id');
+            var tableId = button.data('table-id'); //tablonun id'si
+            
+            var modalBody = $('#createOrUpdateProductVariantAttributeValueModalBody');
+            modalBody.html('<div class="text-center">Yükleniyor...</div>');
+            if (attributeId) {
+                $.ajax({
+                    url: '/Product/CreateOrUpdateProductVariantAttributeValue',
+                    type: 'GET',
+                    data: { productVariantAttributeId: attributeId, id:tableId },
+                    success: function (result) {
+                        modalBody.html(result);
+                    },
+                    error: function () {
+                        modalBody.html('<div class="text-danger text-center">Form yüklenemedi.</div>');
+                    }
+                });
+            } else {
+                modalBody.html('<div class="text-danger text-center">Geçersiz attribute ID.</div>');
+            }
+        });
+    }
     return {
-        init: initList
+        init: initList,
+        initCreateOrUpdateProductVariantAttributeValueModal: initCreateOrUpdateProductVariantAttributeValueModal
     };
 
 })(jQuery);

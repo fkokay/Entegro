@@ -20,6 +20,13 @@ namespace Entegro.Infrastructure.Repositories
             await _context.ProductVariantAttributeValues.AddAsync(data);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(ProductVariantAttributeValue data)
+        {
+            _context.ProductVariantAttributeValues.Remove(data);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<ProductVariantAttributeValue?> GetByIdAsync(int id)
         {
             return await _context.ProductVariantAttributeValues.FirstOrDefaultAsync(x => x.Id == id);
@@ -28,6 +35,11 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<ProductVariantAttributeValue?> GetByNameAsync(int productVariantAttributeId, string name)
         {
             return await _context.ProductVariantAttributeValues.FirstOrDefaultAsync(o => o.ProductVariantAttributeId == productVariantAttributeId && o.Name == name);
+        }
+
+        public async Task<ProductVariantAttributeValue?> GetByProductVariantAttributeIdAsync(int productVariantAttributeId)
+        {
+            return await _context.ProductVariantAttributeValues.FirstOrDefaultAsync(x => x.ProductVariantAttributeId == productVariantAttributeId);
         }
 
         public async Task<Application.DTOs.Common.PagedResult<ProductVariantAttributeValue>> GetPagedAsync(GridCommand gridCommand, int productVariantAttributeId)
@@ -107,6 +119,12 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = gridCommand.Start / gridCommand.Length,
                 PageSize = gridCommand.Length
             };
+        }
+
+        public async Task UpdateAsync(ProductVariantAttributeValue data)
+        {
+            _context.ProductVariantAttributeValues.Update(data);
+            await _context.SaveChangesAsync();
         }
     }
 }

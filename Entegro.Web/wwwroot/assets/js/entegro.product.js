@@ -79,7 +79,6 @@ Entegro.product = (function ($) {
             downloadEnabled: false
         });
     }
-
     function ProductImageMianPicture() {
         $(document).on("click", ".set-main-picture", function (e) {
             var el = $(this).closest('.dz-image-preview');
@@ -89,7 +88,6 @@ Entegro.product = (function ($) {
             return false;
         });
     }
-
     function DescriptionEditor() {
         const fullToolbar = [
             [{ font: [] }, { size: [] }],
@@ -115,7 +113,6 @@ Entegro.product = (function ($) {
             fullEditor.root.innerHTML = description.value;
         }
     }
-
     function ProductCategoryCreatePopup(productId) {
         var popup = $('#ProductCategoryPopup');
         var popupContent = $("#ProductCategoryPopupContent");
@@ -136,7 +133,6 @@ Entegro.product = (function ($) {
             }
         });
     }
-
     function ProductCategoryCreatePopupInit(popup, popupContent) {
         var categorySelect = $(popupContent).find("#CategoryId");
         $(categorySelect).select2({
@@ -200,7 +196,6 @@ Entegro.product = (function ($) {
             });
         });
     }
-
     function ProductCategoryDelete() {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');
@@ -233,7 +228,6 @@ Entegro.product = (function ($) {
             });
         });
     }
-
     function ProductVariantAttributeCombinationRepeaterInit(data) {
         const $repeater = $('#ProductVariantAttributeCombinationRepeater');
         if (!$repeater.length) return;
@@ -348,7 +342,6 @@ Entegro.product = (function ($) {
         ProductVariantAttributeCombinationRepeaterLoad(data || []);
         ProductVariantAttributeCombinationRepeaterIndexes();
     }
-
     function ProductVariantAttributeCombinationRepeaterLoad(data) {
         var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
         var $template = $list.find('[data-repeater-item]:first').clone(true, true);
@@ -382,7 +375,6 @@ Entegro.product = (function ($) {
             $list.append($row);
         });
     }
-
     function ProductVariantAttributeCombinationRepeaterIndexes() {
         var $list = $('#ProductVariantAttributeCombinationRepeater [data-repeater-list="ProductVariantAttributeCombinations"]');
 
@@ -410,7 +402,6 @@ Entegro.product = (function ($) {
             });
         });
     }
-
     function Validation() {
         const formValidation = FormValidation.formValidation(
             document.getElementById('product-form'),
@@ -594,7 +585,6 @@ Entegro.product = (function ($) {
             });
         });
     }
-
     function initAttributesTable(productId) {
         if (!productId) return;
 
@@ -619,7 +609,7 @@ Entegro.product = (function ($) {
                 }
             },
             columns: [
-                { data: 'Id', visible: false }, // ID görünmesin
+                { data: 'Id', visible: false },
                 {
                     data: 'ProductAttribute.Name',
                 },
@@ -627,7 +617,6 @@ Entegro.product = (function ($) {
                     data: 'AttributeControlTypeId',
                     title: 'Kontrol Türü',
                     render: function (data, type, row) {
-                        
                         const types = {
                             0: 'Açılır Liste',
                             1: 'Radyo Düğmesi Listesi',
@@ -636,8 +625,7 @@ Entegro.product = (function ($) {
                             4: 'Çok Satırlı Metin Kutusu',
                             5: 'Takvim',
                             6: 'Dosya Yükleme',
-                            7:'Kutular (Renk ve Görüntü)'
-
+                            7: 'Kutular (Renk ve Görüntü)'
                         };
                         return types[data] || 'Bilinmiyor';
                     }
@@ -646,6 +634,15 @@ Entegro.product = (function ($) {
                     data: 'IsRequried',
                     render: function (data) {
                         return data ? 'Evet' : 'Hayır';
+                    }
+                },
+                
+                {
+                    data: 'ProductVariantAttributeValues',
+                    title: 'Özellikler',
+                    render: function (data) {
+                        const count = data?.length || 0;
+                        return `${count} ürün özelliği var`;
                     }
                 },
                 {
@@ -661,40 +658,37 @@ Entegro.product = (function ($) {
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                        console.log(row);
                         return `
-                         <div class="d-inline-block text-nowrap">
-                             <button type="button"
-                                     class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-createorupdate-productvariant"
-                                     data-product-id="${productId}"
-                                     data-attribute-id="${row.ProductAttributeId}"
-                                     data-bs-toggle="modal"
-                                     data-bs-target="#createOrUpdateProductVariantAttributeModal">
-                                 <i class="icon-base ti ti-pencil icon-22px"></i>
-                             </button>
-
-                             <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow"
-                                     data-bs-toggle="dropdown">
-                                 <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                             </button>
-
-                             <div class="dropdown-menu dropdown-menu-end m-0">
-                                 <button type="button"
-                                         class="dropdown-item text-danger btn-delete-attribute"
-                                         data-id="${row.Id}">
-                                     Sil
-                                 </button>
-                                 <button type="button"
-                                         class="dropdown-item text-primary btn-view-values"
-                                         data-id="${row.Id}">
-                                     Özellik Değerlerini Gör
-                                 </button>
-                             </div>
-                         </div>`;
+              <div class="d-inline-block text-nowrap">
+                  <button type="button"
+                          class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-createorupdate-productvariant"
+                          data-product-id="${productId}"
+                          data-attribute-id="${row.ProductAttributeId}"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createOrUpdateProductVariantAttributeModal">
+                      <i class="icon-base ti ti-pencil icon-22px"></i>
+                  </button>
+                  <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow"
+                          data-bs-toggle="dropdown">
+                      <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-end m-0">
+                      <button type="button"
+                              class="dropdown-item text-danger btn-delete-attribute"
+                              data-id="${row.Id}">
+                          Sil
+                      </button>
+                      <button type="button"
+                              class="dropdown-item text-success btn-view-values"
+                              data-id="${row.Id}">
+                          Özellik Değerlerini Gör
+                      </button>
+                  </div>
+              </div>`;
                     }
                 }
-
             ],
+
             columnDefs: [
                 {
                     targets: 0,
