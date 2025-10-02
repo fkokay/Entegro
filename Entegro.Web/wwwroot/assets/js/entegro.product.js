@@ -636,7 +636,6 @@ Entegro.product = (function ($) {
                         return data ? 'Evet' : 'Hayır';
                     }
                 },
-                
                 {
                     data: 'ProductVariantAttributeValues',
                     title: 'Özellikler',
@@ -701,10 +700,6 @@ Entegro.product = (function ($) {
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 }
             ],
-            select: {
-                style: "multi",
-                selector: "td:nth-child(1)"
-            },
             displayLength: 10,
             layout: {
                 topStart: {
