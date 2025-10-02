@@ -730,7 +730,7 @@ Entegro.product = (function ($) {
                     }]
                 },
                 bottomStart: {
-                    rowClass: "row mx-3 justify-content-between",
+                    rowClass: "row mx-3 mb-3 justify-content-between",
                     features: ["info"]
                 },
                 bottomEnd: "paging"
@@ -740,6 +740,7 @@ Entegro.product = (function ($) {
     
         setTimeout(() => {
             const adjustments = [
+                { selector: ".dt-container", classToAdd: "border rounded" },
                 { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
                 { selector: ".dt-buttons.btn-group", classToAdd: "mb-md-0 mb-6" },
                 { selector: ".dt-search .form-control", classToRemove: "form-control-sm", classToAdd: "ms-0" },
