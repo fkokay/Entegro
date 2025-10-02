@@ -25,7 +25,16 @@ namespace Entegro.Application.Services.Base
             return _mapper.Map<ProductVariantAttributeValueDto>(model);
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            var model = await _productVariantAttributeValueRepository.GetByIdAsync(id);
 
+            if (model == null)
+            {
+                throw new KeyNotFoundException($"ProductAttributeValue with ID {id} not found.");
+            }
+            await _productVariantAttributeValueRepository.DeleteAsync(model);
+        }
 
         public async Task<ProductVariantAttributeValueDto?> GetByIdAsync(int id)
         {
@@ -42,6 +51,18 @@ namespace Entegro.Application.Services.Base
         public async Task<ProductVariantAttributeValueDto?> GetByNameAsync(int productVariantAttributeId, string name)
         {
             var productAttributeValue = await _productVariantAttributeValueRepository.GetByNameAsync(productVariantAttributeId, name);
+            if (productAttributeValue == null)
+            {
+                return null;
+            }
+
+            var productAttributeValueDto = _mapper.Map<ProductVariantAttributeValueDto>(productAttributeValue);
+            return productAttributeValueDto;
+        }
+
+        public async Task<ProductVariantAttributeValueDto?> GetByProductVariantAttributeIdAsync(int productVariantAttributeId)
+        {
+            var productAttributeValue = await _productVariantAttributeValueRepository.GetByProductVariantAttributeIdAsync(productVariantAttributeId);
             if (productAttributeValue == null)
             {
                 return null;
@@ -68,6 +89,12 @@ namespace Entegro.Application.Services.Base
                 PageNumber = values.PageNumber,
                 PageSize = values.PageSize
             };
+        }
+
+        public async Task<ProductVariantAttributeValueDto> UpdateAsync(UpdateProductVariantAttributeValueDto data)
+        {
+            await _productVariantAttributeValueRepository.UpdateAsync(_mapper.Map<ProductVariantAttributeValue>(data));
+            return _mapper.Map<ProductVariantAttributeValueDto>(data);
         }
     }
 }

@@ -10,6 +10,7 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Domain.Enums;
@@ -1904,6 +1905,35 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CreateOrUpdateProductVariantAttributeValue(int id, int productVariantAttributeId)
+        {
+            var model = new ProductVariantAttributeValueModel();
+
+            if (id == 0)
+            {
+                model.ProductVariantAttributeId = productVariantAttributeId;
+                return PartialView("_CreateOrUpdate.ProductVariantAttributeValue", model);
+            }
+            var productAttributeValue = await _productVariantAttributeValueService.GetByIdAsync(id);
+            var mapped = _mapper.Map(productAttributeValue, model);
+            return PartialView("_CreateOrUpdate.ProductVariantAttributeValue", mapped);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateOrUpdateProductVariantAttributeValue(ProductVariantAttributeValueModel model)
+        {
+            if (model.Id > 0)
+            {
+                var updateDto = _mapper.Map<UpdateProductVariantAttributeValueDto>(model);
+                await _productVariantAttributeValueService.UpdateAsync(updateDto);
+                return RedirectToAction("ProductVariantAttributeValues", new { productVariantAttributeId = updateDto.ProductVariantAttributeId });
+            }
+            var createDto = _mapper.Map<CreateProductVariantAttributeValueDto>(model);
+
+            await _productVariantAttributeValueService.AddAsync(createDto);
+            return RedirectToAction("ProductVariantAttributeValues", new { productVariantAttributeId = createDto.ProductVariantAttributeId });
+        }
+
         [HttpPost]
         public async Task<IActionResult> ProductVariantAttributeValueList([FromBody] GridCommand gridCommand, int productVariantAttributeId)
         {
@@ -1924,6 +1954,19 @@ namespace Entegro.Web.Controllers
             try
             {
                 await _productVariantAttributeService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteProductVariantAttributeValue(int id)
+        {
+            try
+            {
+                await _productVariantAttributeValueService.DeleteAsync(id);
                 return Json(new { success = true });
             }
             catch (Exception ex)
