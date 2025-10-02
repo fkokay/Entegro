@@ -32,7 +32,6 @@ namespace Entegro.Web.Models.Catalog.Products
         public string? Gtin { get; set; }
         public int? MainPictureId { get; set; }
         public bool Published { get; set; } = true;
-        public int[] SelectedProductAttributeIds { get; set; } = Array.Empty<int>();
         public BrandModel? Brand { get; set; }
         public string? PictureUrl { get; set; }
         public List<ProductMediaFileModel> ProductMediaFiles { get; set; } = new List<ProductMediaFileModel>();

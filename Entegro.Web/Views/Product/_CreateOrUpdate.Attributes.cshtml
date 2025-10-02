@@ -1,17 +1,6 @@
 ﻿@model ProductModel
 
 <div class="row g-3 p-3">
-    <div class="col-md-12">
-        <div class="row">
-            <label class="col-sm-3 col-form-label text-sm-start" for="SelectedProductAttributeIds">Varyantlar</label>
-            <div class="col-sm-9">
-                <select asp-for="SelectedProductAttributeIds" asp-items="ViewBag.ProductAttributes" multiple="multiple" class="form-select">
-                </select>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row g-3 p-3">
     <div id="ProductVariantAttributeCombinationRepeater">
         <div data-repeater-list="ProductVariantAttributeCombinations">
             <div data-repeater-item class="repeater-wrapper pt-0 pt-md-4">

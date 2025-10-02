@@ -7,11 +7,10 @@ namespace Entegro.Web.Models.Catalog.Attributes
         public int Id { get; set; }
         public int ProductId { get; set; }
         public int ProductAttributeId { get; set; }
-        public string ProductAttribute { get; set; }
+        public string? ProductAttribute { get; set; }
         public bool IsRequried { get; set; }
         public int AttributeControlTypeId { get; set; }
         public int DisplayOrder { get; set; }
-
 
         public ProductModel Product { get; set; }
         public ProductAttributeModel Attribute { get; set; }

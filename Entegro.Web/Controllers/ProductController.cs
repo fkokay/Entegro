@@ -12,6 +12,8 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Domain.Enums;
+using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
@@ -217,29 +219,7 @@ namespace Entegro.Web.Controllers
 
                 var productVariantAttributes = await _productVariantAttributeService.GetAllAsync(model.Id);
 
-                var deletedProductVariantAttributes = productVariantAttributes.Where(m => !model.SelectedProductAttributeIds.Contains(m.ProductAttributeId)).ToList();
-                foreach (var item in deletedProductVariantAttributes)
-                {
-                    await _productVariantAttributeService.DeleteAsync(item.Id);
-                }
 
-                foreach (var item in model.SelectedProductAttributeIds)
-                {
-                    var exist = productVariantAttributes.Where(m => m.ProductAttributeId == item).FirstOrDefault();
-
-                    if (exist == null)
-                    {
-                        CreateProductVariantAttributeDto createProductAttributeMappingDto = new CreateProductVariantAttributeDto
-                        {
-                            ProductId = model.Id,
-                            ProductAttributeId = item,
-                            DisplayOrder = 0,
-                            AttributeControlTypeId = 0
-                        };
-
-                        await _productVariantAttributeService.AddAsync(createProductAttributeMappingDto);
-                    }
-                }
 
                 return Json(new { success = true });
             }
@@ -1868,8 +1848,42 @@ namespace Entegro.Web.Controllers
 
 
         #region ProductVariantAttribute
+        [HttpGet]
+        public async Task<IActionResult> CreateOrUpdateProductVariantAttribute(int productId, int productVariantAttributeId)
+        {
+            var model = new ProductVariantAttributeModel();
+            var productAttributes = await _productAttributeService.GetAllAsync();
+            ViewBag.ProductAttributes = productAttributes.Select(m => new SelectListItem()
+            {
+                Text = m.Name,
+                Value = m.Id.ToString()
+            }).ToList();
+            ViewBag.FormControlTypes = EnumHelper.GetEnumSelectList<FormControlType>();
 
+            if (productVariantAttributeId == 0)
+            {
+                model.ProductId = productId;
+                return PartialView("_CreateOrUpdate.ProductVariantAttribute", model);
+            }
+            var productAttribute = await _productVariantAttributeService.GetByAttibuteIdAsync(productId, productVariantAttributeId);
+            var mapped = _mapper.Map(productAttribute, model);
+            return PartialView("_CreateOrUpdate.ProductVariantAttribute", mapped);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateOrUpdateProductVariantAttribute(ProductVariantAttributeModel model)
+        {
+            if (model.Id > 0)
+            {
+                var updateDto = _mapper.Map<UpdateProductVariantAttributeDto>(model);
+                await _productVariantAttributeService.UpdateAsync(updateDto);
+                return Json(new { success = true });
+            }
 
+            var createDto = _mapper.Map<CreateProductVariantAttributeDto>(model);
+            await _productVariantAttributeService.AddAsync(createDto);
+
+            return Json(new { success = true });
+        }
         [HttpPost]
         public async Task<IActionResult> ProductVariantAttributeList([FromBody] GridCommand gridCommand, int productId)
         {
@@ -1904,12 +1918,26 @@ namespace Entegro.Web.Controllers
             });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteProductVariantAttribute(int id)
+        {
+            try
+            {
+                await _productVariantAttributeService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         #endregion
         private async Task PrepareProductModel(ProductModel model, ProductDto? product)
         {
             if (product != null)
             {
-                model.SelectedProductAttributeIds = product.ProductVariantAttributes.Select(x => x.ProductAttributeId).ToArray();
+
                 model.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new ProductVariantAttributeModel()
                 {
                     AttributeControlTypeId = m.AttributeControlTypeId,
@@ -1971,13 +1999,6 @@ namespace Entegro.Web.Controllers
                     }
                 }).ToList();
 
-                var productAttributes = await _productAttributeService.GetAllAsync();
-                ViewBag.ProductAttributes = productAttributes.Select(x => new SelectListItem
-                {
-                    Text = x.Name,
-                    Value = x.Id.ToString(),
-                    Selected = model.SelectedProductAttributeIds.Contains(x.Id)
-                }).ToList();
             }
 
             var brands = await _brandService.GetAllBrandsAsync();
@@ -2004,5 +2025,7 @@ namespace Entegro.Web.Controllers
                 new SelectListItem { Text = "Kutu", Value = "Kutu" }
             };
         }
+
+
     }
 }

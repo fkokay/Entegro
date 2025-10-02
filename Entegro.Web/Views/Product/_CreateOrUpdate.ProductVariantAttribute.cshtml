@@ -1,0 +1,43 @@
+﻿@model ProductVariantAttributeModel
+
+
+<form asp-action="CreateOrUpdateProductVariantAttribute" method="post" id="createOrUpdateProductVariantAttributeForm">
+    <input type="hidden" value="@Model.Id" asp-for="Id" />
+    <input type="hidden" value="@Model.ProductId" asp-for="ProductId" />
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label text-sm-start" asp-for="ProductAttributeId">Özellik</label>
+            <select asp-for="ProductAttributeId" asp-items="ViewBag.ProductAttributes" class="select2 form-select">
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label text-sm-start" asp-for="AttributeControlTypeId">Kontrol Türü</label>
+            <select asp-for="AttributeControlTypeId" asp-items="ViewBag.FormControlTypes" class="select2 form-select">
+            </select>
+        </div>
+
+        <div class="col-md-6 mt-1">
+            <label class="form-label text-sm-start" asp-for="DisplayOrder">Görüntüleme sırası</label>
+            @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" })
+        </div>
+
+        <div class="col-md-6 mt-1">
+            <label class="form-label text-sm-start" asp-for="IsRequried">Zorunlu</label>
+            <div class="d-flex" style="height:38px;">
+                <label class="switch switch-lg">
+                    @Html.CheckBoxFor(m => m.IsRequried, new { @class = "switch-input" })
+                    <span class="switch-toggle-slider">
+                        <span class="switch-on">Evet</span>
+                        <span class="switch-off">Hayır</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </div>
+</form>
+

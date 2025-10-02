@@ -54,6 +54,18 @@
     </div>
 </div>
 
+<div class="modal fade" id="createOrUpdateProductVariantAttributeModal" tabindex="-1" aria-labelledby="createOrUpdateProductVariantAttributeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center">Yeni Ürün Varyantı Oluştur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body" id="createOrUpdateProductVariantAttributeModalBody">
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="/assets/js/entegro.product.js" asp-append-version="true"></script>
@@ -68,6 +80,11 @@
             Entegro.product.DescriptionEditor();
             Entegro.product.ProductVariantAttributeCombinationRepeaterInit(window.ProductVariantAttributeCombinations);
             Entegro.product.Validation();
+            Entegro.product.initCreateOrUpdateProductVariantAttributeModal();
+            Entegro.product.initCreateOrUpdateProductVariantAttributeForm();
+            Entegro.product.initDeleteAttributeHandler();
+          
+
 
              $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-variants"]').on('shown.bs.tab', function () {
                  var id = @Html.Raw(Json.Serialize(Model.Id));
@@ -83,5 +100,7 @@
             const attributeId = $(this).data('id');
              window.location.href = `/Product/ProductVariantAttributeValues?productVariantAttributeId=${attributeId}`;
         });
+
+       
     </script>
 }

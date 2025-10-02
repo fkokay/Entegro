@@ -595,7 +595,6 @@ Entegro.product = (function ($) {
         });
     }
 
-
     function initAttributesTable(productId) {
         if (!productId) return;
 
@@ -628,12 +627,17 @@ Entegro.product = (function ($) {
                     data: 'AttributeControlTypeId',
                     title: 'Kontrol Türü',
                     render: function (data, type, row) {
-                        // Burada enum ya da açıklama gerekiyorsa dönüşüm yapılabilir
+                        
                         const types = {
-                            1: 'Textbox',
-                            2: 'Dropdown',
-                            3: 'Checkbox',
-                            // Diğer kontrol türlerini ekle
+                            0: 'Açılır Liste',
+                            1: 'Radyo Düğmesi Listesi',
+                            2: 'Onay Kutusu',
+                            3: 'Metin Kutusu',
+                            4: 'Çok Satırlı Metin Kutusu',
+                            5: 'Takvim',
+                            6: 'Dosya Yükleme',
+                            7:'Kutular (Renk ve Görüntü)'
+
                         };
                         return types[data] || 'Bilinmiyor';
                     }
@@ -657,12 +661,15 @@ Entegro.product = (function ($) {
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
+                        console.log(row);
                         return `
                          <div class="d-inline-block text-nowrap">
                              <button type="button"
-                                     class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-edit-attribute"
-                                     data-id="${row.Id}"
-                                     title="Güncelle">
+                                     class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-createorupdate-productvariant"
+                                     data-product-id="${productId}"
+                                     data-attribute-id="${row.ProductAttributeId}"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#createOrUpdateProductVariantAttributeModal">
                                  <i class="icon-base ti ti-pencil icon-22px"></i>
                              </button>
 
@@ -741,13 +748,13 @@ Entegro.product = (function ($) {
                             },
                             {
                                 text: `<button type="button"
-                                        class="btn btn-primary btn-create-address"
-                                        data-customer-id="${productId}"
-                                        data-address-id="0"
+                                        class="btn btn-primary btn-createorupdate-productvariant"
+                                        data-product-id="${productId}"
+                                        data-attribute-id="0"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#createAddressModal">
+                                        data-bs-target="#createOrUpdateProductVariantAttributeModal">
                                         <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
-                                        <span class="d-none d-sm-inline-block">Ürüne Geri Dön</span>
+                                        <span class="d-none d-sm-inline-block">Yeni Ürün Varyantı Oluştur</span>
                                     </button>`,
                                 className: "p-0 border-0 bg-transparent"
                             }
@@ -817,6 +824,138 @@ Entegro.product = (function ($) {
                 });
         }
     }
+    function initCreateOrUpdateProductVariantAttributeModal() {
+        $('#createOrUpdateProductVariantAttributeModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var productId = button.data('product-id');
+            var attributeId = button.data('attribute-id');
+
+            var modalBody = $('#createOrUpdateProductVariantAttributeModalBody');
+            modalBody.html('<div class="text-center">Yükleniyor...</div>');
+
+            if (productId) {
+                $.ajax({
+                    url: '/Product/CreateOrUpdateProductVariantAttribute',
+                    type: 'GET',
+                    data: { productId: productId, productVariantAttributeId: attributeId },
+                    success: function (result) {
+                        modalBody.html(result);
+                    },
+                    error: function () {
+                        modalBody.html('<div class="text-danger text-center">Adres formu yüklenemedi.</div>');
+                    }
+                });
+            } else {
+                modalBody.html('<div class="text-danger text-center">Geçersiz ürün ID.</div>');
+            }
+        });
+    }
+    function initCreateOrUpdateProductVariantAttributeForm() {
+        $(document).off('submit.createOrUpdateProductVariantAttributeForm')
+            .on('submit.createOrUpdateProductVariantAttributeForm', '#createOrUpdateProductVariantAttributeForm', function (e) {
+                e.preventDefault();
+
+                const $form = $(this);
+
+                if ($form.valid && !$form.valid()) return;
+
+                if ($form.data('submitting')) return;
+
+                $form.data('submitting', true);
+                const $buttons = $form.find('button[type="submit"], input[type="submit"]');
+                $buttons.prop('disabled', true);
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            // Eğer modal içindeyse kapat
+                            $('#createOrUpdateProductVariantAttributeModal').modal('hide');
+
+                            // Formu sıfırla
+                            $form[0].reset();
+
+                            // DataTable'ı yeniden yükle
+                            $('#AttributesTable').DataTable().ajax.reload(null, false);
+
+                            // Başarı mesajı
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı',
+                                text: 'Ürün varyant özelliği kaydedildi.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata',
+                                text: response.message || 'Bilinmeyen bir hata oluştu.',
+                                confirmButtonText: 'Tamam'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sunucu Hatası',
+                            text: 'Varyant kaydedilirken bir hata oluştu.'
+                        });
+                    },
+                    complete: function () {
+                        $form.data('submitting', false);
+                        $buttons.prop('disabled', false);
+                    }
+                });
+            });
+    }
+
+    function initDeleteAttributeHandler(tableSelector = '#AttributesTable') {
+        $(document).on('click', '.btn-delete-attribute', function () {
+            const attributeId = $(this).data('id');
+
+            if (!attributeId) return;
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu öğe silinecek ve geri alınamaz!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'Vazgeç',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/Product/DeleteProductVariantAttribute?id=${attributeId}`, 
+                        type: 'POST', 
+                        success: function () {
+                            Swal.fire({
+                                title: 'Silindi!',
+                                text: 'Öğe başarıyla silindi.',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+
+                            $(tableSelector).DataTable().ajax.reload(null, false);
+                        },
+                        error: function (xhr) {
+                            Swal.fire({
+                                title: 'Hata!',
+                                text: 'Silme işlemi sırasında bir hata oluştu.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
 
     return {
         Init: Init,
@@ -826,5 +965,8 @@ Entegro.product = (function ($) {
         ProductCategoryCreatePopup: ProductCategoryCreatePopup,
         ProductVariantAttributeCombinationRepeaterInit: ProductVariantAttributeCombinationRepeaterInit,
         Validation: Validation,
+        initCreateOrUpdateProductVariantAttributeModal: initCreateOrUpdateProductVariantAttributeModal,
+        initCreateOrUpdateProductVariantAttributeForm: initCreateOrUpdateProductVariantAttributeForm,
+        initDeleteAttributeHandler: initDeleteAttributeHandler,
     };
 })(jQuery);
