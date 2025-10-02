@@ -709,13 +709,7 @@ Entegro.product = (function ($) {
             layout: {
                 topStart: {
                     rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
-                    features: [{
-                        search: {
-                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
-                            placeholder: "Ara..",
-                            text: "_INPUT_"
-                        }
-                    }]
+                    features: []
                 },
                 topEnd: {
                     rowClass: "row m-3 my-0 justify-content-between",
@@ -725,21 +719,6 @@ Entegro.product = (function ($) {
                             text: "_MENU_"
                         },
                         buttons: [
-                            {
-                                extend: "collection",
-                                className: "btn btn-label-secondary dropdown-toggle me-4",
-                                text: `<span class="d-flex align-items-center gap-1">
-                                    <i class="icon-base ti ti-upload icon-xs"></i>
-                                    <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
-                                  </span>`,
-                                buttons: [
-                                    { extend: "print", className: "dropdown-item", text: "Print", exportOptions: { columns: [2] } },
-                                    { extend: "csv", className: "dropdown-item", text: "CSV", exportOptions: { columns: [2] } },
-                                    { extend: "excel", className: "dropdown-item", text: "Excel", exportOptions: { columns: [2] } },
-                                    { extend: "pdf", className: "dropdown-item", text: "PDF", exportOptions: { columns: [2] } },
-                                    { extend: "copy", className: "dropdown-item", text: "Copy", exportOptions: { columns: [2] } }
-                                ]
-                            },
                             {
                                 text: `<button type="button"
                                         class="btn btn-primary btn-createorupdate-productvariant"
@@ -795,7 +774,6 @@ Entegro.product = (function ($) {
         }
         fieldEl.focus();
     }
-
     function RefreshTab(tabSelector) {
         const tabButton = document.querySelector(`#product-tabs button[data-bs-target="${tabSelector}"]`);
         if (!tabButton) return;
@@ -906,7 +884,6 @@ Entegro.product = (function ($) {
                 });
             });
     }
-
     function initDeleteAttributeHandler(tableSelector = '#AttributesTable') {
         $(document).on('click', '.btn-delete-attribute', function () {
             const attributeId = $(this).data('id');
