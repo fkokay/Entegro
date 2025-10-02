@@ -25,21 +25,11 @@ Entegro.productvariantattributevalue.list = (function ($) {
                 }
             },
             columns: [
-                { data: 'Id', orderable: false }, // checkbox kolonu
                 { data: 'Id', visible: false },   // id kolonunu gizle
                 { data: 'Name' },
-                { data: 'Id'}
+                { data: 'Id' }
             ],
             columnDefs: [
-                {
-                    targets: 0,
-                    orderable: false,
-                    searchable: false,
-                    checkboxes: {
-                        selectAllRender: '<input type="checkbox" class="form-check-input">'
-                    },
-                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
-                },
                 {
                     targets: -1,
                     searchable: false,
@@ -53,7 +43,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                 data-table-id="${row.Id}"
                                 data-bs-toggle="modal"
                                 data-bs-target="#createOrUpdateProductVariantAttributeValueModal"
-                               title="Düzenle">
+                               title="DÃ¼zenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
 
@@ -63,17 +53,13 @@ Entegro.productvariantattributevalue.list = (function ($) {
                             </button>
                             <div class="dropdown-menu dropdown-menu-end m-0">
                                 <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">
-                                    Deðer Sil
+                                    DeÄŸer Sil
                                 </a>
                             </div>
                         </div>`;
                     }
                 }
             ],
-            select: {
-                style: "multi",
-                selector: "td:nth-child(1)"
-            },
             displayLength: 10,
             layout: {
                 topStart: {
@@ -95,21 +81,6 @@ Entegro.productvariantattributevalue.list = (function ($) {
                         },
                         buttons: [
                             {
-                                extend: "collection",
-                                className: "btn btn-label-secondary dropdown-toggle me-4",
-                                text: `<span class="d-flex align-items-center gap-1">
-                                <i class="icon-base ti ti-upload icon-xs"></i>
-                                <span class="d-none d-sm-inline-block">Dýþarý Aktar</span>
-                              </span>`,
-                                buttons: [
-                                    { extend: "print", className: "dropdown-item", text: "Print", exportOptions: { columns: [2] } },
-                                    { extend: "csv", className: "dropdown-item", text: "CSV", exportOptions: { columns: [2] } },
-                                    { extend: "excel", className: "dropdown-item", text: "Excel", exportOptions: { columns: [2] } },
-                                    { extend: "pdf", className: "dropdown-item", text: "PDF", exportOptions: { columns: [2] } },
-                                    { extend: "copy", className: "dropdown-item", text: "Copy", exportOptions: { columns: [2] } }
-                                ]
-                            },
-                            {
                                 text: `<button type="button"
                                         class="btn btn-primary btn-create-attribute-value"
                                         data-attribute-id="${productVariantAttributeId}"
@@ -117,7 +88,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                         data-bs-toggle="modal"
                                         data-bs-target="#createOrUpdateProductVariantAttributeValueModal">
                                     <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
-                                    <span class="d-none d-sm-inline-block">Yeni Deðer Ekle</span>
+                                    <span class="d-none d-sm-inline-block">Yeni Bir DeÄŸer Ekle</span>
                                 </button>`,
                                 className: "p-0 border-0 bg-transparent"
                             }
@@ -132,7 +103,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
             }
         });
 
-        // Class düzenlemeleri
+        // Class dÃ¼zenlemeleri
         setTimeout(() => {
             const adjustments = [
                 { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -153,16 +124,16 @@ Entegro.productvariantattributevalue.list = (function ($) {
             });
         }, 100);
 
-        // Silme iþlemi
+        // Silme iÅŸlemi
         $(document).on('click', '.delete-record', function () {
             const valueId = $(this).data('id');
             Swal.fire({
                 title: 'Emin misiniz?',
-                text: 'Bu deðer silinecek!',
+                text: 'Bu deÄŸer silinecek!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'Ýptal',
+                cancelButtonText: 'Ä°ptal',
                 customClass: {
                     confirmButton: 'btn btn-danger me-3',
                     cancelButton: 'btn btn-secondary'
@@ -179,7 +150,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Silindi!',
-                                    text: 'Deðer baþarýyla silindi.',
+                                    text: 'DeÄŸer baÅŸarÄ±yla silindi.',
                                     confirmButtonText: 'Tamam',
                                     customClass: { confirmButton: 'btn btn-success' },
                                     buttonsStyling: false
@@ -190,7 +161,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Hata!',
-                                    text: response.message || 'Silme iþlemi baþarýsýz oldu.',
+                                    text: response.message || 'Silme iÅŸlemi baÅŸarÄ±sÄ±z oldu.',
                                     confirmButtonText: 'Tamam',
                                     customClass: { confirmButton: 'btn btn-danger' },
                                     buttonsStyling: false
@@ -200,8 +171,8 @@ Entegro.productvariantattributevalue.list = (function ($) {
                         error: function () {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Sunucu Hatasý!',
-                                text: 'Ýstek gönderilirken bir hata oluþtu.',
+                                title: 'Sunucu HatasÄ±!',
+                                text: 'Ä°stek gÃ¶nderilirken bir hata oluÅŸtu.',
                                 confirmButtonText: 'Tamam',
                                 customClass: { confirmButton: 'btn btn-danger' },
                                 buttonsStyling: false
@@ -220,23 +191,23 @@ Entegro.productvariantattributevalue.list = (function ($) {
             var button = $(event.relatedTarget);
             var attributeId = button.data('attribute-id');
             var tableId = button.data('table-id'); //tablonun id'si
-            
+
             var modalBody = $('#createOrUpdateProductVariantAttributeValueModalBody');
-            modalBody.html('<div class="text-center">Yükleniyor...</div>');
+            modalBody.html('<div class="text-center">YÃ¼kleniyor...</div>');
             if (attributeId) {
                 $.ajax({
                     url: '/Product/CreateOrUpdateProductVariantAttributeValue',
                     type: 'GET',
-                    data: { productVariantAttributeId: attributeId, id:tableId },
+                    data: { productVariantAttributeId: attributeId, id: tableId },
                     success: function (result) {
                         modalBody.html(result);
                     },
                     error: function () {
-                        modalBody.html('<div class="text-danger text-center">Form yüklenemedi.</div>');
+                        modalBody.html('<div class="text-danger text-center">Form yÃ¼klenemedi.</div>');
                     }
                 });
             } else {
-                modalBody.html('<div class="text-danger text-center">Geçersiz attribute ID.</div>');
+                modalBody.html('<div class="text-danger text-center">GeÃ§ersiz attribute ID.</div>');
             }
         });
     }
