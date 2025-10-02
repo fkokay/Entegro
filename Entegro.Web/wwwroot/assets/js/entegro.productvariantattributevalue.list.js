@@ -46,16 +46,14 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
+                            <a
+                                class="btn btn-text-secondary rounded-pill waves-effect btn-icon delete-record"
+                                data-id="${row.Id}"
+                                title="Sil">
+                                <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
+                            </a>
 
-                         
-                            <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end m-0">
-                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">
-                                    Değer Sil
-                                </a>
-                            </div>
+                            
                         </div>`;
                     }
                 }

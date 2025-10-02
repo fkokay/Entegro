@@ -589,6 +589,7 @@ Entegro.product = (function ($) {
         if (!productId) return;
 
         const table = $('#AttributesTable').DataTable({
+
             language: {
                 paginate: {
                     next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
@@ -639,11 +640,23 @@ Entegro.product = (function ($) {
                 {
                     data: 'ProductVariantAttributeValues',
                     title: 'Özellikler',
-                    render: function (data) {
+                    render: function (data, type, row) {
                         const count = data?.length || 0;
-                        return `${count} ürün özelliği var`;
+                        const productVariantAttributeId = data[0].ProductVariantAttributeId;
+
+                       
+                                        const clickableText = `
+                            <span class="text-primary btn-view-values cursor-pointer" data-id="${productVariantAttributeId}">
+                                ${count} ürün özelliği var
+                            </span>
+                        `;
+
+
+
+                        return `${clickableText}`;
                     }
-                },
+                }
+,
                 {
                     data: 'ProductVariantAttributeValues',
                     title: 'Görüntülenme Sayısı',
@@ -733,7 +746,7 @@ Entegro.product = (function ($) {
                     rowClass: "row mx-3 mb-3 justify-content-between",
                     features: ["info"]
                 },
-                bottomEnd: "paging"
+                bottomEnd: ""
             }
         });
 
