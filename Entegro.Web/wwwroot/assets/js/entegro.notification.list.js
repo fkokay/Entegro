@@ -6,18 +6,13 @@ Entegro.notification.list = (function ($) {
     function initList() {
         const table = $('#NotificationTable').DataTable({
             language: {
-                search: "Bildirim Ara:",
-                lengthMenu: "Göster _MENU_ kayıt",
-                info: "_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor",
-                infoEmpty: "Kayıt yok",
-                infoFiltered: "(_MAX_ kayıt içerisinden filtrelendi)",
-                zeroRecords: "Eşleşen kayıt bulunamadı",
                 paginate: {
-                    next: '<i class="icon-base ti ti-chevron-right"></i>',
-                    previous: '<i class="icon-base ti ti-chevron-left"></i>',
-                    first: '<i class="icon-base ti ti-chevrons-left"></i>',
-                    last: '<i class="icon-base ti ti-chevrons-right"></i>'
-                }
+                    next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                },
+                url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
             order: [[4, 'desc']],

@@ -639,14 +639,12 @@ Entegro.product = (function ($) {
                 },
                 {
                     data: 'ProductVariantAttributeValues',
-                    title: 'Özellikler',
                     render: function (data, type, row) {
                         const count = data?.length || 0;
                         const productVariantAttributeId = data[0].ProductVariantAttributeId;
-
-                       
-                                        const clickableText = `
-                            <span class="text-primary btn-view-values cursor-pointer" data-id="${productVariantAttributeId}">
+                        const productId = row.ProductId;
+                         const clickableText = `
+                            <span class="text-primary btn-view-values cursor-pointer" data-attribute-id="${productVariantAttributeId}" data-product-id="${productId}">
                                 ${count} ürün özelliği var
                             </span>
                         `;
@@ -659,14 +657,12 @@ Entegro.product = (function ($) {
 ,
                 {
                     data: 'ProductVariantAttributeValues',
-                    title: 'Görüntülenme Sayısı',
                     render: function (data) {
                         return data?.length || 0;
                     }
                 },
                 {
                     data: 'Id',
-                    title: 'Opsiyonlar',
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
@@ -680,22 +676,13 @@ Entegro.product = (function ($) {
                           data-bs-target="#createOrUpdateProductVariantAttributeModal">
                       <i class="icon-base ti ti-pencil icon-22px"></i>
                   </button>
-                  <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow"
-                          data-bs-toggle="dropdown">
-                      <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                  
+                  <button type="button"
+                          class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-attribute"
+                          data-id="${row.Id}">
+                      <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
                   </button>
-                  <div class="dropdown-menu dropdown-menu-end m-0">
-                      <button type="button"
-                              class="dropdown-item text-danger btn-delete-attribute"
-                              data-id="${row.Id}">
-                          Sil
-                      </button>
-                      <button type="button"
-                              class="dropdown-item text-success btn-view-values"
-                              data-id="${row.Id}">
-                          Özellik Değerlerini Gör
-                      </button>
-                  </div>
+
               </div>`;
                     }
                 }

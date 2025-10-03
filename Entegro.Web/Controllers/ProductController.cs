@@ -1899,10 +1899,15 @@ namespace Entegro.Web.Controllers
             });
         }
         [HttpGet]
-        public IActionResult ProductVariantAttributeValues(int productVariantAttributeId)
+        public async Task<IActionResult> ProductVariantAttributeValues(ProductVariantAttributeValuePageModel model)
         {
-            ViewBag.ProductVariantAttributeId = productVariantAttributeId;
-            return View();
+            if (model.ProductId > 0)
+            {
+                var product = await _productService.GetProductByIdAsync(model.ProductId);
+                if (product != null)
+                    model.Name = product.Name;
+            }
+            return View(model);
         }
 
         [HttpGet]
@@ -1926,12 +1931,14 @@ namespace Entegro.Web.Controllers
             {
                 var updateDto = _mapper.Map<UpdateProductVariantAttributeValueDto>(model);
                 await _productVariantAttributeValueService.UpdateAsync(updateDto);
-                return RedirectToAction("ProductVariantAttributeValues", new { productVariantAttributeId = updateDto.ProductVariantAttributeId });
             }
-            var createDto = _mapper.Map<CreateProductVariantAttributeValueDto>(model);
+            else
+            {
+                var createDto = _mapper.Map<CreateProductVariantAttributeValueDto>(model);
+                await _productVariantAttributeValueService.AddAsync(createDto);
+            }
 
-            await _productVariantAttributeValueService.AddAsync(createDto);
-            return RedirectToAction("ProductVariantAttributeValues", new { productVariantAttributeId = createDto.ProductVariantAttributeId });
+            return Json(new { success = true });
         }
 
         [HttpPost]

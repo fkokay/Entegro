@@ -96,11 +96,12 @@
 
         });
 
-       $(document).on('click', '.btn-view-values', function () {
-            const attributeId = $(this).data('id');
-             window.location.href = `/Product/ProductVariantAttributeValues?productVariantAttributeId=${attributeId}`;
-        });
+        $(document).on('click', '.btn-view-values', function () {
+            const attributeId = $(this).data('attribute-id');
+            const productId = $(this).data('product-id');
 
-       
+            const url = `/Product/ProductVariantAttributeValues?productVariantAttributeId=${attributeId}&productId=${productId}`;
+            window.location.href = url;
+        });
     </script>
 }

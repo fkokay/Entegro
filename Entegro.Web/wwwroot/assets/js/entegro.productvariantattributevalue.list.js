@@ -44,7 +44,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                 data-bs-toggle="modal"
                                 data-bs-target="#createOrUpdateProductVariantAttributeValueModal"
                                title="Düzenle">
-                                <i class="icon-base ti ti-pencil icon-22px"></i>
+                                <i class="icon-base ti ti-pencil icon-22px text-dark"></i>
                             </a>
                             <a
                                 class="btn btn-text-secondary rounded-pill waves-effect btn-icon delete-record"
@@ -52,8 +52,6 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                 title="Sil">
                                 <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
                             </a>
-
-                            
                         </div>`;
                     }
                 }
@@ -153,7 +151,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                                     customClass: { confirmButton: 'btn btn-success' },
                                     buttonsStyling: false
                                 }).then(() => {
-                                    table.ajax.reload(null, false);
+                                    location.reload();
                                 });
                             } else {
                                 Swal.fire({
@@ -180,6 +178,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
                 }
             });
         });
+
 
         return table;
     }
@@ -209,9 +208,43 @@ Entegro.productvariantattributevalue.list = (function ($) {
             }
         });
     }
+    function initCreateOrUpdateProductVariantAttributeValueForm() {
+        $(document).on('submit', '#createOrUpdateProductVariantAttributeValueForm', function (e) {
+            e.preventDefault();
+
+            var $form = $(this);
+            var formData = $form.serialize();
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function () {
+                    // Modal kapatılır
+                    $('#createOrUpdateProductVariantAttributeValueModal').modal('hide');
+
+                    // Sayfa yenilenir
+                    location.reload();
+                },
+                error: function () {
+                    // Hata durumunda kullanıcıya bilgi gösterilebilir
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: 'Form gönderilirken bir sorun oluştu.',
+                        confirmButtonText: 'Tamam',
+                        customClass: { confirmButton: 'btn btn-danger' },
+                        buttonsStyling: false
+                    });
+                }
+            });
+        });
+    }
+
     return {
         init: initList,
-        initCreateOrUpdateProductVariantAttributeValueModal: initCreateOrUpdateProductVariantAttributeValueModal
+        initCreateOrUpdateProductVariantAttributeValueModal: initCreateOrUpdateProductVariantAttributeValueModal,
+        initCreateOrUpdateProductVariantAttributeValueForm: initCreateOrUpdateProductVariantAttributeValueForm
     };
 
 })(jQuery);

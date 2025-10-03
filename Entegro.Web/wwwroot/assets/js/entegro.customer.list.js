@@ -31,9 +31,10 @@ Entegro.customer.list = (function ($) {
                 { data: 'Email' },
                 {
                     data: 'CreatedOn',
+                    name: 'CreatedOnUtc',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
-                        return moment(data).format("DD.MM.yyyy HH:mm");
+                        return moment(data).format("DD.MM.YYYY HH:mm");
                     }
                 },
                 { data: 'Id' }

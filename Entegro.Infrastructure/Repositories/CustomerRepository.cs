@@ -1,14 +1,8 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 
 namespace Entegro.Infrastructure.Repositories
@@ -37,7 +31,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<bool> ExistsByEmailAsync(string email)
         {
-            return await _context.Customers.Where(m=> m.Email == email).AnyAsync();
+            return await _context.Customers.Where(m => m.Email == email).AnyAsync();
         }
 
         public async Task<List<Customer>> GetAllAsync()
