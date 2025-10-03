@@ -35,6 +35,9 @@ namespace Entegro.Web.Controllers
             model.SystemUrl = settings.Where(m => m.Key == "SystemUrl").Select(m => m.Value).FirstOrDefault() ?? "";
             model.SystemApiUrl = settings.Where(m => m.Key == "SystemApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
 
+            model.DecreaseStockOnOrderParameter = settings.Where(m => m.Key == "DecreaseStockOnOrderParameter").Select(m => m.Value).FirstOrDefault() ?? "";
+            model.IncreaseStockOnCancelParameter = settings.Where(m => m.Key == "IncreaseStockOnCancelParameter").Select(m => m.Value).FirstOrDefault() ?? "";
+
             return View(model);
         }
 
@@ -59,6 +62,26 @@ namespace Entegro.Web.Controllers
             else
             {
                 await _settingService.AddAsync("SystemApiUrl", model.SystemApiUrl);
+            }
+
+            var decreaseStockOnOrderParameterExists = await _settingService.ExistsByKeyAsync("DecreaseStockOnOrderParameter");
+            if (decreaseStockOnOrderParameterExists)
+            {
+                await _settingService.UpdateAsync("DecreaseStockOnOrderParameter", model.DecreaseStockOnOrderParameter);
+            }
+            else
+            {
+                await _settingService.AddAsync("DecreaseStockOnOrderParameter", model.DecreaseStockOnOrderParameter);
+            }
+
+            var increaseStockOnCancelParameterExists = await _settingService.ExistsByKeyAsync("IncreaseStockOnCancelParameter");
+            if (increaseStockOnCancelParameterExists)
+            {
+                await _settingService.UpdateAsync("IncreaseStockOnCancelParameter", model.IncreaseStockOnCancelParameter);
+            }
+            else
+            {
+                await _settingService.AddAsync("IncreaseStockOnCancelParameter", model.IncreaseStockOnCancelParameter);
             }
 
             return RedirectToAction("GeneralCommon");

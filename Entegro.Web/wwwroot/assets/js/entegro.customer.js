@@ -325,6 +325,11 @@ Entegro.customer = (function ($) {
     function initCustomerAddressTable(customerId) {
         if (!customerId) return;
 
+        if ($.fn.DataTable.isDataTable('#CustomerAddressTable')) {
+            $('#CustomerAddressTable').DataTable().ajax.url('/Customer/CustomerAddressList?customerId=' + customerId).load();
+            return;
+        }
+
         const table = $('#CustomerAddressTable').DataTable({
             language: {
                 paginate: {

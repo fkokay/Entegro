@@ -8,12 +8,13 @@
         <label class="form-label" for="Name">
             Ad <span class="text-danger">*</span>
         </label>
-        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Örn: Renk" })
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Örn: Renk", required = "required" })
     </div>
 
+    <!-- Description -->
     <div class="col-12 mb-3">
         <label class="form-label" for="Description">
-            Ad <span class="text-danger">*</span>
+            Açıklama
         </label>
         @Html.TextBoxFor(m => m.Description, new { @class = "form-control", placeholder = "Varyant açıklaması (opsiyonel)" })
     </div>
@@ -23,11 +24,15 @@
         <label class="form-label" for="DisplayOrder">
             Gösterim Sırası <span class="text-danger">*</span>
         </label>
-        @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" })
+        @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", required = "required" })
     </div>
 
     <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">Vazgeç</button>
+        <button type="submit" class="btn btn-success me-sm-3 me-1">
+            <i class="bi bi-check-circle me-1"></i> Kaydet
+        </button>
+        <button type="reset" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Vazgeç
+        </button>
     </div>
 </form>

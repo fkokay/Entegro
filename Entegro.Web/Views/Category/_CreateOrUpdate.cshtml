@@ -23,103 +23,73 @@
             <!-- Personal Info -->
             <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3">
+                    <input type="hidden" asp-for="Description" />
                     <!-- Kategori Seçimi -->
                     <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="ParentCategoryId">Kategori</label>
-                            <div class="col-sm-9">
-                                <select id="ParentCategoryId" name="ParentCategoryId" class="select2 form-select form-select-lg" asp-for="ParentCategoryId">
-                                    @if (Model.Parent != null)
-                                    {
-                                        <option value="@Model.Parent.Id" selected>@Model.Parent.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="ParentCategoryId">Kategori</label>
+                        <select id="ParentCategoryId" name="ParentCategoryId" class="select2 form-select form-select-lg" asp-for="ParentCategoryId">
+                            @if (Model.Parent != null)
+                            {
+                                <option value="@Model.Parent.Id" selected>@Model.Parent.Name</option>
+                            }
+                        </select>
                     </div>
 
                     <!-- Kategori Adı -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Ad</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Ad</label>
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
                     </div>
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Published">Yayınlandı</label>
-                            <div class="col-sm-9">
-                                <label class="switch switch-lg">
-                                    @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
-                                    <span class="switch-toggle-slider">
-                                        <span class="switch-on"></span>
-                                        <span class="switch-off"></span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Display Order -->
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Sıra</label>
+                        @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
                     </div>
 
                     <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="MediaFileId">Resim</label>
-                            <div class="col-sm-9">
-                                <div class="fu-container">
-                                    <div class="dropzone-container">
-                                        <div class="fu-thumb fu-filename rounded @(Model.MediaFileId.HasValue ? "" : "empty")" data-current-filename="@(Model.MediaFile == null ? "" : Model.MediaFile.Name)">
-                                            <figure class="file-figure">
-                                                @if (Model.MediaFile == null)
-                                                {
-                                                    <i class="file-icon show fa-5x fa-fw far fa-file-image" style="color: #e77c00"></i>
-                                                }
-                                                else
-                                                {
-                                                    <i class="file-icon fa-5x fa-fw far fa-file-image" style="color: #e77c00"></i>
-                                                    <picture class="file-thumb show loaded" data-type="image">
-                                                        <img class="file-img" data-src="@Model.MediaFile.Url" src="@Model.MediaFile.Url">
-                                                    </picture>
-                                                }
-                                            </figure>
-                                        </div>
-                                        @Html.HiddenFor(m => m.MediaFileId, new { @class = "hidden" })
-                                        <div class="fu-controls">
-                                            <div>
-                                                <div class="dropzone-target">
-                                                    <div class="dropzone-file-info d-flex align-items-center">
-                                                        <div class="fu-message text-truncate empty" title="Dosya yükle">
-                                                            Dosya yükle
-                                                        </div>
-
-                                                        <a href="#" class="fu-remove remove btn btn-clear-dark btn-sm btn-no-border btn-icon rounded-circle" title="Dosyayı kaldır">
-                                                            <i class="fu-remove-icon fs-h6 p-0 text-danger">×</i>
-                                                        </a>
-                                                    </div>
-
-                                                    <div id="MediaUpload" class="fu-fileupload" data-dialog-url="/media/fileconflictresolutiondialog/" data-assignment-url="" data-remove-url="" data-sort-url="" data-entity-id="0" data-type-filter="image" data-upload-url="/media/upload/?isTransient=True&amp;path=catalog&amp;entityType=Brand" data-accept=".avif,.bmp,.gif,.ico,.jfif,.jpeg,.jpg,.png,.svg,.webp" data-show-remove-after-upload="true">
-                                                        <input type="hidden" id="MediaUpload" name="MediaUpload">
-                                                        <div class="fu-buttons"></div>
-                                                    </div>
+                        <label class="form-label text-sm-start" for="MediaFileId">Resim</label>
+                        <div class="fu-container">
+                            <div class="dropzone-container">
+                                <div class="fu-thumb fu-filename rounded @(Model.MediaFileId.HasValue ? "" : "empty")" data-current-filename="@(Model.MediaFile == null ? "" : Model.MediaFile.Name)">
+                                    <figure class="file-figure">
+                                        @if (Model.MediaFile == null)
+                                        {
+                                            <i class="file-icon show fa-5x fa-fw far fa-file-image" style="color: #e77c00"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="file-icon fa-5x fa-fw far fa-file-image" style="color: #e77c00"></i>
+                                            <picture class="file-thumb show loaded" data-type="image">
+                                                <img class="file-img" data-src="@Model.MediaFile.Url" src="@Model.MediaFile.Url">
+                                            </picture>
+                                        }
+                                    </figure>
+                                </div>
+                                @Html.HiddenFor(m => m.MediaFileId, new { @class = "hidden" })
+                                <div class="fu-controls">
+                                    <div>
+                                        <div class="dropzone-target">
+                                            <div class="dropzone-file-info d-flex align-items-center">
+                                                <div class="fu-message text-truncate empty" title="Dosya yükle">
+                                                    Dosya yükle
                                                 </div>
+
+                                                <a href="#" class="fu-remove remove btn btn-clear-dark btn-sm btn-no-border btn-icon rounded-circle" title="Dosyayı kaldır">
+                                                    <i class="fu-remove-icon fs-h6 p-0 text-danger">×</i>
+                                                </a>
+                                            </div>
+
+                                            <div id="MediaUpload" class="fu-fileupload" data-dialog-url="/media/fileconflictresolutiondialog/" data-assignment-url="" data-remove-url="" data-sort-url="" data-entity-id="0" data-type-filter="image" data-upload-url="/media/upload/?isTransient=True&amp;path=catalog&amp;entityType=Brand" data-accept=".avif,.bmp,.gif,.ico,.jfif,.jpeg,.jpg,.png,.svg,.webp" data-show-remove-after-upload="true">
+                                                <input type="hidden" id="MediaUpload" name="MediaUpload">
+                                                <div class="fu-buttons"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="fu-progress">
-                                        <div class="progress">
-                                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
+                                </div>
+                            </div>
+                            <div class="fu-progress">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
                         </div>
@@ -127,13 +97,22 @@
 
                     <!-- Açıklama -->
                     <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Açıklama</label>
-                            <div class="col-sm-9">
-                                @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
-                            </div>
+                        <label class="form-label text-sm-start">Açıklama</label>
+                        <div id="full-editor">
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Published">Yayınlandı</label>
+                        <label class="switch switch-lg">
+                            @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on"></span>
+                                <span class="switch-off"></span>
+                            </span>
+                        </label>
+                    </div>
+
                 </div>
             </div>
 
@@ -141,28 +120,16 @@
             <div class="tab-pane fade" id="form-tabs-seo" role="tabpanel">
                 <div class="row g-3">
                     <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Başlık</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.MetaTitle, new { @class = "form-control" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Başlık</label>
+                        @Html.TextBoxFor(m => m.MetaTitle, new { @class = "form-control" })
                     </div>
                     <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Anahtar Kelimeler</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.MetaKeywords, new { @class = "form-control" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Anahtar Kelimeler</label>
+                        @Html.TextBoxFor(m => m.MetaKeywords, new { @class = "form-control" })
                     </div>
                     <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Açıklama</label>
-                            <div class="col-sm-9">
-                                @Html.TextAreaFor(m => m.MetaDescription, new { @class = "form-control" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Açıklama</label>
+                        @Html.TextAreaFor(m => m.MetaDescription, new { @class = "form-control" })
                     </div>
                 </div>
             </div>

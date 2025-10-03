@@ -38,12 +38,14 @@
 
 <div class="modal fade" id="viewTownsModal" tabindex="-1" aria-labelledby="viewTownsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
+        <div class="modal-content">
+            <div class="modal-header">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="text-center mb-4">
                     <h3 class="mb-2" id="viewTownsModalLabel">İlçeler</h3>
                 </div>
+            </div>
+            <div class="modal-body">
                 <div id="townsModalContent">
                     <div class="text-center p-4">
                         <div class="spinner-border text-primary" role="status">
@@ -56,29 +58,61 @@
     </div>
 </div>
 <div class="modal fade" id="createOrUpdateTownModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Modal Header -->
+            <div class="modal-header p-0 position-relative" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <h5 class="modal-title m-0">İlçe Bilgileri</h5>
+                </div>
+              
+            </div>
+
+            <div class="modal-body px-4 py-4" id="createOrUpdateTownModalBody">
+                <!-- Form buraya yüklenecek -->
             </div>
         </div>
     </div>
 </div>
 <div class="modal fade" id="createOrUpdateCityModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Modal Header -->
+            <div class="modal-header p-0 position-relative" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <h5 class="modal-title m-0">Şehir Bilgileri</h5>
+                </div>
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body px-4 py-4" id="createOrUpdateCityModalBody">
+               
             </div>
         </div>
     </div>
 </div>
 <div class="modal fade" id="createOrUpdateDistrictModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Modal Header -->
+            <div class="modal-header p-0 position-relative" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <h5 class="modal-title m-0">Mahalle Bilgileri</h5>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body px-4 py-4" id="createOrUpdateDistrictModalBody">
+                <!-- Form buraya yüklenecek -->
             </div>
         </div>
     </div>
 </div>
+
 
 
 @section Scripts {

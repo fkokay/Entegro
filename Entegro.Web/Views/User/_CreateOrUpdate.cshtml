@@ -19,59 +19,35 @@
             <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="FirstName">Ad</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control",@required="required" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="FirstName">Ad</label>
+                        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @required = "required" })
+
                     </div>
                     <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="LastName">Soyadı</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @required = "required" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="LastName">Soyadı</label>
+                        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @required = "required" })
                     </div>
                     <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Email">Email</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email", @required = "required" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="Email">Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email", @required = "required" })
                     </div>
                     <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Password">Şifre</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @required = "required" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="Password">Şifre</label>
+                        @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @required = "required" })
                     </div>
                     <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="PhoneNumber">Telefon</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @type = "phone", @required = "required" })
-                            </div>
-                        </div>
+                        <label class="form-label text-sm-start" for="PhoneNumber">Telefon</label>
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @type = "phone", @required = "required" })
                     </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Active">Aktif</label>
-                            <div class="col-sm-9">
-                                <label class="switch switch-lg">
-                                    @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
-                                    <span class="switch-toggle-slider">
-                                        <span class="switch-on"></span>
-                                        <span class="switch-off"></span>
-                                    </span>
-                                </label>
-                
-                            </div>
-                        </div>
+                    <div class="col-md-12">
+                        <label class="form-label text-sm-start" for="Active">Aktif</label>
+                        <label class="switch switch-lg">
+                            @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on"></span>
+                                <span class="switch-off"></span>
+                            </span>
+                        </label>
                     </div>
                 </div>
             </div>

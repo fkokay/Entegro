@@ -1,108 +1,106 @@
 ﻿@model AddressModel
 
-
-<form asp-action="CreateOrUpdateCustomerAddressMapping" method="post" id="createAddressForm">
+<form asp-action="CreateOrUpdateCustomerAddressMapping" method="post" id="createAddressForm" class="row g-4">
     <input type="hidden" name="CustomerId" value="@ViewBag.CustomerId" />
     <input type="hidden" asp-for="Id" />
 
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label asp-for="Title" class="form-label">Adres Başlığı</label>
-            <input asp-for="Title" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Salutation" class="form-label">Hitap</label>
-            <input asp-for="Salutation" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="AddressType" class="form-label">Adres Türü</label>
-            @Html.DropDownListFor(m => m.AddressType, new SelectList(new[] {
-            new { Value = 0, Text = "Bireysel" },
-                        new { Value = 1, Text = "Kurumsal" }
-                        }, "Value", "Text"), new { @class = "form-control", @id = "AddressType" })
-        </div>
+    <!-- Satır 1 -->
+    <div class="col-md-4">
+        <label asp-for="Title" class="form-label fw-semibold">Adres Başlığı</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Salutation" class="form-label fw-semibold">Hitap</label>
+        <input asp-for="Salutation" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="AddressType" class="form-label fw-semibold">Adres Türü</label>
+        @Html.DropDownListFor(m => m.AddressType, new SelectList(new[] {
+        new { Value = 0, Text = "Bireysel" },
+                new { Value = 1, Text = "Kurumsal" }
+                }, "Value", "Text"), new { @class = "form-select" })
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label asp-for="FirstName" class="form-label">Ad</label>
-            <input asp-for="FirstName" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="LastName" class="form-label">Soyad</label>
-            <input asp-for="LastName" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Email" class="form-label">E-posta</label>
-            <input asp-for="Email" type="email" class="form-control" />
-        </div>
+    <!-- Satır 2 -->
+    <div class="col-md-4">
+        <label asp-for="FirstName" class="form-label fw-semibold">Ad</label>
+        <input asp-for="FirstName" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="LastName" class="form-label fw-semibold">Soyad</label>
+        <input asp-for="LastName" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Email" class="form-label fw-semibold">E-posta</label>
+        <input asp-for="Email" type="email" class="form-control" />
     </div>
 
-   
-
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label asp-for="Country" class="form-label">Ülke</label>
-            <input asp-for="Country" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="City" class="form-label">Şehir</label>
-            <input asp-for="City" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Town" class="form-label">İlçe</label>
-            <input asp-for="Town" class="form-control" />
-        </div>
+    <!-- Satır 3 -->
+    <div class="col-md-4">
+        <label asp-for="Country" class="form-label fw-semibold">Ülke</label>
+        <input asp-for="Country" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="City" class="form-label fw-semibold">Şehir</label>
+        <input asp-for="City" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Town" class="form-label fw-semibold">İlçe</label>
+        <input asp-for="Town" class="form-control" />
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label asp-for="District" class="form-label">Mahalle</label>
-            <input asp-for="District" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="ZipPostalCode" class="form-label">Posta Kodu</label>
-            <input asp-for="ZipPostalCode" class="form-control" />
-        </div>
-        <div class="col-md-4">
-            <label asp-for="Company" class="form-label">Şirket</label>
-            <input asp-for="Company" class="form-control" />
-        </div>
+    <!-- Satır 4 -->
+    <div class="col-md-4">
+        <label asp-for="District" class="form-label fw-semibold">Mahalle</label>
+        <input asp-for="District" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="ZipPostalCode" class="form-label fw-semibold">Posta Kodu</label>
+        <input asp-for="ZipPostalCode" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Company" class="form-label fw-semibold">Şirket</label>
+        <input asp-for="Company" class="form-control" />
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label asp-for="PhoneNumber" class="form-label">Telefon Numarası</label>
-            <input asp-for="PhoneNumber" class="form-control" />
-        </div>
-        <div class="col-md-6">
-            <label asp-for="FaxNumber" class="form-label">Faks Numarası</label>
-            <input asp-for="FaxNumber" class="form-control" />
-        </div>
+    <!-- Satır 5 -->
+    <div class="col-md-6">
+        <label asp-for="PhoneNumber" class="form-label fw-semibold">Telefon Numarası</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FaxNumber" class="form-label fw-semibold">Faks Numarası</label>
+        <input asp-for="FaxNumber" class="form-control" />
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label asp-for="TaxOffice" class="form-label">Vergi Dairesi</label>
-            <input asp-for="TaxOffice" class="form-control" />
-        </div>
-        <div class="col-md-6">
-            <label asp-for="TaxOfficeNumber" class="form-label">Vergi Dairesi Numarası</label>
-            <input asp-for="TaxOfficeNumber" class="form-control" />
-        </div>
+    <!-- Satır 6 -->
+    <div class="col-md-6">
+        <label asp-for="TaxOffice" class="form-label fw-semibold">Vergi Dairesi</label>
+        <input asp-for="TaxOffice" class="form-control" />
     </div>
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label asp-for="Address1" class="form-label">Adres 1</label>
-            <textarea class="form-control" asp-for="Address1" rows="3" required></textarea>
-        </div>
+    <div class="col-md-6">
+        <label asp-for="TaxOfficeNumber" class="form-label fw-semibold">Vergi Dairesi Numarası</label>
+        <input asp-for="TaxOfficeNumber" class="form-control" />
+    </div>
 
-        <div class="col-md-6">
-            <label asp-for="Address2" class="form-label">Adres 2</label>
-            <textarea class="form-control" asp-for="Address2" rows="3" required></textarea>
-        </div>
+    <!-- Satır 7 -->
+    <div class="col-md-6">
+        <label asp-for="Address1" class="form-label fw-semibold">Adres 1 <span class="text-danger">*</span></label>
+        <textarea asp-for="Address1" class="form-control" rows="3" required></textarea>
     </div>
-    <div class="text-end">
-        <button type="submit" class="btn btn-primary">Kaydet</button>
+    <div class="col-md-6">
+        <label asp-for="Address2" class="form-label fw-semibold">Adres 2 <span class="text-danger">*</span></label>
+        <textarea asp-for="Address2" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <!-- Butonlar -->
+    <div class="col-12 text-center mt-4">
+        <button type="submit" class="btn btn-success me-3 px-5">
+            <i class="bi bi-save me-1"></i> Kaydet
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-5" data-bs-dismiss="modal" aria-label="Kapat">
+            <i class="bi bi-x-lg me-1"></i> Kapat
+        </button>
     </div>
 </form>
+

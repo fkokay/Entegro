@@ -2,7 +2,7 @@
 Entegro.category = Entegro.category || {};
 
 Entegro.category = (function ($) {
-
+    var fullEditor;
     function initUploader() {
         if (!$('#MediaUpload').length) return;
 
@@ -157,7 +157,11 @@ Entegro.category = (function ($) {
                         e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
                     }
                 });
-
+                instance.on('core.form.valid', function () {
+                    if (typeof fullEditor !== "undefined" && fullEditor.root) {
+                        document.getElementById('Description').value = fullEditor.root.innerHTML;
+                    }
+                });
                 instance.on('core.form.valid', function () {
                     const $form = $('#category-form');
                     const serializedData = $form.serialize();
@@ -257,13 +261,39 @@ Entegro.category = (function ($) {
         });
     }
 
+    function DescriptionEditor() {
+        const fullToolbar = [
+            [{ font: [] }, { size: [] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ script: 'super' }, { script: 'sub' }],
+            [{ header: '1' }, { header: '2' }, 'blockquote', 'code-block'],
+            [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+            [{ direction: 'rtl' }],
+            ['link', 'image', 'video', 'formula'],
+            ['clean']
+        ];
+
+        fullEditor = new Quill("#full-editor", {
+            bounds: "#full-editor",
+            placeholder: 'Açıklama Giriniz...',
+            modules: { formula: true, toolbar: fullToolbar },
+            theme: 'snow'
+        });
+
+        const description = document.querySelector("#Description");
+        if (description && description.value) {
+            fullEditor.root.innerHTML = description.value;
+        }
+    }
+
     return {
         
         init: function (mode, formActionUrl) {
             initUploader();
             initFormValidation(formActionUrl);
             initSelect2();
-
+            DescriptionEditor();
             if (mode === 'edit') {
                 initDeleteButton();
             }

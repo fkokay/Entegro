@@ -1,29 +1,47 @@
 ﻿@model MarketplaceIntegrationSystemModel
 <div class="modal fade" id="addMarketplace" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Entegrasyon Ekle</h3>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-header p-0 position-relative" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <h5 class="modal-title m-0">Entegrasyon Ekle</h5>
                 </div>
-                <form id="addMarketplaceForm" class="row g-3" onsubmit="return false">
+            </div>
+
+            <div class="modal-body px-4 py-4">
+                <form id="addMarketplaceForm" class="row g-4" onsubmit="return false">
                     @Html.HiddenFor(m => m.MarketplaceType)
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="Name">Adı</label>
-                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Adı", required = "required" })
-                    </div>
-                    <div class="col-12 col-md-12">
-                        <label class="form-label" for="Description">Açıklaması</label>
-                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Açıklaması", rows = "3" })
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" for="Name">Adı</label>
+                        @Html.TextBoxFor(m => m.Name, new {
+                        @class = "form-control",
+                                                placeholder = "Adı",
+                                                required = "required"
+                                                })
                     </div>
 
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Kapat</button>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" for="Description">Açıklaması</label>
+                        @Html.TextAreaFor(m => m.Description, new {
+                                                @class = "form-control",
+                                                placeholder = "Açıklama giriniz",
+                                                rows = "4"
+                                                })
+                    </div>
+
+                    <div class="col-12 text-center pt-3">
+                        <button type="submit" class="btn btn-success px-4 me-2">
+                            <i class="bi bi-check-circle me-1"></i> Kaydet
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Kapat
+                        </button>
                     </div>
                 </form>
             </div>
+
         </div>
     </div>
 </div>

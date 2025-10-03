@@ -588,6 +588,12 @@ Entegro.product = (function ($) {
     function initAttributesTable(productId) {
         if (!productId) return;
 
+
+        if ($.fn.DataTable.isDataTable('#AttributesTable')) {
+            $('#AttributesTable').DataTable().ajax.url('/Product/ProductVariantAttributeList?productId=' + productId).load();
+            return;
+        }
+
         const table = $('#AttributesTable').DataTable({
 
             language: {
@@ -640,21 +646,18 @@ Entegro.product = (function ($) {
                 {
                     data: 'ProductVariantAttributeValues',
                     render: function (data, type, row) {
-                        const count = data?.length || 0;
-                        const productVariantAttributeId = data[0].ProductVariantAttributeId;
-                        const productId = row.ProductId;
-                         const clickableText = `
-                            <span class="text-primary btn-view-values cursor-pointer" data-attribute-id="${productVariantAttributeId}" data-product-id="${productId}">
-                                ${count} ürün özelliği var
-                            </span>
-                        `;
+                        const count = Array.isArray(data) ? data.length : 0;
 
-
-
-                        return `${clickableText}`;
+                        const productVariantAttributeId = row.Id;
+                        const clickableText = `
+                        <span class="text-primary btn-view-values cursor-pointer" 
+                              data-attribute-id="${productVariantAttributeId}" 
+                              data-product-id="${productId}">
+                            ${count} ürün özelliği var
+                        </span> `;
+                        return clickableText;
                     }
-                }
-,
+                },
                 {
                     data: 'ProductVariantAttributeValues',
                     render: function (data) {
@@ -667,23 +670,23 @@ Entegro.product = (function ($) {
                     searchable: false,
                     render: function (data, type, row) {
                         return `
-              <div class="d-inline-block text-nowrap">
-                  <button type="button"
-                          class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-createorupdate-productvariant"
-                          data-product-id="${productId}"
-                          data-attribute-id="${row.ProductAttributeId}"
-                          data-bs-toggle="modal"
-                          data-bs-target="#createOrUpdateProductVariantAttributeModal">
-                      <i class="icon-base ti ti-pencil icon-22px"></i>
-                  </button>
-                  
-                  <button type="button"
-                          class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-attribute"
-                          data-id="${row.Id}">
-                      <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
-                  </button>
+                        <div class="d-inline-block text-nowrap">
+                            <button type="button"
+                                    class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-createorupdate-productvariant"
+                                    data-product-id="${productId}"
+                                    data-attribute-id="${row.ProductAttributeId}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#createOrUpdateProductVariantAttributeModal">
+                                <i class="icon-base ti ti-pencil icon-22px"></i>
+                            </button>
+                            
+                            <button type="button"
+                                    class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-attribute"
+                                    data-id="${row.Id}">
+                                <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
+                            </button>
 
-              </div>`;
+                        </div>`;
                     }
                 }
             ],

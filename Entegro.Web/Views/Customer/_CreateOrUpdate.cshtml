@@ -21,108 +21,75 @@
                 <div class="row g-3 p-3">
                     @Html.HiddenFor(m => m.Id)
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Name">Ad Soyad / Şirket Adı</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Name">Ad Soyad / Şirket Adı</label>
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name" })
+
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Email">Email</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email", @id = "Email" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Email">Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email", @id = "Email" })
+
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="PhoneNumber">Telefon</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @id = "PhoneNumber" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="PhoneNumber">Telefon</label>
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @id = "PhoneNumber" })
+
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="City">Şehir</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.City, new { @class = "form-control", @id = "City" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="City">Şehir</label>
+                        @Html.TextBoxFor(m => m.City, new { @class = "form-control", @id = "City" })
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="District">İlçe</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.District, new { @class = "form-control", @id = "District" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="District">İlçe</label>
+                        @Html.TextBoxFor(m => m.District, new { @class = "form-control", @id = "District" })
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Town">Mahalle</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Town, new { @class = "form-control", @id = "Town" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Town">Mahalle</label>
+                        @Html.TextBoxFor(m => m.Town, new { @class = "form-control", @id = "Town" })
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Street">Cadde / Sokak</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Street, new { @class = "form-control", @id = "Street" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Street">Cadde / Sokak</label>
+                        @Html.TextBoxFor(m => m.Street, new { @class = "form-control", @id = "Street" })
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Address">Adres</label>
-                            <div class="col-sm-9">
-                                @Html.TextAreaFor(m => m.Address, new { @class = "form-control", @id = "Address", rows = "3" })
-                            </div>
-                        </div>
+                    
+
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="CustomerType">Müşteri Tipi</label>
+                        @Html.DropDownListFor(m => m.CustomerType, new SelectList(new[] {
+                        new { Value = 0, Text = "Bireysel" },
+                                                new { Value = 1, Text = "Kurumsal" }
+                                                }, "Value", "Text"), new { @class = "form-control", @id = "CustomerType" })
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="CustomerType">Müşteri Tipi</label>
-                            <div class="col-sm-9">
-                                @Html.DropDownListFor(m => m.CustomerType, new SelectList(new[] {
-                                new { Value = 0, Text = "Bireysel" },
-                                                                new { Value = 1, Text = "Kurumsal" }
-                                                                }, "Value", "Text"), new { @class = "form-control", @id = "CustomerType" })
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="TaxOffice">Vergi Dairesi</label>
-                            <div class="col-sm-9">
+                            <label class="form-label text-sm-start" for="TaxOffice">Vergi Dairesi</label>
+                            <div class="">
                                 @Html.TextBoxFor(m => m.TaxOffice, new { @class = "form-control", @id = "TaxOffice" })
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="TaxNumber">Vergi Numarası</label>
-                            <div class="col-sm-9">
+                            <label class="form-label text-sm-start" for="TaxNumber">Vergi Numarası</label>
+                            <div class="">
                                 @Html.TextBoxFor(m => m.TaxNumber, new { @class = "form-control", @id = "TaxNumber" })
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-md-12">
+                        <label class="form-label text-sm-start" for="Address">Adres</label>
+                        @Html.TextAreaFor(m => m.Address, new { @class = "form-control", @id = "Address", rows = "3" })
+                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="customer-address" role="tabpanel">

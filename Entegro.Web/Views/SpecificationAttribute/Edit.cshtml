@@ -1,10 +1,32 @@
 ﻿@model SpecificationAttributeModel
 
-<form asp-action="Edit" id="specificationattribute-form">
-    <div class="container-fluid flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ürün Özellik Yönetimi /</span><span class="text-muted fw-light"> Ürün Özelliği /</span> Ürün Özelliği Düzenle</h4>
+
+<div class="container-fluid flex-grow-1 container-p-y">
+    <form asp-action="Edit" id="specificationattribute-form">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
+            <div class="d-flex flex-column justify-content-center">
+                <h4 class="mb-1">Ürün Özellik Yönetimi</h4>
+                <p class="mb-0">Ürün Özelliği</p>
+            </div>
+            <div class="d-flex align-content-center flex-wrap gap-4">
+                <div class="d-flex gap-4">
+                    <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                        <span class="d-flex justify-content-center text-nowrap">
+                            <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
+                        </span>
+                    </a>
+                </div>
+               
+                <button type="submit" id="save-btn" class="btn btn-primary waves-effect waves-light">
+                    <span class="d-flex justify-content-center text-nowrap">
+                        <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
+                    </span>
+                </button>
+            </div>
+        </div>
+      
         <div class="row">
-            <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+            <div class="col-lg-12 col-12 mb-lg-0 mb-4">
                 <div class="card mb-3">
                     <div class="card-header">
                         <ul class="nav nav-tabs card-header-tabs" id="specificationattribute-tabs" role="tablist">
@@ -23,7 +45,6 @@
                         <div class="tab-pane fade show active" id="form-tabs-attribute" role="tabpanel">
                             @await Html.PartialAsync("_SpecificationAttributeEdit", new SpecificationAttributeModel { Id = Model.Id, Name = Model.Name })
                         </div>
-
                         <div class="tab-pane fade" id="form-tabs-attributeOption" role="tabpanel">
                             @if (Model.Id > 0)
                             {
@@ -40,33 +61,31 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-12 invoice-actions">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <button type="submit" id="save-btn" class="btn btn-primary d-grid w-100 mb-2 waves-effect waves-light">
-                            <span class="d-flex align-items-center justify-content-center text-nowrap"><i class="ti ti-check ti-xs me-1"></i>Kaydet</span>
-                        </button>
-                        <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">Vazgeç</a>
-                    </div>
-                </div>
-            </div>
+            
         </div>
-    </div>
-</form>
 
+    </form>
+</div>
 <div class="modal fade" id="SpecificationAttributeOptionPopup" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3 class="mb-2">Ürün Özellik Değeri Ekle</h3>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Modal Header -->
+            <div class="modal-header p-0 position-relative" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <h5 class="modal-title m-0">Ürün Özellik Değeri Ekle</h5>
                 </div>
-                <div id="SpecificationAttributeOptionPopupContent"></div>
             </div>
+
+            <div class="modal-body px-4 py-4">
+                <div id="SpecificationAttributeOptionPopupContent">
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script src="/assets/js/entegro.specificationattribute.js" asp-append-version="true"></script>

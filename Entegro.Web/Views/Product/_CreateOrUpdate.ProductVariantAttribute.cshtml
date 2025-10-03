@@ -2,30 +2,36 @@
 
 
 <form asp-action="CreateOrUpdateProductVariantAttribute" method="post" id="createOrUpdateProductVariantAttributeForm">
-    <input type="hidden" value="@Model.Id" asp-for="Id" />
-    <input type="hidden" value="@Model.ProductId" asp-for="ProductId" />
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.ProductId)
 
-    <div class="row mb-3">
+    <div class="row g-4">
+        <!-- Özellik -->
         <div class="col-md-6">
-            <label class="form-label text-sm-start" asp-for="ProductAttributeId">Özellik</label>
-            <select asp-for="ProductAttributeId" asp-items="ViewBag.ProductAttributes" class="select2 form-select">
-            </select>
+            <label class="form-label fw-semibold" asp-for="ProductAttributeId">Özellik</label>
+            <select asp-for="ProductAttributeId" asp-items="ViewBag.ProductAttributes" class="select2 form-select" required></select>
         </div>
 
+        <!-- Kontrol Türü -->
         <div class="col-md-6">
-            <label class="form-label text-sm-start" asp-for="AttributeControlTypeId">Kontrol Türü</label>
-            <select asp-for="AttributeControlTypeId" asp-items="ViewBag.FormControlTypes" class="select2 form-select">
-            </select>
+            <label class="form-label fw-semibold" asp-for="AttributeControlTypeId">Kontrol Türü</label>
+            <select asp-for="AttributeControlTypeId" asp-items="ViewBag.FormControlTypes" class="select2 form-select" required></select>
         </div>
 
-        <div class="col-md-6 mt-1">
-            <label class="form-label text-sm-start" asp-for="DisplayOrder">Görüntüleme sırası</label>
-            @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number" })
+        <!-- Görüntüleme Sırası -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold" asp-for="DisplayOrder">Görüntüleme Sırası</label>
+            @Html.TextBoxFor(m => m.DisplayOrder, new {
+                @class = "form-control",
+                @type = "number",
+                placeholder = "Sıra numarası giriniz"
+            })
         </div>
 
-        <div class="col-md-6 mt-1">
-            <label class="form-label text-sm-start" asp-for="IsRequried">Zorunlu</label>
-            <div class="d-flex" style="height:38px;">
+        <!-- Zorunlu Alan -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold" asp-for="IsRequried">Zorunlu</label>
+            <div class="d-flex align-items-center" style="height: 38px;">
                 <label class="switch switch-lg">
                     @Html.CheckBoxFor(m => m.IsRequried, new { @class = "switch-input" })
                     <span class="switch-toggle-slider">
@@ -36,8 +42,16 @@
             </div>
         </div>
     </div>
-    <div class="text-end">
-        <button type="submit" class="btn btn-primary">Kaydet</button>
+
+    <!-- Butonlar -->
+    <div class="col-12 text-center pt-4">
+        <button type="submit" class="btn btn-success px-4 me-2">
+            <i class="bi bi-check-circle me-1"></i> Kaydet
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Kapat
+        </button>
     </div>
 </form>
+
 

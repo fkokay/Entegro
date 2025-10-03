@@ -2,7 +2,7 @@
 Entegro.brand = Entegro.brand || {};
 
 Entegro.brand = (function ($) {
-
+    var fullEditor;
     function initUploader() {
         if (!$('#MediaUpload').length) return;
 
@@ -157,7 +157,11 @@ Entegro.brand = (function ($) {
                         e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
                     }
                 });
-
+                instance.on('core.form.valid', function () {
+                    if (typeof fullEditor !== "undefined" && fullEditor.root) {
+                        document.getElementById('Description').value = fullEditor.root.innerHTML;
+                    }
+                });
                 instance.on('core.form.valid', function () {
                     const $form = $(form);
                     const serializedData = $form.serialize();
@@ -211,7 +215,31 @@ Entegro.brand = (function ($) {
             }
         });
     }
+    function DescriptionEditor() {
+        const fullToolbar = [
+            [{ font: [] }, { size: [] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ script: 'super' }, { script: 'sub' }],
+            [{ header: '1' }, { header: '2' }, 'blockquote', 'code-block'],
+            [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+            [{ direction: 'rtl' }],
+            ['link', 'image', 'video', 'formula'],
+            ['clean']
+        ];
 
+        fullEditor = new Quill("#full-editor", {
+            bounds: "#full-editor",
+            placeholder: 'Açıklama Giriniz...',
+            modules: { formula: true, toolbar: fullToolbar },
+            theme: 'snow'
+        });
+
+        const description = document.querySelector("#Description");
+        if (description && description.value) {
+            fullEditor.root.innerHTML = description.value;
+        }
+    }
     function initSelect2() {
         const $dropdown = $('#ParentBrandId');
         if (!$dropdown.length) return;
@@ -266,6 +294,7 @@ Entegro.brand = (function ($) {
             initFormValidation(formActionUrl);
             initDeleteButton();
             initSelect2();
+            DescriptionEditor();
         }
     };
 

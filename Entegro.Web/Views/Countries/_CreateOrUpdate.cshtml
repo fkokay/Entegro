@@ -21,37 +21,25 @@
         <div class="tab-content">
             <div class="tab-pane fade active show" id="form-tabs-general" role="tabpanel">
                 <div class="row g-3">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Ad</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control",@required="required" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Ad</label>
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @required = "required" })
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="formtabs-first-name">Sıra</label>
-                            <div class="col-sm-9">
-                                @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="formtabs-first-name">Sıra</label>
+                        @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @type = "number", min = "0" })
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label text-sm-start" for="Published">Yayınlandı</label>
-                            <div class="col-sm-9">
-                                <label class="switch switch-lg">
-                                    @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input" })
-                                    <span class="switch-toggle-slider">
-                                        <span class="switch-on"></span>
-                                        <span class="switch-off"></span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Published">Yayınlandı</label>
+                        <label class="switch switch-lg">
+                            @Html.CheckBoxFor(m => m.Published, new { @class = "switch-input form-control" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on"></span>
+                                <span class="switch-off"></span>
+                            </span>
+                        </label>
                     </div>
                 </div>
             </div>

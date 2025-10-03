@@ -1,24 +1,26 @@
 ﻿@model DistrictModel
 
-<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-<div class="text-center mb-4">
-    <h3 class="mb-2">Mahalle Bilgileri</h3>
-</div>
-<form asp-action="CreateOrUpdateDistrict" asp-controller="District" method="post">
+
+<form asp-action="CreateOrUpdateDistrict" asp-controller="District" method="post" class="row g-4">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="TownId" />
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Adı</label>
-        <input asp-for="Name" class="form-control" required />
+    <div class="col-12">
+        <label asp-for="Name" class="form-label fw-semibold">Adı <span class="text-danger">*</span></label>
+        <input asp-for="Name" class="form-control" required placeholder="Mahalle adı giriniz" />
     </div>
 
-    <div class="mb-3 form-check">
-        <input asp-for="Published" class="form-check-input" />
-        <label asp-for="Published" class="form-check-label">Yayınlandı</label>
+    <div class="col-12 d-flex align-items-center">
+        <input asp-for="Published" class="form-check-input me-2" id="PublishedCheck" />
+        <label asp-for="Published" class="form-check-label" for="PublishedCheck">Yayınlandı</label>
     </div>
 
-    <div class="text-end">
-        <button type="submit" class="btn btn-primary">Kaydet</button>
+    <div class="col-12 text-center pt-3">
+        <button type="submit" class="btn btn-success px-4 me-2">
+            <i class="bi bi-check-circle me-1"></i> Kaydet
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" aria-label="Kapat">
+            <i class="bi bi-x-circle me-1"></i> Kapat
+        </button>
     </div>
 </form>
