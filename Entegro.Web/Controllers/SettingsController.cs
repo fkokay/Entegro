@@ -93,7 +93,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Erp()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP,null);
 
             var model = new ErpListModel();
             model.ErpList = allErpIntegrationSystem.Select(m => new ErpIntegrationSystemModel
@@ -487,7 +487,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Commerce()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce,null);
 
             var model = new CommerceListModel();
             model.CommerceList = allErpIntegrationSystem.Select(m => new CommerceIntegrationSystemModel
@@ -661,7 +661,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Cargo()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Cargo);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Cargo, null);
 
             var model = new CargoListModel();
             model.CargoList = allErpIntegrationSystem.Select(m => new CargoIntegrationSystemModel
@@ -1043,7 +1043,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Marketplace()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Marketplace);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Marketplace, null);
 
             var model = new MarketplaceListModel();
             model.MarketplaceList = allErpIntegrationSystem.Select(m => new MarketplaceIntegrationSystemModel
@@ -1708,7 +1708,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> EInvoice()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.EInvoice);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.EInvoice, null);
 
             var model = new EInvoiceListModel();
             model.EInvoiceList = allErpIntegrationSystem.Select(m => new EInvoiceIntegrationSystemModel

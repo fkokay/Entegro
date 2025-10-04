@@ -7,7 +7,7 @@ namespace Entegro.Application.Interfaces.Services.Base
     {
         Task<IntegrationSystemDto?> GetByIdAsync(int id);
         Task<IntegrationSystemDto?> GetByTypeIdAsync(int typeId);
-        Task<List<IntegrationSystemDto>> GetAllAsync(int? integrationSystemTypeId);
+        Task<List<IntegrationSystemDto>> GetAllAsync(int? integrationSystemTypeId, bool? active);
         Task<PagedResult<IntegrationSystemDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<int> AddAsync(CreateIntegrationSystemDto integrationSystem);
         Task<bool> UpdateAsync(UpdateIntegrationSystemDto integrationSystem);

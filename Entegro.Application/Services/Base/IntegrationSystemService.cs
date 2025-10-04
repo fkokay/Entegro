@@ -38,9 +38,9 @@ namespace Entegro.Application.Services.Base
             return true;
         }
 
-        public async Task<List<IntegrationSystemDto>> GetAllAsync(int? integrationSystemTypeId)
+        public async Task<List<IntegrationSystemDto>> GetAllAsync(int? integrationSystemTypeId,bool? active)
         {
-            var integrationSystem = await _integrationSystemRepository.GetAllAsync(integrationSystemTypeId);
+            var integrationSystem = await _integrationSystemRepository.GetAllAsync(integrationSystemTypeId,active);
             var IntegrationSystemDto = _mapper.Map<IEnumerable<IntegrationSystemDto>>(integrationSystem);
             return IntegrationSystemDto.ToList();
         }

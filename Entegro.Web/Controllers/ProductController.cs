@@ -147,7 +147,7 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> List()
         {
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null);
+            var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null,true);
             ViewBag.Commerces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce).Select(
                 m => new { m.Id, m.Name }
                 ).ToList();

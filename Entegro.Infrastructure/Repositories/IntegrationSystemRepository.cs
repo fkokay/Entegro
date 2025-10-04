@@ -36,7 +36,7 @@ namespace Entegro.Infrastructure.Repositories
             return integrationSystems;
         }
 
-        public async Task<List<IntegrationSystem>> GetAllAsync(int? integrationSystemTypeId)
+        public async Task<List<IntegrationSystem>> GetAllAsync(int? integrationSystemTypeId, bool? active)
         {
             var query = _context.IntegrationSystems
             .Include(x => x.IntegrationSystemParameters)
@@ -45,6 +45,11 @@ namespace Entegro.Infrastructure.Repositories
             if (integrationSystemTypeId.HasValue)
             {
                 query = query.Where(x => x.IntegrationSystemTypeId == integrationSystemTypeId.Value);
+            }
+
+            if (active.HasValue)
+            {
+                query = query.Where(x => x.Active == active.Value);
             }
 
             var integrationSystems = await query.ToListAsync();
