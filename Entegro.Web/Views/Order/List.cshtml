@@ -8,19 +8,19 @@
     </div>
     <div class="card">
         <div class="order-actions border-bottom p-4 d-flex">
-            <button class="btn active" data-order-status="1">Paketlenecek(@Model.ToBePackedQuantity)</button>
+            <button class="btn active" data-order-status="1">Paketlenecek <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="2">Gönderime Hazır(@Model.ReadyToShipQuantity)</button>
+            <button class="btn" data-order-status="2">Gönderime Hazır <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="3">Kargoda(@Model.ShippedQuantity)</button>
+            <button class="btn" data-order-status="3">Kargoda <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ShippedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="4">Teslim Edildi(@Model.DeliveredQuantity)</button>
+            <button class="btn" data-order-status="4">Teslim Edildi <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.DeliveredQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="5">Teslim Edilemedi(@Model.UnDeliverdQuantity)</button>
+            <button class="btn" data-order-status="5">Teslim Edilemedi <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.UnDeliverdQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="6">Ödemesi Bekleniyor(@Model.PaymentAwaitingQuantity)</button>
+            <button class="btn" data-order-status="6">Ödemesi Bekleniyor <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.PaymentAwaitingQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="7">İptal Edildi(@Model.CancalledQuantity)</button>
+            <button class="btn" data-order-status="7">İptal Edildi <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.CancalledQuantity</span></button>
         </div>
         <div class="p-5">
             <div class="row">

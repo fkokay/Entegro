@@ -118,10 +118,12 @@ Entegro.log.list = (function ($) {
                     return JSON.stringify(d);
                 },
             },
+            autoWidth: false,
             columns: [
                 { data: 'Id', visible: false },
                 {
                     data: 'Level',
+                    width: "auto",
                     render: function (data, type, row) {
                         if (type === "display" || type === "filter") {
                             return getLevelBadge(data);
@@ -131,25 +133,24 @@ Entegro.log.list = (function ($) {
                 },
                 {
                     data: 'Message',
+                    width: "auto",
                     render: function (data, type, row) {
                         if (type === "display") {
-                            return `<a href="/Log/View?logId=${row.Id}" class="text-decoration-underline text-primary">${data}</a>`;
+                            return `<a href="/Log/View?logId=${row.Id}" class="text-truncate d-inline-block" style="max-width:800px;">${data}</a>`;
                         }
                         return data;
                     }
                 },
                 {
                     data: 'TimeStamp',
+                    width: "auto",
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.yyyy HH:mm:ss");
                     }
                 },
-                { data: 'Id' }
-            ],
-            columnDefs: [
                 {
-                    targets: -1,
+                    data: 'Id',
                     title: 'İşlemler',
                     searchable: false,
                     orderable: false,
@@ -220,7 +221,7 @@ Entegro.log.list = (function ($) {
                                 ]
                             },
                             {
-                                text: `<i class="icon-base ti ti-trash me-1"></i> Tamamını Sil`,
+                                text: `<i class="icon-base ti ti-trash me-1"></i>Temizle`,
                                 className: "btn btn-danger delete-all-logs",
                                 action: function () {
                                     Swal.fire({

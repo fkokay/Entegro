@@ -15,15 +15,15 @@
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
-                        <a asp-controller="Product" asp-action="List" class="menu-link">
-                            <i class="menu-icon tf-icons ti ti-package"></i>
-                            <div data-i18n="Ürünler">Ürünler</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
                         <a asp-controller="Category" asp-action="List" class="menu-link">
                             <i class="menu-icon tf-icons ti ti-category"></i>
                             <div data-i18n="Kategoriler">Kategoriler</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a asp-controller="Product" asp-action="List" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-package"></i>
+                            <div data-i18n="Ürünler">Ürünler</div>
                         </a>
                     </li>
                     <li class="menu-item">
@@ -32,6 +32,7 @@
                             <div data-i18n="Markalar">Markalar</div>
                         </a>
                     </li>
+                    <li class="divider"></li>
                     <li class="menu-item">
                         <a asp-controller="ProductAttribute" asp-action="List" class="menu-link">
                             <i class="menu-icon tf-icons ti ti-versions"></i>
@@ -44,6 +45,7 @@
                             <div data-i18n="Varyant Değerleri">Varyant Değerleri</div>
                         </a>
                     </li>
+                    <li class="divider"></li>
                     <li class="menu-item">
                         <a asp-controller="SpecificationAttribute" asp-action="List" class="menu-link">
                             <i class="menu-icon tf-icons ti ti-spacing-vertical"></i>
@@ -101,12 +103,6 @@
                 </ul>
             </li>
             <li class="menu-item">
-                <a asp-controller="Notification" asp-action="List" class="menu-link">
-                    <i class="menu-icon tf-icons ti ti-bell"></i>
-                    <div data-i18n="Bildirimler">Bildirimler</div>
-                </a>
-            </li>
-            <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons ti ti-database-import"></i>
                     <div data-i18n="Toplu İşlemeler">Toplu İşlemeler</div>
@@ -146,47 +142,56 @@
                 <ul class="menu-sub">
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="GeneralCommon" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-adjustments"></i>
                             <div data-i18n="Genel Ayarlar">Genel Ayarlar</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="User" asp-action="List" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-users"></i>
                             <div data-i18n="Kullanıcılar">Kullanıcılar</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="EmailAccount" asp-action="List" class="menu-link">
-                            <div data-i18n="Mail Entegrasyonu">Mail Entegrasyonu</div>
+                            <i class="menu-icon tf-icons ti ti-mail"></i>
+                            <div data-i18n="E-posta Hesapları">E-posta Hesapları</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="Countries" asp-action="List" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-world"></i>
                             <div data-i18n="Ülkeler">Ülkeler</div>
                         </a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="Erp" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-hierarchy-2"></i>
                             <div data-i18n="ERP Entegrasyonu">ERP Entegrasyonu</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="Marketplace" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-hierarchy-2"></i>
                             <div data-i18n="Pazaryeri Entegrasyonu">Pazaryeri Entegrasyonu</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="Commerce" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-hierarchy-2"></i>
                             <div data-i18n="E-Ticaret Entegrasyonu">E-Ticaret Entegrasyonu</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="Cargo" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-hierarchy-2"></i>
                             <div data-i18n="Kargo Entegrasyonu">Kargo Entegrasyonu</div>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a asp-controller="Settings" asp-action="EInvoice" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-hierarchy-2"></i>
                             <div data-i18n="E-Fatura Entegrasyonu">E-Fatura Entegrasyonu</div>
                         </a>
                     </li>
@@ -199,6 +204,12 @@
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
+                        <a asp-controller="Notification" asp-action="List" class="menu-link">
+                            <i class="menu-icon tf-icons ti ti-bell"></i>
+                            <div data-i18n="Bildirimler">Bildirimler</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
                         <a asp-controller="Scheduling" asp-action="List" class="menu-link">
                             <i class="menu-icon tf-icons ti ti-clock"></i>
                             <div data-i18n="Zamanlanmış Görevler">Zamanlanmış Görevler</div>
@@ -207,7 +218,7 @@
                     <li class="menu-item">
                         <a asp-controller="Log" asp-action="List" class="menu-link">
                             <i class="menu-icon tf-icons ti ti-logic-nand"></i>
-                            <div data-i18n="Hata Kayıtları">Hata Kayıtları</div>
+                            <div data-i18n="Log Kayıtları">Log Kayıtları</div>
                         </a>
                     </li>
                 </ul>

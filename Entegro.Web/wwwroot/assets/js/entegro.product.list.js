@@ -300,6 +300,7 @@ Entegro.product.list = (function ($) {
                 },
                 { data: 'Code', visible: false },
                 { data: 'BrandId', visible: false },
+                { data: 'Barcode', visible: false },
                 {
                     data: 'Name',
                     render: (data, type, row) => {
@@ -317,10 +318,14 @@ Entegro.product.list = (function ($) {
                         </div>`;
                     }
                 },
-                { data: 'Barcode' },
                 {
                     data: 'Price',
-                    render: $.fn.dataTable.render.number(".", ",", 2)
+                    render: (data, type, row) => {
+                        if (type === "sort" || type === "type") {
+                            return data;
+                        }
+                        return $.fn.dataTable.render.number('.', ',', 2).display(data) + ' ' + row.Currency;
+                    }
                 },
                 { data: 'StockQuantity'},
                 {

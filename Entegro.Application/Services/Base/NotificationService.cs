@@ -164,7 +164,7 @@ namespace Entegro.Application.Services.Base
             var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
 
             var connection = new HubConnectionBuilder()
-              .WithUrl(systemUrl.Value+"notificationHub")
+              .WithUrl(systemUrl.Value+"/notificationHub")
               .Build();
 
             await connection.StartAsync();
