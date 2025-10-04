@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
 
-            <div class="modal-header p-0 position-relative" style="height: 80px;">
+            <div class="modal-header p-0 position-relative">
                 <div class="d-flex justify-content-center align-items-center w-100 h-100">
                     <h5 class="modal-title m-0">Entegrasyon Ekle</h5>
                 </div>
@@ -12,23 +12,16 @@
             <div class="modal-body px-4 py-4">
                 <form id="addMarketplaceForm" class="row g-4" onsubmit="return false">
                     @Html.HiddenFor(m => m.MarketplaceType)
+                    @Html.HiddenFor(m => m.Active)
 
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="Name">Adı</label>
-                        @Html.TextBoxFor(m => m.Name, new {
-                        @class = "form-control",
-                                                placeholder = "Adı",
-                                                required = "required"
-                                                })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Adı", required = "required" })
                     </div>
 
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="Description">Açıklaması</label>
-                        @Html.TextAreaFor(m => m.Description, new {
-                                                @class = "form-control",
-                                                placeholder = "Açıklama giriniz",
-                                                rows = "4"
-                                                })
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Açıklama giriniz", rows = "4" })
                     </div>
 
                     <div class="col-12 text-center pt-3">

@@ -5,7 +5,7 @@
 
 
 <div class="container-fluid flex-grow-1 container-p-y">
-    <form asp-action="CommerceParameterTrendyolEFaturam" id="einvoice-setting-trendyol-form">
+    <form asp-action="EInvoiceParameterTrendyolEFaturam" id="einvoice-setting-trendyol-form">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
             <div class="d-flex flex-column justify-content-center">
                 <h4 class="mb-1">@ViewData["Title"]</h4>
@@ -46,6 +46,18 @@
                         <div class="mb-6">
                             <label class="form-label" for="basic-default-fullname">Açıklaması</label>
                             @Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-6">
+                            <label class="form-label" for="Active">Aktif</label>
+                            <div class="d-flex" style="height:38px;">
+                                <label class="switch switch-lg">
+                                    @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
+                                    <span class="switch-toggle-slider">
+                                        <span class="switch-on">Evet</span>
+                                        <span class="switch-off">Hayır</span>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
