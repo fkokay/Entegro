@@ -14,9 +14,9 @@ Entegro.returnrequest.list = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[2, 'asc']], // ID'ye göre sıralama
+            order: [[8, 'asc']], // ID'ye göre sıralama
             ajax: {
-                url: '/ReturnRequest/ReturnRequestList', // Kendi endpoint'ine göre değiştir
+                url: '/ReturnRequest/ReturnRequestList', 
                 type: 'POST',
                 contentType: 'application/json',
                 data: function (d) {
@@ -33,7 +33,8 @@ Entegro.returnrequest.list = (function ($) {
                 { data: 'OrderItemId' },
                 { data: 'ReturnRequestStatus' },
                 {
-                    data: 'CreatedOn',
+                    name:'CreatedOn',
+                    data: 'CreatedOnUtc',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.yyyy HH:mm");
