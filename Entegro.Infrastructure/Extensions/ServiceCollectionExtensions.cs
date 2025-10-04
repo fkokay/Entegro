@@ -55,6 +55,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IEventPublisher, EventBus>();
             services.AddScoped<ITaskDescriptorService, TaskDescriptorService>();
+            services.AddScoped<IReturnRequestService, ReturnRequestService>();
             services.AddHttpClient();
 
             return services;

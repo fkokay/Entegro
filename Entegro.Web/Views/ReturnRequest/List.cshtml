@@ -1,5 +1,44 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "İade Talepleri";
+}
+
+<div class="flex-grow-1 container-p-y container-fluid">
+    <div class="d-flex flex-column justify-content-center">
+        <h4 class="mb-3">@ViewData["Title"]</h4>
+    </div>
+    <div class="card">
+        <div class="card-header border-bottom">
+            <h5 class="card-title mb-0">Filtreler</h5>
+            <div class="row pt-4 gap-6 gap-md-0 g-md-6">
+            </div>
+        </div>
+
+        <div class="card-datatable">
+            <table id="ReturnRequestTable" class="table">
+                <thead class="border-top">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Id</th>
+                        <th>Ürün</th>
+                        <th>Miktar</th>
+                        <th>Müşteri</th>
+                        <th>Sipariş</th>
+                        <th>İade Talebinin Durumu</th>
+                        <th>Oluşturulma Tarihi</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/assets/js/entegro.returnrequest.list.js" asp-append-version="true"></script>
+    <script>
+        $(function() {
+             Entegro.returnrequest.list.init();
+        });
+    </script>
 }

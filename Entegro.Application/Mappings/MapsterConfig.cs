@@ -29,6 +29,7 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ReturnRequest;
 using Entegro.Application.DTOs.Setting;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
@@ -213,8 +214,11 @@ namespace Entegro.Application.Mappings
             config.NewConfig<TaskDescriptor, UpdateTaskDescriptorDto>().TwoWays();
 
             // ---------------- TaskExecutionInfoMapping ----------------
-
             config.NewConfig<TaskExecutionInfo, TaskExecutionInfoDto>().TwoWays();
+            // ---------------- ReturnRequest ----------------
+            config.NewConfig<ReturnRequest, ReturnRequestDto>().TwoWays();
+            config.NewConfig<ReturnRequest, CreateReturnRequestDto>().TwoWays();
+            config.NewConfig<ReturnRequest, UpdateReturnRequestDto>().TwoWays();
         }
     }
 }
