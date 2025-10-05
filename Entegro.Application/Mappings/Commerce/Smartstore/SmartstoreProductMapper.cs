@@ -80,8 +80,8 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.ShortDescription = "";
                 smartstoreProduct.AdminComment = "";
                 smartstoreProduct.ProductTemplateId = 1;
-                smartstoreProduct.ShowOnHomePage = false;
-                smartstoreProduct.HomePageDisplayOrder = 0;
+                smartstoreProduct.ShowOnHomePage = customData.ShowOnHomePage;
+                smartstoreProduct.HomePageDisplayOrder = customData.HomePageDisplayOrder;
                 smartstoreProduct.AllowCustomerReviews = true;
                 smartstoreProduct.Sku = product.Code;
                 smartstoreProduct.FullDescription = product.Description;
@@ -97,7 +97,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.SubjectToAcl = false;
                 smartstoreProduct.LimitedToStores = false;
                 smartstoreProduct.ManufacturerPartNumber = "";
-                smartstoreProduct.Gtin = "";
+                smartstoreProduct.Gtin = product.Gtin;
                 smartstoreProduct.IsGiftCard = false;
                 smartstoreProduct.GiftCardTypeId = 0;
                 smartstoreProduct.RequireOtherProducts = false;
@@ -124,10 +124,10 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.TaxCategoryId = 1;
                 smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
                 smartstoreProduct.StockQuantity = product.StockQuantity;
-                smartstoreProduct.DisplayStockAvailability = false;
-                smartstoreProduct.DisplayStockQuantity = false;
-                smartstoreProduct.MinStockQuantity = 0;
-                smartstoreProduct.LowStockActivityId = 0;
+                smartstoreProduct.DisplayStockAvailability = customData.DisplayStockAvailability;
+                smartstoreProduct.DisplayStockQuantity = customData.DisplayStockQuantity;
+                smartstoreProduct.MinStockQuantity = customData.MinStockQuantity;
+                smartstoreProduct.LowStockActivityId = customData.LowStockActivityId;
                 smartstoreProduct.NotifyAdminForQuantityBelow = 0;
                 smartstoreProduct.BackorderModeId = 0;
                 smartstoreProduct.AllowBackInStockSubscriptions = false;
@@ -144,9 +144,9 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.Price = product.Price;
                 smartstoreProduct.ComparePrice = 0;
                 smartstoreProduct.ComparePriceLabelId = null;
-                smartstoreProduct.SpecialPrice = null;
-                smartstoreProduct.SpecialPriceStartDateTimeUtc = null;
-                smartstoreProduct.SpecialPriceEndDateTimeUtc = null;
+                smartstoreProduct.SpecialPrice = customData.SpecialPrice;
+                smartstoreProduct.SpecialPriceStartDateTimeUtc = customData.SpecialPriceStartDateTime ?? customData.SpecialPriceStartDateTime.ToUniversalTime();
+                smartstoreProduct.SpecialPriceEndDateTimeUtc = customData.SpecialPriceEndDateTime ?? customData.SpecialPriceEndDateTime.ToUniversalTime();
                 smartstoreProduct.CustomerEntersPrice = false;
                 smartstoreProduct.MinimumCustomerEnteredPrice = 0;
                 smartstoreProduct.MaximumCustomerEnteredPrice = 1000;

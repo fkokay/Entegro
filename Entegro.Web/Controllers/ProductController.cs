@@ -1847,7 +1847,6 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
-
         #region ProductVariantAttribute
         [HttpGet]
         public async Task<IActionResult> CreateOrUpdateProductVariantAttribute(int productId, int productVariantAttributeId)
@@ -1983,6 +1982,7 @@ namespace Entegro.Web.Controllers
         }
 
         #endregion
+
         private async Task PrepareProductModel(ProductModel model, ProductDto? product)
         {
             if (product != null)

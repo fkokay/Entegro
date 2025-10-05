@@ -1,7 +1,6 @@
-﻿
-@model SmartstoreProductIntegrationModel
+﻿@model SmartstoreProductIntegrationModel
 
-<div class="row">
+<div class="row mb-5">
     <div class="d-flex justify-content-start align-items-center product-name">
         <div class="avatar-wrapper">
             <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
@@ -9,59 +8,156 @@
             </div>
         </div>
         <div class="d-flex flex-column">
-            <h6 class="text-nowrap mb-0">@Model.ProductName</h6>
+            <h6 class="text-wrap mb-0">@Model.ProductName</h6>
             <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
         </div>
     </div>
-    <div class="col-12 col-md-12">
+    <div class="col-12">
         <hr />
     </div>
-    <div class="col-6 col-md-6">
+    <div class="col-6 col-md-6 mb-2">
         <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
-        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly" })
+        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly", disabled = "disabled" })
     </div>
-    <div class="col-6 col-md-6">
-        <label class="form-label" for="CommerceType">E-Ticaret</label>
-        @Html.TextBoxFor(m => m.CommerceType, new { @class = "form-control", @readonly = "readonly" })
+    <div class="col-6 col-md-6 mb-2">
+        <label class="form-label" for="CommerceType">E-Ticaret Türü</label>
+        @Html.TextBoxFor(m => m.CommerceType, new { @class = "form-control", @readonly = "readonly", disabled = "disabled" })
     </div>
-</div>
-
-<form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationSmartstore" asp-controller="Product" class="row g-3 mt-3">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="ProductId" />
-    <input type="hidden" asp-for="IntegrationSystemId" />
-
-    <div class="col-12 col-md-12">
+    <div class="col-6 col-md-6 mb-2">
         <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
         <input type="text" asp-for="IntegrationCode" class="form-control" required />
     </div>
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="price">Fiyat</label>
-        <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
-    </div>
-    <div class="col-12 col-md-12">
-        <div class="form-check form-switch mb-2 mt-2">
-            <input class="form-check-input" type="checkbox" asp-for="Active" />
-            <label class="form-check-label" for="Active">Aktif</label>
+    <div class="col-6 col-md-6 mb-2">
+        <label class="form-label" for="Custom_ShowOnHomePage">Entegrasyon Aktif</label>
+        <div class="d-flex" style="height:38px;">
+            <label class="switch switch-lg">
+                @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
+                <span class="switch-toggle-slider">
+                    <span class="switch-on">Evet</span>
+                    <span class="switch-off">Hayır</span>
+                </span>
+            </label>
         </div>
     </div>
-    <div class="col-12 col-md-12">
-        <hr />
-    </div>
-    <div class="col-md-12">
-        <label class="form-label" for="Custom.ManageInventoryMethod">Stok Yönetimi</label>
-        <select asp-for="Custom.ManageInventoryMethod" class="form-select">
-            <option value="0">Stok Kontrolü Yok</option>
-            <option value="1">Stok Takibi Var</option>
-            <option value="2">Özelliklerle Birlikte Stok Takibi Var</option>
-        </select>
+</div>
+<form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationSmartstore" asp-controller="Product">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ProductId" />
+    <input type="hidden" asp-for="IntegrationSystemId" />
+    <ul class="nav nav-tabs card-header-tabs" id="smartstore-integration-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" type="button" role="tab">Genel Bilgiler</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-price" type="button" role="tab">Fiyat</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-inventory" type="button" role="tab">Envanter</button>
+        </li>
+    </ul>
+    <div class="tab-content p-0 pt-5 pb-5">
+        <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
+            <div class="row">
+                <div class="col-12 col-md-6 mb-2">
+                    <label class="form-label" for="Custom_ShowOnHomePage">Ana sayfada göster</label>
+                    <div class="d-flex" style="height:38px;">
+                        <label class="switch switch-lg" data-toggler-for="#pnlHomePageDisplayOrder">
+                            @Html.CheckBoxFor(m => m.Custom.ShowOnHomePage, new { @class = "switch-input", data_toggler_for = "#pnlHomePageDisplayOrder" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on">Evet</span>
+                                <span class="switch-off">Hayır</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mb-2" id="pnlHomePageDisplayOrder" style="display:none;">
+                    <label class="form-label" for="Custom_HomePageDisplayOrder">Görüntüleme sırası</label>
+                    <input type="number" asp-for="Custom.HomePageDisplayOrder" class="form-control" step="1" min="0" required />
+                </div>
+      
+            </div>
+        </div>
+        <div class="tab-pane fade" id="form-tabs-price" role="tabpanel">
+            <div class="row">
+                <div class="col-12 col-md-12 mb-2">
+                    <label class="form-label" for="price">Fiyat</label>
+                    <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
+                </div>
+                <div class="col-12 col-md-12 mb-2">
+                    <label class="form-label" for="price">Özel Fiyat</label>
+                    <input type="number" asp-for="Custom.SpecialPrice" class="form-control" step="0.01" min="0" />
+                </div>
+                <div class="col-12 col-md-6 mb-2">
+                    <label class="form-label" for="price">Özel Fiyat Başlangıç Tarihi</label>
+                    <input type="datetime" asp-for="Custom.SpecialPriceStartDateTime" class="form-control"/>
+                </div>
+                <div class="col-12 col-md-6 mb-2">
+                    <label class="form-label" for="price">Özel Fiyat Bitiş Tarihi</label>
+                    <input type="datetime" asp-for="Custom.SpecialPriceEndDateTime" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="form-tabs-inventory" role="tabpanel">
+            <div class="row">
+                <div class="col-12 col-md-6 mb-2">
+                    <label class="form-label" for="Custom_ManageInventoryMethod">Stok Yönetimi</label>
+                    <select asp-for="Custom.ManageInventoryMethod" class="form-select">
+                        <option value="0">Stok Kontrolü Yok</option>
+                        <option value="1">Stok Takibi Var</option>
+                        <option value="2">Özelliklerle Birlikte Stok Takibi Var</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 mb-2" id="pnlStockQuantity" style="display:none;">
+                    <label class="form-label" for="Custom_StockQunatity">Stok Miktarı</label>
+                    <input type="number" asp-for="Custom.StockQunatity" class="form-control" step="1" min="0" required />
+                </div>
+                <div class="col-12 col-md-6 mb-2" id="pnlDisplayStockAvailability" style="display:none;">
+                    <label class="form-label" for="Custom_DisplayStockAvailability">Stok Durumunu Göster</label>
+                    <div class="d-flex" style="height:38px;">
+                        <label class="switch switch-lg">
+                            @Html.CheckBoxFor(m => m.Custom.DisplayStockAvailability, new { @class = "switch-input", data_toggler_for = "#pnlDisplayStockQuantity" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on">Evet</span>
+                                <span class="switch-off">Hayır</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mb-2" id="pnlDisplayStockQuantity" style="display:none;">
+                    <label class="form-label" for="Custom_DisplayStockQuantity">Stok Miktarını Göster</label>
+                    <div class="d-flex" style="height:38px;">
+                        <label class="switch switch-lg">
+                            @Html.CheckBoxFor(m => m.Custom.DisplayStockQuantity, new { @class = "switch-input" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on">Evet</span>
+                                <span class="switch-off">Hayır</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mb-2" id="pnlMinStockQuantity" style="display:none;">
+                    <label class="form-label" for="Custom_MinStockQuantity">Minimum Stok miktarı</label>
+                    <input type="number" asp-for="Custom.MinStockQuantity" class="form-control" step="1" min="0" required />
+                </div>
+                <div class="col-12 col-md-6 mb-2" id="pnlLowStockActivity">
+                    <label class="form-label" for="Custom_LowStockActivityId">Stok Yönetimi</label>
+                    <select asp-for="Custom.LowStockActivityId" class="form-select">
+                        <option value="0">Hiçbir şey</option>
+                        <option value="1">Satın al düğmesini devre dışı bırak</option>
+                        <option value="2">Yayınlanmadı</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-12 text-center">
-        <button type="submit" class="btn btn-primary me-sm-3 me-1">Kaydet</button>
-        <button type="reset" class="btn btn-label-secondary @(Model.Id == 0 ? "" : "me-sm-3 me-1")" data-bs-dismiss="modal">İptal</button>
+        <button type="submit" class="btn btn-primary me-sm-3 me-1" style="width:100px;">Kaydet</button>
+        <button type="reset" class="btn btn-label-secondary @(Model.Id == 0 ? "" : "me-sm-3 me-1")" style="width:100px;" data-bs-dismiss="modal">İptal</button>
         @if (Model.Id > 0)
         {
-            <button type="button" class="btn btn-danger" onclick="Entegro.product.list.deleteIntegration(@Model.Id)">Sil</button>
+            <button type="button" class="btn btn-danger" onclick="Entegro.product.list.deleteIntegration(@Model.Id)" style="width:100px;">Sil</button>
         }
     </div>
 </form>
+
+
