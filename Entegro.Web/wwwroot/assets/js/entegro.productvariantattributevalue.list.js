@@ -37,20 +37,15 @@ Entegro.productvariantattributevalue.list = (function ($) {
                     render: function (data, type, row) {
                         return `
                         <div class="d-inline-block text-nowrap">
-                            <a 
-                               class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-create-attribute-value" 
-                                data-attribute-id="${row.productVariantAttributeId}"
+                            <a class="btn btn-text-secondary rounded-pill waves-effect btn-icon btn-create-attribute-value" data-attribute-id="${row.productVariantAttributeId}"
                                 data-table-id="${row.Id}"
                                 data-bs-toggle="modal"
                                 data-bs-target="#createOrUpdateProductVariantAttributeValueModal"
-                               title="Düzenle">
+                                title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px text-dark"></i>
                             </a>
-                            <a
-                                class="btn btn-text-secondary rounded-pill waves-effect btn-icon delete-record"
-                                data-id="${row.Id}"
-                                title="Sil">
-                                <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
+                            <a class="btn btn-text-secondary rounded-pill waves-effect btn-icon delete-record" data-id="${row.Id}" title="Sil">
+                                <i class="icon-base ti ti-trash icon-22px text-danger"></i>
                             </a>
                         </div>`;
                     }

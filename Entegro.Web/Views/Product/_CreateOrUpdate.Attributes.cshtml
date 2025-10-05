@@ -1,5 +1,20 @@
 ﻿@model ProductModel
 
+<div class="d-flex justify-content-between align-items-center mt-5">
+    <h5 class="mb-0 card-title">Özellik kombinasyonları</h5>
+    <div class="d-flex">
+        <button type="button" class="btn btn-label-dark CreateCombination waves-effect me-3">
+            Kombinasyon Ekle
+        </button>
+        <button type="button" class="btn btn-label-primary CreateAllCombinations waves-effect me-3">
+            Tüm Kombinasyonları Oluştur
+        </button>
+        <button type="button" class="btn btn-label-danger DeleteAllCombinations waves-effect">
+            Tüm Kombinasyonları Sil
+        </button>
+    </div>
+
+</div>
 <div class="row g-3 p-0">
     <div id="ProductVariantAttributeCombinationRepeater">
         <div data-repeater-list="ProductVariantAttributeCombinations">
@@ -9,12 +24,12 @@
                     <div class="row w-100 p-3">
                         <!-- Nested Attributes -->
                         <div class="ProductVariantAttributeSelectionRepeater">
-                            <div data-repeater-list="ProductVariantAttributeSelections">
+                            <div data-repeater-list="ProductVariantAttributeSelections" class="row">
                                 @foreach (var productVariantAttribute in Model.ProductVariantAttributes)
                                 {
-                                    <div data-repeater-item class="repeater-wrapper row mb-2" data-product-variant-attribute-id="@productVariantAttribute.Id">
+                                    <div data-repeater-item class="repeater-wrapper col-12 col-md-3" data-product-variant-attribute-id="@productVariantAttribute.Id">
                                         <input type="hidden" name="ProductVariantAttributeId" value="@productVariantAttribute.Id" />
-                                        <div class="col-md-2 col-12 mb-md-0 mb-3">
+                                        <div class="mb-md-0 mb-3">
                                             <p class="mb-2 repeater-title">@productVariantAttribute.ProductAttribute</p>
                                             <select name="ProductVariantAttributeValueId" class="form-select item-details mb-3">
                                                 @foreach (var val in productVariantAttribute.ProductVariantAttributeValues)

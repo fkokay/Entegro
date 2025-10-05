@@ -112,7 +112,17 @@ Entegro.category.list = (function () {
                         return moment(data).format("DD.MM.yyyy HH:mm");
                     }
                 }, // 6
-                { data: 'Published' }, // 7
+                {
+                    data: 'Published',
+                    render: data => {
+                        const checked = data ? "checked" : "";
+                        const titleText = data ? "Yayında" : "Yayında Değil";
+                        return `
+                        <div class="form-check d-inline-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
+                        </div>`;
+                    }
+                },
                 { data: 'Id' } // 8 - işlemler
             ],
             columnDefs: [
@@ -151,18 +161,6 @@ Entegro.category.list = (function () {
                              ${row.Breadcrumb}
                            </div>
                          </div>`;
-                    }
-                },
-                {
-                    targets: -2,
-                    className: "text-center",
-                    render: data => {
-                        const checked = data ? "checked" : "";
-                        const titleText = data ? "Yayında" : "Yayında Değil";
-                        return `
-                                <div class="form-check d-inline-flex justify-content-center">
-                                  <input class="form-check-input" type="checkbox" ${checked} disabled title="${titleText}">
-                                </div>`;
                     }
                 },
                 {

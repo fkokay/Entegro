@@ -1,6 +1,7 @@
 ﻿var Entegro = Entegro || {};
 Entegro.product = (function ($) {
     var fullEditor;
+    var formValidation;
     function showMessage(title, message, type = "info", redirectUrl = null, reload = null) {
         Swal.fire({
             title: title,
@@ -21,6 +22,40 @@ Entegro.product = (function ($) {
     }
 
     function Init() {
+        document.querySelector('#SaveBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+
+            formValidation.validate().then(function (status) {
+                if (status === 'Valid') {
+                    if (typeof fullEditor !== "undefined" && fullEditor.root) {
+                        document.getElementById('Description').value = fullEditor.root.innerHTML;
+                    }
+
+                    const form = $('#product-form');
+                    const action = form.attr("action");
+                    const formData = form.serialize();
+
+                    $.ajax({
+                        url: action,
+                        type: 'POST',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                showMessage("Başarılı!", 'Ürün başarıyla kaydedildi.', "success", "/Product/List");
+                            } else {
+                                showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
+                            }
+                        },
+                        error: function (xhr) {
+                            showMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
+                        }
+                    });
+                } else {
+                    console.log("Form hatalı, submit iptal.");
+                }
+            });
+        });
+
         if ($('#SelectedProductAttributeIds').length && !$('#SelectedProductAttributeIds').data('select2')) {
             $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
             $('#SelectedProductAttributeIds').select2({
@@ -58,7 +93,7 @@ Entegro.product = (function ($) {
                 if (event.target.dataset.bsTarget == "#form-tabs-attributes") {
                     if (event.target.dataset.url.length > 0) {
                         $("#form-tabs-attributes").load(event.target.dataset.url, function () {
-                           
+
                         });
                     }
                 }
@@ -164,7 +199,7 @@ Entegro.product = (function ($) {
             }
         });
 
-       
+
         $(document).off('click', '#btnSaveProductCategory').on('click', '#btnSaveProductCategory', function () {
             const payload = {
                 productId: Number($('#ProductId').val()) || 0,
@@ -248,41 +283,12 @@ Entegro.product = (function ($) {
                     $idProductVariantAttributeInput.val(productVariantAttributeId);
                 });
 
-               
+                Validation();
             },
             hide: function (deleteElement) {
-                var $idInput = $(deleteElement).find('[name$="[Id]"]');
-                var id = $idInput.val();
-             
+                var $item = $(this);
+                var id = $item.find("input[name$='[Id]']").val();
 
-                // Eğer id boşsa (yeni eklenmiş, henüz kaydedilmemiş varyant)
-                if (!id || parseInt(id) === 0) {
-                    Swal.fire({
-                        title: 'Emin misiniz?',
-                        text: "Bu varyant formdan silinecek.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Evet, sil!',
-                        cancelButtonText: 'İptal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $(deleteElement).slideUp('fast', function () {
-                                $(this).remove();
-                            });
-
-                            Swal.fire(
-                                'Silindi!',
-                                'Varyant formdan kaldırıldı.',
-                                'success'
-                            );
-                        }
-                    });
-                    return;
-                }
-
-                // id varsa (veritabanında kayıtlı varyant)
                 Swal.fire({
                     title: 'Emin misiniz?',
                     text: "Bu varyant silinecek. Bu işlemi geri alamazsınız!",
@@ -290,54 +296,52 @@ Entegro.product = (function ($) {
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Evet, sil!',
-                    cancelButtonText: 'İptal'
+                    confirmButtonText: 'Evet',
+                    cancelButtonText: 'Vazgeç'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/Product/ProductVariantAttributeDelete',
-                            type: 'POST',
-                            data: { id: id },
-                            success: function (response) {
-                                if (response.success) {
-                                    $(deleteElement).slideUp('fast', function () {
-                                        $(this).remove();
-                                    });
+                        if (!id || parseInt(id) === 0) {
+                            $(deleteElement).slideUp('fast', function () {
+                                $(this).remove();
+                            });
 
-                                    Swal.fire(
-                                        'Silindi!',
-                                        'Varyant başarıyla silindi.',
-                                        'success'
-                                    );
-                                } else {
-                                    Swal.fire(
-                                        'Hata!',
-                                        response.message || 'Bir hata oluştu.',
-                                        'error'
-                                    );
+                            Swal.fire('Silindi!', 'Varyant formdan kaldırıldı.', 'success');
+                        } else {
+                            $.ajax({
+                                url: '/Product/ProductVariantAttributeDelete',
+                                type: 'POST',
+                                data: { id: id },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $(deleteElement).slideUp('fast', function () {
+                                            $(this).remove();
+                                        });
+
+                                        Swal.fire('Silindi!', 'Varyant formdan kaldırıldı.', 'success');
+                                    }
+                                    else {
+                                        Swal.fire('Hata!', response.message || 'Bir hata oluştu.', 'error');
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire('Hata!', 'Sunucuya ulaşılamadı.', 'error');
                                 }
-                            },
-                            error: function () {
-                                Swal.fire(
-                                    'Hata!',
-                                    'Sunucuya ulaşılamadı.',
-                                    'error'
-                                );
-                            }
-                        });
+                            });
+                        }
                     }
                 });
+
+                Validation();
             },
             repeaters: [{
                 selector: '.ProductVariantAttributeSelectionRepeater',
                 initEmpty: false,
                 show: function () {
                     $(this).slideDown();
-                   
                 },
                 hide: function (deleteElement) {
                     if (confirm('Attribute silinecek emin misiniz?')) {
-                        $(this).slideUp(deleteElement); 
+                        $(this).slideUp(deleteElement);
                     }
                 }
             }]
@@ -407,7 +411,7 @@ Entegro.product = (function ($) {
         });
     }
     function Validation() {
-        const formValidation = FormValidation.formValidation(
+        formValidation = FormValidation.formValidation(
             document.getElementById('product-form'),
             {
                 locale: 'tr_TR',
@@ -431,7 +435,9 @@ Entegro.product = (function ($) {
                         }
                     },
                     'Currency': {
-                        validators: { notEmpty: { message: 'Para birimi seçilmelidir.' } }
+                        validators: {
+                            notEmpty: { message: 'Para birimi seçilmelidir.' }
+                        }
                     },
                     'StockQuantity': {
                         validators: {
@@ -500,95 +506,75 @@ Entegro.product = (function ($) {
                     autoFocus: new FormValidation.plugins.AutoFocus()
                 },
                 init: (instance) => {
+                    // Input-group sonrası mesaj konumlandırma
                     instance.on('plugins.message.placed', function (e) {
                         if (e.element.parentElement.classList.contains('input-group')) {
                             e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
                         }
                     });
 
+                    // Alan invalid olursa ilgili sekmeyi aç
                     instance.on('core.field.invalid', function (e) {
                         const fieldEl = e.elements && e.elements.length ? e.elements[0] : null;
                         if (fieldEl) FocusFieldAndShowTab(fieldEl);
                     });
 
+                    // Form invalid olursa ilk hatalı alana odaklan
                     instance.on('core.form.invalid', function () {
                         const invalidEl = document.querySelector('[data-field].is-invalid, .is-invalid');
                         if (invalidEl) FocusFieldAndShowTab(invalidEl);
-                    });
-
-                    instance.on('core.form.valid', function () {
-                        if (typeof fullEditor !== "undefined" && fullEditor.root) {
-                            document.getElementById('Description').value = fullEditor.root.innerHTML;
-                        }
-
-                        const form = $('#product-form');
-                        const action = $('#product-form').attr("action");
-                        const formData = $(form).serialize();
-
-                        $.ajax({
-                            url: action,
-                            type: 'POST',
-                            data: formData,
-                            success: function (response) {
-                                if (response.success) {
-                                    showMessage("Başarılı!", 'Ürün başarıyla kaydedildi.', "success", "/Product/List");
-                                } else {
-                                    showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
-                                }
-                            },
-                            error: function (xhr) {
-                                showMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
-                            }
-                        });
                     });
                 }
             }
         );
 
-        document.querySelectorAll('[name^="ProductVariantAttributeCombinations"][name$="[StokCode]"]').forEach(function (el) {
-            const name = el.getAttribute('name');
+        // Dinamik olarak ilk yüklemede alanları ekle
+        InitVariantValidation(formValidation);
+        RemoveVariantValidation(formValidation);
+    }
 
+    // Dinamik alanlara validation ekleme
+    function InitVariantValidation(formValidation, scope) {
+        const container = scope ? $(scope) : $(document);
+
+        container.find('[name^="ProductVariantAttributeCombinations"][name$="[StokCode]"]').each(function () {
+            const name = $(this).attr('name');
             formValidation.addField(name, {
                 validators: {
                     notEmpty: { message: 'Varyant Stok kodu boş bırakılamaz.' },
-                    stringLength: {
-                        max: 50,
-                        message: 'Varyant Stok kodu en fazla 50 karakter olabilir.'
-                    }
+                    stringLength: { max: 50, message: 'Varyant Stok kodu en fazla 50 karakter olabilir.' }
                 }
             });
 
-            el.addEventListener('input', function () {
+            $(this).on('input', function () {
                 formValidation.revalidateField(name);
             });
         });
-        document.querySelectorAll('[name^="ProductVariantAttributeCombinations"][name$="[Price]"]').forEach(function (el) {
-            const name = el.getAttribute('name');
 
-            formValidation.addField(name, {
-                validators: {
-                    notEmpty: { message: 'Varyant fiyatı boş bırakılamaz.' },
-                }
-            });
-
-            el.addEventListener('input', function () {
-                formValidation.revalidateField(name);
-            });
-        });
-        document.querySelectorAll('[name^="ProductVariantAttributeCombinations"][name$="[StockQuantity]"]').forEach(function (el) {
-            const name = el.getAttribute('name');
-
+        container.find('[name^="ProductVariantAttributeCombinations"][name$="[StockQuantity]"]').each(function () {
+            const name = $(this).attr('name');
             formValidation.addField(name, {
                 validators: {
                     notEmpty: { message: 'Varyant stok miktarı boş bırakılamaz.' },
+                    integer: { message: 'Varyant stok miktarı tam sayı olmalıdır.' }
                 }
             });
 
-            el.addEventListener('input', function () {
+            $(this).on('input', function () {
                 formValidation.revalidateField(name);
             });
         });
     }
+
+    // Dinamik alanları repeater’dan silerken validation’dan da kaldır
+    function RemoveVariantValidation(formValidation, scope) {
+        const container = $(scope);
+
+        container.find('[name^="ProductVariantAttributeCombinations"]').each(function () {
+            formValidation.removeField($(this).attr('name'));
+        });
+    }
+
     function initAttributesTable(productId) {
         if (!productId) return;
 
@@ -657,7 +643,7 @@ Entegro.product = (function ($) {
                         <span class="text-primary btn-view-values cursor-pointer" 
                               data-attribute-id="${productVariantAttributeId}" 
                               data-product-id="${productId}">
-                            ${count} ürün özelliği var
+                            ${count} seçenekleri düzenle
                         </span> `;
                         return clickableText;
                     }
@@ -687,24 +673,11 @@ Entegro.product = (function ($) {
                             <button type="button"
                                     class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-attribute"
                                     data-id="${row.Id}">
-                                <i class="icon-base ti ti-eraser icon-22px text-danger"></i>
+                                <i class="icon-base ti ti-trash icon-22px text-danger"></i>
                             </button>
 
                         </div>`;
                     }
-                }
-            ],
-
-            columnDefs: [
-                {
-                    targets: 0,
-                    orderable: false,
-                    searchable: false,
-                    responsivePriority: 3,
-                    checkboxes: {
-                        selectAllRender: '<input type="checkbox" class="form-check-input">'
-                    },
-                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 }
             ],
             displayLength: 10,
@@ -744,7 +717,7 @@ Entegro.product = (function ($) {
             }
         });
 
-    
+
         setTimeout(() => {
             const adjustments = [
                 { selector: ".dt-container", classToAdd: "border rounded" },
@@ -905,8 +878,8 @@ Entegro.product = (function ($) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/Product/DeleteProductVariantAttribute?id=${attributeId}`, 
-                        type: 'POST', 
+                        url: `/Product/DeleteProductVariantAttribute?id=${attributeId}`,
+                        type: 'POST',
                         success: function () {
                             Swal.fire({
                                 title: 'Silindi!',
