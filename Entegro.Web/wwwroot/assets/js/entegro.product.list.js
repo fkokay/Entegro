@@ -219,6 +219,33 @@ Entegro.product.list = (function ($) {
                         $.validator.unobtrusive.parse('#integrationDialog');
                     }
 
+                    window.initDataToggler();
+
+                    $("#Custom_ManageInventoryMethod").change(function () {
+                        var manageInventoryMethod = $(this).val();
+                        if (manageInventoryMethod == 0) {
+                            $("#pnlStockQuantity").hide();
+                            $("#pnlDisplayStockAvailability").hide();
+                            $("#pnlDisplayStockQuantity").hide();
+                            $("#pnlMinStockQuantity").hide();
+                            $("#pnlLowStockActivity").hide();
+                        } else if (manageInventoryMethod == 1) {
+                            $("#pnlStockQuantity").show();
+                            $("#pnlDisplayStockAvailability").show();
+                            $("#pnlDisplayStockQuantity").show();
+                            $("#pnlMinStockQuantity").show();
+                            $("#pnlLowStockActivity").show();
+                        } else if (manageInventoryMethod == 2) {
+                            $("#pnlStockQuantity").hide();
+                            $("#pnlDisplayStockAvailability").show();
+                            $("#pnlDisplayStockQuantity").show();
+                            $("#pnlMinStockQuantity").hide();
+                            $("#pnlLowStockActivity").hide();
+                        }
+                    });
+
+                    $("#Custom_ManageInventoryMethod").change();
+
                     $('#addIntegration').modal('show');
                 },
                 error: function (xhr) {

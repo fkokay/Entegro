@@ -116,4 +116,33 @@
         });
     };
 
+    window.initDataToggler = function () {
+        $(".switch-input[data-toggler-for]").each(function () {
+            var $chk = $(this);
+            var targetSelector = $chk.attr("data-toggler-for");
+            var $target = $(targetSelector);
+
+            function togglePanel() {
+                if ($chk.is(":checked")) {
+                    $target.slideDown();
+                    $target.find("input,select,textarea").prop("disabled", false);
+                } else {
+                    $target.slideUp();
+                    $target.find("input,select,textarea").prop("disabled", true);
+                }
+            }
+
+            // İlk yükleme
+            togglePanel();
+
+            // Değişiklik olunca
+            $chk.on("change", togglePanel);
+        });
+    };
+
+    $(document).ready(function () {
+        window.initDataToggler();
+    });
+
+
 })(jQuery, this, document);
