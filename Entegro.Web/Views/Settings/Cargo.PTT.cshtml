@@ -38,12 +38,24 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Adı</label>
+                            <label class="form-label" for="Name">Adı</label>
                             @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
                         </div>
                         <div class="mb-6">
-                            <label class="form-label" for="basic-default-fullname">Açıklaması</label>
+                            <label class="form-label" for="Description">Açıklaması</label>
                             @Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-6">
+                            <label class="form-label" for="Active">Aktif</label>
+                            <div class="d-flex" style="height:38px;">
+                                <label class="switch switch-lg">
+                                    @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
+                                    <span class="switch-toggle-slider">
+                                        <span class="switch-on">Evet</span>
+                                        <span class="switch-off">Hayır</span>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -88,7 +88,7 @@ namespace Entegro.Api.Jobs
         {
             _logger.LogInformation("Sipariş aktarım servisi başladı.");
 
-            var integrationSystems = await _integrationSystemService.GetAllAsync(null);
+            var integrationSystems = await _integrationSystemService.GetAllAsync(null, true);
             foreach (var item in integrationSystems)
             {
                 switch (item.IntegrationSystemType)

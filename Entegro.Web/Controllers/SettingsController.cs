@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Cargo;
@@ -9,6 +10,7 @@ using Entegro.Web.Models.Integration.EInvoice;
 using Entegro.Web.Models.Integration.Erp;
 using Entegro.Web.Models.Integration.Marketplace;
 using Entegro.Web.Models.Setting;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -91,7 +93,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Erp()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP,null);
 
             var model = new ErpListModel();
             model.ErpList = allErpIntegrationSystem.Select(m => new ErpIntegrationSystemModel
@@ -99,6 +101,7 @@ namespace Entegro.Web.Controllers
                 Id = m.Id,
                 Name = m.Name,
                 Description = m.Description,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType,
                 IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
@@ -115,6 +118,7 @@ namespace Entegro.Web.Controllers
             createIntegrationSystem.Name = model.Name;
             createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.ERP;
             createIntegrationSystem.Description = model.Description;
+            createIntegrationSystem.Active = model.Active;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
@@ -149,67 +153,85 @@ namespace Entegro.Web.Controllers
             switch (erpType.Value)
             {
                 case "Logo":
-                    var id = integrationSystemErp.Id;
-                    var name = integrationSystemErp.Name;
-                    var description = integrationSystemErp.Description;
-                    var apiUrl = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
-                    var apiUser = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
-                    var apiPassword = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
-
-                    LogoErpSettingsModel model = new LogoErpSettingsModel();
-                    model.Id = id;
-                    model.Name = name;
-                    model.Description = description;
-                    model.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
-                    model.IntegrationSystemId = integrationSystemErp.Id;
-                    model.ErpType = erpType.Value;
-                    model.ApiUrl = apiUrl?.Value;
-                    model.ApiUser = apiUser?.Value;
-                    model.ApiPassword = apiPassword?.Value;
-
-
-                    return View($"Erp.Logo", model);
+                    return ErpSettingLogo(integrationSystemErp, erpType.Value);
                 case "Netsis":
-                    var idForNetsis = integrationSystemErp.Id;
-                    var nameForNetsis = integrationSystemErp.Name;
-                    var descriptionForNetsis = integrationSystemErp.Description;
-                    var apiUrlForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
-                    var apiUserForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
-                    var apiPasswordForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
-
-                    NetsisErpSettingsModel modelForNetsis = new NetsisErpSettingsModel();
-                    modelForNetsis.Id = idForNetsis;
-                    modelForNetsis.Name = nameForNetsis;
-                    modelForNetsis.Description = descriptionForNetsis;
-                    modelForNetsis.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
-                    modelForNetsis.IntegrationSystemId = integrationSystemErp.Id;
-                    modelForNetsis.ErpType = erpType.Value;
-                    modelForNetsis.ApiUrl = apiUrlForNetsis?.Value;
-                    modelForNetsis.ApiUser = apiUserForNetsis?.Value;
-                    modelForNetsis.ApiPassword = apiPasswordForNetsis?.Value;
-                    return View($"Erp.Netsis", modelForNetsis);
+                   return ErpSettingNetsis(integrationSystemErp,erpType.Value);
                 case "Opak":
-                    var idForOpak = integrationSystemErp.Id;
-                    var nameForOpak = integrationSystemErp.Name;
-                    var descriptionForOpak = integrationSystemErp.Description;
-                    var apiUrlForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
-                    var apiUserForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
-                    var apiPasswordForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
-
-                    OpakErpSettingsModel modelForOpak = new OpakErpSettingsModel();
-                    modelForOpak.Id = idForOpak;
-                    modelForOpak.Name = nameForOpak;
-                    modelForOpak.Description = descriptionForOpak;
-                    modelForOpak.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
-                    modelForOpak.IntegrationSystemId = integrationSystemErp.Id;
-                    modelForOpak.ErpType = erpType.Value;
-                    modelForOpak.ApiUrl = apiUrlForOpak?.Value;
-                    modelForOpak.ApiUser = apiUserForOpak?.Value;
-                    modelForOpak.ApiPassword = apiPasswordForOpak?.Value;
-                    return View($"Erp.Opak", modelForOpak);
+                    return ErpsettingOpak(integrationSystemErp, erpType.Value);
             }
 
             return NotFound();
+        }
+
+        private IActionResult ErpsettingOpak(IntegrationSystemDto integrationSystemErp, string erpType)
+        {
+            var idForOpak = integrationSystemErp.Id;
+            var nameForOpak = integrationSystemErp.Name;
+            var descriptionForOpak = integrationSystemErp.Description;
+            var apiUrlForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
+            var apiUserForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
+            var apiPasswordForOpak = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
+
+            OpakErpSettingsModel modelForOpak = new OpakErpSettingsModel();
+            modelForOpak.Id = idForOpak;
+            modelForOpak.Name = nameForOpak;
+            modelForOpak.Description = descriptionForOpak;
+            modelForOpak.Active = integrationSystemErp.Active;
+            modelForOpak.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
+            modelForOpak.IntegrationSystemId = integrationSystemErp.Id;
+            modelForOpak.ErpType = erpType;
+            modelForOpak.ApiUrl = apiUrlForOpak?.Value;
+            modelForOpak.ApiUser = apiUserForOpak?.Value;
+            modelForOpak.ApiPassword = apiPasswordForOpak?.Value;
+            return View($"Erp.Opak", modelForOpak);
+        }
+
+        private IActionResult ErpSettingNetsis(IntegrationSystemDto integrationSystemErp, string erpType)
+        {
+            var idForNetsis = integrationSystemErp.Id;
+            var nameForNetsis = integrationSystemErp.Name;
+            var descriptionForNetsis = integrationSystemErp.Description;
+            var apiUrlForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
+            var apiUserForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
+            var apiPasswordForNetsis = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
+
+            NetsisErpSettingsModel modelForNetsis = new NetsisErpSettingsModel();
+            modelForNetsis.Id = idForNetsis;
+            modelForNetsis.Name = nameForNetsis;
+            modelForNetsis.Description = descriptionForNetsis;
+            modelForNetsis.Active = integrationSystemErp.Active;
+            modelForNetsis.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
+            modelForNetsis.IntegrationSystemId = integrationSystemErp.Id;
+            modelForNetsis.ErpType = erpType;
+            modelForNetsis.ApiUrl = apiUrlForNetsis?.Value;
+            modelForNetsis.ApiUser = apiUserForNetsis?.Value;
+            modelForNetsis.ApiPassword = apiPasswordForNetsis?.Value;
+            return View($"Erp.Netsis", modelForNetsis);
+        }
+
+        private IActionResult ErpSettingLogo(IntegrationSystemDto integrationSystemErp, string erpType)
+        {
+            var id = integrationSystemErp.Id;
+            var name = integrationSystemErp.Name;
+            var description = integrationSystemErp.Description;
+            var apiUrl = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").FirstOrDefault();
+            var apiUser = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").FirstOrDefault();
+            var apiPassword = integrationSystemErp.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").FirstOrDefault();
+
+            LogoErpSettingsModel model = new LogoErpSettingsModel();
+            model.Id = id;
+            model.Name = name;
+            model.Description = description;
+            model.Active = integrationSystemErp.Active;
+            model.IntegrationSystemTypeId = integrationSystemErp.IntegrationSystemTypeId;
+            model.IntegrationSystemId = integrationSystemErp.Id;
+            model.ErpType = erpType;
+            model.ApiUrl = apiUrl?.Value;
+            model.ApiUser = apiUser?.Value;
+            model.ApiPassword = apiPassword?.Value;
+
+
+            return View($"Erp.Logo", model);
         }
 
         [HttpPost]
@@ -217,13 +239,13 @@ namespace Entegro.Web.Controllers
         {
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
 
-            //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
             {
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
 
             if (apiUrl == null)
@@ -294,13 +316,13 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ErpParameterNetsis(NetsisErpSettingsModel model)
         {
-            //mağaza bilgileri güncelle
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
             {
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
 
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
@@ -379,7 +401,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
             if (apiUrl == null)
@@ -464,7 +487,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Commerce()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce,null);
 
             var model = new CommerceListModel();
             model.CommerceList = allErpIntegrationSystem.Select(m => new CommerceIntegrationSystemModel
@@ -472,6 +495,7 @@ namespace Entegro.Web.Controllers
                 Id = m.Id,
                 Name = m.Name,
                 Description = m.Description,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType,
                 IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
@@ -488,6 +512,7 @@ namespace Entegro.Web.Controllers
             createIntegrationSystem.Name = model.Name;
             createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Commerce;
             createIntegrationSystem.Description = model.Description;
+            createIntegrationSystem.Active = model.Active;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
@@ -531,6 +556,7 @@ namespace Entegro.Web.Controllers
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
+                    model.Active = integrationSystemCommerce.Active;
                     model.IntegrationSystemTypeId = integrationSystemCommerce.IntegrationSystemTypeId;
                     model.IntegrationSystemId = integrationSystemId;
                     model.CommerceType = commerceType.Value;
@@ -554,7 +580,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active= model.Active
             });
 
             if (apiUrl == null)
@@ -638,7 +665,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Cargo()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Cargo);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Cargo, null);
 
             var model = new CargoListModel();
             model.CargoList = allErpIntegrationSystem.Select(m => new CargoIntegrationSystemModel
@@ -646,6 +673,7 @@ namespace Entegro.Web.Controllers
                 Id = m.Id,
                 Name = m.Name,
                 Description = m.Description,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType,
                 IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
@@ -662,6 +690,7 @@ namespace Entegro.Web.Controllers
             createIntegrationSystem.Name = model.Name;
             createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Cargo;
             createIntegrationSystem.Description = model.Description;
+            createIntegrationSystem.Active = model.Active;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
@@ -679,86 +708,95 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> CargoSettings(int integrationSystemId)
         {
-
             var integrationSystemCargo = await _integrationSystemService.GetByIdAsync(integrationSystemId);
             if (integrationSystemCargo == null)
             {
-                return View();
+                return NotFound();
             }
-
 
             var cargoType = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "CargoType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
             if (cargoType == null)
             {
                 return NotFound();
             }
+
             switch (cargoType.Value)
             {
                 case "Yurtici":
-                    var id = integrationSystemCargo.Id;
-                    var name = integrationSystemCargo.Name;
-                    var description = integrationSystemCargo.Description;
-                    var apiUrl = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var apiUser = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var apiPassword = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-
-                    YurticiCargoSettingsModel yurticiCargoSettings = new YurticiCargoSettingsModel();
-                    yurticiCargoSettings.Id = id;
-                    yurticiCargoSettings.Name = name;
-                    yurticiCargoSettings.Description = description;
-                    yurticiCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
-                    yurticiCargoSettings.IntegrationSystemId = integrationSystemCargo.Id;
-                    yurticiCargoSettings.CargoType = cargoType.Value;
-                    yurticiCargoSettings.ApiUrl = apiUrl?.Value;
-                    yurticiCargoSettings.ApiUser = apiUser?.Value;
-                    yurticiCargoSettings.ApiPassword = apiPassword?.Value;
-
-                    return View($"Cargo.Yurtici", yurticiCargoSettings);
+                    return CargoSettingYurtici(integrationSystemCargo, cargoType.Value);
 
                 case "PTT":
-                    var idForPTT = integrationSystemCargo.Id;
-                    var nameForPTT = integrationSystemCargo.Name;
-                    var descriptionForPTT = integrationSystemCargo.Description;
-                    var musteriId = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "MusteriId" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var password = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "Password" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var barkodStartPrefix = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "BarkodStartPrefix" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var barkodEndPrefix = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "BarkodEndPrefix" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-
-                    PTTCargoSettingsModel pTTCargoSettings = new PTTCargoSettingsModel();
-                    pTTCargoSettings.Id = idForPTT;
-                    pTTCargoSettings.Name = nameForPTT;
-                    pTTCargoSettings.Description = descriptionForPTT;
-                    pTTCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
-                    pTTCargoSettings.IntegrationSystemId = integrationSystemCargo.Id;
-                    pTTCargoSettings.CargoType = cargoType.Value;
-                    pTTCargoSettings.MusteriId = musteriId?.Value;
-                    pTTCargoSettings.Password = password?.Value;
-                    pTTCargoSettings.BarkodStartPrefix = barkodStartPrefix?.Value;
-                    pTTCargoSettings.BarkodEndPrefix = barkodEndPrefix?.Value;
-
-                    return View($"Cargo.PTT", pTTCargoSettings);
+                    return CargoSettingPTT(integrationSystemCargo,cargoType.Value);
 
                 case "Aras":
-                    var username = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "Username" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var passwordAras = integrationSystemCargo.IntegrationSystemParameters.Where(m => m.Key == "Password" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var idForAras = integrationSystemCargo.Id;
-                    var nameForAras = integrationSystemCargo.Name;
-                    var descriptionForAras = integrationSystemCargo.Description;
-
-                    ArasCargoSettingsModel arasCargoSettings = new ArasCargoSettingsModel();
-                    arasCargoSettings.Id = idForAras;
-                    arasCargoSettings.Name = nameForAras;
-                    arasCargoSettings.Description = descriptionForAras;
-                    arasCargoSettings.IntegrationSystemTypeId = integrationSystemCargo.IntegrationSystemTypeId;
-                    arasCargoSettings.IntegrationSystemId = integrationSystemId;
-                    arasCargoSettings.CargoType = cargoType.Value;
-                    arasCargoSettings.Username = username?.Value;
-                    arasCargoSettings.Password = passwordAras?.Value;
-
-                    return View($"Cargo.Aras", arasCargoSettings);
+                    return CargoSettingAras(integrationSystemCargo, cargoType.Value);
 
             }
+
             return NotFound();
+        }
+
+        private IActionResult CargoSettingAras(IntegrationSystemDto integrationSystem, string cargoType)
+        {
+            var username = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Username" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+            var passwordAras = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Password" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+
+            ArasCargoSettingsModel arasCargoSettings = new ArasCargoSettingsModel();
+            arasCargoSettings.Id = integrationSystem.Id;
+            arasCargoSettings.Name = integrationSystem.Name;
+            arasCargoSettings.Description = integrationSystem.Description;
+            arasCargoSettings.Active = integrationSystem.Active;
+            arasCargoSettings.IntegrationSystemTypeId = integrationSystem.IntegrationSystemTypeId;
+            arasCargoSettings.IntegrationSystemId = integrationSystem.Id;
+            arasCargoSettings.CargoType = cargoType;
+            arasCargoSettings.Username = username?.Value;
+            arasCargoSettings.Password = passwordAras?.Value;
+
+            return View($"Cargo.Aras", arasCargoSettings);
+        }
+
+        private IActionResult CargoSettingPTT(IntegrationSystemDto integrationSystem, string cargoType)
+        {
+            var musteriId = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "MusteriId" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+            var password = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "Password" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+            var barkodStartPrefix = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "BarkodStartPrefix" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+            var barkodEndPrefix = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "BarkodEndPrefix" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+
+            PTTCargoSettingsModel pTTCargoSettings = new PTTCargoSettingsModel();
+            pTTCargoSettings.Id = integrationSystem.Id;
+            pTTCargoSettings.Name = integrationSystem.Name;
+            pTTCargoSettings.Description = integrationSystem.Description;
+            pTTCargoSettings.Active = integrationSystem.Active;
+            pTTCargoSettings.IntegrationSystemTypeId = integrationSystem.IntegrationSystemTypeId;
+            pTTCargoSettings.IntegrationSystemId = integrationSystem.Id;
+            pTTCargoSettings.CargoType = cargoType;
+            pTTCargoSettings.MusteriId = musteriId?.Value;
+            pTTCargoSettings.Password = password?.Value;
+            pTTCargoSettings.BarkodStartPrefix = barkodStartPrefix?.Value;
+            pTTCargoSettings.BarkodEndPrefix = barkodEndPrefix?.Value;
+
+            return View($"Cargo.PTT", pTTCargoSettings);
+        }
+
+        private IActionResult CargoSettingYurtici(IntegrationSystemDto integrationSystem,string cargoType)
+        {
+            var apiUrl = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+            var apiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+            var apiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
+
+            YurticiCargoSettingsModel yurticiCargoSettings = new YurticiCargoSettingsModel();
+            yurticiCargoSettings.Id = integrationSystem.Id;
+            yurticiCargoSettings.Name = integrationSystem.Name;
+            yurticiCargoSettings.Description = integrationSystem.Description;
+            yurticiCargoSettings.Active = integrationSystem.Active;
+            yurticiCargoSettings.IntegrationSystemTypeId = integrationSystem.IntegrationSystemTypeId;
+            yurticiCargoSettings.IntegrationSystemId = integrationSystem.Id;
+            yurticiCargoSettings.CargoType = cargoType;
+            yurticiCargoSettings.ApiUrl = apiUrl?.Value;
+            yurticiCargoSettings.ApiUser = apiUser?.Value;
+            yurticiCargoSettings.ApiPassword = apiPassword?.Value;
+
+            return View($"Cargo.Yurtici", yurticiCargoSettings);
         }
 
         [HttpPost]
@@ -1009,7 +1047,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Marketplace()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Marketplace);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Marketplace, null);
 
             var model = new MarketplaceListModel();
             model.MarketplaceList = allErpIntegrationSystem.Select(m => new MarketplaceIntegrationSystemModel
@@ -1017,6 +1055,7 @@ namespace Entegro.Web.Controllers
                 Id = m.Id,
                 Name = m.Name,
                 Description = m.Description,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType,
                 IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
@@ -1049,6 +1088,7 @@ namespace Entegro.Web.Controllers
             createIntegrationSystem.Name = model.Name;
             createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Marketplace;
             createIntegrationSystem.Description = model.Description;
+            createIntegrationSystem.Active = model.Active;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
@@ -1109,6 +1149,7 @@ namespace Entegro.Web.Controllers
             model.Id = id;
             model.Name = name;
             model.Description = description;
+            model.Active = integrationSystemMarketplace.Active;
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
@@ -1130,6 +1171,7 @@ namespace Entegro.Web.Controllers
             model.Id = id;
             model.Name = name;
             model.Description = description;
+            model.Active = integrationSystemMarketplace.Active;
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
@@ -1149,6 +1191,7 @@ namespace Entegro.Web.Controllers
             model.Id = id;
             model.Name = name;
             model.Description = description;
+            model.Active = integrationSystemMarketplace.Active;
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
@@ -1170,6 +1213,7 @@ namespace Entegro.Web.Controllers
             model.Id = id;
             model.Name = name;
             model.Description = description;
+            model.Active = integrationSystemMarketplace.Active;
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
@@ -1191,6 +1235,7 @@ namespace Entegro.Web.Controllers
             model.Id = id;
             model.Name = name;
             model.Description = description;
+            model.Active = integrationSystemMarketplace.Active;
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
@@ -1213,6 +1258,7 @@ namespace Entegro.Web.Controllers
             model.Id = id;
             model.Name = name;
             model.Description = description;
+            model.Active = integrationSystemMarketplace.Active;
             model.IntegrationSystemTypeId = integrationSystemMarketplace.IntegrationSystemTypeId;
             model.IntegrationSystemId = integrationSystemMarketplace.Id;
             model.MarketplaceType = marketPlaceType;
@@ -1233,7 +1279,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active,
             });
 
             var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
@@ -1311,7 +1358,9 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active= model.Active
+                 
             });
 
             var appSecret = await _integrationSystemParameterService.GetByKeyAsync("AppSecret", model.IntegrationSystemId);
@@ -1367,7 +1416,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
 
             var clientId = await _integrationSystemParameterService.GetByKeyAsync("ClientId", model.IntegrationSystemId);
@@ -1422,7 +1472,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
 
             var token = await _integrationSystemParameterService.GetByKeyAsync("Token", model.IntegrationSystemId);
@@ -1499,7 +1550,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active,
             });
 
             var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
@@ -1553,7 +1605,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
 
             var apiUser = await _integrationSystemParameterService.GetByKeyAsync("ApiUser", model.IntegrationSystemId);
@@ -1659,7 +1712,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> EInvoice()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.EInvoice);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.EInvoice, null);
 
             var model = new EInvoiceListModel();
             model.EInvoiceList = allErpIntegrationSystem.Select(m => new EInvoiceIntegrationSystemModel
@@ -1667,6 +1720,7 @@ namespace Entegro.Web.Controllers
                 Id = m.Id,
                 Name = m.Name,
                 Description = m.Description,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType,
                 IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
@@ -1683,6 +1737,7 @@ namespace Entegro.Web.Controllers
             createIntegrationSystem.Name = model.Name;
             createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.EInvoice;
             createIntegrationSystem.Description = model.Description;
+            createIntegrationSystem.Active = model.Active;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
@@ -1702,14 +1757,14 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> EInvoiceSettings(int integrationSystemId)
         {
 
-            var integrationSystemEinvoice = await _integrationSystemService.GetByIdAsync(integrationSystemId);
-            if (integrationSystemEinvoice == null)
+            var integrationSystem = await _integrationSystemService.GetByIdAsync(integrationSystemId);
+            if (integrationSystem == null)
             {
                 return View();
             }
 
 
-            var eInvoiceType = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "EInvoiceType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+            var eInvoiceType = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "EInvoiceType" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
             if (eInvoiceType == null)
             {
                 return NotFound();
@@ -1717,18 +1772,19 @@ namespace Entegro.Web.Controllers
             switch (eInvoiceType.Value)
             {
                 case "TrendyolEFaturam":
-                    var id = integrationSystemEinvoice.Id;
-                    var name = integrationSystemEinvoice.Name;
-                    var description = integrationSystemEinvoice.Description;
-                    var apiUrl = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var apiUser = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
-                    var apiPassword = integrationSystemEinvoice.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+                    var id = integrationSystem.Id;
+                    var name = integrationSystem.Name;
+                    var description = integrationSystem.Description;
+                    var apiUrl = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+                    var apiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
+                    var apiPassword = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword" & m.IntegrationSystemId == integrationSystemId).FirstOrDefault();
 
                     TrendyolEFaturamSettingsModel model = new TrendyolEFaturamSettingsModel();
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
-                    model.IntegrationSystemTypeId = integrationSystemEinvoice.IntegrationSystemTypeId;
+                    model.Active = integrationSystem.Active;
+                    model.IntegrationSystemTypeId = integrationSystem.IntegrationSystemTypeId;
                     model.IntegrationSystemId = integrationSystemId;
                     model.EInvoiceType = eInvoiceType.Value;
                     model.ApiUrl = apiUrl?.Value;
@@ -1743,14 +1799,15 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CommerceParameterTrendyolEFaturam(SmartstoreCommerceSettingsModel model)
+        public async Task<IActionResult> EInvoiceParameterTrendyolEFaturam(TrendyolEFaturamSettingsModel model)
         {
             await _integrationSystemService.UpdateAsync(new UpdateIntegrationSystemDto
             {
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
 
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);

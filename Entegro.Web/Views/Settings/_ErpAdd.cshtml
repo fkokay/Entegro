@@ -14,25 +14,18 @@
             <div class="modal-body px-4 py-4">
                 <form id="addErpForm" class="row g-4" onsubmit="return false">
                     @Html.HiddenFor(m => m.ErpType)
+                    @Html.HiddenFor(m => m.Active)
 
                     <!-- Adı -->
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="Name">Adı</label>
-                        @Html.TextBoxFor(m => m.Name, new {
-                        @class = "form-control",
-                                                placeholder = "ERP adı giriniz",
-                                                required = "required"
-                                                })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "ERP adı giriniz", required = "required" })
                     </div>
 
                     <!-- Açıklaması -->
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="Description">Açıklaması</label>
-                        @Html.TextAreaFor(m => m.Description, new {
-                                                @class = "form-control",
-                                                placeholder = "Açıklama giriniz",
-                                                rows = "4"
-                                                })
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Açıklama giriniz", rows = "4" })
                     </div>
 
                     <!-- Butonlar -->

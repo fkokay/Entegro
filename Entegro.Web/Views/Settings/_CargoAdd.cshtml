@@ -2,40 +2,25 @@
 <div class="modal fade" id="addCargo" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <!-- Modal Header -->
-            <div class="modal-header p-0 position-relative" style="height: 80px;">
+            <div class="modal-header p-0 position-relative">
                 <div class="d-flex justify-content-center align-items-center w-100 h-100">
                     <h5 class="modal-title m-0">Entegrasyon Ekle</h5>
                 </div>
             </div>
-
-
-            <!-- Modal Body -->
             <div class="modal-body px-4 py-4">
                 <form id="addCargoForm" class="row g-4" onsubmit="return false">
                     @Html.HiddenFor(m => m.CargoType)
-
-                    <!-- Name Field -->
+                    @Html.HiddenFor(m => m.Active)
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="Name">Adı</label>
-                        @Html.TextBoxFor(m => m.Name, new {
-                        @class = "form-control",
-                                                placeholder = "Kargo adı giriniz",
-                                                required = "required"
-                                                })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Kargo adı giriniz", required = "required" })
                     </div>
 
-                    <!-- Description Field -->
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="Description">Açıklaması</label>
-                        @Html.TextAreaFor(m => m.Description, new {
-                                                @class = "form-control",
-                                                placeholder = "Açıklama giriniz",
-                                                rows = "4"
-                                                })
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Açıklama giriniz", rows = "4" })
                     </div>
 
-                    <!-- Buttons -->
                     <div class="col-12 text-center pt-3">
                         <button type="submit" class="btn btn-success px-4 me-2">
                             <i class="bi bi-check-circle me-1"></i> Kaydet

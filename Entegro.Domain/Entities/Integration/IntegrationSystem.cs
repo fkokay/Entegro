@@ -42,6 +42,7 @@ namespace Entegro.Domain.Entities.Integration
         }
         public string Name { get; set; }
         public string? Description { get; set; }
+        public bool Active { get; set; }
         public virtual ICollection<IntegrationSystemParameter> IntegrationSystemParameters { get; set; } = new HashSet<IntegrationSystemParameter>();
         public virtual ICollection<IntegrationSystemLog> IntegrationSystemLogs { get; set; } = new HashSet<IntegrationSystemLog>();
 
