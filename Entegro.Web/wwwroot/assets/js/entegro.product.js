@@ -147,7 +147,8 @@ Entegro.product = (function ($) {
                 delay: 250,
                 data: function (params) {
                     return {
-                        term: params.term || '', page: params.page || 1
+                        term: params.term || '',
+                        page: params.page || 1
                     };
                 },
                 processResults: function (data, params) {
@@ -163,7 +164,8 @@ Entegro.product = (function ($) {
             }
         });
 
-        $(document).on('click', '#btnSaveProductCategory', function () {
+       
+        $(document).off('click', '#btnSaveProductCategory').on('click', '#btnSaveProductCategory', function () {
             const payload = {
                 productId: Number($('#ProductId').val()) || 0,
                 categoryId: Number($('#CategoryId').val()) || 0,
@@ -196,6 +198,7 @@ Entegro.product = (function ($) {
             });
         });
     }
+
     function ProductCategoryDelete() {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');

@@ -88,7 +88,7 @@
             window.ProductVariantAttributeCombinations = @Html.Raw(JsonSerializer.Serialize(Model.ProductVariantAttributeCombinations));
 
             Entegro.product.Init();
-            Entegro.product.TabsInit();
+            Entegro.product.TabsInit(); 
             Entegro.product.DescriptionEditor();
             Entegro.product.ProductVariantAttributeCombinationRepeaterInit(window.ProductVariantAttributeCombinations);
             Entegro.product.Validation();
