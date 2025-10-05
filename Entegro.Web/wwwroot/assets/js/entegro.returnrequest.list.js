@@ -3,6 +3,16 @@ Entegro.returnrequest = Entegro.returnrequest || {};
 
 Entegro.returnrequest.list = (function ($) {
     function initList() {
+        const statusDisplayMap = {
+            0: "Beklemede",
+            10: "Alındı",
+            20: "İade Onaylandı",
+            30: "Ürün(ler) Tamir Edildi",
+            40: "Ürün(ler) İade Edildi",
+            50: "Talep Reddedildi",
+            60: "İptal Edildi"
+        };
+
         const table = $('#ReturnRequestTable').DataTable({
             language: {
                 paginate: {
@@ -14,9 +24,9 @@ Entegro.returnrequest.list = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[8, 'asc']], // ID'ye göre sıralama
+            order: [[8, 'asc']], // Tarihe göre sıralama
             ajax: {
-                url: '/ReturnRequest/ReturnRequestList', 
+                url: '/ReturnRequest/ReturnRequestList',
                 type: 'POST',
                 contentType: 'application/json',
                 data: function (d) {
@@ -27,20 +37,25 @@ Entegro.returnrequest.list = (function ($) {
                 { data: 'Id', orderable: false },
                 { data: 'Id', visible: false },
                 { data: 'Id' }, // Id
-                { data: 'ProductName' }, 
+                { data: 'ProductName' },
                 { data: 'Quantity' },
-                { data: 'Customer.Name' }, 
+                { data: 'Customer.Name' },
                 { data: 'OrderItemId' },
-                { data: 'ReturnRequestStatus' },
                 {
-                    name:'CreatedOn',
+                    data: 'ReturnRequestStatus',
+                    render: function (data) {
+                        return statusDisplayMap[data] || "Bilinmeyen";
+                    }
+                },
+                {
+                    name: 'CreatedOn',
                     data: 'CreatedOnUtc',
                     render: function (data, type) {
                         if (type === "sort" || type === "type") return data;
                         return moment(data).format("DD.MM.yyyy HH:mm");
                     }
                 },
-                { data: 'Id' } 
+                { data: 'Id' }
             ],
             columnDefs: [
                 {
@@ -60,12 +75,15 @@ Entegro.returnrequest.list = (function ($) {
                     orderable: false,
                     render: (data, type, row) => `
                     <div class="d-inline-block text-nowrap">
-                        <a href="Details?id=${row.OrderItemId}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Detaylar">
+                        <a href="#" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Detaylar">
                             <i class="icon-base ti ti-eye icon-22px"></i>
                         </a>
-                        <a href="Edit?id=${row.OrderItemId}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
+                        <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
                             <i class="icon-base ti ti-pencil icon-22px"></i>
                         </a>
+                         <button class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete" data-id="${row.Id}" title="Sil">
+                            <i class="icon-base ti ti-trash icon-22px"></i>
+                        </button>
                     </div>`
                 }
             ],
@@ -92,9 +110,7 @@ Entegro.returnrequest.list = (function ($) {
                             menu: [10, 25, 50, 100],
                             text: "_MENU_"
                         },
-                        buttons: [
-                           
-                        ]
+                        buttons: []
                     }]
                 },
                 bottomStart: {
@@ -108,8 +124,12 @@ Entegro.returnrequest.list = (function ($) {
                     if (this.dataSrc() === "ReturnRequestStatus") {
                         Entegro.returnrequest.list.addFilterDropdown(this, ".returnRequestStatusFilter", "Durum", [
                             { title: "Beklemede", id: 0 },
-                            { title: "Onaylandı", id: 1 },
-                            { title: "Reddedildi", id: 2 }
+                            { title: "Alındı", id: 10 },
+                            { title: "İade Onaylandı", id: 20 },
+                            { title: "Ürün(ler) Tamir Edildi", id: 30 },
+                            { title: "Ürün(ler) İade Edildi", id: 40 },
+                            { title: "Talep Reddedildi", id: 50 },
+                            { title: "İptal Edildi", id: 60 }
                         ]);
                     }
                 });
@@ -137,10 +157,52 @@ Entegro.returnrequest.list = (function ($) {
             });
         }, 100);
     }
+    function deleteReturnRequest() {
+        $(document).on('click', '.btn-delete', function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu kaydı silmek üzeresiniz!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/ReturnRequest/Delete`, 
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            Swal.fire(
+                                'Silindi!',
+                                'Kayıt başarıyla silindi.',
+                                'success'
+                            ).then(() => {
+                                window.location.href = "/ReturnRequest/List";
+                            });
+                        },
+                        error: function () {
+                            Swal.fire(
+                                'Hata!',
+                                'Kayıt silinirken bir sorun oluştu.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+
+    }
 
 
     return {
-        init: initList
+        init: initList,
+        deleteReturnRequest: deleteReturnRequest
     };
 
 })(jQuery);

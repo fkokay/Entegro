@@ -158,9 +158,11 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
-        public Task UpdateAsync(ReturnRequest returnRequest)
+        public async Task UpdateAsync(ReturnRequest returnRequest)
         {
-            throw new NotImplementedException();
+            returnRequest.UpdatedOnUtc = DateTime.UtcNow;
+            _context.ReturnRequests.Update(returnRequest);
+            await _context.SaveChangesAsync();
         }
     }
 }

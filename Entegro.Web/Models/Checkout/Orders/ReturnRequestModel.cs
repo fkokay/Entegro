@@ -5,9 +5,10 @@ namespace Entegro.Web.Models.Checkout.Orders
 {
     public class ReturnRequestModel
     {
+        public int Id { get; set; }
         public int OrderItemId { get; set; }
         public int CustomerId { get; set; }
-        public CustomerModel Customer { get; set; }
+        public CustomerModel? Customer { get; set; }
         public int Quantity { get; set; }
         public string ReasonForReturn { get; set; }
         public string RequestedAction { get; set; }
