@@ -44,7 +44,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<ProductVariantAttributeValue>> GetPagedAsync(GridCommand gridCommand, int productVariantAttributeId)
         {
-            var query = _context.ProductVariantAttributeValues.Where(x => x.ProductVariantAttributeId == productVariantAttributeId).AsNoTracking();
+            var query = _context.ProductVariantAttributeValues.Where(x => x.ProductVariantAttributeId == productVariantAttributeId).Include(m=>m.ProductVariantAttribute).AsNoTracking();
 
 
             if (gridCommand.Columns != null)

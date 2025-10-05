@@ -1,4 +1,6 @@
-﻿namespace Entegro.Application.DTOs.ProductVariantAttributeValue
+﻿using Entegro.Application.DTOs.ProductVariantAttribute;
+
+namespace Entegro.Application.DTOs.ProductVariantAttributeValue
 {
     public class ProductVariantAttributeValueDto
     {

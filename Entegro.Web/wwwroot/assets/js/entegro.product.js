@@ -242,10 +242,11 @@ Entegro.product = (function ($) {
 
                 var $idInput = $(this).find('[name$="[Id]"]');
                 $idInput.val(0);
-                var repeterItem = $(this).find("[data-repeater-item]");
-                var productVariantAttributeId = $(repeterItem).attr("data-product-variant-attribute-id");
-                var $idProductVariantAttributeInput = find("input[name*='ProductVariantAttributeId']");
-                $idProductVariantAttributeInput.val(productVariantAttributeId);
+                $(this).find("[data-repeater-item]").each(function () {
+                    var productVariantAttributeId = $(this).attr("data-product-variant-attribute-id");
+                    var $idProductVariantAttributeInput = $(this).find("input[name*='ProductVariantAttributeId']");
+                    $idProductVariantAttributeInput.val(productVariantAttributeId);
+                });
 
                
             },
@@ -628,14 +629,14 @@ Entegro.product = (function ($) {
                     title: 'Kontrol Türü',
                     render: function (data, type, row) {
                         const types = {
-                            0: 'Açılır Liste',
-                            1: 'Radyo Düğmesi Listesi',
-                            2: 'Onay Kutusu',
-                            3: 'Metin Kutusu',
-                            4: 'Çok Satırlı Metin Kutusu',
-                            5: 'Takvim',
-                            6: 'Dosya Yükleme',
-                            7: 'Kutular (Renk ve Görüntü)'
+                            1: 'Açılır Liste',
+                            2: 'Radyo Düğmesi Listesi',
+                            3: 'Onay Kutusu',
+                            4: 'Metin Kutusu',
+                            10: 'Çok Satırlı Metin Kutusu',
+                            20: 'Takvim',
+                            30: 'Dosya Yükleme',
+                            40: 'Kutular (Renk ve Görüntü)'
                         };
                         return types[data] || 'Bilinmiyor';
                     }

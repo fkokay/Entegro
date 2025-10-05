@@ -1903,8 +1903,15 @@ namespace Entegro.Web.Controllers
             if (model.ProductId > 0)
             {
                 var product = await _productService.GetProductByIdAsync(model.ProductId);
-                if (product != null)
-                    model.Name = product.Name;
+                var productVariantAttribute = await _productVariantAttributeService.GetByIdAsync(model.ProductVariantAttributeId);
+              
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                model.ProductName = product.Name;
+                model.ProductAttributeName = productVariantAttribute.ProductAttribute.Name;
             }
             return View(model);
         }

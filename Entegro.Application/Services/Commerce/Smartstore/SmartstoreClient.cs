@@ -328,9 +328,9 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 {
                     ProductId = productId,
                     ProductAttributeId = productAttributeId,
-                    IsRequried = true,
-                    DisplayOrder = 0,
-                    AttributeControlTypeId = 1,
+                    IsRequried = productVariantAttribute.IsRequried,
+                    DisplayOrder = productVariantAttribute.DisplayOrder,
+                    AttributeControlTypeId = productVariantAttribute.AttributeControlTypeId,
                 });
 
                 // AttributeValue kontrol / ekle

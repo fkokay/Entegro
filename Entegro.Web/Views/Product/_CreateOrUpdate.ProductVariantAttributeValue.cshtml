@@ -6,14 +6,18 @@
     <input type="hidden" value="@Model.ProductVariantAttributeId" asp-for="ProductVariantAttributeId" />
 
     <div class="row mb-3">
-
         <div class="col-md-12 mt-1">
             <label class="form-label text-sm-start" asp-for="Name">Ad</label>
             @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @type = "text",@required="required" })
         </div>
 
     </div>
-    <div class="text-end">
-        <button type="submit" class="btn btn-primary">Kaydet</button>
+    <div class="col-12 text-center pt-3">
+        <button type="submit" class="btn btn-success px-4 me-2">
+            <i class="bi bi-check-circle me-1"></i>Kaydet
+        </button>
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i>Kapat
+        </button>
     </div>
 </form>

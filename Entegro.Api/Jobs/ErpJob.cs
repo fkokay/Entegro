@@ -76,7 +76,7 @@ namespace Entegro.Api.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var erpIntegrations = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP);
+            var erpIntegrations = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP,true);
 
             foreach (var erpIntegration in erpIntegrations)
             {

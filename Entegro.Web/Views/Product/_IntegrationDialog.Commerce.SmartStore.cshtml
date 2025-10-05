@@ -1,62 +1,77 @@
 ﻿@model SmartstoreProductIntegrationModel
-
-<div class="row mb-5">
-    <div class="d-flex justify-content-start align-items-center product-name">
-        <div class="avatar-wrapper">
-            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
-                <img src="@Model.ProductMainPicture" alt="" />
-            </div>
-        </div>
-        <div class="d-flex flex-column">
-            <h6 class="text-wrap mb-0">@Model.ProductName</h6>
-            <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
-        </div>
-    </div>
-    <div class="col-12">
-        <hr />
-    </div>
-    <div class="col-6 col-md-6 mb-2">
-        <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
-        @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly", disabled = "disabled" })
-    </div>
-    <div class="col-6 col-md-6 mb-2">
-        <label class="form-label" for="CommerceType">E-Ticaret Türü</label>
-        @Html.TextBoxFor(m => m.CommerceType, new { @class = "form-control", @readonly = "readonly", disabled = "disabled" })
-    </div>
-    <div class="col-6 col-md-6 mb-2">
-        <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
-        <input type="text" asp-for="IntegrationCode" class="form-control" required />
-    </div>
-    <div class="col-6 col-md-6 mb-2">
-        <label class="form-label" for="Custom_ShowOnHomePage">Entegrasyon Aktif</label>
-        <div class="d-flex" style="height:38px;">
-            <label class="switch switch-lg">
-                @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
-                <span class="switch-toggle-slider">
-                    <span class="switch-on">Evet</span>
-                    <span class="switch-off">Hayır</span>
-                </span>
-            </label>
-        </div>
-    </div>
-</div>
 <form id="integrationDialog" asp-action="CreateOrUpdateProductIntegrationSmartstore" asp-controller="Product">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="ProductId" />
     <input type="hidden" asp-for="IntegrationSystemId" />
-    <ul class="nav nav-tabs card-header-tabs" id="smartstore-integration-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#form-tabs-general" type="button" role="tab">Genel Bilgiler</button>
+    <div class="row mb-5">
+        <div class="d-flex justify-content-start align-items-center product-name">
+            <div class="avatar-wrapper">
+                <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                    <img src="@Model.ProductMainPicture" alt="" />
+                </div>
+            </div>
+            <div class="d-flex flex-column">
+                <h6 class="text-wrap mb-0">@Model.ProductName</h6>
+                <small class="text-truncate d-none d-sm-block">@Model.ProductCode</small>
+            </div>
+        </div>
+        <div class="col-12">
+            <hr />
+        </div>
+        <div class="col-6 col-md-6 mb-2">
+            <label class="form-label" for="IntegrationSystemName">Mağaza Adı</label>
+            @Html.TextBoxFor(m => m.IntegrationSystemName, new { @class = "form-control", @readonly = "readonly", disabled = "disabled" })
+        </div>
+        <div class="col-6 col-md-6 mb-2">
+            <label class="form-label" for="CommerceType">E-Ticaret Türü</label>
+            @Html.TextBoxFor(m => m.CommerceType, new { @class = "form-control", @readonly = "readonly", disabled = "disabled" })
+        </div>
+    </div>
+
+    <ul class="nav nav-pills" id="smartstore-integration-tabs" role="tablist">
+        <li class="nav-item" role="presentation" style="margin-inline-end:.25rem;">
+            <button type="button" class="nav-link waves-effect waves-light active" role="tab" data-bs-toggle="tab" data-bs-target="#form-tabs-integration" aria-controls="navs-form-tabs-integration" aria-selected="true">
+                Entegrasyon Bilgileri
+            </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-price" type="button" role="tab">Fiyat</button>
+        <li class="nav-item" role="presentation" style="margin-inline-end:.25rem;">
+            <button type="button" class="nav-link waves-effect waves-light" role="tab" data-bs-toggle="tab" data-bs-target="#form-tabs-general" aria-controls="navs-form-tabs-general" aria-selected="false">
+                Genel Bilgiler
+            </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-inventory" type="button" role="tab">Envanter</button>
+        <li class="nav-item" role="presentation" style="margin-inline-end:.25rem;">
+            <button type="button" class="nav-link waves-effect waves-light" data-bs-toggle="tab" data-bs-target="#form-tabs-price" role="tab" aria-controls="navs-form-tabs-price" aria-selected="false">
+                Fiyat
+            </button>
+        </li>
+        <li class="nav-item" role="presentation" style="margin-inline-end:.25rem;">
+            <button type="button" class="nav-link waves-effect waves-light" data-bs-toggle="tab" data-bs-target="#form-tabs-inventory" role="tab" aria-controls="navs-form-tabs-inventory" aria-selected="false">
+                Envanter
+            </button>
         </li>
     </ul>
-    <div class="tab-content p-0 pt-5 pb-5">
-        <div class="tab-pane fade show active" id="form-tabs-general" role="tabpanel">
+    <div class="tab-content p-0 pt-5 pb-5" style="box-shadow:none;">
+        <div class="tab-pane show active" id="form-tabs-integration" role="tabpanel">
+            <div class="row">
+                <div class="col-6 col-md-6 mb-2">
+                    <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
+                    <input type="text" asp-for="IntegrationCode" class="form-control" required />
+                </div>
+                <div class="col-6 col-md-6 mb-2">
+                    <label class="form-label" for="Custom_ShowOnHomePage">Entegrasyon Aktif</label>
+                    <div class="d-flex" style="height:38px;">
+                        <label class="switch switch-lg">
+                            @Html.CheckBoxFor(m => m.Active, new { @class = "switch-input" })
+                            <span class="switch-toggle-slider">
+                                <span class="switch-on">Evet</span>
+                                <span class="switch-off">Hayır</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="form-tabs-general" role="tabpanel">
             <div class="row">
                 <div class="col-12 col-md-6 mb-2">
                     <label class="form-label" for="Custom_ShowOnHomePage">Ana sayfada göster</label>
@@ -74,10 +89,9 @@
                     <label class="form-label" for="Custom_HomePageDisplayOrder">Görüntüleme sırası</label>
                     <input type="number" asp-for="Custom.HomePageDisplayOrder" class="form-control" step="1" min="0" required />
                 </div>
-      
             </div>
         </div>
-        <div class="tab-pane fade" id="form-tabs-price" role="tabpanel">
+        <div class="tab-pane" id="form-tabs-price" role="tabpanel">
             <div class="row">
                 <div class="col-12 col-md-12 mb-2">
                     <label class="form-label" for="price">Fiyat</label>
@@ -89,7 +103,7 @@
                 </div>
                 <div class="col-12 col-md-6 mb-2">
                     <label class="form-label" for="price">Özel Fiyat Başlangıç Tarihi</label>
-                    <input type="datetime" asp-for="Custom.SpecialPriceStartDateTime" class="form-control"/>
+                    <input type="datetime" asp-for="Custom.SpecialPriceStartDateTime" class="form-control" />
                 </div>
                 <div class="col-12 col-md-6 mb-2">
                     <label class="form-label" for="price">Özel Fiyat Bitiş Tarihi</label>
@@ -97,7 +111,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="form-tabs-inventory" role="tabpanel">
+        <div class="tab-pane" id="form-tabs-inventory" role="tabpanel">
             <div class="row">
                 <div class="col-12 col-md-6 mb-2">
                     <label class="form-label" for="Custom_ManageInventoryMethod">Stok Yönetimi</label>

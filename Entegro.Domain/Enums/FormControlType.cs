@@ -5,28 +5,28 @@ namespace Entegro.Domain.Enums
     public enum FormControlType
     {
         [Display(Name = "Açılır Liste")]
-        Dropdown = 0,
+        Dropdown = 1,
 
         [Display(Name = "Radyo Düğmesi Listesi")]
-        RadioButtonList = 1,
+        RadioButtonList = 2,
 
         [Display(Name = "Onay Kutusu")]
-        Checkbox = 2,
+        Checkbox = 3,
 
         [Display(Name = "Metin Kutusu")]
-        TextBox = 3,
+        TextBox = 4,
 
         [Display(Name = "Çok Satırlı Metin Kutusu")]
-        MultilineTextBox = 4,
+        MultilineTextBox = 10,
 
         [Display(Name = "Takvim")]
-        DatePicker = 5,
+        DatePicker = 20,
 
         [Display(Name = "Dosya Yükleme")]
-        FileUpload = 6,
+        FileUpload = 30,
 
         [Display(Name = "Kutular (Renk ve Görüntü)")]
-        ColorOrImageBox = 7
+        ColorOrImageBox = 40
     }
 
 }
