@@ -495,6 +495,7 @@ namespace Entegro.Web.Controllers
                 Id = m.Id,
                 Name = m.Name,
                 Description = m.Description,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType,
                 IntegrationSystemTypeLabelHint = m.IntegrationSystemTypeLabelHint,
@@ -511,6 +512,7 @@ namespace Entegro.Web.Controllers
             createIntegrationSystem.Name = model.Name;
             createIntegrationSystem.IntegrationSystemTypeId = (int)IntegrationSystemType.Commerce;
             createIntegrationSystem.Description = model.Description;
+            createIntegrationSystem.Active = model.Active;
 
             var integrationSystemId = await _integrationSystemService.AddAsync(createIntegrationSystem);
 
@@ -554,6 +556,7 @@ namespace Entegro.Web.Controllers
                     model.Id = id;
                     model.Name = name;
                     model.Description = description;
+                    model.Active = integrationSystemCommerce.Active;
                     model.IntegrationSystemTypeId = integrationSystemCommerce.IntegrationSystemTypeId;
                     model.IntegrationSystemId = integrationSystemId;
                     model.CommerceType = commerceType.Value;
@@ -577,7 +580,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active= model.Active
             });
 
             if (apiUrl == null)
