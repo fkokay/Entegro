@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entegro.Domain.Enums
 {
@@ -41,38 +37,84 @@ namespace Entegro.Domain.Enums
     public enum ReturnRequestStatus
     {
         /// <summary>
-        /// Pending.
+        /// Beklemede
         /// </summary>
+        [Display(Name = "Beklemede")]
         Pending = 0,
 
         /// <summary>
-        /// Received.
+        /// Alındı
         /// </summary>
+        [Display(Name = "Alındı")]
         Received = 10,
 
         /// <summary>
-        /// Return authorized.
+        /// İade Yetkilendirildi
         /// </summary>
+        [Display(Name = "İade Yetkilendirildi")]
         ReturnAuthorized = 20,
 
         /// <summary>
-        /// Item(s) repaired.
+        /// Ürün(ler) Onarıldı
         /// </summary>
+        [Display(Name = "Ürün(ler) Onarıldı")]
         ItemsRepaired = 30,
 
         /// <summary>
-        /// Item(s) refunded.
+        /// Ürün(ler) İade Edildi
         /// </summary>
+        [Display(Name = "Ürün(ler) İade Edildi")]
         ItemsRefunded = 40,
 
         /// <summary>
-        /// Request rejected.
+        /// Talep Reddedildi
         /// </summary>
+        [Display(Name = "Talep Reddedildi")]
         RequestRejected = 50,
 
         /// <summary>
-        /// Cancelled.
+        /// İptal Edildi
         /// </summary>
+        [Display(Name = "İptal Edildi")]
         Cancelled = 60
     }
+    public enum ReasonForReturnType
+    {
+        /// <summary>
+        /// </summary>
+        [Display(Name = "Yanlış Ürün Alındı")]
+        ReceivedWrongProduct = 0,
+
+        /// <summary>
+        /// </summary>
+        [Display(Name = "Yanlış Ürün Siparişi")]
+        WrongProductOrdered = 1,
+
+        /// <summary>
+        /// </summary>
+        [Display(Name = "Üründe Bir Sorun Var")]
+        AProblemProduct = 2,
+
+
+    }
+    public enum RequestedActionType
+    {
+        /// <summary>
+        /// </summary>
+        [Display(Name = "Tamirat")]
+        Repair = 0,
+
+        /// <summary>
+        /// </summary>
+        [Display(Name = "Yenisiyle Değiştirme")]
+        Replacement = 1,
+
+        /// <summary>
+        /// </summary>
+        [Display(Name = "Mağaza Kredisi")]
+        StoreCredit = 2,
+
+
+    }
+
 }

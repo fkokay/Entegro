@@ -15,7 +15,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ReturnRequestDto?> GetByReturnRequestDtoStatusAsync(int requestStatus);
         Task<PagedResult<ReturnRequestDto>> GetPagedAsync(GridCommand gridCommand);
         Task AddAsync(CreateReturnRequestDto returnReturnRequest);
-        Task UpdateAsync(UpdateReturnRequestDto returnReturnRequest);
+        Task<ReturnRequestDto> UpdateAsync(UpdateReturnRequestDto returnReturnRequest);
         Task DeleteAsync(int id);
     }
 }

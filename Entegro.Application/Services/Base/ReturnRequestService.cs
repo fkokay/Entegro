@@ -8,15 +8,15 @@ namespace Entegro.Application.Services.Base
 {
     public class ReturnRequestService : IReturnRequestService
     {
-        private readonly IReturnRequestRepository _returRequestRepository;
+        private readonly IReturnRequestRepository _returnRequestRepository;
         private readonly IMapper _mapper;
-        public ReturnRequestService(IReturnRequestRepository returRequestRepository, IMapper mapper)
+        public ReturnRequestService(IReturnRequestRepository returnRequestRepository, IMapper mapper)
         {
-            _returRequestRepository = returRequestRepository ?? throw new ArgumentNullException(nameof(returRequestRepository));
+            _returnRequestRepository = returnRequestRepository ?? throw new ArgumentNullException(nameof(returnRequestRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public Task AddAsync(CreateReturnRequestDto returRequest)
+        public Task AddAsync(CreateReturnRequestDto returnRequest)
         {
             throw new NotImplementedException();
         }
@@ -26,11 +26,11 @@ namespace Entegro.Application.Services.Base
             if (id <= 0)
                 throw new ArgumentOutOfRangeException(nameof(id));
 
-            var request = await _returRequestRepository.GetByIdAsync(id);
+            var request = await _returnRequestRepository.GetByIdAsync(id);
             if (request == null)
                 throw new KeyNotFoundException($"ID {id} ile Brand bulunamadı.");
 
-            await _returRequestRepository.DeleteAsync(request);
+            await _returnRequestRepository.DeleteAsync(request);
         }
 
         public async Task<bool> ExistsByCustomerNameAsync(string customerName)
@@ -38,7 +38,7 @@ namespace Entegro.Application.Services.Base
             if (string.IsNullOrWhiteSpace(customerName))
                 throw new ArgumentException("CustomerName boş olamaz.", nameof(customerName));
 
-            return await _returRequestRepository.ExistsByCustomerNameAsync(customerName);
+            return await _returnRequestRepository.ExistsByCustomerNameAsync(customerName);
         }
 
         public async Task<bool> ExistsByIdAsync(int id)
@@ -47,7 +47,7 @@ namespace Entegro.Application.Services.Base
             {
                 throw new ArgumentOutOfRangeException(nameof(id));
             }
-            return await _returRequestRepository.ExistsByIdAsync(id);
+            return await _returnRequestRepository.ExistsByIdAsync(id);
         }
 
         public async Task<bool> ExistsByOrderNumberAsync(string orderNumber)
@@ -55,7 +55,7 @@ namespace Entegro.Application.Services.Base
             if (string.IsNullOrWhiteSpace(orderNumber))
                 throw new ArgumentException("OrderNumber boş olamaz.", nameof(orderNumber));
 
-            return await _returRequestRepository.ExistsByOrderNumberAsync(orderNumber);
+            return await _returnRequestRepository.ExistsByOrderNumberAsync(orderNumber);
         }
 
         public async Task<bool> ExistsByReturnRequestStatusAsync(int requestStatus)
@@ -64,7 +64,7 @@ namespace Entegro.Application.Services.Base
             {
                 throw new ArgumentOutOfRangeException(nameof(requestStatus));
             }
-            return await _returRequestRepository.ExistsByReturnRequestStatusAsync(requestStatus);
+            return await _returnRequestRepository.ExistsByReturnRequestStatusAsync(requestStatus);
         }
 
         public async Task<ReturnRequestDto?> GetByCustomerNameAsync(string name)
@@ -74,7 +74,7 @@ namespace Entegro.Application.Services.Base
                 throw new ArgumentException("Müşteri adı boş olamaz.", nameof(name));
             }
 
-            var returnRequest = await _returRequestRepository.GetByCustomerNameAsync(name);
+            var returnRequest = await _returnRequestRepository.GetByCustomerNameAsync(name);
             var returnRequestDto = _mapper.Map<ReturnRequestDto>(returnRequest);
 
             return returnRequestDto;
@@ -86,7 +86,7 @@ namespace Entegro.Application.Services.Base
             {
                 throw new ArgumentOutOfRangeException(nameof(id));
             }
-            var returnRequest = await _returRequestRepository.GetByIdAsync(id);
+            var returnRequest = await _returnRequestRepository.GetByIdAsync(id);
             var returnRequestDto = _mapper.Map<ReturnRequestDto>(returnRequest);
             return returnRequestDto;
         }
@@ -98,7 +98,7 @@ namespace Entegro.Application.Services.Base
                 throw new ArgumentException("Sipariş Numarası boş olamaz.", nameof(orderNumber));
             }
 
-            var returnRequest = await _returRequestRepository.GetByOrderNumberAsync(orderNumber);
+            var returnRequest = await _returnRequestRepository.GetByOrderNumberAsync(orderNumber);
             var returnRequestDto = _mapper.Map<ReturnRequestDto>(returnRequest);
             return returnRequestDto;
         }
@@ -110,7 +110,7 @@ namespace Entegro.Application.Services.Base
                 throw new ArgumentOutOfRangeException(nameof(requestStatus));
             }
 
-            var returnRequest = await _returRequestRepository.GetByReturnRequestStatusAsync(requestStatus);
+            var returnRequest = await _returnRequestRepository.GetByReturnRequestStatusAsync(requestStatus);
             var returnRequestDto = _mapper.Map<ReturnRequestDto>(returnRequest);
 
             return returnRequestDto;
@@ -118,7 +118,7 @@ namespace Entegro.Application.Services.Base
 
         public async Task<PagedResult<ReturnRequestDto>> GetPagedAsync(GridCommand gridCommand)
         {
-            var returnRequests = await _returRequestRepository.GetPagedAsync(gridCommand);
+            var returnRequests = await _returnRequestRepository.GetPagedAsync(gridCommand);
 
             var items = await returnRequests.Items.SelectAwait(async x =>
             {
@@ -138,9 +138,19 @@ namespace Entegro.Application.Services.Base
             };
         }
 
-        public Task UpdateAsync(UpdateReturnRequestDto returRequest)
+        public async Task<ReturnRequestDto> UpdateAsync(UpdateReturnRequestDto returnRequest)
         {
-            throw new NotImplementedException();
+            if (returnRequest == null)
+                throw new ArgumentNullException(nameof(returnRequest));
+
+            var existingReturnRequest = await _returnRequestRepository.GetByIdAsync(returnRequest.Id);
+            if (existingReturnRequest == null)
+                throw new KeyNotFoundException($"ID {returnRequest.Id} ile ReturnRequest bulunamadı.");
+
+            _mapper.Map(returnRequest, existingReturnRequest);
+            await _returnRequestRepository.UpdateAsync(existingReturnRequest);
+
+            return _mapper.Map<ReturnRequestDto>(existingReturnRequest);
         }
     }
 }
