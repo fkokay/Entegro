@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
@@ -1843,7 +1844,26 @@ namespace Entegro.Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ProductVariantAttributeAllDelete(int productId)
+        {
+            try
+            {
+                var productVariantAttributeCombinations = await _productVariantAttributeCombinationService.GetByProductIdAsync(productId);
 
+                foreach (var item in productVariantAttributeCombinations)
+                {
+                    await _productVariantAttributeCombinationService.DeleteAsync(item.Id);
+                }
+
+                return Json(new { success = true });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
 
         #endregion
 

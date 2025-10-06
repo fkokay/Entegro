@@ -68,5 +68,12 @@ namespace Entegro.Application.Services.Base
             await _productVariantAttributeCombinationRepository.UpdateAsync(_mapper.Map<ProductVariantAttributeCombination>(productVariantAttributeCombination));
             return _mapper.Map<ProductVariantAttributeCombinationDto>(productVariantAttributeCombination);
         }
+
+        public async Task<List<ProductVariantAttributeCombinationDto>> GetByProductIdAsync(int productId)
+        {
+            var productVariantAttributeCombinations = await _productVariantAttributeCombinationRepository.GetByProductIdAsync(productId);
+            var ProductVariantAttributeCombinationsDto = _mapper.Map<IEnumerable<ProductVariantAttributeCombinationDto>>(productVariantAttributeCombinations);
+            return ProductVariantAttributeCombinationsDto.ToList();
+        }
     }
 }
