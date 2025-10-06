@@ -27,6 +27,7 @@ Entegro.productvariantattributevalue.list = (function ($) {
             columns: [
                 { data: 'Id', visible: false },   // id kolonunu gizle
                 { data: 'Name' },
+                { data: 'DisplayOrder' },
                 { data: 'Id' }
             ],
             columnDefs: [

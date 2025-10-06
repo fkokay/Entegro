@@ -11,6 +11,15 @@
             @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @type = "text",@required="required" })
         </div>
 
+        <div class="col-md-12 mt-1">
+            <label class="form-label fw-semibold" asp-for="DisplayOrder">Görüntüleme Sırası</label>
+            @Html.TextBoxFor(m => m.DisplayOrder, new {
+            @class = "form-control",
+                        @type = "number",
+                        placeholder = "Sıra numarası giriniz"
+                        })
+        </div>
+
     </div>
     <div class="col-12 text-center pt-3">
         <button type="submit" class="btn btn-success px-4 me-2">
