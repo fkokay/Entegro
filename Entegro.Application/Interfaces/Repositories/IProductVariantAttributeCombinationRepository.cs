@@ -6,6 +6,7 @@ namespace Entegro.Application.Interfaces.Repositories
     public interface IProductVariantAttributeCombinationRepository
     {
         Task<ProductVariantAttributeCombination?> GetByIdAsync(int id);
+        Task<List<ProductVariantAttributeCombination>> GetByProductIdAsync(int productId);
         Task<List<ProductVariantAttributeCombination>> GetAllAsync();
         Task<PagedResult<ProductVariantAttributeCombination>> GetAllAsync(int pageNumber, int pageSize);
         Task AddAsync(ProductVariantAttributeCombination productVariantAttributeCombination);
