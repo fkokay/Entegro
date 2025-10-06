@@ -905,6 +905,17 @@ Entegro.product = (function ($) {
         });
     }
 
+
+    function initViewVariantAttributeValues() {
+        $(document).on('click', '.btn-view-values', function () {
+            const attributeId = $(this).data('attribute-id');
+            const productId = $(this).data('product-id');
+
+            const url = `/Product/ProductVariantAttributeValues?productVariantAttributeId=${attributeId}&productId=${productId}`;
+            window.location.href = url;
+        });
+    }
+
     return {
         Init: Init,
         TabsInit: TabsInit,
@@ -916,5 +927,6 @@ Entegro.product = (function ($) {
         initCreateOrUpdateProductVariantAttributeModal: initCreateOrUpdateProductVariantAttributeModal,
         initCreateOrUpdateProductVariantAttributeForm: initCreateOrUpdateProductVariantAttributeForm,
         initDeleteAttributeHandler: initDeleteAttributeHandler,
+        initViewVariantAttributeValues: initViewVariantAttributeValues
     };
 })(jQuery);
