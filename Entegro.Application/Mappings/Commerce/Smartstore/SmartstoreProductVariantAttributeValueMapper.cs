@@ -57,7 +57,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProductVariantAttributeValue.PriceAdjustment = 0;
                 smartstoreProductVariantAttributeValue.WeightAdjustment = 0;
                 smartstoreProductVariantAttributeValue.IsPreSelected = false;
-                smartstoreProductVariantAttributeValue.DisplayOrder = 0;
+                smartstoreProductVariantAttributeValue.DisplayOrder = productVariantAttributeValue.DisplayOrder;
                 smartstoreProductVariantAttributeValue.ValueTypeId = 0;
                 smartstoreProductVariantAttributeValue.LinkedProductId = 0;
                 smartstoreProductVariantAttributeValue.Quantity = 0;
