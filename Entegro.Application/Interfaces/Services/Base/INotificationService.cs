@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Notification;
 using Entegro.Domain.Enums;
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Entegro.Application.Interfaces.Services.Base
 {
@@ -18,8 +17,10 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<PagedResult<NotificationDto>> GetPagedAsync(GridCommand gridCommand);
         Task<NotificationDto> AddAsync(CreateNotificationDto model);
         Task<NotificationDto> UpdateAsync(UpdateNotificationDto model);
+        Task<NotificationDto> MarkAsRead(int id);
         Task DeleteAsync(int id);
-       Task SendNotification(NotificationType notificationType, string title, string message);
-        
+        Task DeleteAllAsync(List<int> id);
+        Task SendNotification(NotificationType notificationType, string title, string message);
+
     }
 }

@@ -39,51 +39,6 @@ Entegro.customer = (function ($) {
                         notEmpty: { message: 'Email adresi boş bırakılamaz.' },
                         emailAddress: { message: 'Geçerli bir email adresi giriniz.' }
                     }
-                },
-                'PhoneNumber': {
-                    validators: {
-                        notEmpty: { message: 'Telefon numarası boş bırakılamaz.' },
-                        phone: {
-                            country: 'TR',
-                            message: 'Geçerli bir telefon numarası giriniz.'
-                        }
-                    }
-                },
-                'City': { validators: { notEmpty: { message: 'Şehir boş bırakılamaz.' } } },
-                'District': { validators: { notEmpty: { message: 'İlçe boş bırakılamaz.' } } },
-                'Address': {
-                    validators: {
-                        notEmpty: { message: 'Adres bilgisi boş bırakılamaz.' },
-                        stringLength: { max: 500, message: 'Adres en fazla 500 karakter olabilir.' }
-                    }
-                },
-                'CustomerType': {
-                    validators: {
-                        notEmpty: { message: 'Müşteri tipi seçilmelidir.' },
-                        integer: { message: 'Müşteri tipi geçersiz.' }
-                    }
-                },
-                'TaxOffice': {
-                    validators: {
-                        callback: {
-                            message: 'Kurumsal müşteriler için vergi dairesi zorunludur.',
-                            callback: function (input) {
-                                const type = parseInt(form.querySelector('[name="CustomerType"]').value);
-                                return type === 1 ? input.value.trim().length > 0 : true;
-                            }
-                        }
-                    }
-                },
-                'TaxNumber': {
-                    validators: {
-                        callback: {
-                            message: 'Kurumsal müşteriler için vergi numarası zorunludur.',
-                            callback: function (input) {
-                                const type = parseInt(form.querySelector('[name="CustomerType"]').value);
-                                return type === 1 ? input.value.trim().length > 0 : true;
-                            }
-                        }
-                    }
                 }
             },
             plugins: {

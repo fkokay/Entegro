@@ -16,6 +16,8 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<PagedResult<Notification>> GetPagedAsync(GridCommand gridCommand);
         Task AddAsync(Notification notification);
         Task UpdateAsync(Notification notification);
+        Task MarkAsRead(Notification notification);
         Task DeleteAsync(Notification notification);
+        Task DeleteAllAsync(List<Notification> notification);
     }
 }

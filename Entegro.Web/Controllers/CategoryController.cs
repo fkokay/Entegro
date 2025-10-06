@@ -122,6 +122,25 @@ namespace Entegro.Web.Controllers
                 pagination = new { more = false }
             });
         }
+        [HttpPost]
+        public async Task<IActionResult> AllMainCategory([FromForm] int page = 1, [FromForm] string? term = null)
+        {
+            var categoryTree = await _categoryService.GetCategoryTreeAsync(includeHidden: false);
+            var topLevelCategories = categoryTree.Children;
 
+            var query = topLevelCategories.Select(c => new
+            {
+                id = c.Id.ToString(),
+                text = c.Value.Name.ToString(),
+            });
+
+            var mainList = query.ToList();
+
+            return Json(new
+            {
+                results = mainList,
+                pagination = new { more = false }
+            });
+        }
     }
 }

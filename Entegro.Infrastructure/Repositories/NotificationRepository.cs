@@ -22,6 +22,12 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteAllAsync(List<Notification> notification)
+        {
+            _context.RemoveRange(notification);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task DeleteAsync(Notification notification)
         {
             var tracked = _context.Notifications.Local.FirstOrDefault(b => b.Id == notification.Id);
@@ -133,6 +139,20 @@ namespace Entegro.Infrastructure.Repositories
                 PageSize = gridCommand.Length
             };
         }
+
+        public async Task MarkAsRead(Notification notification)
+        {
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            if (notification.IsRead)
+                return;
+
+            notification.IsRead = true;
+            _context.Notifications.Update(notification);
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task UpdateAsync(Notification notification)
         {

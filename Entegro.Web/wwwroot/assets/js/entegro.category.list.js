@@ -301,7 +301,7 @@ Entegro.category.list = (function () {
                                 noResults: () => 'Sonuç bulunamadı'
                             },
                             ajax: {
-                                url: '/category/AllCategory',
+                                url: '/category/AllMainCategory',
                                 type: 'POST',
                                 dataType: 'json',
                                 delay: 250,

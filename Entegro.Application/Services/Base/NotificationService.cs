@@ -14,7 +14,7 @@ namespace Entegro.Application.Services.Base
         private readonly INotificationRepository _notificationRepository;
         private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
-        public NotificationService(INotificationRepository notificationRepository,ISettingService settingService, IMapper mapper)
+        public NotificationService(INotificationRepository notificationRepository, ISettingService settingService, IMapper mapper)
         {
             _notificationRepository = notificationRepository ?? throw new ArgumentNullException(nameof(notificationRepository));
             _settingService = settingService;
@@ -31,6 +31,31 @@ namespace Entegro.Application.Services.Base
 
             return _mapper.Map<NotificationDto>(notification);
         }
+
+        public async Task DeleteAllAsync(List<int> idList)
+        {
+            if (idList == null || !idList.Any())
+                throw new ArgumentException("Silinecek ID listesi boş olamaz.", nameof(idList));
+
+            var notificationsToDelete = new List<Notification>();
+
+            foreach (var id in idList)
+            {
+                if (id <= 0)
+                    continue; // Geçersiz ID, atla
+
+                var notification = await _notificationRepository.GetByIdAsync(id);
+                if (notification != null)
+                {
+                    notificationsToDelete.Add(notification);
+                }
+            }
+
+            if (!notificationsToDelete.Any())
+                throw new KeyNotFoundException("Hiçbir geçerli Notification bulunamadı.");
+            await _notificationRepository.DeleteAllAsync(notificationsToDelete);
+        }
+
 
         public async Task DeleteAsync(int id)
         {
@@ -159,12 +184,32 @@ namespace Entegro.Application.Services.Base
             };
         }
 
+        public async Task<NotificationDto> MarkAsRead(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id), "Geçerli bir ID girilmelidir.");
+
+            var existingNotification = await _notificationRepository.GetByIdAsync(id);
+            if (existingNotification == null)
+                throw new KeyNotFoundException($"ID {id} ile Notification bulunamadı.");
+
+            // Zaten okunduysa tekrar güncelleme yapma
+            if (!existingNotification.IsRead)
+            {
+                existingNotification.IsRead = true;
+                await _notificationRepository.UpdateAsync(existingNotification);
+            }
+            return _mapper.Map<NotificationDto>(existingNotification);
+        }
+
+
+
         public async Task SendNotification(NotificationType notificationType, string title, string message)
         {
             var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
 
             var connection = new HubConnectionBuilder()
-              .WithUrl(systemUrl.Value+"/notificationHub")
+              .WithUrl(systemUrl.Value + "/notificationHub")
               .Build();
 
             await connection.StartAsync();
