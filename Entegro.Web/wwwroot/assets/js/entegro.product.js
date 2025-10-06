@@ -947,7 +947,7 @@ Entegro.product = (function ($) {
                         return `
                         <div class="d-inline-block text-nowrap">
                              <a href="javascript:void(0);"  class="btn btn-text-secondary rounded-pill waves-effect btn-icon text-danger delete-category-mapping" title="Sil" data-id="${data}">
-                              <i class="icon-base ti ti-eraser icon-22px"></i>
+                              <i class="icon-base ti ti-trash icon-22px"></i>
                              </a>
                         </div>
                     `;

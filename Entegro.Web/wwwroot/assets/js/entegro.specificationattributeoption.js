@@ -51,17 +51,10 @@ Entegro.specificationattributeoption = (function ($) {
                     orderable: false,
                     render: (data, type, row) => `
                     <div class="d-inline-block text-nowrap">
-                        <a href="Edit?id=#" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
-                            <i class="icon-base ti ti-pencil icon-22px"></i>
+                        
+                        <a href="javascript:void(0);" class="btn btn-text-secondary rounded-pill waves-effect btn-icon text-danger delete-record" data-id="${row.Id}">
+                        <i class="icon-base ti ti-trash icon-22px"></i>
                         </a>
-                        <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                            <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end m-0">
-                            <a href="Details?id=${row.Id}" class="dropdown-item">Detaylar</a>
-                            <div class="dropdown-divider"></div>
-                            <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Değer Sil</a>
-                        </div>
                     </div>`
                 }
             ],
@@ -361,7 +354,7 @@ Entegro.specificationattributeoption = (function ($) {
 
         return fv;
     }
-   
+
     return {
         initTable: initSpecificationTable,
         SpecificationAttributeOptionCreatePopup: SpecificationAttributeOptionCreatePopup,
