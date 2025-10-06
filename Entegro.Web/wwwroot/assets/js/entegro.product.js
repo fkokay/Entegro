@@ -532,8 +532,6 @@ Entegro.product = (function ($) {
         InitVariantValidation(formValidation);
         RemoveVariantValidation(formValidation);
     }
-
-    // Dinamik alanlara validation ekleme
     function InitVariantValidation(formValidation, scope) {
         const container = scope ? $(scope) : $(document);
 
@@ -565,8 +563,6 @@ Entegro.product = (function ($) {
             });
         });
     }
-
-    // Dinamik alanları repeater’dan silerken validation’dan da kaldır
     function RemoveVariantValidation(formValidation, scope) {
         const container = $(scope);
 
@@ -649,10 +645,7 @@ Entegro.product = (function ($) {
                     }
                 },
                 {
-                    data: 'ProductVariantAttributeValues',
-                    render: function (data) {
-                        return data?.length || 0;
-                    }
+                    data: 'DisplayOrder',
                 },
                 {
                     data: 'Id',
@@ -702,7 +695,7 @@ Entegro.product = (function ($) {
                                         data-bs-toggle="modal"
                                         data-bs-target="#createOrUpdateProductVariantAttributeModal">
                                         <i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
-                                        <span class="d-none d-sm-inline-block">Yeni Ürün Varyantı Oluştur</span>
+                                        <span class="d-none d-sm-inline-block">Yeni Özellik Ekle</span>
                                     </button>`,
                                 className: "p-0 border-0 bg-transparent"
                             }
