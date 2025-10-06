@@ -95,16 +95,8 @@
             Entegro.product.initCreateOrUpdateProductVariantAttributeModal();
             Entegro.product.initCreateOrUpdateProductVariantAttributeForm();
             Entegro.product.initDeleteAttributeHandler();
-          
-
+            Entegro.product.initViewVariantAttributeValues();
         });
 
-        $(document).on('click', '.btn-view-values', function () {
-            const attributeId = $(this).data('attribute-id');
-            const productId = $(this).data('product-id');
-
-            const url = `/Product/ProductVariantAttributeValues?productVariantAttributeId=${attributeId}&productId=${productId}`;
-            window.location.href = url;
-        });
     </script>
 }
