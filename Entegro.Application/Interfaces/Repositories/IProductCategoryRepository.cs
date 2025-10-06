@@ -1,4 +1,5 @@
-﻿using Entegro.Domain.Entities.Catalog;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Domain.Entities.Catalog;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
@@ -11,6 +12,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task DeleteAsync(ProductCategory productCategoryMapping);
         Task<List<ProductCategory>> GetByProductWithCategoryAsync(int productId);
         Task<List<ProductCategory>> GetByProductsWithCategoryAsync(IEnumerable<int> productIds);
+        Task<PagedResult<ProductCategory>> GetPagedAsync(GridCommand gridCommand, int productId);
 
     }
 }

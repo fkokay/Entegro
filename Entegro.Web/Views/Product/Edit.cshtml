@@ -96,6 +96,17 @@
             Entegro.product.initCreateOrUpdateProductVariantAttributeForm();
             Entegro.product.initDeleteAttributeHandler();
             Entegro.product.initViewVariantAttributeValues();
+
+
+
+
+
+            $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-categories"]').on('shown.bs.tab', function () {
+                var productId = @Html.Raw(Json.Serialize(Model.Id));
+                if (productId && productId > 0) {
+                    Entegro.product.initProductCategoryTable(productId);
+                }
+            });
         });
 
     </script>

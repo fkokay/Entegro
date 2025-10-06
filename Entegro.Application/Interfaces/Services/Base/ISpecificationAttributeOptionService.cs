@@ -11,6 +11,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<SpecificationAttributeOptionDto?> GetByNameAsync(string name);
         Task<IEnumerable<SpecificationAttributeOptionDto>> GetAllAsync();
         Task<PagedResult<SpecificationAttributeOptionDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);
+        Task<PagedResult<SpecificationAttributeOptionDto>> GetPagedAsync(GridCommand gridCommand, int specificationAttributeId);
         Task<SpecificationAttributeOptionDto> AddAsync(CreateSpecificationAttributeOptionDto model);
         Task<SpecificationAttributeOptionDto> UpdateAsync(UpdateSpecificationAttributeOptionDto model);
         Task<bool> DeleteAsync(int id);

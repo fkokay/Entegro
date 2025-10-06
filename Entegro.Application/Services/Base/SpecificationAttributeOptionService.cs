@@ -118,6 +118,24 @@ namespace Entegro.Application.Services.Base
             };
         }
 
+        public async Task<PagedResult<SpecificationAttributeOptionDto>> GetPagedAsync(GridCommand gridCommand, int specificationAttributeId)
+        {
+            var addresses = await _specificationAttributeOptionRepository.GetPagedAsync(gridCommand, specificationAttributeId);
+
+            var items = await addresses.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<SpecificationAttributeOptionDto>(x);
+                return model;
+            }).AsyncToList();
+            return new PagedResult<SpecificationAttributeOptionDto>
+            {
+                Items = items,
+                TotalCount = addresses.TotalCount,
+                PageNumber = addresses.PageNumber,
+                PageSize = addresses.PageSize
+            };
+        }
+
         public async Task<SpecificationAttributeOptionDto> UpdateAsync(UpdateSpecificationAttributeOptionDto model)
         {
             if (model == null)

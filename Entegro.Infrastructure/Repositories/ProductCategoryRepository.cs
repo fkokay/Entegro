@@ -1,8 +1,9 @@
-﻿using Entegro.Application.Interfaces.Repositories;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.Interfaces.Repositories;
 using Entegro.Domain.Entities.Catalog;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq.Dynamic.Core;
 namespace Entegro.Infrastructure.Repositories
 {
     public class ProductCategoryRepository : IProductCategoryRepository
@@ -65,6 +66,50 @@ namespace Entegro.Infrastructure.Repositories
              .Include(m => m.Category)
              .OrderBy(m => m.DisplayOrder).ThenBy(m => m.CategoryId)
              .ToListAsync();
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<ProductCategory>> GetPagedAsync(GridCommand gridCommand, int productId)
+        {
+
+            var query = _context.ProductCategories
+             .AsNoTracking()
+             .Where(m => m.ProductId == productId)
+             .Include(m => m.Category)
+             .OrderBy(m => m.DisplayOrder).ThenBy(m => m.CategoryId).AsNoTracking().AsQueryable();
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b => b.Category.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var productCategories = await query
+            .Skip(gridCommand.Start)
+            .Take(gridCommand.Length)
+            .ToListAsync();
+
+            return new Application.DTOs.Common.PagedResult<ProductCategory>
+            {
+                Items = productCategories,
+                TotalCount = totalCount,
+                PageNumber = gridCommand.Start + 1,
+                PageSize = gridCommand.Length
+            };
         }
 
         public async Task UpdateAsync(ProductCategory productCategoryMapping)

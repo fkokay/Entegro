@@ -16,7 +16,7 @@
                         </span>
                     </a>
                 </div>
-               
+
                 <button type="submit" id="save-btn" class="btn btn-primary waves-effect waves-light">
                     <span class="d-flex justify-content-center text-nowrap">
                         <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
@@ -24,7 +24,7 @@
                 </button>
             </div>
         </div>
-      
+
         <div class="row">
             <div class="col-lg-12 col-12 mb-lg-0 mb-4">
                 <div class="card mb-3">
@@ -48,7 +48,28 @@
                         <div class="tab-pane fade" id="form-tabs-attributeOption" role="tabpanel">
                             @if (Model.Id > 0)
                             {
-                                @await Html.PartialAsync("_SpecificationAttributeOptionList", Model)
+                                <div class="flex-grow-1 container-p-y container-fluid">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h4 class="mb-3">@Model.Name Özellikleri</h4>
+                                    </div>
+                                    <div class="row card-header flex-column flex-md-row border-bottom mx-0 px-3">
+                                        <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0">
+                                            <h5 class="card-title mb-0 text-md-start text-center pb-md-0 pb-6">Filtreler</h5>
+                                        </div>
+                                        <div class="d-md-flex justify-content-between align-items-center dt-layout-end col-md-auto ms-auto mt-0"></div>
+                                    </div>
+                                    <table id="SpecificationAttributeOptionTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Id</th>
+                                                <th>Özellik Değer Adı</th>
+                                                <th>Sırası</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                             }
                             else
                             {
@@ -61,7 +82,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
     </form>
@@ -88,11 +109,23 @@
 
 
 @section Scripts {
+
+    var attributeId = @Html.Raw(Json.Serialize(Model.Id));
     <script src="/assets/js/entegro.specificationattribute.js" asp-append-version="true"></script>
+    <script src="/assets/js/entegro.specificationattributeoption.js" asp-append-version="true"></script>
     <script>
         $(function () {
             Entegro.specificationattribute.init();
             Entegro.specificationattribute.SpecificationAttributeUpdateFormValidationInit();
+
+            $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-attributeOption"]').on('shown.bs.tab', function () {
+                var attributeId = @Html.Raw(Json.Serialize(Model.Id));
+                if (attributeId && attributeId > 0) {
+                    Entegro.specificationattributeoption.initTable(attributeId);
+                }
+            });
         });
     </script>
 }
+
+

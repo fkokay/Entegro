@@ -124,80 +124,7 @@ Entegro.specificationattribute = (function ($) {
         });
     }
 
-    function SpecificationAttributeOptionCreatePopup(id) {
-        var popup = $('#SpecificationAttributeOptionPopup');
-        var popupContent = $("#SpecificationAttributeOptionPopupContent");
-        $.ajax({
-            url: '/SpecificationAttribute/SpecificationAttributeOptionCreatePopup?id=' + id,
-            type: 'GET',
-            dataType: 'html',
-            success: function (html) {
-                $(popupContent).html(html);
-
-                SpecificationAttributeOptionCreatePopupInit(popup, popupContent);
-
-                $(popup).modal('show');
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert('Form yüklenemedi.');
-            }
-        });
-    }
-
-    function SpecificationAttributeOptionCreatePopupInit(popup, popupContent) {
-        const fv = initializeFormValidation('specificationAttributeOptionForm', {
-            'Name': {
-                validators: {
-                    notEmpty: { message: 'Adı alanı boş bırakılamaz.' },
-                    stringLength: { min: 3, message: 'Adı alanı en az 3 karakter olmalıdır.' }
-                }
-            },
-            'DisplayOrder': {
-                validators: {
-                    notEmpty: { message: 'Sıra alanı boş bırakılamaz.' },
-                    integer: { message: 'Sıra alanı geçerli bir sayı olmalıdır.' }
-                }
-            }
-        });
-        $(document).on('click', '#btnSaveSpecificationAttributeOption', function () {
-            fv.validate().then(function (status) {
-                if (status === 'Valid') {
-                    const payload = {
-                        SpecificationAttributeId: Number($('#SpecificationAttributeId').val()) || 0,
-                        Name: $('#OptionName').val() || '',
-                        DisplayOrder: Number($('#DisplayOrder').val()) || 0
-                    };
-
-                    $.ajax({
-                        url: '/SpecificationAttribute/SpecificationAttributeOptionCreate',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(payload),
-                        success: function (json) {
-                            if (json?.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Başarılı!',
-                                    text: 'Özellik başarıyla kaydedildi.',
-                                    confirmButtonText: 'Tamam'
-                                }).then(() => {
-                                    location.reload();
-                                    $(popup).modal('hide');
-                                });
-                            } else {
-                                showMessage("Hata!", json?.errors?.join('\n') || 'Kayıt başarısız.', "error")
-                            }
-                        },
-                        error: function () {
-                            showMessage("Sunucu Hatası!", "İşlem sırasında bir hata oluştu.", "error")
-                        }
-                    });
-                }
-            });
-        });
-    }
-
+ 
     function initializeFormValidation(formId, fieldValidators, onValidCallback) {
         const form = document.getElementById(formId);
 
@@ -292,7 +219,6 @@ Entegro.specificationattribute = (function ($) {
     return {
         init: init,
         SpecificationAttributeCreatePopup: SpecificationAttributeCreatePopup,
-        SpecificationAttributeOptionCreatePopup: SpecificationAttributeOptionCreatePopup,
         SpecificationAttributeUpdateFormValidationInit: SpecificationAttributeUpdateFormValidationInit,
         initializeFormValidation: initializeFormValidation
     };

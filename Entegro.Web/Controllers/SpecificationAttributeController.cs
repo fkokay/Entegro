@@ -137,5 +137,19 @@ namespace Entegro.Web.Controllers
                 data = result.Items
             });
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SpecificationAttributeValueList([FromBody] GridCommand gridCommand, int attributeId)
+        {
+            var result = await _specificationAttributeOptionService.GetPagedAsync(gridCommand, attributeId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
     }
 }

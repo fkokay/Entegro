@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
@@ -14,8 +13,6 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
-using Entegro.Application.Services.Commerce.Smartstore;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
@@ -272,6 +269,20 @@ namespace Entegro.Web.Controllers
             var model = _mapper.Map<List<ProductCategoryModel>>(productCategories);
 
             return PartialView("_CreateOrUpdate.Categories", model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ProductCategoryList([FromBody] GridCommand gridCommand, int productId)
+        {
+            var result = await _productCategoryMappingService.GetPagedAsync(gridCommand, productId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
         }
 
         [HttpGet]
