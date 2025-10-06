@@ -69,7 +69,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreCategory.FullName = category.Name;
                 smartstoreCategory.DefaultViewMode = "Grid";
                 smartstoreCategory.Description = "";
-                smartstoreCategory.DisplayOrder = 0;
+                smartstoreCategory.DisplayOrder = category.DisplayOrder;
                 smartstoreCategory.UpdatedOnUtc = DateTime.Now;
                 smartstoreCategory.SubjectToAcl = false;
                 smartstoreCategory.ShowOnHomePage = false;

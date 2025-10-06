@@ -55,16 +55,6 @@ Entegro.product = (function ($) {
                 }
             });
         });
-
-        if ($('#SelectedProductAttributeIds').length && !$('#SelectedProductAttributeIds').data('select2')) {
-            $('#SelectedProductAttributeIds').wrap('<div class="position-relative"></div>');
-            $('#SelectedProductAttributeIds').select2({
-                width: '100%',
-                placeholder: 'Varyant seçiniz',
-                allowClear: true,
-                dropdownParent: $('#SelectedProductAttributeIds').parent()
-            });
-        };
     }
 
     function TabsInit() {
