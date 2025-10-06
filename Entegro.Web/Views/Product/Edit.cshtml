@@ -97,15 +97,6 @@
             Entegro.product.initDeleteAttributeHandler();
           
 
-
-             $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-variants"]').on('shown.bs.tab', function () {
-                 var id = @Html.Raw(Json.Serialize(Model.Id));
-                if (id && id > 0) {
-                    Entegro.product.initAttributesTable(id);
-                }
-            });
-
-
         });
 
         $(document).on('click', '.btn-view-values', function () {

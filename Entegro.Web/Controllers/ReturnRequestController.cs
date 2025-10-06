@@ -36,7 +36,6 @@ namespace Entegro.Web.Controllers
             {
                 return NotFound();
             }
-
             ViewBag.ReturnRequestStatus = EnumHelper.GetEnumSelectList<ReturnRequestStatus>();
             ViewBag.ReasonForReturnType = EnumHelper.GetEnumSelectList<ReasonForReturnType>();
             ViewBag.RequestedActionType = EnumHelper.GetEnumSelectList<RequestedActionType>();

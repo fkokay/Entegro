@@ -12,10 +12,16 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-stock" type="button" role="tab">Envanter</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-variants-btn" data-bs-toggle="tab" data-bs-target="#form-tabs-variants" type="button" role="tab">
+                    <button class="nav-link" id="tab-variants-btn"
+                            data-bs-toggle="tab"
+                            data-bs-target="#form-tabs-variants"
+                            data-product-id="@Model?.Id"
+                            type="button" role="tab">
                         Varyantlar
                     </button>
                 </li>
+
+
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-seo" type="button" role="tab">Arama Motorları (SEO)</button>
                 </li>
