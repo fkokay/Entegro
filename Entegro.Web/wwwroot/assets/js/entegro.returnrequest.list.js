@@ -2,6 +2,78 @@
 Entegro.returnrequest = Entegro.returnrequest || {};
 
 Entegro.returnrequest.list = (function ($) {
+
+    function addFilterDropdown(column, containerSelector, placeholder, map = null) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
+        let select = document.createElement("select");
+        select.className = "form-select select2 text-capitalize";
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        container.appendChild(select);
+
+        if (map && Array.isArray(map)) {
+            map.forEach(item => {
+                let option = document.createElement("option");
+                option.value = item.id;
+                option.textContent = item.title;
+                select.appendChild(option);
+            });
+        } else {
+            column.data().unique().sort().each(function (value) {
+                if (value !== null && value !== undefined && value !== "") {
+                    let option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        if (window.jQuery && $(select).select2) {
+            $(select).select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: "resolve"
+            });
+
+
+            $(select).on("change", function () {
+                const val = this.value || "";
+                column.search(val, false, false).draw();
+            });
+        } else {
+            select.addEventListener("change", function () {
+                const val = select.value ? `^${select.value}$` : "";
+                column.search(val, true, false).draw();
+            });
+        }
+
+    }
+    function addFilterText(column, containerSelector, placeholder) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
+        // input elementini oluştur
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control";
+        input.placeholder = placeholder;
+
+        container.appendChild(input);
+
+        // her yazımda filtre uygula (debounce ile optimize edebilirsin)
+        input.addEventListener("keyup", function () {
+            const val = input.value || "";
+            column.search(val, false, true).draw();
+        });
+    }
     function initList() {
         const statusDisplayMap = {
             0: "Beklemede",
@@ -24,7 +96,7 @@ Entegro.returnrequest.list = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[8, 'asc']], // Tarihe göre sıralama
+            order: [[9, 'asc']], // Tarihe göre sıralama
             ajax: {
                 url: '/ReturnRequest/ReturnRequestList',
                 type: 'POST',
@@ -41,6 +113,7 @@ Entegro.returnrequest.list = (function ($) {
                 { data: 'Quantity' },
                 { data: 'Customer.Name' },
                 { data: 'OrderItemId' },
+                { data: 'ReturnRequestStatusId', visible: false },
                 {
                     data: 'ReturnRequestStatus',
                     render: function (data) {
@@ -67,6 +140,11 @@ Entegro.returnrequest.list = (function ($) {
                         selectAllRender: '<input type="checkbox" class="form-check-input">'
                     },
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                },
+                {
+                    targets: 7, // ReturnRequestStatusId'nin indexi
+                    visible: false,
+                    searchable: false
                 },
                 {
                     targets: -1,
@@ -121,7 +199,7 @@ Entegro.returnrequest.list = (function ($) {
             },
             initComplete: function () {
                 this.api().columns().every(function () {
-                    if (this.dataSrc() === "ReturnRequestStatus") {
+                    if (this.dataSrc() === "ReturnRequestStatusId") {
                         Entegro.returnrequest.list.addFilterDropdown(this, ".returnRequestStatusFilter", "Durum", [
                             { title: "Beklemede", id: 0 },
                             { title: "Alındı", id: 10 },
@@ -201,8 +279,11 @@ Entegro.returnrequest.list = (function ($) {
 
 
     return {
+        addFilterText: addFilterText,
+        addFilterDropdown: addFilterDropdown,
         init: initList,
-        deleteReturnRequest: deleteReturnRequest
+        deleteReturnRequest: deleteReturnRequest,
+       
     };
 
 })(jQuery);
