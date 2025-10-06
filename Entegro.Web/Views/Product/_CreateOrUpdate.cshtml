@@ -33,7 +33,7 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-categories" type="button" role="tab"
-                            data-url="@(Model.Id > 0 ? Url.Action("LoadTabCategories", "Product", new { productId = Model.Id }) : "")">
+                            >
                         Kategori Eşleştirmeleri
                     </button>
                 </li>
@@ -258,9 +258,20 @@
             <div class="tab-pane fade" id="form-tabs-categories" role="tabpanel" data-loaded="false">
                 @if (Model.Id > 0)
                 {
-                    <div class="p-4 text-center text-muted" id="productcategories-loading" style="display:none">
-                        Yükleniyor...
+                    <div class="d-flex flex-column justify-content-center">
+                        <h4 class="mb-3">Ürün Kategorileri</h4>
                     </div>
+                    <table id="ProductCategoryTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>#</th>
+                                <th>Kategori Yolu</th>
+                                <th>Sırası</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                    </table>
                 }
                 else
                 {

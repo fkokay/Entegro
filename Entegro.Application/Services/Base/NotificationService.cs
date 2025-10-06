@@ -42,7 +42,7 @@ namespace Entegro.Application.Services.Base
             foreach (var id in idList)
             {
                 if (id <= 0)
-                    continue; // Geçersiz ID, atla
+                    continue;
 
                 var notification = await _notificationRepository.GetByIdAsync(id);
                 if (notification != null)

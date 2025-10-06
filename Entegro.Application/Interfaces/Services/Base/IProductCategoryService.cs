@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.ProductCategory;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductCategory;
 
 namespace Entegro.Application.Interfaces.Services.Base
 {
@@ -10,5 +11,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ProductCategoryDto> UpdateAsync(UpdateProductCategoryDto updateProductCategory);
         Task<List<ProductCategoryDto>> GetByProductWithCategoryAsync(int productId);
         Task DeleteAsync(int productCategoryId);
+        Task<PagedResult<ProductCategoryDto>> GetPagedAsync(GridCommand gridCommand, int productId);
     }
 }

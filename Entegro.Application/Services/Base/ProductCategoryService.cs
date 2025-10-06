@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.ProductCategory;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Entities.Catalog;
@@ -83,6 +84,29 @@ namespace Entegro.Application.Services.Base
             }).ToListAsync();
 
             return productCategoryDtos;
+        }
+
+        public async Task<PagedResult<ProductCategoryDto>> GetPagedAsync(GridCommand gridCommand, int productId)
+        {
+            var productCategories = await _productCategoryMappingRepository.GetPagedAsync(gridCommand, productId);
+
+            var items = await productCategories.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ProductCategoryDto>(x);
+                model.Id = x.Id;
+                model.CategoryId = x.CategoryId;
+                model.ProductId = x.ProductId;
+                model.DisplayOrder = x.DisplayOrder;
+                model.CategoryBreadcrumb = await _categoryService.GetCategoryPathAsync(x.Category);
+                return model;
+            }).AsyncToList();
+            return new PagedResult<ProductCategoryDto>
+            {
+                Items = items,
+                TotalCount = productCategories.TotalCount,
+                PageNumber = productCategories.PageNumber,
+                PageSize = productCategories.PageSize
+            };
         }
     }
 }

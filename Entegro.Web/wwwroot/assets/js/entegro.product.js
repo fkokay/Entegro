@@ -82,13 +82,7 @@ Entegro.product = (function ($) {
 
                 }
 
-                if (event.target.dataset.bsTarget == "#form-tabs-categories") {
-                    if (event.target.dataset.url.length > 0) {
-                        $("#form-tabs-categories").load(event.target.dataset.url, function () {
-                            ProductCategoryDelete();
-                        });
-                    }
-                }
+              
 
                 if (event.target.dataset.bsTarget == "#form-tabs-attributes") {
                     if (event.target.dataset.url.length > 0) {
@@ -230,6 +224,10 @@ Entegro.product = (function ($) {
                         }).then(() => {
                             RefreshTab("#form-tabs-categories");
                             $(popup).modal('hide');
+                            const table = $('#ProductCategoryTable').DataTable();
+                            if (table) {
+                                table.ajax.reload(null, false);
+                            }
                         });
                     } else {
                         showMessage("Hata!", json?.errors?.join('\n') || 'Kayıt başarısız.', "error")
@@ -240,8 +238,8 @@ Entegro.product = (function ($) {
                 }
             });
         });
-    }
 
+    }
     function ProductCategoryDelete() {
         $(document).on('click', '#productCategoryTable .btn-delete', function () {
             const $tr = $(this).closest('tr');
@@ -913,6 +911,228 @@ Entegro.product = (function ($) {
             window.location.href = url;
         });
     }
+    function initProductCategoryTable(productId) {
+        if (!productId) return;
+
+        const tableId = '#ProductCategoryTable';
+        const url = '/Product/ProductCategoryList?productId=' + productId;
+
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().ajax.url(url).load();
+            return;
+        }
+
+        const table = $(tableId).DataTable({
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
+                paginate: {
+                    next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                }
+            },
+            serverSide: true,
+            processing: true,
+            order: [[3, 'asc']], // DisplayOrder'a göre sırala
+            ajax: {
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            columns: [
+                { data: 'Id', orderable: false }, // checkbox
+                { data: 'Id', visible: false },
+                { data: 'CategoryBreadcrumb', title: 'Kategori Yolu' },
+                { data: 'DisplayOrder', title: 'Sırası' },
+                {
+                    data: 'Id',
+                    title: 'İşlemler',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                        <div class="d-inline-block text-nowrap">
+                             <a href="javascript:void(0);"  class="btn btn-text-secondary rounded-pill waves-effect btn-icon text-danger delete-category-mapping" title="Sil" data-id="${data}">
+                              <i class="icon-base ti ti-eraser icon-22px"></i>
+                             </a>
+                        </div>
+                    `;
+                    }
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    checkboxes: {
+                        selectAllRender: '<input type="checkbox" class="form-check-input">'
+                    },
+                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                }
+            ],
+            select: {
+                style: 'multi',
+                selector: 'td:nth-child(1)'
+            },
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: {
+                            menu: [10, 25, 50, 100],
+                            text: "_MENU_"
+                        },
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                    <i class="icon-base ti ti-upload icon-xs"></i>
+                                    <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                                  </span>`,
+                                buttons: [
+                                    {
+                                        extend: "print",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-printer me-1"></i> Print</span>`,
+                                        exportOptions: { columns: [2, 3] }
+                                    },
+                                    {
+                                        extend: "csv",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file me-1"></i> Csv</span>`,
+                                        exportOptions: { columns: [2, 3] }
+                                    },
+                                    {
+                                        extend: "excel",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-upload me-1"></i> Excel</span>`,
+                                        exportOptions: { columns: [2, 3] }
+                                    },
+                                    {
+                                        extend: "pdf",
+                                        className: "dropdown-item",
+                                        text: `<span class="d-flex align-items-center"><i class="icon-base ti tabler-file-text me-1"></i> Pdf</span>`,
+                                        exportOptions: { columns: [2, 3] }
+                                    },
+                                    {
+                                        extend: "copy",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-copy me-1"></i> Copy`,
+                                        exportOptions: { columns: [2, 3] }
+                                    }
+                                ]
+                            },
+                            {
+                                text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                                <span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
+                                className: "add-new btn btn-primary",
+                                action: function () {
+                                    const id = productId;
+
+                                    $.ajax({
+                                        url: `/Product/ProductCategoryCreatePopup`,
+                                        type: 'GET',
+                                        data: { id: id },
+                                        success: function (result) {
+                                            $('#ProductCategoryPopupContent').html(result);
+                                            $('#ProductCategoryPopup').modal('show');
+                                            ProductCategoryCreatePopup(id);
+                                        },
+                                        error: function () {
+                                            alert("Modal yüklenemedi. Lütfen tekrar deneyin.");
+                                        }
+                                    });
+                                }
+                            }
+
+                        ]
+                    }]
+                },
+                bottomStart: {
+                    rowClass: "row mx-3 justify-content-between",
+                    features: ["info"]
+                },
+                bottomEnd: "paging"
+            }
+        });
+
+        // Silme işlemi
+        $(document).on('click', '.delete-category-mapping', function () {
+            const id = $(this).data('id');
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu kategori ilişkisi silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Product/ProductCategoryDelete',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'Kategori ilişkisi başarıyla silindi.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: { confirmButton: 'btn btn-success' },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    table.ajax.reload(null, false);
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: { confirmButton: 'btn btn-danger' },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Sunucu Hatası!',
+                                text: 'İstek gönderilirken bir hata oluştu.',
+                                confirmButtonText: 'Tamam',
+                                customClass: { confirmButton: 'btn btn-danger' },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
 
     function CreateCombination() {
         $("[data-repeater-create]").click();
@@ -982,6 +1202,7 @@ Entegro.product = (function ($) {
         initViewVariantAttributeValues: initViewVariantAttributeValues,
         CreateCombination: CreateCombination,
         CreateAllCombinations: CreateAllCombinations,
-        DeleteAllCombinations: DeleteAllCombinations
+        DeleteAllCombinations: DeleteAllCombinations,
+        initProductCategoryTable: initProductCategoryTable
     };
 })(jQuery);

@@ -1,5 +1,4 @@
-﻿using Entegro.Application.DTOs.MediaFile;
-using Entegro.Web.Models.Content;
+﻿using Entegro.Web.Models.Content;
 
 namespace Entegro.Web.Models.Catalog.Brands
 {
@@ -13,7 +12,7 @@ namespace Entegro.Web.Models.Catalog.Brands
         public string? MetaDescription { get; set; }
         public string? MetaKeywords { get; set; }
         public int DisplayOrder { get; set; }
-        public bool Published { get; set; }
+        public bool Published { get; set; } = true;
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
 
