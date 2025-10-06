@@ -35,7 +35,7 @@
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributeOption" type="button" role="tab">Ürün Özellik Değerleri</button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributeOption" data-attribute-id="@Model?.Id"  type="button" role="tab">Ürün Özellik Değerleri</button>
                             </li>
                         </ul>
                     </div>
@@ -91,7 +91,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
 
-            <!-- Modal Header -->
+
             <div class="modal-header p-0 position-relative" style="height: 80px;">
                 <div class="d-flex justify-content-center align-items-center w-100 h-100">
                     <h5 class="modal-title m-0">Ürün Özellik Değeri Ekle</h5>
@@ -117,13 +117,7 @@
         $(function () {
             Entegro.specificationattribute.init();
             Entegro.specificationattribute.SpecificationAttributeUpdateFormValidationInit();
-
-            $('button[data-bs-toggle="tab"][data-bs-target="#form-tabs-attributeOption"]').on('shown.bs.tab', function () {
-                var attributeId = @Html.Raw(Json.Serialize(Model.Id));
-                if (attributeId && attributeId > 0) {
-                    Entegro.specificationattributeoption.initTable(attributeId);
-                }
-            });
+            Entegro.specificationattributeoption.TabsInit();
         });
     </script>
 }

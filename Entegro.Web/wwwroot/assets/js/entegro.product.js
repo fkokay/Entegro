@@ -72,7 +72,14 @@ Entegro.product = (function ($) {
 
                 }
 
-              
+
+                if (event.target.dataset.bsTarget == "#form-tabs-categories") {
+                    var id = event.target.dataset.productId;
+                    if (id && id > 0) {
+                        Entegro.product.initProductCategoryTable(id);
+                    }
+                }
+
 
                 if (event.target.dataset.bsTarget == "#form-tabs-attributes") {
                     if (event.target.dataset.url.length > 0) {

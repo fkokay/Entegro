@@ -4,6 +4,23 @@ Entegro.specificationattributeoption = Entegro.specificationattributeoption || {
 Entegro.specificationattributeoption = (function ($) {
     'use strict';
 
+    function TabsInit() {
+        const tabButtons = document.querySelectorAll('#specificationattribute-tabs button[data-bs-toggle="tab"]');
+        tabButtons.forEach(function (button) {
+            button.addEventListener('shown.bs.tab', function (event) {
+                const target = event.target.dataset.bsTarget;
+                if (target === "#form-tabs-attributeOption") {
+                    const id = event.target.dataset.attributeId;
+
+                    if (id && parseInt(id) > 0) {
+                        Entegro.specificationattributeoption.initTable(parseInt(id));
+                    }
+                }
+            });
+        });
+    }
+
+
     function initSpecificationTable(attributeId) {
         if (!attributeId) return;
 
@@ -358,7 +375,8 @@ Entegro.specificationattributeoption = (function ($) {
     return {
         initTable: initSpecificationTable,
         SpecificationAttributeOptionCreatePopup: SpecificationAttributeOptionCreatePopup,
-        initializeFormValidation: initializeFormValidation
+        initializeFormValidation: initializeFormValidation,
+        TabsInit: TabsInit
     };
 
 })(jQuery);
