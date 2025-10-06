@@ -904,8 +904,6 @@ Entegro.product = (function ($) {
             });
         });
     }
-
-
     function initViewVariantAttributeValues() {
         $(document).on('click', '.btn-view-values', function () {
             const attributeId = $(this).data('attribute-id');
@@ -913,6 +911,60 @@ Entegro.product = (function ($) {
 
             const url = `/Product/ProductVariantAttributeValues?productVariantAttributeId=${attributeId}&productId=${productId}`;
             window.location.href = url;
+        });
+    }
+
+    function CreateCombination() {
+        $("[data-repeater-create]").click();
+    }
+
+    function CreateAllCombinations(productId) {
+        Swal.fire({
+            title: 'Emin misiniz?',
+            text: 'Tüm özellikleri birleştirmek istiyor musunuz? Mevcut kombinasyonlar silinecektir!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Evet',
+            cancelButtonText: 'Vazgeç'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: '/Product/ProductVariantAttributeCreateAll',
+                type: 'POST',
+                data: { productId: productId },
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Hata', text: 'Bir hata oluştu.' });
+                }
+            });
+        });
+    }
+
+    function DeleteAllCombinations(productId) {
+        Swal.fire({
+            title: 'Emin misiniz?',
+            text: 'Tüm kombinasyonlar silinecek emin misin?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Evet',
+            cancelButtonText: 'Vazgeç'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: '/Product/ProductVariantAttributeAllDelete',
+                type: 'POST',
+                data: { productId: productId },
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Silme başarısız', text: 'Bir hata oluştu.' });
+                }
+            });
         });
     }
 
@@ -927,6 +979,9 @@ Entegro.product = (function ($) {
         initCreateOrUpdateProductVariantAttributeModal: initCreateOrUpdateProductVariantAttributeModal,
         initCreateOrUpdateProductVariantAttributeForm: initCreateOrUpdateProductVariantAttributeForm,
         initDeleteAttributeHandler: initDeleteAttributeHandler,
-        initViewVariantAttributeValues: initViewVariantAttributeValues
+        initViewVariantAttributeValues: initViewVariantAttributeValues,
+        CreateCombination: CreateCombination,
+        CreateAllCombinations: CreateAllCombinations,
+        DeleteAllCombinations: DeleteAllCombinations
     };
 })(jQuery);

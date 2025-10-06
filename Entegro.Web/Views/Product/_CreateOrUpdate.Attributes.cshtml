@@ -1,15 +1,15 @@
 ﻿@model ProductModel
 
 <div class="d-flex justify-content-between align-items-center mt-5">
-    <h5 class="mb-0 card-title">Özellik kombinasyonları</h5>
+    <h5 class="mb-0 card-title">Özellik Kombinasyonları</h5>
     <div class="d-flex">
-        <button type="button" class="btn btn-label-dark CreateCombination waves-effect me-3">
+        <button type="button" class="btn btn-label-dark waves-effect me-3" onclick="Entegro.product.CreateCombination()">
             Kombinasyon Ekle
         </button>
-        <button type="button" class="btn btn-label-primary CreateAllCombinations waves-effect me-3">
+        <button type="button" class="btn btn-label-primary waves-effect me-3" onclick="Entegro.product.CreateAllCombinations(@Model.Id)">
             Tüm Kombinasyonları Oluştur
         </button>
-        <button type="button" class="btn btn-label-danger DeleteAllCombinations waves-effect">
+        <button type="button" class="btn btn-label-danger waves-effect" onclick="Entegro.product.DeleteAllCombinations(@Model.Id)">
             Tüm Kombinasyonları Sil
         </button>
     </div>
@@ -91,7 +91,7 @@
         @if (Model.ProductVariantAttributes.Any())
         {
             <div class="col-12 mt-2 p-3">
-                <button type="button" class="btn btn-primary" data-repeater-create>Yeni Varyant</button>
+                <button type="button" class="btn btn-primary" data-repeater-create>Kombinasyon Ekle</button>
             </div>
         }
     </div>

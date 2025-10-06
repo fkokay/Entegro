@@ -14,6 +14,8 @@ using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Services.Commerce.Smartstore;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
@@ -148,7 +150,7 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> List()
         {
-            var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null,true);
+            var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null, true);
             ViewBag.Commerces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce).Select(
                 m => new { m.Id, m.Name }
                 ).ToList();
@@ -1865,6 +1867,51 @@ namespace Entegro.Web.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ProductVariantAttributeCreateAll(int productId)
+        {
+            try
+            {
+                var product = await _productService.GetProductByIdAsync(productId);
+                var existing = await _productVariantAttributeCombinationService.GetByProductIdAsync(productId);
+
+                // eski kombinasyonları sil
+                foreach (var item in existing)
+                {
+                    await _productVariantAttributeCombinationService.DeleteAsync(item.Id);
+                }
+
+                // tüm kombinasyonları üret
+                var allCombinations = GetAllCombinations(product.ProductVariantAttributes.ToList());
+
+                int index = 0;
+                foreach (var combination in allCombinations)
+                {
+                    index++;
+
+                    var dto = new CreateProductVariantAttributeCombinationDto
+                    {
+                        ProductId = productId,
+                        StokCode = $"{product.Code}-{index}",
+                        Gtin = "",
+                        ManufacturerPartNumber = "",
+                        Price = null,
+                        StockQuantity = 0,
+                        RawAttribute = JsonConvert.SerializeObject(combination)
+                    };
+
+                    await _productVariantAttributeCombinationService.AddAsync(dto);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
         #endregion
 
         #region ProductVariantAttribute
@@ -1924,7 +1971,7 @@ namespace Entegro.Web.Controllers
             {
                 var product = await _productService.GetProductByIdAsync(model.ProductId);
                 var productVariantAttribute = await _productVariantAttributeService.GetByIdAsync(model.ProductVariantAttributeId);
-              
+
                 if (product == null)
                 {
                     return NotFound();
@@ -2101,6 +2148,36 @@ namespace Entegro.Web.Controllers
                 new SelectListItem { Text = "Metre", Value = "Metre" },
                 new SelectListItem { Text = "Kutu", Value = "Kutu" }
             };
+        }
+        public static List<List<ProductVariantAttributeSelection>> GetAllCombinations(List<ProductVariantAttributeDto> attributes)
+        {
+            var results = new List<List<ProductVariantAttributeSelection>>() { new List<ProductVariantAttributeSelection>() };
+
+            foreach (var attribute in attributes)
+            {
+                var temp = new List<List<ProductVariantAttributeSelection>>();
+
+                foreach (var combination in results)
+                {
+                    foreach (var value in attribute.ProductVariantAttributeValues)
+                    {
+                        var newCombination = new List<ProductVariantAttributeSelection>(combination)
+                        {
+                            new ProductVariantAttributeSelection
+                            {
+                                ProductVariantAttributeId = attribute.Id,
+                                ProductVariantAttributeValueId = value.Id
+                            }
+                        };
+
+                        temp.Add(newCombination);
+                    }
+                }
+
+                results = temp;
+            }
+
+            return results;
         }
 
 

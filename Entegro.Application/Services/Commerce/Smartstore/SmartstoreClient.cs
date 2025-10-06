@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductBrand;
@@ -359,7 +360,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
                 List<KeyValuePair<int, ICollection<object>>> attributes = new List<KeyValuePair<int, ICollection<object>>>();
 
-                var rawAttributes = JsonSerializer.Deserialize<List<ProductVariantAttributeModel>>(combination.RawAttribute);
+                var rawAttributes = JsonSerializer.Deserialize<List<ProductVariantAttributeSelection>>(combination.RawAttribute);
 
                 foreach (var rawAttibute in rawAttributes)
                 {
@@ -1096,11 +1097,5 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 _combinedHash64 = (_combinedHash64 << 5) + _combinedHash64 ^ hash;
             }
         }
-    }
-
-    public class ProductVariantAttributeModel
-    {
-        public int ProductVariantAttributeId { get; set; }
-        public int ProductVariantAttributeValueId { get; set; }
     }
 }
