@@ -12,5 +12,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task DeleteAsync(int id);
         Task<List<ProductSpecificationAttributeDto>> GetSpecificationAttributeByProductId(int productId);
         Task<PagedResult<ProductSpecificationAttributeDto>> GetPagedAsync(GridCommand gridCommand, int productId);
+        Task<bool> ExistsByIdAsync(int specificationAttributeOptionId, int productId);
     }
 }

@@ -33,6 +33,11 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsByIdAsync(int specificationAttributeOptionId, int productId)
+        {
+            return await _context.ProductSpecificationAttributes.AnyAsync(o => o.SpecificationAttributeOptionId == specificationAttributeOptionId && o.ProductId == productId);
+        }
+
         public async Task<List<ProductSpecificationAttribute>> GetAllAsync()
         {
             return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().ToListAsync();
@@ -42,6 +47,8 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
+
+
 
         public async Task<Application.DTOs.Common.PagedResult<ProductSpecificationAttribute>> GetPagedAsync(GridCommand gridCommand, int productId)
         {

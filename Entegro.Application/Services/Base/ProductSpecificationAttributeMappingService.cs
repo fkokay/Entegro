@@ -37,6 +37,16 @@ namespace Entegro.Application.Services.Base
             await _productSpecificationAttributeMappingRepository.DeleteAsync(productSpecificationAttribute);
         }
 
+        public async Task<bool> ExistsByIdAsync(int specificationAttributeOptionId, int productId)
+        {
+            if (specificationAttributeOptionId <= 0 && productId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(specificationAttributeOptionId), nameof(productId));
+            }
+
+            return await _productSpecificationAttributeMappingRepository.ExistsByIdAsync(specificationAttributeOptionId, productId);
+        }
+
         public async Task<List<ProductSpecificationAttributeDto>> GetAllAsync()
         {
             var productSpecificationAttributes = await _productSpecificationAttributeMappingRepository.GetAllAsync();

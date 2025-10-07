@@ -9,6 +9,7 @@ using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
@@ -20,6 +21,7 @@ using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.CrossSellProducts;
 using Entegro.Web.Models.Catalog.Products;
+using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
 using Entegro.Web.Models.Catalog.RelatedProducts;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
@@ -322,7 +324,7 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
-        #region Product SpecificationAttribute
+        #region ProductSpecificationAttribute
 
         [HttpPost]
         public async Task<IActionResult> ProductSpecificationAttributeMappingList([FromBody] GridCommand gridCommand, int productId)
@@ -336,6 +338,39 @@ namespace Entegro.Web.Controllers
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProductSpecificationAttributeMapping([FromBody] ProductSpecificationAttributeModel model)
+        {
+            try
+            {
+                var isExist = await _productSpecificationAttributeMappingService.ExistsByIdAsync(model.SpecificationAttributeOptionId, model.ProductId);
+                if (isExist)
+                {
+                    return Json(new { success = false, message = "Eşleştirme Zaten Mevcut" });
+                }
+                var mapped = _mapper.Map<CreateProductSpecificationAttributeDto>(model);
+                await _productSpecificationAttributeMappingService.AddAsync(mapped);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteProductSpecificationAttributeMapping(int id)
+        {
+            try
+            {
+                await _productSpecificationAttributeMappingService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
         #endregion
 
@@ -2094,7 +2129,7 @@ namespace Entegro.Web.Controllers
                 var isExist = await _crossSellProductService.ExistsByIdAsync(model.ProductId1, model.ProductId2);
                 if (isExist)
                 {
-                    return Json(new { success = false, message = "Zaten Eşleştirilme Mevcut" });
+                    return Json(new { success = false, message = "Eşleştirme Zaten Mevcut" });
                 }
                 var mapped = _mapper.Map<CreateCrossSellProductDto>(model);
                 await _crossSellProductService.AddAsync(mapped);
@@ -2158,7 +2193,7 @@ namespace Entegro.Web.Controllers
                 var isExist = await _relatedProductService.ExistsByIdAsync(model.ProductId1, model.ProductId2);
                 if (isExist)
                 {
-                    return Json(new { success = false, message = "Zaten Eşleştirilme Mevcut" });
+                    return Json(new { success = false, message = "Eşleştirme Zaten Mevcut" });
                 }
                 var mapped = _mapper.Map<CreateRelatedProductDto>(model);
                 await _relatedProductService.AddAsync(mapped);
