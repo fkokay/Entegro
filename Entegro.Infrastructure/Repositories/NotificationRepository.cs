@@ -24,7 +24,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task DeleteAllAsync(List<Notification> notification)
         {
-            _context.RemoveRange(notification);
+            _context.Notifications.RemoveRange(notification);
             await _context.SaveChangesAsync();
         }
 

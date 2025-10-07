@@ -20,7 +20,6 @@ Entegro.specificationattributeoption = (function ($) {
         });
     }
 
-
     function initSpecificationTable(attributeId) {
         if (!attributeId) return;
 

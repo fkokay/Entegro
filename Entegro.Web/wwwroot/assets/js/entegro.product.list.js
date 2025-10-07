@@ -718,6 +718,9 @@ Entegro.product.list = (function ($) {
         });
     }
 
+   
+
+
 
     return {
         getIntegrationLogo: getIntegrationLogo,
@@ -728,6 +731,6 @@ Entegro.product.list = (function ($) {
         editIntegration: editIntegration,
         initList: initList,
         deleteProduct: deleteProduct,
-        deleteIntegration: deleteIntegration 
+        deleteIntegration: deleteIntegration
     };
 })(jQuery);

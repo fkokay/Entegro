@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.CrossSellProduct;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
@@ -11,13 +12,15 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
+using Entegro.Application.DTOs.RelatedProduct;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
+using Entegro.Web.Models.Catalog.CrossSellProducts;
 using Entegro.Web.Models.Catalog.Products;
-using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
+using Entegro.Web.Models.Catalog.RelatedProducts;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Common;
@@ -52,6 +55,8 @@ namespace Entegro.Web.Controllers
         private readonly IPazaramaService _pazaramaService;
         private readonly IHepsiburadaService _hepsiburadaService;
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
+        private readonly ICrossSellProductService _crossSellProductService;
+        private readonly IRelatedProductService _relatedProductService;
         private readonly IMapper _mapper;
         public ProductController(
             IProductService productService,
@@ -71,7 +76,9 @@ namespace Entegro.Web.Controllers
             IPazaramaService pazaramaService,
             IHepsiburadaService hepsiburadaService,
             IMapper mapper,
-            IProductVariantAttributeValueService productVariantAttributeValueService)
+            IProductVariantAttributeValueService productVariantAttributeValueService,
+            ICrossSellProductService crossSellProductService,
+            IRelatedProductService relatedProductService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -91,6 +98,8 @@ namespace Entegro.Web.Controllers
             _hepsiburadaService = hepsiburadaService;
             _mapper = mapper;
             _productVariantAttributeValueService = productVariantAttributeValueService;
+            _crossSellProductService = crossSellProductService;
+            _relatedProductService = relatedProductService;
         }
 
         #region Product list / create / edit / delete
@@ -261,17 +270,6 @@ namespace Entegro.Web.Controllers
 
         #region Product Categories
 
-        [HttpGet]
-        public async Task<IActionResult> LoadTabCategories(int productId)
-        {
-            ViewBag.ProductId = productId;
-            var productCategories = await _productCategoryMappingService.GetByProductWithCategoryAsync(productId);
-            var model = _mapper.Map<List<ProductCategoryModel>>(productCategories);
-
-            return PartialView("_CreateOrUpdate.Categories", model);
-        }
-
-
         [HttpPost]
         public async Task<IActionResult> ProductCategoryList([FromBody] GridCommand gridCommand, int productId)
         {
@@ -326,15 +324,18 @@ namespace Entegro.Web.Controllers
 
         #region Product SpecificationAttribute
 
-        [HttpGet]
-        public async Task<IActionResult> LoadTabSpecificationAttribute(int productId)
+        [HttpPost]
+        public async Task<IActionResult> ProductSpecificationAttributeMappingList([FromBody] GridCommand gridCommand, int productId)
         {
-            ViewBag.ProductId = productId;
-            var productSpecificationAttributes = await _productSpecificationAttributeMappingService.GetSpecificationAttributeByProductId(productId);
-            var model = _mapper.Map<List<ProductSpecificationAttributeModel>>(productSpecificationAttributes);
+            var result = await _productSpecificationAttributeMappingService.GetPagedAsync(gridCommand, productId);
 
-
-            return PartialView("_CreateOrUpdate.SpecificationAttributes", model);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
         }
         #endregion
 
@@ -2068,6 +2069,135 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
+
+
+        #region CrossSellProduct
+
+        [HttpPost]
+        public async Task<IActionResult> CrossSellProductList([FromBody] GridCommand gridCommand, int productId)
+        {
+            var result = await _crossSellProductService.GetPagedAsync(gridCommand, productId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateCrossSaleProduct([FromBody] CrossSellProductModel model)
+        {
+
+            try
+            {
+                var isExist = await _crossSellProductService.ExistsByIdAsync(model.ProductId1, model.ProductId2);
+                if (isExist)
+                {
+                    return Json(new { success = false, message = "Zaten Eşleştirilme Mevcut" });
+                }
+                var mapped = _mapper.Map<CreateCrossSellProductDto>(model);
+                await _crossSellProductService.AddAsync(mapped);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteCrossSell(int id)
+        {
+            try
+            {
+                await _crossSellProductService.DeleteAsync(id);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteMultipleCrossSell([FromBody] List<int> ids)
+        {
+            try
+            {
+                await _crossSellProductService.DeleteAllAsync(ids);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        #endregion
+
+        #region RelatedProduct
+
+        [HttpPost]
+        public async Task<IActionResult> RelatedProductList([FromBody] GridCommand gridCommand, int productId)
+        {
+            var result = await _relatedProductService.GetPagedAsync(gridCommand, productId);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateRelatedProduct([FromBody] RelatedProductModel model)
+        {
+
+            try
+            {
+                var isExist = await _relatedProductService.ExistsByIdAsync(model.ProductId1, model.ProductId2);
+                if (isExist)
+                {
+                    return Json(new { success = false, message = "Zaten Eşleştirilme Mevcut" });
+                }
+                var mapped = _mapper.Map<CreateRelatedProductDto>(model);
+                await _relatedProductService.AddAsync(mapped);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteRelated(int relatedProductId)
+        {
+            try
+            {
+                await _relatedProductService.DeleteAsync(relatedProductId);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteMultipleRelated([FromBody] List<int> ids)
+        {
+            try
+            {
+                await _relatedProductService.DeleteAllAsync(ids);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        #endregion
         private async Task PrepareProductModel(ProductModel model, ProductDto? product)
         {
             if (product != null)

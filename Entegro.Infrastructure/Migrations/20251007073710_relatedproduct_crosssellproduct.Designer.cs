@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20251007073710_relatedproduct_crosssellproduct")]
+    partial class relatedproduct_crosssellproduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,11 +148,6 @@ namespace Entegro.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId2");
-
-                    b.HasIndex("ProductId1", "ProductId2")
-                        .IsUnique();
 
                     b.ToTable("CrossSellProduct");
                 });
@@ -587,11 +585,6 @@ namespace Entegro.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId2");
-
-                    b.HasIndex("ProductId1", "ProductId2")
-                        .IsUnique();
 
                     b.ToTable("RelatedProduct");
                 });
@@ -1919,25 +1912,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Entegro.Domain.Entities.Catalog.CrossSellProduct", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.Catalog.Product", "Product1")
-                        .WithMany("CrossSellProducts")
-                        .HasForeignKey("ProductId1")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Catalog.Product", "Product2")
-                        .WithMany("CrossSellAsSuggestedProduct")
-                        .HasForeignKey("ProductId2")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Product1");
-
-                    b.Navigation("Product2");
-                });
-
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.Product", b =>
                 {
                     b.HasOne("Entegro.Domain.Entities.Catalog.Brand", "Brand")
@@ -2091,25 +2065,6 @@ namespace Entegro.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ProductVariantAttribute");
-                });
-
-            modelBuilder.Entity("Entegro.Domain.Entities.Catalog.RelatedProduct", b =>
-                {
-                    b.HasOne("Entegro.Domain.Entities.Catalog.Product", "Product1")
-                        .WithMany("RelatedProducts")
-                        .HasForeignKey("ProductId1")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Entegro.Domain.Entities.Catalog.Product", "Product2")
-                        .WithMany("RelatedAsSuggestedProduct")
-                        .HasForeignKey("ProductId2")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Product1");
-
-                    b.Navigation("Product2");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.SpecificationAttributeOption", b =>
@@ -2386,10 +2341,6 @@ namespace Entegro.Infrastructure.Migrations
 
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.Product", b =>
                 {
-                    b.Navigation("CrossSellAsSuggestedProduct");
-
-                    b.Navigation("CrossSellProducts");
-
                     b.Navigation("ProductCategories");
 
                     b.Navigation("ProductIntegrations");
@@ -2399,10 +2350,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Navigation("ProductVariantAttributeCombinations");
 
                     b.Navigation("ProductVariantAttributes");
-
-                    b.Navigation("RelatedAsSuggestedProduct");
-
-                    b.Navigation("RelatedProducts");
                 });
 
             modelBuilder.Entity("Entegro.Domain.Entities.Catalog.ProductAttribute", b =>

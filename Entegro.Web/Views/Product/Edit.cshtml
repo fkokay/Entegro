@@ -58,8 +58,6 @@
         </div>
     </div>
 </div>
-
-
 <div class="modal fade" id="createOrUpdateProductVariantAttributeModal" tabindex="-1" aria-labelledby="createOrUpdateProductVariantAttributeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -77,6 +75,102 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="CrossSaleProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <form asp-action="/Product/CreateCrossSaleProduct" method="post" id="CrossSaleProductForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="CrossSaleProductModalLabel">Çapraz Satış Ürün Eşleştirme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-5">
+                        <input type="hidden" id="ProductId1" name="ProductId1"  value="@Model.Id"/>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductId2">Ürün</label>
+                            <select id="ProductId2" name="ProductId2" class="select2 form-select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                    <button type="submit" class="btn btn-warning">Eşleştir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="RelatedProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <form asp-action="/Product/CreateRelatedProduct" method="post" id="RelatedProductForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="RelatedProductModalLabel">İlişkili Ürün Eşleştirme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-5">
+                        <input type="hidden" id="ProductId1" name="ProductId1"  value="@Model.Id"/>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductId2">Ürün</label>
+                            <select id="ProductId2Related" name="ProductId2" class="select2 form-select"></select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" name="DisplayOrder">Sıra</label>
+                            <input type="number" min="0" class="form-control" id="DisplayOrderRelated" name="DisplayOrder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                    <button type="submit" class="btn btn-warning">Eşleştir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ProductSpecificationAttributeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <form asp-action="/Product/CreateProductSpecificationAttribute" method="post" id="ProductSpecificationAttributeForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ProductSpecificationAttributeModalLabel">Özellik Değeri -Ürün Eşleştirme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-5">
+                        <input type="hidden" id="ProductId" name="ProductId"  value="@Model.Id"/>
+
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="SpecificationAttributeId">Özellik</label>
+                            <select id="SpecificationAttributeId" name="SpecificationAttributeId" class="select2 form-select"></select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="SpecificationAttributeOptionId">Özellik Değeri</label>
+                            <select id="SpecificationAttributeOptionId" name="SpecificationAttributeOptionId" class="select2 form-select"></select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" name="DisplayOrder">Sıra</label>
+                            <input type="number" min="0" class="form-control" id="DisplayOrderRelated" name="DisplayOrder" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                    <button type="submit" class="btn btn-warning">Eşleştir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
 @section Scripts {

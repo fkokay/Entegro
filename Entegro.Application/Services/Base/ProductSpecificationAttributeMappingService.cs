@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.ProductSpecificationAttribute;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Entities.Catalog;
@@ -53,6 +54,25 @@ namespace Entegro.Application.Services.Base
 
             var productSpecificationAttributeDto = _mapper.Map<ProductSpecificationAttributeDto>(productSpecificationAttribute);
             return productSpecificationAttributeDto;
+        }
+
+        public async Task<PagedResult<ProductSpecificationAttributeDto>> GetPagedAsync(GridCommand gridCommand, int productId)
+        {
+            var productSpecificationAttribute = await _productSpecificationAttributeMappingRepository.GetPagedAsync(gridCommand, productId);
+
+            var items = await productSpecificationAttribute.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ProductSpecificationAttributeDto>(x);
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<ProductSpecificationAttributeDto>
+            {
+                Items = items,
+                TotalCount = productSpecificationAttribute.TotalCount,
+                PageNumber = productSpecificationAttribute.PageNumber,
+                PageSize = productSpecificationAttribute.PageSize
+            };
         }
 
         public async Task<List<ProductSpecificationAttributeDto>> GetSpecificationAttributeByProductId(int productId)

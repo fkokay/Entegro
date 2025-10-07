@@ -65,6 +65,13 @@ namespace Entegro.Application.Services.Base
             return specificationAttributeDtos;
         }
 
+        public async Task<PagedResult<SpecificationAttributeDto>> GetAllAsync(int page, string term)
+        {
+            var attributes = await _specificationAttributeRepository.GetAllAsync(page, term);
+            var attributeDtos = _mapper.Map<PagedResult<SpecificationAttributeDto>>(attributes);
+            return attributeDtos;
+        }
+
         public async Task<SpecificationAttributeDto?> GetByIdAsync(int id)
         {
             if (id <= 0)

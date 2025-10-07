@@ -79,15 +79,28 @@ Entegro.product = (function ($) {
                         Entegro.product.initProductCategoryTable(id);
                     }
                 }
+                if (event.target.dataset.bsTarget == "#form-tabs-crosssaleproduct") {
 
-
-                if (event.target.dataset.bsTarget == "#form-tabs-attributes") {
-                    if (event.target.dataset.url.length > 0) {
-                        $("#form-tabs-attributes").load(event.target.dataset.url, function () {
-
-                        });
+                    var id = event.target.dataset.productId;
+                    if (id && id > 0) {
+                        Entegro.product.initCrossSellList(id);
                     }
                 }
+                if (event.target.dataset.bsTarget == "#form-tabs-relatedProduct") {
+
+                    var id = event.target.dataset.productId;
+                    if (id && id > 0) {
+                        Entegro.product.initRelatedProductList(id);
+                    }
+                }
+                if (event.target.dataset.bsTarget == "#form-tabs-attributes") {
+
+                    var id = event.target.dataset.productId;
+                    if (id && id > 0) {
+                        Entegro.product.initProductSpecificationAttributeTable(id);
+                    }
+                }
+
 
                 if (event.target.dataset.bsTarget == "#form-tabs-variants") {
                     var id = event.target.dataset.productId;
@@ -1185,6 +1198,877 @@ Entegro.product = (function ($) {
         });
     }
 
+    function initCrossSellList(productId) {
+
+
+        if (!productId) return;
+
+        const tableId = '#CrossSaleProductTable';
+        const url = '/Product/CrossSellProductList?productId=' + productId;
+
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().ajax.url(url).load();
+            return;
+        }
+
+
+        const table = $('#CrossSaleProductTable').DataTable({
+            language: {
+                paginate: {
+                    next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                },
+                url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
+            },
+            serverSide: true,
+            processing: true,
+            ajax: {
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            order: [[0, 'asc']], // DisplayOrder sırasına göre
+            columns: [
+                { data: 'Id', orderable: false },
+                {
+                    data: 'Product2.name',
+                    render: function (data, type, row) {
+                        return row.Product2?.Name ?? '-';
+                    }
+                },
+                {
+                    data: 'Product2.Code',
+                    render: function (data, type, row) {
+                        return row.Product2?.Code ?? '-';
+                    }
+                },
+                {
+                    data: 'Product2.Published',
+                    render: data => {
+                        const checked = data ? "checked" : "";
+                        const titleText = data ? "Yayında" : "Yayında Değil";
+                        return `
+                     <div class="form-check d-inline-flex justify-content-center">
+                       <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
+                     </div>`;
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return `
+                     <div class="btn-group" role="group">
+                         <button class="btn btn-sm btn-outline-danger delete-crosssell" data-id="${row.Id}" title="Sil">
+                             <i class="ti ti-trash"></i>
+                         </button>
+                     </div>
+                 `;
+                    }
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    checkboxes: { selectRow: true },
+                    className: "text-center",
+                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                }
+            ],
+            select: {
+                style: "multi",
+                selector: "td:first-child"
+            },
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: { menu: [10, 25, 50, 100], text: "_MENU_" },
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                 <i class="icon-base ti ti-upload icon-xs"></i>
+                                 <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                               </span>`,
+                                buttons: [
+                                    { extend: "print", className: "dropdown-item", text: `<i class="icon-base ti tabler-printer me-1"></i> Print`, exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "csv", className: "dropdown-item", text: `<i class="icon-base ti tabler-file me-1"></i> CSV`, exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "excel", className: "dropdown-item", text: `<i class="icon-base ti tabler-upload me-1"></i> Excel`, exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "pdf", className: "dropdown-item", text: `<i class="icon-base ti tabler-file-text me-1"></i> PDF`, exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "copy", className: "dropdown-item", text: `<i class="icon-base ti tabler-copy me-1"></i> Kopyala`, exportOptions: { columns: [1, 2, 3] } },
+
+                                ]
+                            },
+                            {
+                                text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                                         <span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
+                                className: "add-new btn btn-primary",
+                                action: function () {
+
+                                    $('#CrossSaleProductModal').modal('show');
+
+                                    $('#ProductId2').select2({
+                                        language: "tr",
+                                        placeholder: 'Ürün seçiniz',
+                                        allowClear: true,
+                                        dropdownParent: $('#CrossSaleProductModal'), // doğru modal ID
+                                        width: '100%',
+                                        ajax: {
+                                            url: "/Product/AllProduct",
+                                            type: 'POST',
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: function (params) {
+                                                return {
+                                                    term: params.term || '',
+                                                    page: params.page || 1
+                                                };
+                                            },
+                                            processResults: function (data, params) {
+                                                params.page = params.page || 1;
+                                                return {
+                                                    results: data.results,
+                                                    pagination: {
+                                                        more: data.pagination?.more === true
+                                                    }
+                                                };
+                                            },
+                                            cache: true
+                                        },
+                                        templateResult: function (state) {
+                                            if (!state.id) {
+                                                return state.text;
+                                            }
+                                            var $state = $('<span>' + state.text + '</span><br><span>' + state.code + '</span>');
+                                            return $state;
+                                        }
+                                    });
+                                }
+                            },
+                            {
+                                text: `<span class="d-flex align-items-center gap-1">
+                                    <i class="icon-base ti ti-trash icon-xs"></i>
+                                    <span class="d-none d-sm-inline-block">Seçilenleri Sil</span>
+                                </span>`,
+                                className: 'btn btn-outline-danger',
+                                attr: { id: 'deleteSelectedCrossSell', disabled: true },
+                                action: function () {
+                                    const selectedData = table.rows({ selected: true }).data().toArray();
+                                    const ids = selectedData.map(row => row.Id);
+                                    if (ids.length === 0) return;
+
+                                    Swal.fire({
+                                        title: 'Emin misiniz?',
+                                        text: `${ids.length} çapraz satış silinecek!`,
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Evet, sil!',
+                                        cancelButtonText: 'İptal',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger me-3',
+                                            cancelButton: 'btn btn-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            $.ajax({
+                                                url: '/Product/DeleteMultipleCrossSell',
+                                                type: 'POST',
+                                                contentType: 'application/json',
+                                                data: JSON.stringify(ids),
+                                                success: function (response) {
+                                                    if (response.success) {
+                                                        Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Silindi!',
+                                                            text: 'Seçilen çapraz satışlar silindi.',
+                                                            confirmButtonText: 'Tamam',
+                                                            customClass: { confirmButton: 'btn btn-success' },
+                                                            buttonsStyling: false
+                                                        }).then(() => {
+                                                            table.ajax.reload(null, false);
+                                                        });
+                                                    } else {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Hata!',
+                                                            text: response.message || 'Silme işlemi başarısız oldu.',
+                                                            confirmButtonText: 'Tamam',
+                                                            customClass: { confirmButton: 'btn btn-danger' },
+                                                            buttonsStyling: false
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        ]
+                    }]
+                },
+                bottomStart: {
+                    rowClass: "row mx-3 justify-content-between",
+                    features: ["info"]
+                },
+                bottomEnd: "paging"
+            },
+            initComplete: function () {
+                $('#CrossSaleProductTable thead th:first-child')
+                    .html('<input type="checkbox" id="selectAllCrossSell" class="form-check-input" />');
+
+                $('#selectAllCrossSell').on('change', function () {
+                    if ($(this).is(':checked')) {
+                        table.rows().select();
+                    } else {
+                        table.rows().deselect();
+                    }
+                });
+            }
+        });
+
+        table.on('select deselect', function () {
+            const totalRows = table.rows().count();
+            const selectedData = table.rows({ selected: true }).data().toArray();
+            const selectedRows = selectedData.length;
+
+            $('#selectAllCrossSell').prop('checked', selectedRows === totalRows && totalRows > 0);
+            $('#CrossSaleProductTable tbody tr').each(function () {
+                const isSelected = table.row(this).selected();
+                $(this).find('input.dt-checkboxes').prop('checked', isSelected);
+            });
+
+            $('#deleteSelectedCrossSell').prop('disabled', selectedRows === 0);
+        });
+
+        table.on('draw', function () {
+            $('#selectAllCrossSell').prop('checked', false);
+            $('#deleteSelectedCrossSell').prop('disabled', true);
+            $('#CrossSaleProductTable tbody input.dt-checkboxes').prop('checked', false);
+        });
+
+        // Tekli silme
+        $(document).on('click', '.delete-crosssell', function () {
+            const id = $(this).data('id');
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu çapraz satış bağlantısı silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Product/DeleteCrossSell',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Silindi!',
+                                    text: 'Çapraz satış silindi.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: { confirmButton: 'btn btn-success' },
+                                    buttonsStyling: false
+                                }).then(() => {
+                                    table.ajax.reload(null, false);
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    confirmButtonText: 'Tamam',
+                                    customClass: { confirmButton: 'btn btn-danger' },
+                                    buttonsStyling: false
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+
+        // Form Submit işlemi - AJAX POST
+        $(document).on('submit', '#CrossSaleProductForm', function (e) {
+            e.preventDefault();
+
+            const productId1 = $('#ProductId1').val();
+            const productId2 = $('#ProductId2').val();
+
+            if (!productId2) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı!',
+                    text: 'Lütfen eşlenecek ürünü seçiniz.',
+                    confirmButtonText: 'Tamam',
+                    customClass: { confirmButton: 'btn btn-warning' },
+                    buttonsStyling: false
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/Product/CreateCrossSaleProduct',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    ProductId1: parseInt(productId1),
+                    ProductId2: parseInt(productId2)
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        $('#CrossSaleProductModal').modal('hide');
+
+                        // DataTable yenile
+                        $('#CrossSaleProductTable').DataTable().ajax.reload(null, false);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı!',
+                            text: 'Ürün eşleştirildi.',
+                            confirmButtonText: 'Tamam',
+                            customClass: { confirmButton: 'btn btn-success' },
+                            buttonsStyling: false
+                        });
+
+                        // Formu sıfırla
+                        $('#CrossSaleProductForm')[0].reset();
+                        $('#ProductId2').val(null).trigger('change');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Hata!',
+                            text: response.message || 'Eşleştirme işlemi başarısız oldu.',
+                            confirmButtonText: 'Tamam',
+                            customClass: { confirmButton: 'btn btn-danger' },
+                            buttonsStyling: false
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sunucu Hatası!',
+                        text: 'İstek gönderilirken bir hata oluştu.',
+                        confirmButtonText: 'Tamam',
+                        customClass: { confirmButton: 'btn btn-danger' },
+                        buttonsStyling: false
+                    });
+                }
+            });
+        });
+
+
+
+    }
+    function initRelatedProductList(productId) {
+        if (!productId) return;
+
+        const tableId = '#RelatedProductTable';
+        const url = '/Product/RelatedProductList?productId=' + productId;
+
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().ajax.url(url).load();
+            return;
+        }
+
+        const table = $(tableId).DataTable({
+            language: {
+                paginate: {
+                    next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                },
+                url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
+            },
+            serverSide: true,
+            processing: true,
+            ajax: {
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            order: [[3, 'asc']],
+            columns: [
+                { data: 'Id', orderable: false },
+                {
+                    data: 'Product2.Name',
+                    render: (data, type, row) => row.Product2?.Name ?? '-'
+                },
+                {
+                    data: 'Product2.Code',
+                    render: (data, type, row) => row.Product2?.Code ?? '-'
+                },
+                {
+                    data: 'DisplayOrder'
+                },
+                {
+                    data: 'Product2.Published',
+                    render: data => {
+                        const checked = data ? "checked" : "";
+                        const titleText = data ? "Yayında" : "Yayında Değil";
+                        return `
+                        <div class="form-check d-inline-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
+                        </div>`;
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    className: 'text-center',
+                    render: row => `
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-danger delete-related" data-related-id="${row.Id}" title="Sil">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                `
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    checkboxes: { selectRow: true },
+                    className: "text-center",
+                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                }
+            ],
+            select: { style: "multi", selector: "td:first-child" },
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: { menu: [10, 25, 50, 100], text: "_MENU_" },
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                <i class="icon-base ti ti-upload icon-xs"></i>
+                                <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                            </span>`,
+                                buttons: [
+                                    { extend: "print", className: "dropdown-item", text: "Print", exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "csv", className: "dropdown-item", text: "CSV", exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "excel", className: "dropdown-item", text: "Excel", exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "pdf", className: "dropdown-item", text: "PDF", exportOptions: { columns: [1, 2, 3] } },
+                                    { extend: "copy", className: "dropdown-item", text: "Kopyala", exportOptions: { columns: [1, 2, 3] } }
+                                ]
+                            },
+                            {
+                                text: `<i class="ti ti-plus icon-16px me-1"></i><span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
+                                className: "add-new btn btn-primary",
+                                action: function () {
+                                    $('#RelatedProductModal').modal('show');
+                                    $('#ProductId2Related').select2({
+                                        language: "tr",
+                                        placeholder: 'Ürün seçiniz',
+                                        allowClear: true,
+                                        dropdownParent: $('#RelatedProductModal'),
+                                        width: '100%',
+                                        ajax: {
+                                            url: "/Product/AllProduct",
+                                            type: 'POST',
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: params => ({
+                                                term: params.term || '',
+                                                page: params.page || 1
+                                            }),
+                                            processResults: (data, params) => {
+                                                params.page = params.page || 1;
+                                                return {
+                                                    results: data.results,
+                                                    pagination: { more: data.pagination?.more === true }
+                                                };
+                                            },
+                                            cache: true
+                                        },
+                                        templateResult: state => {
+                                            if (!state.id) return state.text;
+                                            return $('<span>' + state.text + '</span><br><span>' + state.code + '</span>');
+                                        }
+                                    });
+                                }
+                            },
+                            {
+                                text: `<span class="d-flex align-items-center gap-1">
+                                    <i class="icon-base ti ti-trash icon-xs"></i>
+                                    <span class="d-none d-sm-inline-block">Seçilenleri Sil</span>
+                                </span>`,
+                                className: 'btn btn-outline-danger',
+                                attr: { id: 'deleteSelectedRelated', disabled: true },
+                                action: function () {
+                                    const selectedData = table.rows({ selected: true }).data().toArray();
+                                    const ids = selectedData.map(row => row.Id);
+
+                                    if (ids.length === 0) return;
+
+                                    Swal.fire({
+                                        title: 'Emin misiniz?',
+                                        text: `${ids.length} ilişki silinecek!`,
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Evet, sil!',
+                                        cancelButtonText: 'İptal',
+                                        customClass: { confirmButton: 'btn btn-danger me-3', cancelButton: 'btn btn-secondary' },
+                                        buttonsStyling: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            $.ajax({
+                                                url: '/Product/DeleteMultipleRelated',
+                                                type: 'POST',
+                                                contentType: 'application/json',
+                                                data: JSON.stringify(ids),
+                                                success: function (response) {
+                                                    if (response.success) {
+                                                        Swal.fire({ icon: 'success', title: 'Silindi!', text: 'İlişkili ürün(ler) silindi.' })
+                                                            .then(() => table.ajax.reload(null, false));
+                                                    } else {
+                                                        Swal.fire({ icon: 'error', title: 'Hata!', text: response.message || 'Silme işlemi başarısız oldu.' });
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        ]
+                    }]
+                },
+                bottomStart: { rowClass: "row mx-3 justify-content-between", features: ["info"] },
+                bottomEnd: "paging"
+            },
+            initComplete: function () {
+                $('#RelatedProductTable thead th:first-child').html('<input type="checkbox" id="selectAllRelated" class="form-check-input" />');
+                $('#selectAllRelated').on('change', function () {
+                    $(this).is(':checked') ? table.rows().select() : table.rows().deselect();
+                });
+            }
+        });
+
+        table.on('select deselect', function () {
+            const totalRows = table.rows().count();
+            const selectedRows = table.rows({ selected: true }).count();
+            $('#selectAllRelated').prop('checked', selectedRows === totalRows && totalRows > 0);
+            $('#RelatedProductTable tbody tr').each(function () {
+                const isSelected = table.row(this).selected();
+                $(this).find('input.dt-checkboxes').prop('checked', isSelected);
+            });
+            $('#deleteSelectedRelated').prop('disabled', selectedRows === 0);
+        });
+
+        table.on('draw', function () {
+            $('#selectAllRelated').prop('checked', false);
+            $('#deleteSelectedRelated').prop('disabled', true);
+            $('#RelatedProductTable tbody input.dt-checkboxes').prop('checked', false);
+        });
+
+       
+        $('#RelatedProductTable').on('click', '.delete-related', function () {
+            const relatedProductId = $(this).attr('data-related-id'); // attr ile al
+            console.log("Silinecek tekli ID:", relatedProductId);
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: 'Bu ilişki silinecek!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal',
+                customClass: { confirmButton: 'btn btn-danger me-3', cancelButton: 'btn btn-secondary' },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Product/DeleteRelated',
+                        type: 'POST',
+                        data: { relatedProductId: relatedProductId },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({ icon: 'success', title: 'Silindi!', text: 'İlişki başarıyla silindi.' })
+                                    .then(() => table.ajax.reload(null, false));
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Hata!', text: response.message || 'Silme işlemi başarısız oldu.' });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({ icon: 'error', title: 'Sunucu Hatası!', text: 'İstek gönderilirken bir hata oluştu.' });
+                        }
+                    });
+                }
+            });
+        });
+
+      
+        $('#RelatedProductForm').on('submit', function (e) {
+            e.preventDefault();
+            const productId1 = $('#ProductId1').val();
+            const relatedProductId2 = $('#ProductId2Related').val();
+            const displayOrder = $('#DisplayOrderRelated').val();
+
+            if (!relatedProductId2) {
+                Swal.fire({ icon: 'warning', title: 'Uyarı!', text: 'Lütfen eşlenecek ürünü seçiniz.' });
+                return;
+            }
+
+            $.ajax({
+                url: '/Product/CreateRelatedProduct',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    ProductId1: parseInt(productId1),
+                    ProductId2: parseInt(relatedProductId2),
+                    DisplayOrder: parseInt(displayOrder) || 0
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        $('#RelatedProductModal').modal('hide');
+                        table.ajax.reload(null, false);
+                        Swal.fire({ icon: 'success', title: 'Başarılı!', text: 'Ürün eşleştirildi.' });
+                        $('#RelatedProductForm')[0].reset();
+                        $('#ProductId2Related').val(null).trigger('change');
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Hata!', text: response.message || 'Eşleştirme işlemi başarısız oldu.' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Sunucu Hatası!', text: 'İstek gönderilirken bir hata oluştu.' });
+                }
+            });
+        });
+    }
+    function initProductSpecificationAttributeTable(productId) {
+        if (!productId) return;
+
+        if ($.fn.DataTable.isDataTable('#ProductSpecificationAttributeMappingTable')) {
+            $('#ProductSpecificationAttributeMappingTable').DataTable()
+                .ajax.url('/Product/ProductSpecificationAttributeMappingList?productId=' + productId).load();
+            return;
+        }
+
+        const table = $('#ProductSpecificationAttributeMappingTable').DataTable({
+            language: {
+                paginate: {
+                    next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
+                    previous: '<i class="icon-base ti ti-chevron-left scaleX-n1-rtl icon-18px"></i>',
+                    first: '<i class="icon-base ti ti-chevrons-left scaleX-n1-rtl icon-18px"></i>',
+                    last: '<i class="icon-base ti ti-chevrons-right scaleX-n1-rtl icon-18px"></i>'
+                },
+                url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json'
+            },
+            serverSide: true,
+            processing: true,
+            order: [[2, 'asc']],
+            ajax: {
+                url: '/Product/ProductSpecificationAttributeMappingList?productId=' + productId,
+                type: 'POST',
+                contentType: 'application/json',
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            columns: [
+                { data: null, defaultContent: '', orderable: false },
+                { data: 'Id', visible: false },
+                {
+                    data: 'SpecificationAttributeOption.Name',
+                    title: 'Özellik Adı'
+                },
+                {
+                    data: 'Id',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                <div class="d-inline-block text-nowrap">
+                    <button type="button"
+                        class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-spec-attribute"
+                        data-id="${data}">
+                        <i class="icon-base ti ti-trash icon-22px text-danger"></i>
+                    </button>
+                </div>`;
+                    }
+                }
+            ],
+            displayLength: 10,
+            layout: {
+                topStart: {
+                    rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
+                    features: []
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
+                        pageLength: {
+                            menu: [10, 25, 50, 100],
+                            text: "_MENU_"
+                        },
+                        buttons: [
+                            {
+                                text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                                   <span class="d-none d-sm-inline-block">Yeni Özellik Ekle</span>`,
+                                className: "btn btn-primary btn-add-spec-attribute",
+                                action: function (e, dt, node, config) {
+                                    // Butona tıklanınca çalışacak
+                                    alert("basıldı -> " + productId);
+
+                                    // Formu temizle
+                                    $('#ProductSpecificationAttributeForm')[0].reset();
+                                    $('#SpecificationAttributeId').val(null).trigger('change');
+                                    $('#SpecificationAttributeOptionId').val(null).trigger('change').empty();
+                                    $('#ProductSpecificationAttributeForm #ProductId').val(productId);
+
+                                    // Modal aç
+                                    $('#ProductSpecificationAttributeModal').modal('show');
+
+                                    // Dropdownları başlat
+                                    initSpecificationAttributeDropdowns();
+                                }
+                            }
+                        ]
+                    }]
+                },
+                bottomStart: {
+                    rowClass: "row mx-3 mb-3 justify-content-between",
+                    features: ["info"]
+                },
+                bottomEnd: ""
+            }
+        });
+
+        // UI düzenlemeleri
+        setTimeout(() => {
+            const adjustments = [
+                { selector: ".dt-container", classToAdd: "border rounded" },
+                { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
+                { selector: ".dt-buttons.btn-group", classToAdd: "mb-md-0 mb-6" },
+                { selector: ".dt-search .form-control", classToRemove: "form-control-sm", classToAdd: "ms-0" },
+                { selector: ".dt-search", classToAdd: "mb-0 mb-md-6" },
+                { selector: ".dt-length .form-select", classToRemove: "form-select-sm" },
+                { selector: ".dt-layout-end", classToAdd: "gap-md-2 gap-0 mt-0" },
+                { selector: ".dt-layout-start", classToAdd: "mt-0" },
+                { selector: ".dt-layout-table", classToRemove: "row mt-2" },
+                { selector: ".dt-layout-full", classToRemove: "col-md col-12", classToAdd: "table-responsive" }
+            ];
+            adjustments.forEach(({ selector, classToRemove, classToAdd }) => {
+                document.querySelectorAll(selector).forEach(el => {
+                    if (classToRemove) classToRemove.split(" ").forEach(cls => el.classList.remove(cls));
+                    if (classToAdd) classToAdd.split(" ").forEach(cls => el.classList.add(cls));
+                });
+            });
+        }, 100);
+
+        return table;
+    }
+
+    function initSpecificationAttributeDropdowns() {
+        $('#SpecificationAttributeId').select2({
+            language: "tr",
+            placeholder: 'Özellik seçiniz',
+            allowClear: true,
+            dropdownParent: $('#ProductSpecificationAttributeModal'),
+            width: '100%',
+            ajax: {
+                url: "/SpecificationAttribute/AllSpecificationAttribute",
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination?.more === true
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // Özellik seçilince alt seçenekleri doldur
+        $('#SpecificationAttributeId').on('select2:select', function (e) {
+            const selected = e.params.data;
+            const options = selected.specificationAttributeOptions || [];
+
+            $('#SpecificationAttributeOptionId').empty();
+
+            options.forEach(opt => {
+                const newOption = new Option(opt.text, opt.id, false, false);
+                $('#SpecificationAttributeOptionId').append(newOption);
+            });
+
+            $('#SpecificationAttributeOptionId').val(null).trigger('change');
+        });
+
+
+        // Option select2 init
+        $('#SpecificationAttributeOptionId').select2({
+            language: "tr",
+            placeholder: 'Özellik değeri seçiniz',
+            allowClear: true,
+            dropdownParent: $('#ProductSpecificationAttributeModal'),
+            width: '100%'
+        });
+    }
+
+
+
     return {
         Init: Init,
         TabsInit: TabsInit,
@@ -1200,6 +2084,10 @@ Entegro.product = (function ($) {
         CreateCombination: CreateCombination,
         CreateAllCombinations: CreateAllCombinations,
         DeleteAllCombinations: DeleteAllCombinations,
-        initProductCategoryTable: initProductCategoryTable
+        initProductCategoryTable: initProductCategoryTable,
+        initCrossSellList: initCrossSellList,
+        initRelatedProductList: initRelatedProductList,
+        initProductSpecificationAttributeTable: initProductSpecificationAttributeTable,
+        initSpecificationAttributeDropdowns: initSpecificationAttributeDropdowns
     };
 })(jQuery);

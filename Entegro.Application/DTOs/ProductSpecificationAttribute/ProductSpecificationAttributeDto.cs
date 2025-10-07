@@ -7,9 +7,9 @@ namespace Entegro.Application.DTOs.ProductSpecificationAttribute
     {
         public int Id { get; set; }
         public int SpecificationAttributeOptionId { get; set; }
-        public virtual SpecificationAttributeOptionDto SpecificationAttributeOption { get; set; }
+        public SpecificationAttributeOptionDto SpecificationAttributeOption { get; set; }
         public int ProductId { get; set; }
-        public virtual ProductDto Product { get; set; }
+        public ProductDto Product { get; set; }
         public int DisplayOrder { get; set; }
     }
 }

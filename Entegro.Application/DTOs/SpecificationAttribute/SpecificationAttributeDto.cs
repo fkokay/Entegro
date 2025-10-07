@@ -6,7 +6,6 @@ namespace Entegro.Application.DTOs.SpecificationAttribute
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
-        public virtual List<SpecificationAttributeOptionDto> SpecificationAttributeOptions { get; set; } = new List<SpecificationAttributeOptionDto>();
+        public List<SpecificationAttributeOptionDto> SpecificationAttributeOptions { get; set; } = new List<SpecificationAttributeOptionDto>();
     }
 }

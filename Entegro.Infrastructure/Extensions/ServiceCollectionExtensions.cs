@@ -56,6 +56,8 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IEventPublisher, EventBus>();
             services.AddScoped<ITaskDescriptorService, TaskDescriptorService>();
             services.AddScoped<IReturnRequestService, ReturnRequestService>();
+            services.AddScoped<ICrossSellProductService, CrossSellProductService>();
+            services.AddScoped<IRelatedProductService, RelatedProductService>();
             services.AddHttpClient();
 
             return services;

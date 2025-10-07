@@ -1,11 +1,8 @@
-﻿using AngleSharp.Dom;
-using Entegro.Domain.Entities.Content;
+﻿using Entegro.Domain.Entities.Content;
 using Entegro.Domain.Entities.Integration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Emit;
 
 namespace Entegro.Domain.Entities.Catalog
 {
@@ -100,6 +97,11 @@ namespace Entegro.Domain.Entities.Catalog
         public virtual ICollection<ProductVariantAttribute> ProductVariantAttributes { get; set; } = new HashSet<ProductVariantAttribute>();
         public virtual ICollection<ProductVariantAttributeCombination> ProductVariantAttributeCombinations { get; set; } = new HashSet<ProductVariantAttributeCombination>();
         public virtual ICollection<ProductIntegration> ProductIntegrations { get; set; } = new HashSet<ProductIntegration>();
+        public virtual ICollection<CrossSellProduct> CrossSellProducts { get; set; } = new HashSet<CrossSellProduct>();
+        public virtual ICollection<CrossSellProduct> CrossSellAsSuggestedProduct { get; set; } = new HashSet<CrossSellProduct>();
+        public virtual ICollection<RelatedProduct> RelatedProducts { get; set; } = new HashSet<RelatedProduct>();
+        public virtual ICollection<RelatedProduct> RelatedAsSuggestedProduct { get; set; } = new HashSet<RelatedProduct>();
+
 
     }
 }

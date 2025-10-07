@@ -53,6 +53,31 @@ namespace Entegro.Infrastructure.Repositories
             };
         }
 
+        public async Task<Application.DTOs.Common.PagedResult<SpecificationAttribute>> GetAllAsync(int page, string term)
+        {
+            {
+                var query = _context.SpecificationAttributes
+                    .Include(x => x.SpecificationAttributeOptions).AsNoTracking();
+                if (!string.IsNullOrEmpty(term))
+                {
+                    query = query.Where(b =>
+                    b.Name.Contains(term)).AsQueryable();
+                }
+
+                var totalCount = await query.CountAsync();
+                var products = await query.Skip((page * 7) - 7)
+                    .Take(7).ToListAsync();
+
+                return new Application.DTOs.Common.PagedResult<SpecificationAttribute>
+                {
+                    Items = products,
+                    TotalCount = totalCount,
+                    PageNumber = page,
+                    PageSize = 7
+                };
+            }
+        }
+
         public async Task<SpecificationAttribute?> GetByIdAsync(int id)
         {
             return await _context.SpecificationAttributes

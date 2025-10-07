@@ -15,5 +15,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(SpecificationAttribute specificationAttribute);
         Task UpdateAsync(SpecificationAttribute specificationAttribute);
         Task DeleteAsync(SpecificationAttribute specificationAttribute);
+        Task<PagedResult<SpecificationAttribute>> GetAllAsync(int page, string term);
+
     }
 }

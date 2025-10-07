@@ -37,11 +37,23 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" type="button" role="tab"
-                            data-url="@(Model.Id > 0 ? Url.Action("LoadTabSpecificationAttribute", "Product", new { productId = Model.Id }) : "")">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-attributes" data-product-id="@Model?.Id" type="button" role="tab">
                         Ürün Özellikleri
                     </button>
                 </li>
+
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-crosssaleproduct" data-product-id="@Model?.Id" type="button" role="tab">
+                        Çapraz Satışlar
+                    </button>
+                </li>
+
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#form-tabs-relatedProduct" data-product-id="@Model?.Id" type="button" role="tab">
+                       İlişkili Ürünler
+                    </button>
+                </li>
+
             </ul>
         </div>
 
@@ -284,14 +296,80 @@
             <div class="tab-pane fade" id="form-tabs-attributes" role="tabpanel">
                 @if (Model.Id > 0)
                 {
-                    <div class="p-4 text-center text-muted" id="productattributes-loading" style="display:none">
-                        Yükleniyor...
+                    <div class="d-flex flex-column justify-content-center">
+                        <h4 class="mb-3">Ürün Özellikleri</h4>
                     </div>
+                    <table id="ProductSpecificationAttributeMappingTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Id</th>
+                                <th>Özellik Adı</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                    </table>
                 }
                 else
                 {
                     <div class="alert alert-danger">
                         Bu ürüne özellik eklemek için önce ürünü kaydetmeniz gerekmektedir.
+                    </div>
+                }
+            </div>
+
+            <!--Çapraz Satışlar-->
+            <div class="tab-pane fade" id="form-tabs-crosssaleproduct" role="tabpanel" data-loaded="false">
+                @if (Model.Id > 0)
+                {
+                    <div class="d-flex flex-column justify-content-center">
+                        <h4 class="mb-3">Çapraz Satışlar</h4>
+                    </div>
+                    <table id="CrossSaleProductTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Ürün</th>
+                                <th>Ürün Kodu</th>
+                                <th>Yayınlandı</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ürüne çapraz satışlar eklemek için önce ürünü kaydetmeniz gerekmektedir.
+                    </div>
+                }
+            </div>
+
+
+            <!--İlişkili Ürünler-->
+            <div class="tab-pane fade" id="form-tabs-relatedProduct" role="tabpanel" data-loaded="false">
+                @if (Model.Id > 0)
+                {
+                    <div class="d-flex flex-column justify-content-center">
+                        <h4 class="mb-3">İlişkili Ürünler</h4>
+                    </div>
+                    <table id="RelatedProductTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Ürün</th>
+                                <th>Ürün Kodu</th>
+                                <th>Görüntülenme Sırası</th>
+                                <th>Yayınlandı</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        Bu ürüne çapraz satışlar eklemek için önce ürünü kaydetmeniz gerekmektedir.
                     </div>
                 }
             </div>

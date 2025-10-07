@@ -76,6 +76,8 @@ namespace Entegro.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new TaskExecutionInfoMap());
             modelBuilder.ApplyConfiguration(new ActivityLogMap());
             modelBuilder.ApplyConfiguration(new TaskExecutionInfoMap());
+            modelBuilder.ApplyConfiguration(new CrossSellProductMap());
+            modelBuilder.ApplyConfiguration(new RelatedProductMap());
         }
 
         public DbSet<User> Users { get; set; }
@@ -122,5 +124,7 @@ namespace Entegro.Infrastructure.Data
         public DbSet<TaskExecutionInfo> TaskExecutionInfos { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<ActivityLogType> ActivityLogTypes { get; set; }
+        public DbSet<CrossSellProduct> CrossSellProducts { get; set; }
+        public DbSet<RelatedProduct> RelatedProducts { get; set; }
     }
 }

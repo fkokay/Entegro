@@ -29,6 +29,31 @@ namespace Entegro.Web.Controllers
 
 
         #region SpecificationAttribute
+
+        [HttpPost]
+        public async Task<IActionResult> AllSpecificationAttribute([FromForm] int page = 1, [FromForm] string term = "")
+        {
+            var specs = await _specificationAttributeService.GetAllAsync(page, term);
+
+            var query = specs.Items.Select(c => new
+            {
+                id = c.Id.ToString(),
+                text = c.Name,
+                specificationAttributeOptions = c.SpecificationAttributeOptions.Select(o => new
+                {
+                    id = o.Id,
+                    text = o.Name
+                }).ToList()
+            });
+
+            var mainList = query.ToList();
+            return Json(new
+            {
+                results = mainList,
+                pagination = new { more = specs.HasNextPage }
+            });
+        }
+
         [HttpGet]
         public IActionResult SpecificationAttributeCreatePopup()
         {

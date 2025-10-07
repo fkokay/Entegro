@@ -6,50 +6,56 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 namespace Entegro.Infrastructure.Repositories
 {
-    public class ProductSpecificationAttributeMappingRepository : IProductSpecificationAttributeMappingRepository
+    public class RelatedProductRepository : IRelatedProductRepository
     {
         private readonly EntegroDbContext _context;
 
-        public ProductSpecificationAttributeMappingRepository(EntegroDbContext context)
+        public RelatedProductRepository(EntegroDbContext context)
         {
             _context = context;
         }
 
-        public async Task AddAsync(ProductSpecificationAttribute productSpecificationAttribute)
+        public async Task AddAsync(RelatedProduct relatedProduct)
         {
-            var mapping = new ProductSpecificationAttribute
-            {
-                ProductId = productSpecificationAttribute.ProductId,
-                SpecificationAttributeOptionId = productSpecificationAttribute.SpecificationAttributeOptionId,
-                DisplayOrder = productSpecificationAttribute.DisplayOrder
-            };
-            await _context.ProductSpecificationAttributes.AddAsync(mapping);
+            await _context.RelatedProducts.AddAsync(relatedProduct);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(ProductSpecificationAttribute productSpecificationAttribute)
+        public async Task DeleteAllAsync(List<RelatedProduct> relatedProduct)
         {
-            _context.ProductSpecificationAttributes.Remove(productSpecificationAttribute);
+            _context.RelatedProducts.RemoveRange(relatedProduct);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ProductSpecificationAttribute>> GetAllAsync()
+        public async Task DeleteAsync(RelatedProduct relatedProduct)
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().ToListAsync();
+            var entity = new RelatedProduct { Id = relatedProduct.Id };
+            _context.RelatedProducts.Attach(entity);
+            _context.RelatedProducts.Remove(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<ProductSpecificationAttribute?> GetByIdAsync(int id)
+        public async Task<bool> ExistsByIdAsync(int productId1, int productId2)
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.RelatedProducts.AnyAsync(o => o.ProductId1 == productId1 && o.ProductId2 == productId2);
         }
 
-        public async Task<Application.DTOs.Common.PagedResult<ProductSpecificationAttribute>> GetPagedAsync(GridCommand gridCommand, int productId)
+        public async Task<RelatedProduct?> GetByIdAsync(int id)
         {
-            var query = _context.ProductSpecificationAttributes
-                .Include(psa => psa.Product)
-                .Include(psa => psa.SpecificationAttributeOption)
-                .ThenInclude(psa => psa.SpecificationAttribute).OrderBy(b => b.Id)
-                .Where(b => b.ProductId == productId).AsNoTracking();
+            return await _context.RelatedProducts.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<RelatedProduct?> GetByIdAsync(int productId1, int productId2)
+        {
+            return await _context.RelatedProducts
+             .Include(b => b.Product1)
+             .Include(b => b.Product2)
+             .AsNoTracking().FirstOrDefaultAsync(o => o.ProductId1 == productId1 && o.ProductId2 == productId2);
+        }
+
+        public async Task<Application.DTOs.Common.PagedResult<RelatedProduct>> GetPagedAsync(GridCommand gridCommand, int productId)
+        {
+            var query = _context.RelatedProducts.Include(b => b.Product1).Include(b => b.Product2).OrderBy(b => b.Id).Where(b => b.ProductId1 == productId).AsNoTracking();
 
 
             if (gridCommand.Columns != null)
@@ -92,9 +98,7 @@ namespace Entegro.Infrastructure.Repositories
                 if (!string.IsNullOrEmpty(gridCommand.Search.Value))
                 {
                     query = query.Where(b =>
-                    b.SpecificationAttributeOption.Name.Contains(gridCommand.Search.Value) ||
-                    b.Product.Name.Contains(gridCommand.Search.Value) ||
-                    b.SpecificationAttributeOption.SpecificationAttribute.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                    b.Product1.Name.Contains(gridCommand.Search.Value) || b.Product2.Name.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
             }
 
@@ -119,25 +123,20 @@ namespace Entegro.Infrastructure.Repositories
                 .AsSplitQuery()
                 .ToListAsync();
 
-            return new Application.DTOs.Common.PagedResult<ProductSpecificationAttribute>
+            return new Application.DTOs.Common.PagedResult<RelatedProduct>
             {
                 Items = relatedProducts,
                 TotalCount = totalCount,
                 PageNumber = gridCommand.Start / gridCommand.Length,
                 PageSize = gridCommand.Length
             };
-
         }
 
-        public async Task<List<ProductSpecificationAttribute>> GetSpecificationAttributeByProductId(int productId)
+        public async Task UpdateAsync(RelatedProduct relatedProduct)
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().Where(x => x.ProductId == productId).ToListAsync();
-        }
-
-        public async Task UpdateAsync(ProductSpecificationAttribute productSpecificationAttribute)
-        {
-            _context.ProductSpecificationAttributes.Update(productSpecificationAttribute);
+            _context.RelatedProducts.Update(relatedProduct);
             await _context.SaveChangesAsync();
         }
     }
 }
+

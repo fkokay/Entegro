@@ -15,5 +15,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<SpecificationAttributeDto> AddAsync(CreateSpecificationAttributeDto model);
         Task<SpecificationAttributeDto> UpdateAsync(UpdateSpecificationAttributeDto model);
         Task DeleteAsync(int id);
+        Task<PagedResult<SpecificationAttributeDto>> GetAllAsync(int page, string term);
     }
 }

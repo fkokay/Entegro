@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.ProductSpecificationAttribute;
+﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.ProductSpecificationAttribute;
 
 namespace Entegro.Application.Interfaces.Services.Base
 {
@@ -10,5 +11,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ProductSpecificationAttributeDto> UpdateAsync(UpdateProductSpecificationAttributeDto productSpecificationAttribute);
         Task DeleteAsync(int id);
         Task<List<ProductSpecificationAttributeDto>> GetSpecificationAttributeByProductId(int productId);
+        Task<PagedResult<ProductSpecificationAttributeDto>> GetPagedAsync(GridCommand gridCommand, int productId);
     }
 }
