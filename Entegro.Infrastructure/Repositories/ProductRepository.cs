@@ -192,12 +192,21 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<int> GetProductCountAsync()
         {
-            return await _context.Products.CountAsync(x => x.Published);
+            return await _context.Products.CountAsync();
         }
 
-        public async Task<List<Product>?> GetProductIntegrationMatrixAsync()
+        public async Task<List<Product>?> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId)
         {
-            return await _context.Products.Include(p => p.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(i => i.IntegrationSystemParameters).ToListAsync();
+            var query = _context.Products
+            .Include(p => p.ProductIntegrations)
+                .ThenInclude(pi => pi.IntegrationSystem)
+                    .ThenInclude(i => i.IntegrationSystemParameters)
+                    .AsQueryable();
+
+            if (brandId > 0)
+                query = query.Where(x => x.BrandId == brandId);
+
+            return await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         public async Task<Product?> GetProductIntegrationMatrixByIdAsync(int productId)

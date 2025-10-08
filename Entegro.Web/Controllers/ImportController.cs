@@ -612,11 +612,22 @@ namespace Entegro.Web.Controllers
 
 
         #region BulkUpdatePrices
-        public async Task<IActionResult> BulkUpdatePrices()
+        public async Task<IActionResult> BulkUpdatePrices(int page = 1, int brandId = 0)
         {
-            var integrations = await _productService.GetProductIntegrationMatrixAsync();
+            int pageSize = 20;
+            int totalCount = 0;
+            var brands = await _brandService.GetAllBrandsAsync();
 
-            var viewModel = integrations.Take(10).Select(p => new ProductIntegrationViewModel
+            ViewBag.Brands = brands.Select(m => new SelectListItem()
+            {
+                Text = m.Name,
+                Value = m.Id.ToString()
+            }).ToList();
+
+
+            var integrations = await _productService.GetProductIntegrationMatrixAsync(page, pageSize, brandId);
+
+            var viewModel = integrations.Select(p => new ProductIntegrationViewModel
             {
                 ProductId = p.Id,
                 ProductName = p.Name,
@@ -638,6 +649,17 @@ namespace Entegro.Web.Controllers
                 )
             }).ToList();
 
+            if (brandId > 0)
+                totalCount = integrations.Count();
+
+            else
+                totalCount = await _productService.GetProductCountAsync();
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.SelectedBrandId = brandId;
             return View(viewModel);
         }
 
@@ -678,7 +700,7 @@ namespace Entegro.Web.Controllers
                 }
             }
 
-            return RedirectToAction("BulkUpdatePrices");
+            return Json(new { success = true });
         }
         #endregion
 

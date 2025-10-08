@@ -19,7 +19,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<bool> UpdateProductMainPictureIdAsync(int productId, int mainPictureId);
         Task DeleteAsync(int productId);
         Task<int> GetProductCountAsync();
-        Task<List<ProductDto?>> GetProductIntegrationMatrixAsync();
+        Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId);
         Task<ProductDto?> GetProductIntegrationMatrixByIdAsync(int productId);
     }
 }

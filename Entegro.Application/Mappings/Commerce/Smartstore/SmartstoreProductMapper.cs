@@ -1,12 +1,6 @@
 ﻿using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Product;
-using Entegro.Domain.Entities;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Commerce.Smartstore
 {
@@ -80,8 +74,8 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.ShortDescription = "";
                 smartstoreProduct.AdminComment = "";
                 smartstoreProduct.ProductTemplateId = 1;
-                smartstoreProduct.ShowOnHomePage = customData.ShowOnHomePage;
-                smartstoreProduct.HomePageDisplayOrder = customData.HomePageDisplayOrder;
+                smartstoreProduct.ShowOnHomePage = customData == null ? false : customData.ShowOnHomePage;
+                smartstoreProduct.HomePageDisplayOrder = customData == null ? 0 : customData.HomePageDisplayOrder;
                 smartstoreProduct.AllowCustomerReviews = true;
                 smartstoreProduct.Sku = product.Code;
                 smartstoreProduct.FullDescription = product.Description;
@@ -124,10 +118,10 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.TaxCategoryId = 1;
                 smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
                 smartstoreProduct.StockQuantity = product.StockQuantity;
-                smartstoreProduct.DisplayStockAvailability = customData.DisplayStockAvailability;
-                smartstoreProduct.DisplayStockQuantity = customData.DisplayStockQuantity;
-                smartstoreProduct.MinStockQuantity = customData.MinStockQuantity;
-                smartstoreProduct.LowStockActivityId = customData.LowStockActivityId;
+                smartstoreProduct.DisplayStockAvailability = customData == null ? false : customData.DisplayStockAvailability;
+                smartstoreProduct.DisplayStockQuantity = customData == null ? false : customData.DisplayStockQuantity;
+                smartstoreProduct.MinStockQuantity = customData == null ? 0 : customData.MinStockQuantity;
+                smartstoreProduct.LowStockActivityId = customData == null ? 0 : customData.LowStockActivityId;
                 smartstoreProduct.NotifyAdminForQuantityBelow = 0;
                 smartstoreProduct.BackorderModeId = 0;
                 smartstoreProduct.AllowBackInStockSubscriptions = false;
@@ -136,7 +130,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.QuantityStep = 1;
                 smartstoreProduct.QuantityControlType = "Spinner";
                 smartstoreProduct.HideQuantityControl = false;
-                smartstoreProduct.AllowedQuantities =null;
+                smartstoreProduct.AllowedQuantities = null;
                 smartstoreProduct.DisableBuyButton = false;
                 smartstoreProduct.DisableWishlistButton = false;
                 smartstoreProduct.AvailableForPreOrder = false;
@@ -144,9 +138,9 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.Price = product.Price;
                 smartstoreProduct.ComparePrice = 0;
                 smartstoreProduct.ComparePriceLabelId = null;
-                smartstoreProduct.SpecialPrice = customData.SpecialPrice;
-                smartstoreProduct.SpecialPriceStartDateTimeUtc = customData.SpecialPriceStartDateTime ?? customData.SpecialPriceStartDateTime.ToUniversalTime();
-                smartstoreProduct.SpecialPriceEndDateTimeUtc = customData.SpecialPriceEndDateTime ?? customData.SpecialPriceEndDateTime.ToUniversalTime();
+                smartstoreProduct.SpecialPrice = customData == null ? 0 : customData.SpecialPrice;
+                smartstoreProduct.SpecialPriceStartDateTimeUtc = customData == null ? null : customData.SpecialPriceStartDateTime ?? customData.SpecialPriceStartDateTime.ToUniversalTime();
+                smartstoreProduct.SpecialPriceEndDateTimeUtc = customData == null ? null : customData.SpecialPriceEndDateTime ?? customData.SpecialPriceEndDateTime.ToUniversalTime();
                 smartstoreProduct.CustomerEntersPrice = false;
                 smartstoreProduct.MinimumCustomerEnteredPrice = 0;
                 smartstoreProduct.MaximumCustomerEnteredPrice = 1000;

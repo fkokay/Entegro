@@ -220,9 +220,10 @@ namespace Entegro.Application.Services.Base
             return await _productRepository.GetProductCountAsync();
         }
 
-        public async Task<List<ProductDto>> GetProductIntegrationMatrixAsync()
+        public async Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId)
         {
-            var products = await _productRepository.GetProductIntegrationMatrixAsync();
+            var products = await _productRepository.GetProductIntegrationMatrixAsync(pageNumber, pageSize, brandId);
+
             var productDtos = _mapper.Map<List<ProductDto>>(products);
             return productDtos;
         }
