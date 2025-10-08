@@ -2,8 +2,11 @@
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.MediaFile;
+using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Import;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -21,7 +24,9 @@ namespace Entegro.Web.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IBrandService _brandService;
         private readonly ISettingService _settingService;
-        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService)
+        private readonly IMapper _mapper;
+        private readonly IProductIntegrationService _productIntegrationService;
+        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService, IMapper mapper, IProductIntegrationService productIntegrationService)
         {
             _mediaFileService = mediaFileService;
             _webHostEnvironment = webHostEnvironment;
@@ -31,6 +36,8 @@ namespace Entegro.Web.Controllers
             _categoryService = categoryService;
             _brandService = brandService;
             _settingService = settingService;
+            _mapper = mapper;
+            _productIntegrationService = productIntegrationService;
         }
 
 
@@ -602,5 +609,78 @@ namespace Entegro.Web.Controllers
             });
 
         }
+
+
+        #region BulkUpdatePrices
+        public async Task<IActionResult> BulkUpdatePrices()
+        {
+            var integrations = await _productService.GetProductIntegrationMatrixAsync();
+
+            var viewModel = integrations.Take(10).Select(p => new ProductIntegrationViewModel
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                Price = p.Price,
+                SalePrice = p.SalePrice,
+                IntegrationPrices = p.ProductIntegrations.ToDictionary(
+                    pi =>
+                        pi.IntegrationSystem.IntegrationSystemParameters
+                            .FirstOrDefault(x => x.Key == "MarketplaceType")?.Value +
+                        pi.IntegrationSystem.IntegrationSystemParameters
+                            .FirstOrDefault(x => x.Key == "CommerceType")?.Value +
+                        " > " +
+                        pi.IntegrationSystem.Name,
+                    pi => new IntegrationPriceInfo
+                    {
+                        IntegrationSystemId = pi.IntegrationSystem.Id,
+                        Price = pi.Price
+                    }
+                )
+            }).ToList();
+
+            return View(viewModel);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveIntegrations(List<ProductIntegrationViewModel> model)
+        {
+            foreach (var product in model)
+            {
+                var productDto = await _productService.GetProductByIdAsync(product.ProductId);
+
+                if (productDto == null)
+                {
+                    return NotFound();
+                }
+
+                var mapped = _mapper.Map<UpdateProductDto>(productDto);
+                mapped.Price = product.Price;
+                mapped.SalePrice = product.SalePrice;
+                await _productService.UpdateAsync(mapped);
+
+                foreach (var integrationEntry in product.IntegrationPrices.Values)
+                {
+                    int integrationSystemId = integrationEntry.IntegrationSystemId;
+                    decimal? newPrice = integrationEntry.Price;
+
+                    if (!newPrice.HasValue) continue;
+                    var integration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.ProductId, integrationSystemId);
+
+                    if (integration != null)
+                    {
+
+                        var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(integration);
+                        mappedProductIntegration.ProductId = product.ProductId;
+                        mappedProductIntegration.Price = newPrice.Value;
+                        await _productIntegrationService.UpdateAsync(mappedProductIntegration);
+                    }
+                }
+            }
+
+            return RedirectToAction("BulkUpdatePrices");
+        }
+        #endregion
+
     }
 }

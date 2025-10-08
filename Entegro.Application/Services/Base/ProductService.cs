@@ -219,5 +219,19 @@ namespace Entegro.Application.Services.Base
         {
             return await _productRepository.GetProductCountAsync();
         }
+
+        public async Task<List<ProductDto>> GetProductIntegrationMatrixAsync()
+        {
+            var products = await _productRepository.GetProductIntegrationMatrixAsync();
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
+            return productDtos;
+        }
+
+        public async Task<ProductDto?> GetProductIntegrationMatrixByIdAsync(int productId)
+        {
+            var product = await _productRepository.GetProductIntegrationMatrixByIdAsync(productId);
+            var productDto = _mapper.Map<ProductDto>(product);
+            return productDto;
+        }
     }
 }

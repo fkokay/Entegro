@@ -18,7 +18,7 @@ namespace Entegro.Application.DTOs.Product
         public string? Gtin { get; set; }
         public decimal Price { get; set; }
         public decimal OldPrice { get; set; }
-        public decimal SpecialPrice { get; set; }
+        public decimal SalePrice { get; set; }
         public string? Currency { get; set; }
         public string? Unit { get; set; }
         public decimal VatRate { get; set; }

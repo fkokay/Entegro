@@ -194,5 +194,15 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Products.CountAsync(x => x.Published);
         }
+
+        public async Task<List<Product>?> GetProductIntegrationMatrixAsync()
+        {
+            return await _context.Products.Include(p => p.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(i => i.IntegrationSystemParameters).ToListAsync();
+        }
+
+        public async Task<Product?> GetProductIntegrationMatrixByIdAsync(int productId)
+        {
+            return await _context.Products.Include(p => p.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).FirstOrDefaultAsync(p => p.Id == productId);
+        }
     }
 }

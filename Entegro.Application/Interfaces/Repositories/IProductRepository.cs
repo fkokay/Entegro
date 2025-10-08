@@ -16,5 +16,8 @@ namespace Entegro.Application.Interfaces.Repositories
         Task UpdateAsync(Product product);
         Task UpdateMainPictureIdAsync(int productId, int mainPictureId);
         Task DeleteAsync(Product product);
+        Task<List<Product>?> GetProductIntegrationMatrixAsync();
+        Task<Product?> GetProductIntegrationMatrixByIdAsync(int productId);
+
     }
 }
