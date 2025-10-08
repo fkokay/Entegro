@@ -372,6 +372,25 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteMultipleProductSpecificationAttributeMapping([FromBody] List<int> ids)
+        {
+            try
+            {
+                foreach (var id in ids)
+                {
+                    await _productSpecificationAttributeMappingService.DeleteAsync(id);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         #endregion
 
         #region Product Pictures

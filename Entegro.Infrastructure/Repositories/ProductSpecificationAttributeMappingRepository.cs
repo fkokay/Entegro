@@ -45,7 +45,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductSpecificationAttribute?> GetByIdAsync(int id)
         {
-            return await _context.ProductSpecificationAttributes.Include(m => m.Product).Include(m => m.SpecificationAttributeOption).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductSpecificationAttributes.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
 
@@ -68,7 +68,8 @@ namespace Entegro.Infrastructure.Repositories
                         var searchVal = col.Search.Value.Trim('^', '$');
 
                         // ilgili property’nin tipini bul
-                        var prop = typeof(Brand).GetProperty(col.Data);
+                        var propName = col.Data.Contains(".") ? col.Data.Split('.').Last().Trim() : col.Data.Trim();
+                        var prop = typeof(SpecificationAttributeOption).GetProperty(propName);
                         if (prop == null) continue;
 
                         if (prop.PropertyType == typeof(string))
@@ -100,7 +101,6 @@ namespace Entegro.Infrastructure.Repositories
                 {
                     query = query.Where(b =>
                     b.SpecificationAttributeOption.Name.Contains(gridCommand.Search.Value) ||
-                    b.Product.Name.Contains(gridCommand.Search.Value) ||
                     b.SpecificationAttributeOption.SpecificationAttribute.Name.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
             }
@@ -119,7 +119,7 @@ namespace Entegro.Infrastructure.Repositories
 
             var totalCount = await query.CountAsync();
 
-            var relatedProducts = await query
+            var productSpecificationAttributes = await query
                 .Skip(gridCommand.Start)
                 .Take(gridCommand.Length)
                 .AsNoTracking()
@@ -128,7 +128,7 @@ namespace Entegro.Infrastructure.Repositories
 
             return new Application.DTOs.Common.PagedResult<ProductSpecificationAttribute>
             {
-                Items = relatedProducts,
+                Items = productSpecificationAttributes,
                 TotalCount = totalCount,
                 PageNumber = gridCommand.Start / gridCommand.Length,
                 PageSize = gridCommand.Length

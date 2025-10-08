@@ -20,7 +20,77 @@ Entegro.product = (function ($) {
             }
         });
     }
+    function addFilterDropdown(column, containerSelector, placeholder, map = null) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
 
+        let select = document.createElement("select");
+        select.className = "form-select select2 text-capitalize";
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        container.appendChild(select);
+
+        if (map && Array.isArray(map)) {
+            map.forEach(item => {
+                let option = document.createElement("option");
+                option.value = item.id;
+                option.textContent = item.title;
+                select.appendChild(option);
+            });
+        } else {
+            column.data().unique().sort().each(function (value) {
+                if (value !== null && value !== undefined && value !== "") {
+                    let option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        if (window.jQuery && $(select).select2) {
+            $(select).select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: "resolve"
+            });
+
+
+            $(select).on("change", function () {
+                const val = this.value || "";
+                column.search(val, false, false).draw();
+            });
+        } else {
+            select.addEventListener("change", function () {
+                const val = select.value ? `^${select.value}$` : "";
+                column.search(val, true, false).draw();
+            });
+        }
+
+    }
+    function addFilterText(column, containerSelector, placeholder) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
+
+        // input elementini oluştur
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control";
+        input.placeholder = placeholder;
+
+        container.appendChild(input);
+
+        // her yazımda filtre uygula (debounce ile optimize edebilirsin)
+        input.addEventListener("keyup", function () {
+            const val = input.value || "";
+            column.search(val, false, true).draw();
+        });
+    }
     function Init() {
         document.querySelector('#SaveBtn').addEventListener('click', function (e) {
             e.preventDefault();
@@ -1889,13 +1959,15 @@ Entegro.product = (function ($) {
     function initProductSpecificationAttributeTable(productId) {
         if (!productId) return;
 
-        if ($.fn.DataTable.isDataTable('#ProductSpecificationAttributeMappingTable')) {
-            $('#ProductSpecificationAttributeMappingTable').DataTable()
-                .ajax.url('/Product/ProductSpecificationAttributeMappingList?productId=' + productId).load();
+        const tableId = '#ProductSpecificationAttributeMappingTable';
+        const url = '/Product/ProductSpecificationAttributeMappingList?productId=' + productId;
+
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().ajax.url(url).load();
             return;
         }
 
-        const table = $('#ProductSpecificationAttributeMappingTable').DataTable({
+        const table = $(tableId).DataTable({
             language: {
                 paginate: {
                     next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
@@ -1909,7 +1981,7 @@ Entegro.product = (function ($) {
             processing: true,
             order: [[2, 'asc']],
             ajax: {
-                url: '/Product/ProductSpecificationAttributeMappingList?productId=' + productId,
+                url: url,
                 type: 'POST',
                 contentType: 'application/json',
                 data: function (d) {
@@ -1917,33 +1989,56 @@ Entegro.product = (function ($) {
                 }
             },
             columns: [
-                { data: null, defaultContent: '', orderable: false },
+                { data: null, defaultContent: '', orderable: false }, // checkbox alanı
                 { data: 'Id', visible: false },
                 {
                     data: 'SpecificationAttributeOption.Name',
                     title: 'Özellik Adı'
                 },
+                { data: 'SpecificationAttributeOption.SpecificationAttributeId', visible: false },
                 {
                     data: 'Id',
                     orderable: false,
                     searchable: false,
-                    render: function (data, type, row) {
+                    render: function (data) {
                         return `
-            <div class="d-inline-block text-nowrap">
-                <button type="button"
-                    class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-spec-attribute"
-                    data-id="${data}">
-                    <i class="icon-base ti ti-trash icon-22px text-danger"></i>
-                </button>
-            </div>`;
+                        <div class="d-inline-block text-nowrap">
+                            <button type="button"
+                                class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete-spec-attribute"
+                                data-id="${data}">
+                                <i class="icon-base ti ti-trash icon-22px text-danger"></i>
+                            </button>
+                        </div>`;
                     }
                 }
             ],
+            columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    checkboxes: { selectRow: true },
+                    className: "text-center",
+                    render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
+                },
+                {
+                    targets: 3,
+                    visible: false,
+                    searchable: false
+                }
+            ],
+            select: { style: "multi", selector: "td:first-child" },
             displayLength: 10,
             layout: {
                 topStart: {
                     rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
-                    features: []
+                    features: [{
+                        search: {
+                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
+                            placeholder: "Ara..",
+                            text: "_INPUT_"
+                        }
+                    }]
                 },
                 topEnd: {
                     rowClass: "row m-3 my-0 justify-content-between",
@@ -1955,9 +2050,9 @@ Entegro.product = (function ($) {
                         buttons: [
                             {
                                 text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
-                               <span class="d-none d-sm-inline-block">Yeni Özellik Ekle</span>`,
+                                   <span class="d-none d-sm-inline-block">Yeni Özellik Ekle</span>`,
                                 className: "btn btn-primary btn-add-spec-attribute",
-                                action: function (e, dt, node, config) {
+                                action: function () {
                                     $('#ProductSpecificationAttributeForm')[0].reset();
                                     $('#SpecificationAttributeId').val(null).trigger('change');
                                     $('#SpecificationAttributeOptionId').val(null).trigger('change').empty();
@@ -1965,6 +2060,59 @@ Entegro.product = (function ($) {
 
                                     $('#ProductSpecificationAttributeModal').modal('show');
                                     initSpecificationAttributeDropdowns();
+                                }
+                            },
+                            {
+                                text: `<i class="icon-base ti ti-trash icon-16px me-1"></i>
+                                   <span class="d-none d-sm-inline-block">Seçilenleri Sil</span>`,
+                                className: "btn btn-outline-danger",
+                                attr: { id: 'deleteSelectedSpecAttributes', disabled: true },
+                                action: function () {
+                                    const selectedData = table.rows({ selected: true }).data().toArray();
+                                    const ids = selectedData.map(row => row.Id);
+
+                                    if (ids.length === 0) return;
+
+                                    Swal.fire({
+                                        title: 'Emin misiniz?',
+                                        text: `${ids.length} özellik eşleştirmesi silinecek!`,
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Evet, sil!',
+                                        cancelButtonText: 'İptal',
+                                        customClass: {
+                                            confirmButton: 'btn btn-danger me-3',
+                                            cancelButton: 'btn btn-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).then(result => {
+                                        if (result.isConfirmed) {
+                                            $.ajax({
+                                                url: '/Product/DeleteMultipleProductSpecificationAttributeMapping',
+                                                type: 'POST',
+                                                contentType: 'application/json',
+                                                data: JSON.stringify(ids),
+                                                success: function (response) {
+                                                    if (response.success) {
+                                                        Swal.fire({
+                                                            icon: 'success',
+                                                            title: 'Silindi!',
+                                                            text: 'Seçilen özellikler silindi.'
+                                                        }).then(() => table.ajax.reload(null, false));
+                                                    } else {
+                                                        Swal.fire({ icon: 'error', title: 'Hata!', text: response.message });
+                                                    }
+                                                },
+                                                error: function () {
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Sunucu Hatası!',
+                                                        text: 'İstek gönderilirken hata oluştu.'
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             }
                         ]
@@ -1974,33 +2122,70 @@ Entegro.product = (function ($) {
                     rowClass: "row mx-3 mb-3 justify-content-between",
                     features: ["info"]
                 },
-                bottomEnd: ""
+                bottomEnd: "paging"
+            },
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    if (this.dataSrc() === "SpecificationAttributeOption.SpecificationAttributeId") {
+                        var column = this;
+
+                        $('<select id="optionFilter" style="width:200px"></select>')
+                            .appendTo(".optionAttributeFilter")
+                            .on("change", function () {
+                                const val = $(this).val();
+                                column.search(val ? "^" + val + "$" : "", true, false).draw();
+                            });
+
+                        $('#optionFilter').select2({
+                            placeholder: "Özellik seçin",
+                            allowClear: true,
+                            ajax: {
+                                url: '/SpecificationAttribute/AllSpecificationAttribute',
+                                type: 'POST',
+                                dataType: 'json',
+                                delay: 250,
+                                data: params => ({
+                                    term: params.term || "",
+                                    page: params.page || 1
+                                }),
+                                processResults: (data, params) => ({
+                                    results: data.results,
+                                    pagination: { more: data.pagination.more }
+                                })
+                            }
+                        });
+                    }
+                });
+
+                // SelectAll checkbox ekle
+                $('#ProductSpecificationAttributeMappingTable thead th:first-child')
+                    .html('<input type="checkbox" id="selectAllSpec" class="form-check-input" />');
+
+                $('#selectAllSpec').on('change', function () {
+                    $(this).is(':checked') ? table.rows().select() : table.rows().deselect();
+                });
             }
         });
 
-        // UI düzenlemeleri
-        setTimeout(() => {
-            const adjustments = [
-                { selector: ".dt-container", classToAdd: "border rounded" },
-                { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
-                { selector: ".dt-buttons.btn-group", classToAdd: "mb-md-0 mb-6" },
-                { selector: ".dt-search .form-control", classToRemove: "form-control-sm", classToAdd: "ms-0" },
-                { selector: ".dt-search", classToAdd: "mb-0 mb-md-6" },
-                { selector: ".dt-length .form-select", classToRemove: "form-select-sm" },
-                { selector: ".dt-layout-end", classToAdd: "gap-md-2 gap-0 mt-0" },
-                { selector: ".dt-layout-start", classToAdd: "mt-0" },
-                { selector: ".dt-layout-table", classToRemove: "row mt-2" },
-                { selector: ".dt-layout-full", classToRemove: "col-md col-12", classToAdd: "table-responsive" }
-            ];
-            adjustments.forEach(({ selector, classToRemove, classToAdd }) => {
-                document.querySelectorAll(selector).forEach(el => {
-                    if (classToRemove) classToRemove.split(" ").forEach(cls => el.classList.remove(cls));
-                    if (classToAdd) classToAdd.split(" ").forEach(cls => el.classList.add(cls));
-                });
+        // Satır seçiminde delete butonu yönet
+        table.on('select deselect', function () {
+            const totalRows = table.rows().count();
+            const selectedRows = table.rows({ selected: true }).count();
+            $('#selectAllSpec').prop('checked', selectedRows === totalRows && totalRows > 0);
+            $('#ProductSpecificationAttributeMappingTable tbody tr').each(function () {
+                const isSelected = table.row(this).selected();
+                $(this).find('input.dt-checkboxes').prop('checked', isSelected);
             });
-        }, 100);
+            $('#deleteSelectedSpecAttributes').prop('disabled', selectedRows === 0);
+        });
 
-       
+        table.on('draw', function () {
+            $('#selectAllSpec').prop('checked', false);
+            $('#deleteSelectedSpecAttributes').prop('disabled', true);
+            $('#ProductSpecificationAttributeMappingTable tbody input.dt-checkboxes').prop('checked', false);
+        });
+
+        // Form submit (tekli ekleme)
         $('#ProductSpecificationAttributeForm').on('submit', function (e) {
             e.preventDefault();
 
@@ -2025,8 +2210,7 @@ Entegro.product = (function ($) {
                 success: function (response) {
                     if (response.success) {
                         $('#ProductSpecificationAttributeModal').modal('hide');
-                        $('#ProductSpecificationAttributeMappingTable').DataTable().ajax.reload(null, false);
-
+                        table.ajax.reload(null, false);
                         Swal.fire({ icon: 'success', title: 'Başarılı!', text: 'Özellik başarıyla eşleştirildi.' });
 
                         $('#ProductSpecificationAttributeForm')[0].reset();
@@ -2041,11 +2225,10 @@ Entegro.product = (function ($) {
                 }
             });
         });
-        
-        $('#ProductSpecificationAttributeMappingTable').on('click', '.btn-delete-spec-attribute', function () {
-            const id = $(this).data('id'); // data-id attribute
-            console.log("Silinecek Spec ID:", id);
 
+        // Tekli sil
+        $('#ProductSpecificationAttributeMappingTable').on('click', '.btn-delete-spec-attribute', function () {
+            const id = $(this).data('id');
             Swal.fire({
                 title: 'Emin misiniz?',
                 text: 'Bu özellik eşleştirmesi silinecek!',
@@ -2063,30 +2246,17 @@ Entegro.product = (function ($) {
                     $.ajax({
                         url: '/Product/DeleteProductSpecificationAttributeMapping',
                         type: 'POST',
-                        data: { id: id }, // controller parametre adı id
+                        data: { id: id },
                         success: function (response) {
                             if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Silindi!',
-                                    text: 'Özellik eşleştirmesi başarıyla silindi.'
-                                }).then(() => {
-                                    $('#ProductSpecificationAttributeMappingTable').DataTable().ajax.reload(null, false);
-                                });
+                                Swal.fire({ icon: 'success', title: 'Silindi!', text: 'Özellik başarıyla silindi.' })
+                                    .then(() => table.ajax.reload(null, false));
                             } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Hata!',
-                                    text: response.message || 'Silme işlemi başarısız oldu.'
-                                });
+                                Swal.fire({ icon: 'error', title: 'Hata!', text: response.message || 'Silme işlemi başarısız oldu.' });
                             }
                         },
                         error: function () {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Sunucu Hatası!',
-                                text: 'İstek gönderilirken bir hata oluştu.'
-                            });
+                            Swal.fire({ icon: 'error', title: 'Sunucu Hatası!', text: 'İstek gönderilirken hata oluştu.' });
                         }
                     });
                 }
@@ -2095,6 +2265,7 @@ Entegro.product = (function ($) {
 
         return table;
     }
+
     function initSpecificationAttributeDropdowns() {
         $('#SpecificationAttributeId').select2({
             language: "tr",
@@ -2172,6 +2343,8 @@ Entegro.product = (function ($) {
         initCrossSellList: initCrossSellList,
         initRelatedProductList: initRelatedProductList,
         initProductSpecificationAttributeTable: initProductSpecificationAttributeTable,
-        initSpecificationAttributeDropdowns: initSpecificationAttributeDropdowns
+        initSpecificationAttributeDropdowns: initSpecificationAttributeDropdowns,
+        addFilterDropdown: addFilterDropdown,
+        addFilterText: addFilterText
     };
 })(jQuery);

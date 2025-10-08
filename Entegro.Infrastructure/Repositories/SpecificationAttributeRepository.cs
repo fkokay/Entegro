@@ -90,14 +90,49 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<SpecificationAttribute>> GetPagedAsync(GridCommand gridCommand)
         {
-            var query = _context.SpecificationAttributes
-             .AsNoTracking();
+            var query = _context.SpecificationAttributes.AsNoTracking();
+
+            if (gridCommand.Columns != null)
+            {
+                foreach (var col in gridCommand.Columns)
+                {
+                    if (!string.IsNullOrEmpty(col.Search?.Value))
+                    {
+                        var searchVal = col.Search.Value.Trim('^', '$');
+
+                        // ilgili property’nin tipini bul
+                        var prop = typeof(Product).GetProperty(col.Data);
+                        if (prop == null) continue;
+
+                        if (prop.PropertyType == typeof(string))
+                        {
+                            query = query.Where($"{col.Data}.Contains(@0)", searchVal);
+                        }
+                        else if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
+                        {
+                            if (int.TryParse(searchVal, out var intVal))
+                                query = query.Where($"{col.Data} == @0", intVal);
+                        }
+                        else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
+                        {
+                            if (bool.TryParse(searchVal, out var boolVal))
+                                query = query.Where($"{col.Data} == @0", boolVal);
+                        }
+                        else if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+                        {
+                            if (DateTime.TryParse(searchVal, out var dt))
+                                query = query.Where($"{col.Data}.Date == @0", dt.Date);
+                        }
+                    }
+                }
+            }
 
             if (gridCommand.Search != null)
             {
                 if (!string.IsNullOrEmpty(gridCommand.Search.Value))
                 {
-                    query = query.Where(b => b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                    query = query.Where(b =>
+                    b.Name.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
             }
 
@@ -105,18 +140,7 @@ namespace Entegro.Infrastructure.Repositories
             {
                 foreach (var item in gridCommand.Order)
                 {
-                    string field = "";
-                    if (string.IsNullOrEmpty(gridCommand.Columns[item.Column].Name))
-                    {
-                        field = gridCommand.Columns[item.Column].Data;
-                    }
-                    else
-                    {
-                        field = gridCommand.Columns[item.Column].Name;
-                    }
-
-
-                    query = query.OrderBy($"{field} {(item.Dir ?? "asc")}");
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
                 }
             }
             else
@@ -125,16 +149,19 @@ namespace Entegro.Infrastructure.Repositories
             }
 
             var totalCount = await query.CountAsync();
-            var orders = await query
-            .Skip(gridCommand.Start)
-            .Take(gridCommand.Length)
-            .ToListAsync();
+
+            var attributes = await query
+                .Skip(gridCommand.Start)
+                .Take(gridCommand.Length)
+                .AsNoTracking()
+                .AsSplitQuery()
+                .ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<SpecificationAttribute>
             {
-                Items = orders,
+                Items = attributes,
                 TotalCount = totalCount,
-                PageNumber = gridCommand.Start + 1,
+                PageNumber = gridCommand.Start / gridCommand.Length,
                 PageSize = gridCommand.Length
             };
         }
