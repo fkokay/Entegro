@@ -161,115 +161,16 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg p-4 text-center" style="background: rgba(255, 255, 255, 0.95); border-radius: 1rem;">
-            <div class="d-flex justify-content-center mb-3">
-                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                    <span class="visually-hidden">Yükleniyor...</span>
-                </div>
-            </div>
-            <h5 class="mb-0 fw-semibold text-secondary">Veriler Kaydediliyor.Lütfen bekleyin...</h5>
-        </div>
-    </div>
-</div>
+
 
 
 
 @section Scripts {
+    <script src="/assets/js/entegro.bulkupdateprices.js" asp-append-version="true"></script>
     <script>
-        // Seçili brandId'yi otomatik olarak seç
-        document.addEventListener('DOMContentLoaded', function () {
-            const selectedBrand = '@ViewBag.SelectedBrandId';
-            const brandFilter = document.getElementById('brandFilter');
-
-            if (brandFilter && selectedBrand) {
-                brandFilter.value = selectedBrand;
-            }
-        });
-
-        // Marka değiştiğinde sayfayı brandId ve page=1 ile yenile
-        document.getElementById('brandFilter')?.addEventListener('change', function () {
-            const selectedBrandId = this.value;
-            const newUrl = new URL(window.location.href);
-
-            newUrl.searchParams.set('brandId', selectedBrandId);
-            newUrl.searchParams.set('page', 1); // Marka değiştiğinde sayfa sıfırlanır
-
-            window.location.href = newUrl.toString();
-        });
-
-        // Form değişiklik kontrolü
-        let isFormChanged = false;
-        const form = document.getElementById('integration-form');
-
-        form.querySelectorAll('input').forEach(input => {
-            input.addEventListener('change', () => {
-                isFormChanged = true;
-            });
-        });
-
-        form.addEventListener('submit', () => {
-            isFormChanged = false;
-        });
-
-        // Sayfadan ayrılma uyarısı
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
-
-                if (!href || href.startsWith('#')) return;
-
-                if (isFormChanged) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'Uyarı',
-                        text: 'Kaydedilmemiş değişiklikler var. Sayfadan ayrılmak istiyor musunuz?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sayfadan Ayrıl',
-                        cancelButtonText: 'Sayfada Kal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = href;
-                        }
-                    });
-                }
-            });
-        });
-
-        // Form submit işlemi: loading modal + toast + AJAX
-        document.getElementById('integration-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const form = this;
-            const formData = new FormData(form);
-
-            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-            loadingModal.show();
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                loadingModal.hide();
-
-                if (data.success) {
-                    const toastElement = document.getElementById('successToast');
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                    isFormChanged = false;
-                } else {
-                    alert("Kayıt başarısız!");
-                }
-            })
-            .catch(error => {
-                loadingModal.hide();
-                console.error('Hata oluştu:', error);
-                alert("Sunucu hatası oluştu.");
-            });
+        $(function () {
+            Entegro.bulkupdateprices.init("@selectedBrandId");
         });
     </script>
 }
+
