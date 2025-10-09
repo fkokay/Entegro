@@ -593,8 +593,6 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-        #endregion
-
         [HttpPost]
         public async Task<IActionResult> ImportProfileList([FromBody] GridCommand gridCommand)
         {
@@ -609,13 +607,18 @@ namespace Entegro.Web.Controllers
             });
 
         }
+        #endregion
+
+
 
 
         #region BulkUpdatePrices
-        public async Task<IActionResult> BulkUpdatePrices(int page = 1, int brandId = 0)
+        public async Task<IActionResult> BulkUpdatePrices(int page = 1, int brandId = -1)
         {
             int pageSize = 20;
             int totalCount = 0;
+            List<ProductIntegrationViewModel> viewModel = null;
+
             var brands = await _brandService.GetAllBrandsAsync();
 
             ViewBag.Brands = brands.Select(m => new SelectListItem()
@@ -624,15 +627,24 @@ namespace Entegro.Web.Controllers
                 Value = m.Id.ToString()
             }).ToList();
 
+            if (brandId == -1)
+            {
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = 0;
+                ViewBag.SelectedBrandId = brandId;
+                return View(null);
+            }
+
 
             var integrations = await _productService.GetProductIntegrationMatrixAsync(page, pageSize, brandId);
 
-            var viewModel = integrations.Select(p => new ProductIntegrationViewModel
+            viewModel = integrations.Select(p => new ProductIntegrationViewModel
             {
                 ProductId = p.Id,
                 ProductName = p.Name,
                 Price = p.Price,
                 SalePrice = p.SalePrice,
+                CostPrice = p.CostPrice,
                 IntegrationPrices = p.ProductIntegrations.ToDictionary(
                     pi =>
                         pi.IntegrationSystem.IntegrationSystemParameters
@@ -651,7 +663,6 @@ namespace Entegro.Web.Controllers
 
             if (brandId > 0)
                 totalCount = integrations.Count();
-
             else
                 totalCount = await _productService.GetProductCountAsync();
 
@@ -660,21 +671,22 @@ namespace Entegro.Web.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.SelectedBrandId = brandId;
+
             return View(viewModel);
         }
+
+
 
 
         [HttpPost]
         public async Task<IActionResult> SaveIntegrations(List<ProductIntegrationViewModel> model)
         {
-            foreach (var product in model)
+            var changedProducts = model.Where(m => m.IsChanged).ToList();
+
+            foreach (var product in changedProducts)
             {
                 var productDto = await _productService.GetProductByIdAsync(product.ProductId);
-
-                if (productDto == null)
-                {
-                    return NotFound();
-                }
+                if (productDto == null) continue;
 
                 var mapped = _mapper.Map<UpdateProductDto>(productDto);
                 mapped.Price = product.Price;
@@ -685,23 +697,24 @@ namespace Entegro.Web.Controllers
                 {
                     int integrationSystemId = integrationEntry.IntegrationSystemId;
                     decimal? newPrice = integrationEntry.Price;
-
                     if (!newPrice.HasValue) continue;
-                    var integration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.ProductId, integrationSystemId);
+
+                    var integration = await _productIntegrationService
+                        .GetByProductAndIntegrationSystemAsync(product.ProductId, integrationSystemId);
 
                     if (integration != null)
                     {
-
-                        var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(integration);
-                        mappedProductIntegration.ProductId = product.ProductId;
-                        mappedProductIntegration.Price = newPrice.Value;
-                        await _productIntegrationService.UpdateAsync(mappedProductIntegration);
+                        var mappedIntegration = _mapper.Map<UpdateProductIntegrationDto>(integration);
+                        mappedIntegration.ProductId = product.ProductId;
+                        mappedIntegration.Price = newPrice.Value;
+                        await _productIntegrationService.UpdateAsync(mappedIntegration);
                     }
                 }
             }
 
             return Json(new { success = true });
         }
+
         #endregion
 
     }

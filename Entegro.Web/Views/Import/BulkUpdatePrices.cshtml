@@ -12,14 +12,8 @@
             <div class="d-flex flex-column justify-content-center">
                 <h4 class="mb-1">Toplu Fiyat Güncelle</h4>
                 <p class="mb-0">Toplu Fiyat Güncelle</p>
-
-                <select asp-items="ViewBag.Brands" class="form-select" id="brandFilter">
-                    <option value="0">Marka Seçiniz...</option>
-                </select>
             </div>
-            
 
-         
             <div class="d-flex align-content-center flex-wrap gap-4">
                 <div class="d-flex gap-4">
                     <a href="@Url.Action("BulkUpdatePrices")" class="btn btn-label-secondary d-grid w-100 waves-effect">
@@ -39,68 +33,97 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
+                    <div class="card-header border-bottom">
+                        <h5 class="card-title mb-0">Filtreler</h5>
+                        <div class="row pt-4 gap-6 gap-md-0 g-md-6">
+                            <div class="col-md-2">
+                                <select asp-items="ViewBag.Brands" class="form-select" id="brandFilter">
+                                    <option value="-1">Marka Seçiniz...</option>
+                                    <option value="0">Hepsini Getir</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <h5 class="card-header">Ürün Listesi</h5>
                     <div class="table-responsive text-nowrap">
 
-                        @if (Model != null && Model.Any())
+                        @if (selectedBrandId < 0)
                         {
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Ürün</th>
-                                        <th>Liste Fiyatı</th>
-                                        <th>Satış Fiyatı</th>
-                                        @foreach (var header in Model.First().IntegrationPrices.Keys)
-                                        {
-                                            <th>@header</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody class="table-border-bottom-0">
-                                    @for (int i = 0; i < Model.Count; i++)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <input type="hidden" name="[@(i)].ProductId" value="@Model[i].ProductId" />
-                                                @Model[i].ProductName
-                                            </td>
-                                            <td>
-                                                <input type="number" step="0.01"
-                                                       name="[@(i)].Price"
-                                                       value="@Model[i].Price"
-                                                       class="form-control form-control-sm" />
-                                            </td>
-                                            <td>
-                                                <input type="number" step="0.01"
-                                                       name="[@(i)].SalePrice"
-                                                       value="@Model[i].SalePrice"
-                                                       class="form-control form-control-sm" />
-                                            </td>
-
-                                            @foreach (var kvp in Model[i].IntegrationPrices)
-                                            {
-                                                var header = kvp.Key;
-                                                var value = kvp.Value;
-                                                <td>
-                                                    <input type="hidden"
-                                                           name="[@(i)].IntegrationPrices[@(header)].IntegrationSystemId"
-                                                           value="@value.IntegrationSystemId" />
-
-                                                    <input type="number" step="0.01"
-                                                           name="[@(i)].IntegrationPrices[@(header)].Price"
-                                                           value="@value.Price"
-                                                           class="form-control form-control-sm" />
-                                                </td>
-                                            }
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                            <div class="text-center p-4">
+                                <h4>Lütfen Önce Marka Seçiniz</h4>
+                            </div>
                         }
                         else
                         {
-                            <p>Görüntülenecek değer yok</p>
+                            if (Model != null && Model.Any())
+                            {
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Ürün</th>
+                                            <th>Maliyet Fiyatı</th>
+                                            <th>Liste Fiyatı</th>
+                                            <th>Satış Fiyatı</th>
+                                            @foreach (var header in Model.First().IntegrationPrices.Keys)
+                                            {
+                                                <th>@header</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-border-bottom-0">
+                                        @for (int i = 0; i < Model.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input type="hidden" name="[@(i)].ProductId" value="@Model[i].ProductId" />
+                                                    @Model[i].ProductName
+                                                    <input type="hidden"
+                                                           name="[@(i)].IsChanged"
+                                                           value="false"
+                                                           class="is-changed-flag" />
+                                                </td>
+                                                <td>@Model[i].CostPrice</td>
+                                                <td>
+                                                    <input type="number" step="0.01"
+                                                           name="[@(i)].Price"
+                                                           value="@Model[i].Price"
+                                                           class="form-control form-control-sm" />
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01"
+                                                           name="[@(i)].SalePrice"
+                                                           value="@Model[i].SalePrice"
+                                                           class="form-control form-control-sm" />
+                                                </td>
+
+                                                @foreach (var kvp in Model[i].IntegrationPrices)
+                                                {
+                                                    var header = kvp.Key;
+                                                    var value = kvp.Value;
+                                                    <td>
+                                                        <input type="hidden"
+                                                               name="[@(i)].IntegrationPrices[@(header)].IntegrationSystemId"
+                                                               value="@value.IntegrationSystemId" />
+
+                                                        <input type="number" step="0.01"
+                                                               name="[@(i)].IntegrationPrices[@(header)].Price"
+                                                               value="@value.Price"
+                                                               class="form-control form-control-sm" />
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="text-center p-4">
+                                    <h4>Görüntülenecek Sonuç Yok</h4>
+                                </div>
+                            }
                         }
+
 
                     </div>
                 </div>
@@ -149,8 +172,6 @@
         </li>
     </ul>
 </nav>
-
-
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
     <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">

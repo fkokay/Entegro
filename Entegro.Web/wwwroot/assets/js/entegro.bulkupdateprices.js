@@ -1,9 +1,6 @@
 ﻿var Entegro = Entegro || {};
 Entegro.bulkupdateprices = Entegro.bulkupdateprices || {};
 
-var Entegro = Entegro || {};
-Entegro.bulkupdateprices = Entegro.bulkupdateprices || {};
-
 Entegro.bulkupdateprices = (function ($) {
     let isFormChanged = false;
 
@@ -11,10 +8,19 @@ Entegro.bulkupdateprices = (function ($) {
         const form = document.getElementById('integration-form');
         if (!form) return;
 
-        // Input değişiklik kontrolü
+        // tüm inputları izle
         form.querySelectorAll('input').forEach(input => {
             input.addEventListener('change', () => {
                 isFormChanged = true;
+
+                // ilgili satırdaki IsChanged hidden inputunu bul ve true yap
+                const row = input.closest('tr');
+                if (row) {
+                    const isChangedInput = row.querySelector('input[name*="IsChanged"]');
+                    if (isChangedInput) {
+                        isChangedInput.value = "true";
+                    }
+                }
             });
         });
 
@@ -34,7 +40,6 @@ Entegro.bulkupdateprices = (function ($) {
             }
 
             const formData = new FormData(form);
-
             window.showLoading("Lütfen bekleyiniz..");
 
             fetch(form.action, {
@@ -128,6 +133,7 @@ Entegro.bulkupdateprices = (function ($) {
         }
     };
 })(jQuery);
+
 
 
 

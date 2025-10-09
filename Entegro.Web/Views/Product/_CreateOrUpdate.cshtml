@@ -120,6 +120,10 @@
                         <label class="form-label text-sm-start" for="Price">İndirimli Fiyat</label>
                         @Html.TextBoxFor(m => m.SalePrice, new { @class = "form-control", @type = "number", step = "0.01" })
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm-start" for="Price">Maliyet Fiyat</label>
+                        @Html.TextBoxFor(m => m.CostPrice, new { @class = "form-control", @type = "number", step = "0.01" })
+                    </div>
                     <!-- Para Birimi -->
                     <div class="col-md-6">
                         <label class="form-label text-sm-start" for="Currency">Para Birimi</label>

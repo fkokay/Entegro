@@ -149,7 +149,7 @@ namespace Entegro.Api.Jobs
                         createProductDto.Unit = GetValue(rootElement, mappings, "Unit", "Adet");
                         createProductDto.Gtin = GetValue(rootElement, mappings, "Gtin", "");
                         createProductDto.OldPrice = 0;
-                        createProductDto.SpecialPrice = GetDecimalValue(rootElement, mappings, "SpecialPrice", 0);
+                        createProductDto.SalePrice = GetDecimalValue(rootElement, mappings, "SalePrice", 0);
                         createProductDto.Weight = GetDecimalValue(rootElement, mappings, "Weight", 0);
                         createProductDto.Length = GetDecimalValue(rootElement, mappings, "Length", 0);
                         createProductDto.Height = GetDecimalValue(rootElement, mappings, "Height", 0);
@@ -189,7 +189,7 @@ namespace Entegro.Api.Jobs
                         var categories = GetMultipleValues(rootElement, mappings, "Categories");
                         foreach (var item in categories)
                         {
-                            var category =await CreateOrderUpdateCategory(item);
+                            var category = await CreateOrderUpdateCategory(item);
                             if (category == null)
                             {
                                 continue;
@@ -464,7 +464,7 @@ namespace Entegro.Api.Jobs
                     createBrand.MetaTitle = brand;
                     createBrand.MetaDescription = "";
                     createBrand.MetaKeywords = "";
-                  
+
                     var createdBrand = await _brandService.AddAsync(createBrand);
 
                     return createdBrand.Id;
