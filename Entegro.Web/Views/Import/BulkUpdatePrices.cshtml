@@ -42,6 +42,16 @@
                                     <option value="0">Hepsini Getir</option>
                                 </select>
                             </div>
+
+                            @if (selectedBrandId >= 0)
+                            {
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#priceUpdateModal">
+                                        Maliyet Fiyatına Göre Güncelle
+                                    </button>
+                                </div>
+                            }
+                           
                         </div>
                     </div>
                     <h5 class="card-header">Ürün Listesi</h5>
@@ -179,6 +189,70 @@
                 Kayıt başarılı!
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="priceUpdateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Header -->
+            <div class="modal-header p-0 position-relative" style="height: 80px;">
+                <div class="d-flex justify-content-center align-items-center w-100 h-100">
+                    <h5 class="modal-title m-0">Toplu Fiyat Güncelle</h5>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body px-4 py-4">
+                <form id="priceUpdateForm" class="row g-4" onsubmit="return false">
+
+                    <!-- Yüzde Oranı -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" for="percentValue">Yüzde Fark Oranı (%)</label>
+                        <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required />
+                    </div>
+
+                    <!-- Uygulanacak Sütunlar -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Uygulanacak Sütunlar</label>
+
+                        <!-- Liste fiyatı -->
+                        <div class="form-check">
+                            <input class="form-check-input apply-column" type="checkbox" value="Price" id="colPrice">
+                            <label class="form-check-label" for="colPrice">Liste Fiyatı</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input apply-column" type="checkbox" value="SalePrice" id="colSalePrice">
+                            <label class="form-check-label" for="colSalePrice">Satış Fiyatı</label>
+                        </div>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var header in Model.First().IntegrationPrices.Keys)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input apply-column" type="checkbox" value="@header" id="col_@header">
+                                    <label class="form-check-label" for="col_@header">@header</label>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="col-12 text-center pt-3">
+                        <button type="button" id="applyPercentBtn" class="btn btn-success px-4 me-2">
+                            <i class="bi bi-check-circle me-1"></i> Uygula
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Kapat
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>

@@ -124,12 +124,76 @@ Entegro.bulkupdateprices = (function ($) {
             });
         });
     }
+  
+    function initPriceUpdatePopup() {
+        const applyBtn = document.getElementById("applyPercentBtn");
+        if (!applyBtn) return;
+
+        applyBtn.addEventListener("click", function () {
+            const percent = parseFloat(document.getElementById("percentValue").value) || 0;
+            const checkedCols = Array.from(document.querySelectorAll(".apply-column:checked"));
+
+            if (checkedCols.length === 0) {
+                Swal.fire({
+                    title: 'Uyarı',
+                    text: 'En az bir sütun seçmelisiniz!',
+                    icon: 'warning',
+                    confirmButtonText: 'Tamam'
+                });
+                return;
+            }
+
+            const columns = checkedCols.map(c => c.value);
+
+            document.querySelectorAll("tbody tr").forEach(row => {
+                
+                const cost = parseFloat(row.querySelector("td:nth-child(2)").innerText) || 0;
+
+                if (cost <= 0) {
+                    return;
+                }
+
+                columns.forEach(col => {
+                    let input;
+
+                    if (col === "Price") {
+                        input = row.querySelector("input[name*='Price'][name$='.Price']");
+                    }
+                    else if (col === "SalePrice") {
+                        input = row.querySelector("input[name*='SalePrice']");
+                    }
+                    else {
+                        input = row.querySelector(`input[name*='IntegrationPrices[${col}]'][name$='.Price']`);
+                    }
+
+                    if (input) {
+                        const oldVal = parseFloat(input.value) || 0;
+                        
+                        const newVal = (oldVal + (cost * percent / 100)).toFixed(2);
+                        input.value = newVal;
+
+                        const flag = row.querySelector(".is-changed-flag");
+                        if (flag) flag.value = "true";
+
+
+                        input.dispatchEvent(new Event("change"));
+                    }
+                });
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById("priceUpdateModal")).hide();
+        });
+    }
+
+
+
 
     return {
         init: function (selectedBrand) {
             initBrandFilter(selectedBrand);
             initFormHandler();
             initLeaveWarning();
+            initPriceUpdatePopup();
         }
     };
 })(jQuery);
