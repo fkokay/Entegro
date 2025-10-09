@@ -80,25 +80,6 @@ Entegro.bulkupdateprices = (function ($) {
                 });
         });
     }
-
-    function initBrandFilter(selectedBrand) {
-        const brandFilter = document.getElementById('brandFilter');
-
-        if (brandFilter && selectedBrand) {
-            brandFilter.value = selectedBrand;
-        }
-
-        brandFilter?.addEventListener('change', function () {
-            const selectedBrandId = this.value;
-            const newUrl = new URL(window.location.href);
-
-            newUrl.searchParams.set('brandId', selectedBrandId);
-            newUrl.searchParams.set('page', 1);
-
-            window.location.href = newUrl.toString();
-        });
-    }
-
     function initLeaveWarning() {
         document.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function (e) {
@@ -131,6 +112,12 @@ Entegro.bulkupdateprices = (function ($) {
 
         applyBtn.addEventListener("click", function () {
             const percent = parseFloat(document.getElementById("percentValue").value) || 0;
+            const commissionPercent = parseFloat(document.getElementById("percentCommissionValue").value) || 0;
+            const shippingFee = parseFloat(document.getElementById("shippingFee").value) || 0;
+
+            const applyCommission = document.getElementById("applyCommission")?.checked;
+            const applyShipping = document.getElementById("applyShipping")?.checked;
+
             const checkedCols = Array.from(document.querySelectorAll(".apply-column:checked"));
 
             if (checkedCols.length === 0) {
@@ -146,12 +133,8 @@ Entegro.bulkupdateprices = (function ($) {
             const columns = checkedCols.map(c => c.value);
 
             document.querySelectorAll("tbody tr").forEach(row => {
-                
                 const cost = parseFloat(row.querySelector("td:nth-child(2)").innerText) || 0;
-
-                if (cost <= 0) {
-                    return;
-                }
+                if (cost <= 0) return;
 
                 columns.forEach(col => {
                     let input;
@@ -168,13 +151,25 @@ Entegro.bulkupdateprices = (function ($) {
 
                     if (input) {
                         const oldVal = parseFloat(input.value) || 0;
-                        
-                        const newVal = (oldVal + (cost * percent / 100)).toFixed(2);
-                        input.value = newVal;
+
+                     
+                        let result = oldVal + (cost * percent / 100);
+                        alert("maliyet: "+ result);
+                      
+                        if (applyCommission) {
+                            result = result + (result * commissionPercent / 100);
+                            alert("komisyon: "+result);
+                        }
+
+                        if (applyShipping) {
+                            result = result + shippingFee;
+                            alert("kargo ücreti: "+ result);
+                        }
+
+                        input.value = result.toFixed(2);
 
                         const flag = row.querySelector(".is-changed-flag");
                         if (flag) flag.value = "true";
-
 
                         input.dispatchEvent(new Event("change"));
                     }
@@ -185,15 +180,82 @@ Entegro.bulkupdateprices = (function ($) {
         });
     }
 
+    function initToggleOptions() {
+        const applyCommission = document.getElementById("applyCommission");
+        const commissionBox = document.getElementById("commissionBox");
+        const applyShipping = document.getElementById("applyShipping");
+        const shippingBox = document.getElementById("shippingBox");
+
+        if (applyCommission && commissionBox) {
+            applyCommission.checked = false; // ilk başta false
+            commissionBox.style.display = "none";
+
+            applyCommission.addEventListener("change", function () {
+                commissionBox.style.display = this.checked ? "block" : "none";
+            });
+        }
+
+        if (applyShipping && shippingBox) {
+            applyShipping.checked = false; // ilk başta false
+            shippingBox.style.display = "none";
+
+            applyShipping.addEventListener("change", function () {
+                shippingBox.style.display = this.checked ? "block" : "none";
+            });
+        }
+    }
+
+    function initBrandSelect2(selectedBrand) {
+        const $brandDropdown = $('#brandFilter');
+        if (!$brandDropdown.length) return;
+
+        $brandDropdown.select2({
+            width: '100%',
+            placeholder: 'Marka seçiniz',
+            allowClear: true,
+            language: {
+                noResults: () => 'Sonuç bulunamadı'
+            }
+        });
+
+        
+        if (selectedBrand) {
+           
+            if (selectedBrand === "0" || selectedBrand === "") {
+                selectedBrand = "-1";
+            }
+            $brandDropdown.val(selectedBrand).trigger('change');
+        } else {
+            // hiç gönderilmediyse default -1 olsun
+            $brandDropdown.val("-1").trigger('change');
+        }
+
+        $brandDropdown.on('change', function () {
+            let selectedBrandId = $(this).val();
+
+            if (!selectedBrandId) {
+                // allowClear seçildiyse → 0
+                selectedBrandId = 0;
+            }
+
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('brandId', selectedBrandId);
+            newUrl.searchParams.set('page', 1);
+
+            window.location.href = newUrl.toString();
+        });
+    }
 
 
 
     return {
         init: function (selectedBrand) {
-            initBrandFilter(selectedBrand);
+           
             initFormHandler();
             initLeaveWarning();
+            initToggleOptions();
             initPriceUpdatePopup();
+            initBrandSelect2(selectedBrand);
         }
     };
 })(jQuery);

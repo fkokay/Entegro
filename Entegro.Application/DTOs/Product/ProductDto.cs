@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.RelatedProduct;
 
 namespace Entegro.Application.DTOs.Product
 {
@@ -48,5 +49,6 @@ namespace Entegro.Application.DTOs.Product
         public List<ProductVariantAttributeDto> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeDto>();
         public List<ProductVariantAttributeCombinationDto> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationDto>();
         public List<ProductIntegrationDto> ProductIntegrations { get; set; } = new List<ProductIntegrationDto>();
+        public List<RelatedProductDto> RelatedProducts { get; set; } = new List<RelatedProductDto>();
     }
 }

@@ -37,24 +37,24 @@
                         <h5 class="card-title mb-0">Filtreler</h5>
                         <div class="row pt-4 gap-6 gap-md-0 g-md-6">
                             <div class="col-md-2">
-                                <select asp-items="ViewBag.Brands" class="form-select" id="brandFilter">
-                                    <option value="-1">Marka Seçiniz...</option>
-                                    <option value="0">Hepsini Getir</option>
+                                <select asp-items="ViewBag.Brands" class="form-select select2" id="brandFilter">
+                                    <option></option> 
                                 </select>
-                            </div>
 
-                            @if (selectedBrandId >= 0 && Model != null && Model.Any())
-                            {
-                                <div class="col-md-2">
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#priceUpdateModal">
-                                        Maliyet Fiyatına Göre Güncelle
-                                    </button>
-                                </div>
-                            }
-                           
+                            </div>
                         </div>
                     </div>
-                    <h5 class="card-header">Ürün Listesi</h5>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Ürün Listesi</h5>
+                        @if (selectedBrandId >= 0 && Model != null && Model.Any())
+                        {
+                            <button type="button" class="btn btn-success"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#priceUpdateModal">
+                                Maliyet Fiyatına Göre Güncelle
+                            </button>
+                        }
+                    </div>
                     <div class="table-responsive text-nowrap">
 
                         @if (selectedBrandId < 0)
@@ -207,14 +207,48 @@
             <div class="modal-body px-4 py-4">
                 <form id="priceUpdateForm" class="row g-4" onsubmit="return false">
 
-                    <!-- Yüzde Oranı -->
-                    <div class="col-12">
-                        <label class="form-label fw-semibold" for="percentValue">Yüzde Fark Oranı (%)</label>
-                        <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required min="0" />
+                    <!-- Yüzde Kâr Oranı -->
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-md-4 col-form-label fw-semibold text-end" for="percentValue">
+                            Yüzde Kâr Oranı (%)
+                        </label>
+                        <div class="col-md-8">
+                            <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required min="0" />
+                        </div>
+                    </div>
+
+                    <!-- Komisyon -->
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-md-4 col-form-label fw-semibold text-end" for="applyCommission">
+                            Komisyon (%)
+                        </label>
+                        <div class="col-md-8 d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" id="applyCommission">
+                            </div>
+                            <div id="commissionBox" style="display:none; flex:1;">
+                                <input type="number" step="0.01" class="form-control" id="percentCommissionValue" value="10" min="0" placeholder="Komisyon %" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kargo -->
+                    <div class="row mb-3 align-items-center">
+                        <label class="col-md-4 col-form-label fw-semibold text-end" for="applyShipping">
+                            Kargo
+                        </label>
+                        <div class="col-md-8 d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" id="applyShipping">
+                            </div>
+                            <div id="shippingBox" style="display:none; flex:1;">
+                                <input type="number" step="0.01" class="form-control" id="shippingFee" value="10" min="0" placeholder="Kargo ücreti" />
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Uygulanacak Sütunlar -->
-                    <div class="col-12">
+                    <div class="col-12 mt-3">
                         <label class="form-label fw-semibold d-block mb-2">Uygulanacak Sütunlar</label>
                         <div class="row g-2">
 
@@ -263,6 +297,8 @@
             </div>
 
 
+
+
         </div>
     </div>
 </div>
@@ -276,6 +312,13 @@
         $(function () {
             Entegro.bulkupdateprices.init("@selectedBrandId");
         });
+    </script>
+
+
+
+    <script>
+     
+
     </script>
 }
 
