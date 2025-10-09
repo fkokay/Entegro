@@ -223,8 +223,7 @@ namespace Entegro.Application.Services.Base
         public async Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId)
         {
             var products = await _productRepository.GetProductIntegrationMatrixAsync(pageNumber, pageSize, brandId);
-
-            var productDtos = _mapper.Map<List<ProductDto>>(products);
+            var productDtos = _mapper.Map<List<ProductDto?>>(products);
             return productDtos;
         }
 
@@ -232,6 +231,13 @@ namespace Entegro.Application.Services.Base
         {
             var product = await _productRepository.GetProductIntegrationMatrixByIdAsync(productId);
             var productDto = _mapper.Map<ProductDto>(product);
+            return productDto;
+        }
+
+        public async Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int brandId)
+        {
+            var product = await _productRepository.GetProductIntegrationMatrixAsync(brandId);
+            var productDto = _mapper.Map<List<ProductDto?>>(product);
             return productDto;
         }
     }

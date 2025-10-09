@@ -10,6 +10,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using NPOI.HSSF.UserModel;
 using System.Xml.Linq;
 
 namespace Entegro.Web.Controllers
@@ -642,6 +643,9 @@ namespace Entegro.Web.Controllers
             {
                 ProductId = p.Id,
                 ProductName = p.Name,
+                ProductBrand = p.Brand?.Name ?? "Marka Yok",
+                ProductCode = p.Code ?? "Kod Yok",
+                ProductCategory = p.ProductCategories != null && p.ProductCategories.Any() ? string.Join(", ", p.ProductCategories.Select(pc => pc.Category != null ? pc.Category.Name : "Kategori Yok")) : "Kategori Yok",
                 Price = p.Price,
                 SalePrice = p.SalePrice,
                 CostPrice = p.CostPrice,
@@ -710,6 +714,224 @@ namespace Entegro.Web.Controllers
 
             return Json(new { success = true });
         }
+        [HttpGet]
+        public async Task<IActionResult> ExcelExport(int brandId)
+        {
+            var integrations = await _productService.GetProductIntegrationMatrixAsync(brandId);
+
+            List<ProductIntegrationViewModel> viewModel = integrations.Select(p => new ProductIntegrationViewModel
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                ProductBrand = p.Brand?.Name ?? "Marka Yok",
+                ProductCode = p.Code ?? "Kod Yok",
+                ProductCategory = p.ProductCategories != null && p.ProductCategories.Any()
+                    ? string.Join(", ", p.ProductCategories.Select(pc => pc.Category != null ? pc.Category.Name : "Kategori Yok"))
+                    : "Kategori Yok",
+                Price = p.Price,
+                SalePrice = p.SalePrice,
+                CostPrice = p.CostPrice,
+                IntegrationPrices = p.ProductIntegrations.ToDictionary(
+                    pi =>
+                        (pi.IntegrationSystem.IntegrationSystemParameters
+                            .FirstOrDefault(x => x.Key == "MarketplaceType")?.Value ?? "") +
+                        (pi.IntegrationSystem.IntegrationSystemParameters
+                            .FirstOrDefault(x => x.Key == "CommerceType")?.Value ?? "") +
+                        " > " +
+                        (pi.IntegrationSystem.Name ?? ""),
+                    pi => new IntegrationPriceInfo
+                    {
+                        IntegrationSystemId = pi.IntegrationSystem.Id,
+                        Price = pi.Price
+                    }
+                )
+            }).ToList();
+
+            var workbook = new HSSFWorkbook();
+            var sheet = workbook.CreateSheet("Ürün Listesi");
+
+            // HEADER
+            var headerRow = sheet.CreateRow(0);
+            int col = 0;
+            headerRow.CreateCell(col++).SetCellValue("Id");
+            headerRow.CreateCell(col++).SetCellValue("Ürün");
+            headerRow.CreateCell(col++).SetCellValue("Kodu");
+            headerRow.CreateCell(col++).SetCellValue("Marka");
+            headerRow.CreateCell(col++).SetCellValue("Kategori");
+            headerRow.CreateCell(col++).SetCellValue("Maliyet Fiyatı");
+            headerRow.CreateCell(col++).SetCellValue("Liste Fiyatı");
+            headerRow.CreateCell(col++).SetCellValue("Satış Fiyatı");
+
+            var allIntegrationKeys = viewModel
+                .SelectMany(v => v.IntegrationPrices.Keys)
+                .Distinct()
+                .ToList();
+
+            // Entegrasyon başlıklarını 2 sütun olacak şekilde ekle (Id + Fiyat)
+            foreach (var key in allIntegrationKeys)
+            {
+                headerRow.CreateCell(col++).SetCellValue($"{key} Id");
+                headerRow.CreateCell(col++).SetCellValue($"{key} Fiyat");
+            }
+
+            // DATA ROWS
+            int rowNumber = 1;
+            foreach (var item in viewModel)
+            {
+                var row = sheet.CreateRow(rowNumber++);
+                col = 0;
+
+                row.CreateCell(col++).SetCellValue(item.ProductId);
+                row.CreateCell(col++).SetCellValue(item.ProductName);
+                row.CreateCell(col++).SetCellValue(item.ProductCode);
+                row.CreateCell(col++).SetCellValue(item.ProductBrand);
+                row.CreateCell(col++).SetCellValue(item.ProductCategory);
+                row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.CostPrice));
+                row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.Price));
+                row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.SalePrice));
+
+                // entegrasyon kolonları (Id + Fiyat)
+                foreach (var key in allIntegrationKeys)
+                {
+                    if (item.IntegrationPrices.ContainsKey(key))
+                    {
+                        row.CreateCell(col++).SetCellValue(item.IntegrationPrices[key].IntegrationSystemId);
+                        row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.IntegrationPrices[key].Price));
+                    }
+                    else
+                    {
+                        row.CreateCell(col++).SetCellValue(0); // Id yok
+                        row.CreateCell(col++).SetCellValue(0); // Fiyat yok
+                    }
+                }
+            }
+
+            // Freeze header
+            sheet.CreateFreezePane(0, 1, 0, 1);
+
+            using var exportData = new MemoryStream();
+            workbook.Write(exportData);
+
+            return File(exportData.ToArray(), "application/vnd.ms-excel", "urunler.xls");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExcelImport(IFormFile file, int brandId)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Dosya seçilmedi.");
+
+            var ext = Path.GetExtension(file.FileName).ToLower();
+            if (ext != ".xls")
+                return BadRequest("Lütfen yalnızca .xls dosyası yükleyin.");
+
+            List<ProductIntegrationViewModel> importedData = new List<ProductIntegrationViewModel>();
+
+            using (var stream = file.OpenReadStream())
+            {
+                var workbook = new HSSFWorkbook(stream);
+                var sheet = workbook.GetSheetAt(0);
+
+                for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
+                {
+                    var row = sheet.GetRow(rowIndex);
+                    if (row == null) continue;
+
+                    try
+                    {
+                        int col = 0;
+                        var model = new ProductIntegrationViewModel();
+
+                        model.ProductId = (int)row.GetCell(col++).NumericCellValue;
+                        model.ProductName = row.GetCell(col++)?.ToString();
+                        model.ProductCode = row.GetCell(col++)?.ToString();
+                        model.ProductBrand = row.GetCell(col++)?.ToString();
+                        model.ProductCategory = row.GetCell(col++)?.ToString();
+                        model.CostPrice = row.GetCell(col) != null ? Convert.ToDecimal(row.GetCell(col++).NumericCellValue) : 0;
+                        model.Price = row.GetCell(col) != null ? Convert.ToDecimal(row.GetCell(col++).NumericCellValue) : 0;
+                        model.SalePrice = row.GetCell(col) != null ? Convert.ToDecimal(row.GetCell(col++).NumericCellValue) : 0;
+
+
+                        // Integration sütunlarını oku
+                        model.IntegrationPrices = new Dictionary<string, IntegrationPriceInfo>();
+
+                        while (col < row.LastCellNum)
+                        {
+                            string integrationHeader = sheet.GetRow(0).GetCell(col).ToString(); // başlıktan al
+                            if (integrationHeader.EndsWith("Id"))
+                            {
+                                int integrationId = (int)(row.GetCell(col++)?.NumericCellValue ?? 0);
+                                string priceHeader = sheet.GetRow(0).GetCell(col).ToString();
+                                double integrationPrice = row.GetCell(col++)?.NumericCellValue ?? 0;
+
+                                string key = integrationHeader.Replace(" Id", ""); // örn: Smartstore > Test
+                                model.IntegrationPrices[key] = new IntegrationPriceInfo
+                                {
+                                    IntegrationSystemId = integrationId,
+                                    Price = Convert.ToDecimal(integrationPrice)
+                                };
+                            }
+                            else
+                            {
+                                col++;
+                            }
+                        }
+
+                        importedData.Add(model);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Row {rowIndex} okunamadı: {ex.Message}");
+                    }
+                }
+            }
+
+
+            foreach (var item in importedData)
+            {
+                var product = await _productService.GetProductByIdAsync(item.ProductId);
+                if (product != null)
+                {
+                    product.Price = item.Price;
+                    product.SalePrice = item.SalePrice;
+                    product.CostPrice = item.CostPrice;
+
+
+
+                    var mapped = _mapper.Map<UpdateProductDto>(product);
+                    mapped.Price = item.Price;
+                    mapped.SalePrice = item.SalePrice;
+                    mapped.CostPrice = item.CostPrice;
+                    await _productService.UpdateAsync(mapped);
+
+                    foreach (var kvp in item.IntegrationPrices)
+                    {
+                        var integration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(item.ProductId, kvp.Value.IntegrationSystemId);
+
+                        if (integration != null)
+                        {
+                            integration.Price = kvp.Value.Price.HasValue ? kvp.Value.Price.Value : 0;
+                        }
+                        else
+                        {
+                            // yoksa ekle
+                            await _productIntegrationService.UpdateAsync(new UpdateProductIntegrationDto
+                            {
+                                Id = integration.Id,
+                                ProductId = item.ProductId,
+                                IntegrationSystemId = kvp.Value.IntegrationSystemId,
+                                Price = kvp.Value.Price.Value
+                            });
+                        }
+                    }
+                }
+            }
+
+
+
+            return Json(new { success = true, count = importedData.Count });
+        }
+
 
         #endregion
 

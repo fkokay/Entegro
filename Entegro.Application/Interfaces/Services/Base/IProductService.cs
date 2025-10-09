@@ -20,6 +20,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task DeleteAsync(int productId);
         Task<int> GetProductCountAsync();
         Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId);
+        Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int brandId);
         Task<ProductDto?> GetProductIntegrationMatrixByIdAsync(int productId);
     }
 }

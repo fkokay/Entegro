@@ -48,14 +48,30 @@
                         <h5 class="mb-0">Ürün Listesi</h5>
                         @if (selectedBrandId >= 0 && Model != null && Model.Any())
                         {
-                            <button type="button" class="btn btn-success"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#priceUpdateModal">
-                                Maliyet Fiyatına Göre Güncelle
-                            </button>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-success btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#priceUpdateModal">
+                                    Maliyet Fiyatına Göre Güncelle
+                                </button>
+
+                                <a href="@Url.Action("ExcelExport", "Import", new { brandId = selectedBrandId })"
+                                   class="btn btn-info btn-sm">
+                                    <i class="ti ti-file-spreadsheet ti-xs me-1"></i> Excele Aktar
+                                </a>
+                                <div class="d-flex gap-2">
+                                    <input type="file" id="excelFile" class="d-none" accept=".xls,.xlsx" />
+                                    <label for="excelFile" class="btn btn-warning btn-sm mb-0">
+                                        <i class="ti ti-upload"></i> Excelden Yükle
+                                    </label>
+                                </div>
+
+
+                            </div>
                         }
                     </div>
-                    <div class="table-responsive text-nowrap">
+
+                    <div class="table-responsive">
 
                         @if (selectedBrandId < 0)
                         {
@@ -71,6 +87,8 @@
                                     <thead>
                                         <tr>
                                             <th>Ürün</th>
+                                            <th>Marka</th>
+                                            <th>Kategori</th>
                                             <th>Maliyet Fiyatı</th>
                                             <th>Liste Fiyatı</th>
                                             <th>Satış Fiyatı</th>
@@ -86,12 +104,19 @@
                                             <tr>
                                                 <td>
                                                     <input type="hidden" name="[@(i)].ProductId" value="@Model[i].ProductId" />
-                                                    @Model[i].ProductName
+                                                    <div>
+                                                        <strong>@Model[i].ProductName</strong>
+                                                    </div>
+                                                    <div class="text-muted" style="font-size: 12px;">
+                                                        <span><b>Kod:</b> @Model[i].ProductCode</span><br />
+                                                    </div>
                                                     <input type="hidden"
                                                            name="[@(i)].IsChanged"
                                                            value="false"
                                                            class="is-changed-flag" />
                                                 </td>
+                                                <td>@Model[i].ProductBrand</td>
+                                                <td>@Model[i].ProductCategory</td>
                                                 <td>@Model[i].CostPrice</td>
                                                 <td>
                                                     <input type="number" step="0.01"
@@ -317,8 +342,100 @@
 
 
     <script>
-     
+        document.getElementById("uploadExcel").addEventListener("click", function () {
+            var fileInput = document.getElementById("excelFile");
+            var file = fileInput.files[0];
+            var brandId = "@selectedBrandId";
+
+            if (!file) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Dosya Seçilmedi",
+                    text: "Lütfen bir Excel dosyası seçiniz."
+                });
+                return;
+            }
+
+            var allowedExtensions = [".xls", ".xlsx"];
+            var fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            if (!allowedExtensions.includes(fileExt)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Geçersiz Dosya Tipi",
+                    text: "Sadece Excel (.xls, .xlsx) dosyaları yüklenebilir."
+                });
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("brandId", brandId);
+
+            fetch("@Url.Action("ExcelImport", "Import")", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Yükleme başarısız");
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Başarılı",
+                    text: "Excel başarıyla yüklendi. " + data.count + " kayıt işlendi."
+                }).then(() => {
+                    location.reload(); // sayfayı yenile
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Hata",
+                    text: error.message
+                });
+            });
+        });
+    </script>
+    <script>
+                document.getElementById("excelFile").addEventListener("change", function () {
+            var file = this.files[0];
+            var brandId = "@selectedBrandId";
+
+            if (!file) {
+                Swal.fire({ icon: "warning", title: "Dosya Seçilmedi", text: "Lütfen bir Excel dosyası seçiniz." });
+                return;
+            }
+
+            var allowedExtensions = [".xls", ".xlsx"];
+            var fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            if (!allowedExtensions.includes(fileExt)) {
+                Swal.fire({ icon: "error", title: "Geçersiz Dosya Tipi", text: "Sadece Excel (.xls, .xlsx) dosyaları yüklenebilir." });
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("brandId", brandId);
+
+            fetch("@Url.Action("ExcelImport", "Import")", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Yükleme başarısız");
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({ icon: "success", title: "Başarılı", text: "Excel başarıyla yüklendi. " + data.count + " kayıt işlendi." })
+                    .then(() => location.reload());
+            })
+            .catch(error => {
+                Swal.fire({ icon: "error", title: "Hata", text: error.message });
+            });
+        });
 
     </script>
+
 }
 

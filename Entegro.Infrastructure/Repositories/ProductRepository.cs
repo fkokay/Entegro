@@ -213,5 +213,19 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.Products.Include(p => p.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).FirstOrDefaultAsync(p => p.Id == productId);
         }
+
+        public async Task<List<Product>?> GetProductIntegrationMatrixAsync(int brandId)
+        {
+            var query = _context.Products
+            .Include(p => p.ProductIntegrations)
+                .ThenInclude(pi => pi.IntegrationSystem)
+                    .ThenInclude(i => i.IntegrationSystemParameters)
+                    .AsQueryable();
+
+            if (brandId > 0)
+                query = query.Where(x => x.BrandId == brandId);
+
+            return await query.ToListAsync();
+        }
     }
 }
