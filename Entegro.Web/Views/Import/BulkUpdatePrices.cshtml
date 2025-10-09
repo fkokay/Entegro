@@ -1,6 +1,6 @@
 ﻿@model List<ProductIntegrationViewModel>
 @{
-    ViewData["Title"] = "BulkUpdatePrices";
+    ViewData["Title"] = "Toplu Fiyat Güncelleme";
     int selectedBrandId = ViewBag.SelectedBrandId ?? 0;
 }
 
@@ -43,7 +43,7 @@
                                 </select>
                             </div>
 
-                            @if (selectedBrandId >= 0)
+                            @if (selectedBrandId >= 0 && Model != null && Model.Any())
                             {
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#priceUpdateModal">
@@ -192,8 +192,6 @@
         </div>
     </div>
 </div>
-
-
 <div class="modal fade" id="priceUpdateModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -212,36 +210,47 @@
                     <!-- Yüzde Oranı -->
                     <div class="col-12">
                         <label class="form-label fw-semibold" for="percentValue">Yüzde Fark Oranı (%)</label>
-                        <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required />
+                        <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required min="0" />
                     </div>
 
                     <!-- Uygulanacak Sütunlar -->
                     <div class="col-12">
-                        <label class="form-label fw-semibold">Uygulanacak Sütunlar</label>
+                        <label class="form-label fw-semibold d-block mb-2">Uygulanacak Sütunlar</label>
+                        <div class="row g-2">
 
-                        <!-- Liste fiyatı -->
-                        <div class="form-check">
-                            <input class="form-check-input apply-column" type="checkbox" value="Price" id="colPrice">
-                            <label class="form-check-label" for="colPrice">Liste Fiyatı</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input apply-column" type="checkbox" value="SalePrice" id="colSalePrice">
-                            <label class="form-check-label" for="colSalePrice">Satış Fiyatı</label>
-                        </div>
-
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var header in Model.First().IntegrationPrices.Keys)
-                            {
+                            <!-- Liste fiyatı -->
+                            <div class="col-md-3 col-6">
                                 <div class="form-check">
-                                    <input class="form-check-input apply-column" type="checkbox" value="@header" id="col_@header">
-                                    <label class="form-check-label" for="col_@header">@header</label>
+                                    <input class="form-check-input apply-column" type="checkbox" value="Price" id="colPrice">
+                                    <label class="form-check-label" for="colPrice">Liste Fiyatı</label>
                                 </div>
+                            </div>
+
+                            <!-- Satış fiyatı -->
+                            <div class="col-md-3 col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input apply-column" type="checkbox" value="SalePrice" id="colSalePrice">
+                                    <label class="form-check-label" for="colSalePrice">Satış Fiyatı</label>
+                                </div>
+                            </div>
+
+                            <!-- Integration fiyatları -->
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var header in Model.First().IntegrationPrices.Keys)
+                                {
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input apply-column" type="checkbox" value="@header" id="col_@header">
+                                            <label class="form-check-label" for="col_@header">@header</label>
+                                        </div>
+                                    </div>
+                                }
                             }
-                        }
+                        </div>
                     </div>
 
+                    <!-- Buttons -->
                     <div class="col-12 text-center pt-3">
                         <button type="button" id="applyPercentBtn" class="btn btn-success px-4 me-2">
                             <i class="bi bi-check-circle me-1"></i> Uygula
@@ -252,6 +261,7 @@
                     </div>
                 </form>
             </div>
+
 
         </div>
     </div>

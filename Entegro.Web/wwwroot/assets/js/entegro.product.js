@@ -1979,7 +1979,7 @@ Entegro.product = (function ($) {
             },
             serverSide: true,
             processing: true,
-            order: [[2, 'asc']],
+            order: [[3, 'asc']],
             ajax: {
                 url: url,
                 type: 'POST',
@@ -1992,8 +1992,10 @@ Entegro.product = (function ($) {
                 { data: null, defaultContent: '', orderable: false }, // checkbox alanı
                 { data: 'Id', visible: false },
                 {
+                    data: 'SpecificationAttributeOption.SpecificationAttributeName',
+                },
+                {
                     data: 'SpecificationAttributeOption.Name',
-                    title: 'Özellik Adı'
                 },
                 { data: 'SpecificationAttributeOption.SpecificationAttributeId', visible: false },
                 {
@@ -2022,7 +2024,7 @@ Entegro.product = (function ($) {
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 },
                 {
-                    targets: 3,
+                    targets: 4,
                     visible: false,
                     searchable: false
                 }

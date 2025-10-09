@@ -73,6 +73,7 @@ namespace Entegro.Application.Services.Base
             var items = await productSpecificationAttribute.Items.SelectAwait(async x =>
             {
                 var model = _mapper.Map<ProductSpecificationAttributeDto>(x);
+                model.SpecificationAttributeOption.SpecificationAttributeName = x.SpecificationAttributeOption.SpecificationAttribute?.Name;
                 return model;
             }).AsyncToList();
 

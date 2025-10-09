@@ -238,7 +238,7 @@
                     template.find(".circular-progress").addClass("d-none");
                 }
 
-                // If there was an error returned by the server set file status accordingly.
+                // Eğer hata döndüyse Dropzone.ERROR ata
                 if (response.length) {
                     for (var fileResponse of response) {
                         if (!fileResponse.success) {
@@ -249,12 +249,23 @@
                 }
                 else {
                     file.media = response;
-
                     if (!response.success) file.status = Dropzone.ERROR;
                 }
 
+                // ✅ Yükleme bitince progress sıfırla ve butonları göster
+                var fileProgressBar = $(file.previewElement).find(".progress-bar");
+                dzResetProgressBar(fileProgressBar);
+
+                $(file.previewElement)
+                    .addClass("dz-success dz-complete")
+                    .removeClass("dz-processing");
+
+                $(file.previewElement).find(".delete-entity-picture").removeClass("d-none");
+                $(file.previewElement).find(".fu-item-canceled").addClass("d-none");
+
                 if (options.onUploadCompleted) options.onUploadCompleted.apply(this, [file, response, progress]);
             });
+
 
             el.on("successmultiple", function (files, response, progress) {
                 logEvent("successmultiple", files, response, progress);
@@ -331,15 +342,10 @@
                 var dupeFiles = this.getFilesWithStatus(Dropzone.ERROR).filter(file => file.media && file.media.dupe === true);
                 var successFiles = this.getFilesWithStatus(Dropzone.SUCCESS);
 
-                // If there are duplicates & dialog isn't already open > open duplicate file handler dialog.
                 if (dupeFiles.length !== 0 && dialog && !dialog.isOpen) {
-
-                    // Close confirmation dialog. User was too slow. Uploads are complete.
                     if (elStatusWindow.data("confirmation-requested")) {
                         $("#modal-confirm-shared").modal("hide");
                     }
-
-                    // Open duplicate file handler dialog.
                     dialog.open({
                         queue: Entegro.Admin.Media.convertDropzoneFileQueue(dupeFiles),
                         callerId: elDropzone.find(".fu-fileupload").attr("id"),
@@ -351,21 +357,17 @@
 
                 if (dupeFiles.length === 0) {
                     assignFilesToEntity(assignableFiles, assignableFileIds, true);
-                }
-                else {
-                    // Duplicate resolution may not be done yet.
+                } else {
                     if (!dialog.isOpen && dupeFiles.length > 0) {
                         assignableFileIds = "";
                         assignableFiles.length = 0;
                     }
                 }
 
-                // Status
                 if (elStatusWindow.length > 0) {
                     elStatusWindow.find(".current-file-count").text(successFiles.length ? successFiles.length : 0);
                     elStatusWindow.find(".current-file-text").text((successFiles.length === 1 ? "yükleme tamamlandı" : "yüklemeler tamamlandı"));
 
-                    // Only hide commands if no uploads were canceled.
                     var canceledFiles = this.getFilesWithStatus(Dropzone.CANCELED);
                     if (canceledFiles.length === 0) {
                         elStatusWindow.find(".flyout-commands").removeClass("show");
@@ -375,20 +377,11 @@
                     elStatusWindow.data("upload-in-progress", false);
                 }
 
-                // Reset progressbar when queue is complete.
-                if (opts.maxFiles === 1) {
-                    // SingleFile
-                    dzResetProgressBar(elProgressBar);
-                }
-                else if (!displayPreviewInList || (displayPreviewInList && dupeFiles.length !== 0)) { // Don't reset progress bar for status window if dupefiles = 0
-                    // MultiFile
-                    var uploadedFiles = this.files;
-
-                    for (var file of uploadedFiles) {
-                        // Only reset progress bar if there was an error (e.g. file is dupe) and the files must be processed again.
-                        if (file.status === Dropzone.ERROR) {
-                            dzResetProgressBar($(file.previewElement).find(".progress-bar"));
-                        }
+                // ✅ Başarılı yüklemelerde progress bar temizlensin
+                var uploadedFiles = this.files;
+                for (var file of uploadedFiles) {
+                    if (file.status === Dropzone.SUCCESS) {
+                        dzResetProgressBar($(file.previewElement).find(".progress-bar"));
                     }
                 }
 
