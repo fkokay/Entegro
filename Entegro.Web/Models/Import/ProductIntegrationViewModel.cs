@@ -19,4 +19,12 @@
         public int IntegrationSystemId { get; set; }
         public decimal? Price { get; set; }
     }
+
+    public class ExcelImportRequest
+    {
+        public IFormFile File { get; set; }
+        public int BrandId { get; set; }
+        public List<string> SelectedHeaders { get; set; }
+    }
+
 }

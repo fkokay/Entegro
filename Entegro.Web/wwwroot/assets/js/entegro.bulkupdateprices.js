@@ -7,8 +7,6 @@ Entegro.bulkupdateprices = (function ($) {
     function initFormHandler() {
         const form = document.getElementById('integration-form');
         if (!form) return;
-
-        // tüm inputları izle
         form.querySelectorAll('input').forEach(input => {
             input.addEventListener('change', () => {
                 isFormChanged = true;
@@ -20,10 +18,12 @@ Entegro.bulkupdateprices = (function ($) {
                     if (isChangedInput) {
                         isChangedInput.value = "true";
                     }
+
+                    // satırı renklendir
+                    row.classList.add("row-changed");
                 }
             });
         });
-
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -36,7 +36,7 @@ Entegro.bulkupdateprices = (function ($) {
                     customClass: { confirmButton: 'btn btn-primary' },
                     buttonsStyling: false
                 });
-                return; // post etme
+                return; 
             }
 
             const formData = new FormData(form);
@@ -55,6 +55,11 @@ Entegro.bulkupdateprices = (function ($) {
                         const toast = new bootstrap.Toast(toastElement);
                         toast.show();
                         isFormChanged = false;
+
+                        // Kaydedildikten sonra renkleri temizle
+                        form.querySelectorAll("tr.row-changed").forEach(r => {
+                            r.classList.remove("row-changed");
+                        });
                     } else {
                         Swal.fire({
                             title: 'Hata!',
@@ -105,7 +110,6 @@ Entegro.bulkupdateprices = (function ($) {
             });
         });
     }
-  
     function initPriceUpdatePopup() {
         const applyBtn = document.getElementById("applyPercentBtn");
         if (!applyBtn) return;
@@ -133,14 +137,16 @@ Entegro.bulkupdateprices = (function ($) {
             const columns = checkedCols.map(c => c.value);
 
             document.querySelectorAll("tbody tr").forEach(row => {
-                const cost = parseFloat(row.querySelector("td:nth-child(2)").innerText) || 0;
+                // 4. sütun maliyet fiyatı
+                const costText = row.querySelector("td:nth-child(4)")?.innerText || "0";
+                const cost = parseFloat(costText.replace(",", ".")) || 0;
                 if (cost <= 0) return;
 
                 columns.forEach(col => {
                     let input;
 
                     if (col === "Price") {
-                        input = row.querySelector("input[name*='Price'][name$='.Price']");
+                        input = row.querySelector("input[name$='Price']");
                     }
                     else if (col === "SalePrice") {
                         input = row.querySelector("input[name*='SalePrice']");
@@ -150,24 +156,21 @@ Entegro.bulkupdateprices = (function ($) {
                     }
 
                     if (input) {
-                        const oldVal = parseFloat(input.value) || 0;
+                        const oldVal = parseFloat(input.value.replace(",", ".")) || 0;
 
-                     
                         let result = oldVal + (cost * percent / 100);
-                        alert("maliyet: "+ result);
-                      
-                        if (applyCommission) {
-                            result = result + (result * commissionPercent / 100);
-                            alert("komisyon: "+result);
-                        }
 
                         if (applyShipping) {
                             result = result + shippingFee;
-                            alert("kargo ücreti: "+ result);
+                        }
+
+                        if (applyCommission) {
+                            result = result + (result * commissionPercent / 100);
                         }
 
                         input.value = result.toFixed(2);
 
+                        // değişiklik flag
                         const flag = row.querySelector(".is-changed-flag");
                         if (flag) flag.value = "true";
 
@@ -179,7 +182,6 @@ Entegro.bulkupdateprices = (function ($) {
             bootstrap.Modal.getInstance(document.getElementById("priceUpdateModal")).hide();
         });
     }
-
     function initToggleOptions() {
         const applyCommission = document.getElementById("applyCommission");
         const commissionBox = document.getElementById("commissionBox");
@@ -187,7 +189,7 @@ Entegro.bulkupdateprices = (function ($) {
         const shippingBox = document.getElementById("shippingBox");
 
         if (applyCommission && commissionBox) {
-            applyCommission.checked = false; // ilk başta false
+            applyCommission.checked = false;
             commissionBox.style.display = "none";
 
             applyCommission.addEventListener("change", function () {
@@ -196,7 +198,7 @@ Entegro.bulkupdateprices = (function ($) {
         }
 
         if (applyShipping && shippingBox) {
-            applyShipping.checked = false; // ilk başta false
+            applyShipping.checked = false;
             shippingBox.style.display = "none";
 
             applyShipping.addEventListener("change", function () {
@@ -204,7 +206,6 @@ Entegro.bulkupdateprices = (function ($) {
             });
         }
     }
-
     function initBrandSelect2(selectedBrand) {
         const $brandDropdown = $('#brandFilter');
         if (!$brandDropdown.length) return;
@@ -245,7 +246,127 @@ Entegro.bulkupdateprices = (function ($) {
             window.location.href = newUrl.toString();
         });
     }
+    function initExcelImport(selectedBrandId) {
+        const fileInput = document.getElementById("excelFile");
+        if (!fileInput) return;
 
+        fileInput.addEventListener("change", async function () {
+            const file = this.files[0];
+            const brandId = selectedBrandId || 0;
+
+            if (!file) {
+                Swal.fire({ icon: "warning", title: "Dosya Seçilmedi", text: "Lütfen bir Excel dosyası seçiniz." });
+                return;
+            }
+
+            const allowedExtensions = [".xls", ".xlsx"];
+            const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            if (!allowedExtensions.includes(fileExt)) {
+                Swal.fire({ icon: "error", title: "Geçersiz Dosya Tipi", text: "Sadece Excel (.xls, .xlsx) dosyaları yüklenebilir." });
+                return;
+            }
+
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data, { type: "array" });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const headers = XLSX.utils.sheet_to_json(worksheet, { header: 1 })[0];
+
+
+            let htmlContent = "<div class='text-start'>";
+            headers.forEach((h, i) => {
+                if (!h) return;
+
+                // Eğer başlık "ProductId" veya "Id" ise → seçili ve disabled
+                if (h.toLowerCase() === "productid" || h.toLowerCase() === "id") {
+                    htmlContent += `
+                    <div>
+                        <input type="checkbox" id="chk_${i}" value="${h}" checked disabled>
+                        <label for="chk_${i}">${h} (zorunlu)</label>
+                    </div>`;
+                } else {
+                    htmlContent += `
+                    <div>
+                        <input type="checkbox" id="chk_${i}" value="${h}">
+                        <label for="chk_${i}">${h}</label>
+                    </div>`;
+                }
+            });
+            htmlContent += "</div>";
+
+
+            Swal.fire({
+                title: "Başlıkları Seç",
+                html: htmlContent,
+                showCancelButton: true,
+                confirmButtonText: "Yükle",
+                cancelButtonText: "İptal",
+                preConfirm: () => {
+                    const selected = [];
+                    headers.forEach((h, i) => {
+                        const chk = document.getElementById("chk_" + i);
+                        if (chk && (chk.checked || chk.disabled)) {
+                            selected.push(h);
+                        }
+                    });
+
+                    if (selected.length <= 1) {
+                        Swal.showValidationMessage("Id dışında en az bir başlık seçmelisiniz!");
+                    }
+
+                    return selected;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const selectedHeaders = result.value;
+
+                    const formData = new FormData();
+                    formData.append("File", file);
+                    formData.append("BrandId", brandId);
+
+                    selectedHeaders.forEach((h, i) => {
+                        formData.append(`SelectedHeaders[${i}]`, h);
+                    });
+
+                    window.showLoading("Lütfen bekleyiniz..");
+
+                    fetch(window.excelImportUrl, {
+                        method: "POST",
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error("Yükleme başarısız");
+                            return response.json();
+                        })
+                        .then(data => {
+                            window.hideLoading();
+
+                            let message = `Excel başarıyla yüklendi. ${data.count} kayıt işlendi.`;
+                            if (data.notUpdatedIntegrationCount && data.notUpdatedIntegrationCount > 0) {
+                                message += ` ${data.notUpdatedIntegrationCount} entegrasyon fiyatı güncellenemedi.`;
+                            }
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Başarılı",
+                                text: message
+                            }).then(() => location.reload());
+                        })
+                        .catch(error => {
+                            window.hideLoading();
+                            Swal.fire({ icon: "error", title: "Hata", text: error.message });
+                        });
+
+                } else {
+                    Swal.fire({
+                        icon: "info",
+                        title: "İptal Edildi",
+                        text: "Yükleme işlemi iptal edildi."
+                    }).then(() => location.reload());
+                }
+            });
+        });
+    }
 
 
     return {
@@ -256,6 +377,7 @@ Entegro.bulkupdateprices = (function ($) {
             initToggleOptions();
             initPriceUpdatePopup();
             initBrandSelect2(selectedBrand);
+            initExcelImport(selectedBrand);
         }
     };
 })(jQuery);

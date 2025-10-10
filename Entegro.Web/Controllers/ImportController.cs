@@ -714,6 +714,8 @@ namespace Entegro.Web.Controllers
 
             return Json(new { success = true });
         }
+
+
         [HttpGet]
         public async Task<IActionResult> ExcelExport(int brandId)
         {
@@ -762,16 +764,21 @@ namespace Entegro.Web.Controllers
             headerRow.CreateCell(col++).SetCellValue("Liste Fiyatı");
             headerRow.CreateCell(col++).SetCellValue("Satış Fiyatı");
 
-            var allIntegrationKeys = viewModel
-                .SelectMany(v => v.IntegrationPrices.Keys)
-                .Distinct()
+            // Integration key + Id eşleştirmesi
+            var integrationKeyMap = viewModel
+                .SelectMany(v => v.IntegrationPrices)
+                .GroupBy(x => x.Key)
+                .Select(g => new
+                {
+                    Key = g.Key,
+                    IntegrationSystemId = g.First().Value.IntegrationSystemId
+                })
                 .ToList();
 
-            // Entegrasyon başlıklarını 2 sütun olacak şekilde ekle (Id + Fiyat)
-            foreach (var key in allIntegrationKeys)
+            // Entegrasyon başlıklarını tek sütun olacak şekilde ekle
+            foreach (var item in integrationKeyMap)
             {
-                headerRow.CreateCell(col++).SetCellValue($"{key} Id");
-                headerRow.CreateCell(col++).SetCellValue($"{key} Fiyat");
+                headerRow.CreateCell(col++).SetCellValue($"{item.Key}_Fiyat_IntegrationSystemId_{item.IntegrationSystemId}");
             }
 
             // DATA ROWS
@@ -790,17 +797,15 @@ namespace Entegro.Web.Controllers
                 row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.Price));
                 row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.SalePrice));
 
-                // entegrasyon kolonları (Id + Fiyat)
-                foreach (var key in allIntegrationKeys)
+                foreach (var integration in integrationKeyMap)
                 {
-                    if (item.IntegrationPrices.ContainsKey(key))
+                    if (item.IntegrationPrices.ContainsKey(integration.Key))
                     {
-                        row.CreateCell(col++).SetCellValue(item.IntegrationPrices[key].IntegrationSystemId);
-                        row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.IntegrationPrices[key].Price));
+                        // sadece fiyat yazılacak
+                        row.CreateCell(col++).SetCellValue(Convert.ToDouble(item.IntegrationPrices[integration.Key].Price));
                     }
                     else
                     {
-                        row.CreateCell(col++).SetCellValue(0); // Id yok
                         row.CreateCell(col++).SetCellValue(0); // Fiyat yok
                     }
                 }
@@ -816,18 +821,18 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExcelImport(IFormFile file, int brandId)
+        public async Task<IActionResult> ExcelImport([FromForm] ExcelImportRequest request)
         {
-            if (file == null || file.Length == 0)
+            if (request.File == null || request.File.Length == 0)
                 return BadRequest("Dosya seçilmedi.");
 
-            var ext = Path.GetExtension(file.FileName).ToLower();
+            var ext = Path.GetExtension(request.File.FileName).ToLower();
             if (ext != ".xls")
                 return BadRequest("Lütfen yalnızca .xls dosyası yükleyin.");
 
             List<ProductIntegrationViewModel> importedData = new List<ProductIntegrationViewModel>();
 
-            using (var stream = file.OpenReadStream())
+            using (var stream = request.File.OpenReadStream())
             {
                 var workbook = new HSSFWorkbook(stream);
                 var sheet = workbook.GetSheetAt(0);
@@ -851,29 +856,29 @@ namespace Entegro.Web.Controllers
                         model.Price = row.GetCell(col) != null ? Convert.ToDecimal(row.GetCell(col++).NumericCellValue) : 0;
                         model.SalePrice = row.GetCell(col) != null ? Convert.ToDecimal(row.GetCell(col++).NumericCellValue) : 0;
 
-
                         // Integration sütunlarını oku
                         model.IntegrationPrices = new Dictionary<string, IntegrationPriceInfo>();
 
                         while (col < row.LastCellNum)
                         {
                             string integrationHeader = sheet.GetRow(0).GetCell(col).ToString(); // başlıktan al
-                            if (integrationHeader.EndsWith("Id"))
-                            {
-                                int integrationId = (int)(row.GetCell(col++)?.NumericCellValue ?? 0);
-                                string priceHeader = sheet.GetRow(0).GetCell(col).ToString();
-                                double integrationPrice = row.GetCell(col++)?.NumericCellValue ?? 0;
+                            double integrationPrice = row.GetCell(col)?.NumericCellValue ?? 0;
+                            col++;
 
-                                string key = integrationHeader.Replace(" Id", ""); // örn: Smartstore > Test
+                            int integrationId = 0;
+                            var match = System.Text.RegularExpressions.Regex.Match(integrationHeader, @"IntegrationSystemId_(\d+)$");
+                            if (match.Success)
+                                integrationId = int.Parse(match.Groups[1].Value);
+
+                            string key = integrationHeader;
+
+                            if (integrationId > 0)
+                            {
                                 model.IntegrationPrices[key] = new IntegrationPriceInfo
                                 {
                                     IntegrationSystemId = integrationId,
                                     Price = Convert.ToDecimal(integrationPrice)
                                 };
-                            }
-                            else
-                            {
-                                col++;
                             }
                         }
 
@@ -885,8 +890,7 @@ namespace Entegro.Web.Controllers
                     }
                 }
             }
-
-
+            int notUpdatedIntegrationCount = 0;
             foreach (var item in importedData)
             {
                 var product = await _productService.GetProductByIdAsync(item.ProductId);
@@ -895,8 +899,6 @@ namespace Entegro.Web.Controllers
                     product.Price = item.Price;
                     product.SalePrice = item.SalePrice;
                     product.CostPrice = item.CostPrice;
-
-
 
                     var mapped = _mapper.Map<UpdateProductDto>(product);
                     mapped.Price = item.Price;
@@ -910,28 +912,28 @@ namespace Entegro.Web.Controllers
 
                         if (integration != null)
                         {
-                            integration.Price = kvp.Value.Price.HasValue ? kvp.Value.Price.Value : 0;
+                            integration.Price = kvp.Value.Price ?? 0;
+                            var mappedIntegration = _mapper.Map<UpdateProductIntegrationDto>(integration);
+                            mappedIntegration.IntegrationSystemId = kvp.Value.IntegrationSystemId;
+                            mappedIntegration.Price = kvp.Value.Price.Value;
+                            await _productIntegrationService.UpdateAsync(mappedIntegration);
                         }
                         else
                         {
-                            // yoksa ekle
-                            await _productIntegrationService.UpdateAsync(new UpdateProductIntegrationDto
-                            {
-                                Id = integration.Id,
-                                ProductId = item.ProductId,
-                                IntegrationSystemId = kvp.Value.IntegrationSystemId,
-                                Price = kvp.Value.Price.Value
-                            });
+                            notUpdatedIntegrationCount++;
                         }
                     }
                 }
             }
 
+            return Json(new
+            {
+                success = true,
+                count = importedData.Count,
+                notUpdatedIntegrationCount = notUpdatedIntegrationCount
+            });
 
-
-            return Json(new { success = true, count = importedData.Count });
         }
-
 
         #endregion
 

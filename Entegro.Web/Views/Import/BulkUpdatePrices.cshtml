@@ -3,9 +3,15 @@
     ViewData["Title"] = "Toplu Fiyat Güncelleme";
     int selectedBrandId = ViewBag.SelectedBrandId ?? 0;
 }
+<style>
+    .row-changed {
+        background-color: #fff3cd !important;
+        transition: background-color 0.3s ease;
+    }
+</style>
 
-
-<div class="container-fluid flex-grow-1 container-p-y">
+<div class="mt-6"></div>
+<div class="container-fluid flex-grow-1 container-p-y mt-6">
     <form asp-action="SaveIntegrations" id="integration-form" method="post">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
 
@@ -36,13 +42,25 @@
                     <div class="card-header border-bottom">
                         <h5 class="card-title mb-0">Filtreler</h5>
                         <div class="row pt-4 gap-6 gap-md-0 g-md-6">
-                            <div class="col-md-2">
-                                <select asp-items="ViewBag.Brands" class="form-select select2" id="brandFilter">
-                                    <option></option> 
-                                </select>
-
+                            <div class="col-md-4">
+                                <div class="row g-2">
+                                    <div class="col-8">
+                                        <select asp-items="ViewBag.Brands" class="form-select select2" id="brandFilter">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <a asp-action="BulkUpdatePrices"
+                                           asp-route-brandId="0"
+                                           asp-route-page="1"
+                                           class="btn btn-primary w-100">
+                                            <i class="ti ti-database ti-xs me-1"></i> Tümünü Getir
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Ürün Listesi</h5>
@@ -52,7 +70,7 @@
                                 <button type="button" class="btn btn-success btn-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#priceUpdateModal">
-                                    Maliyet Fiyatına Göre Güncelle
+                                    <i class="ti ti-calculator ti-xs me-1"></i> Maliyet Fiyatına Göre Güncelle
                                 </button>
 
                                 <a href="@Url.Action("ExcelExport", "Import", new { brandId = selectedBrandId })"
@@ -154,7 +172,7 @@
                             else
                             {
                                 <div class="text-center p-4">
-                                    <h4>Görüntülenecek Sonuç Yok</h4>
+                                    <h4>Görüntülenecek Kayıt Yok</h4>
                                 </div>
                             }
                         }
@@ -168,7 +186,7 @@
     </form>
 
 </div>
-<nav aria-label="Sayfalama" class="d-flex justify-content-center mb-3">
+<nav aria-label="Sayfalama" class="d-flex justify-content-center">
     <ul class="pagination">
         <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
             <a class="page-link" href="@Url.Action("BulkUpdatePrices", new { page = ViewBag.CurrentPage - 1, brandId = selectedBrandId })">«</a>
@@ -232,82 +250,100 @@
             <div class="modal-body px-4 py-4">
                 <form id="priceUpdateForm" class="row g-4" onsubmit="return false">
 
-                    <!-- Yüzde Kâr Oranı -->
-                    <div class="row mb-3 align-items-center">
-                        <label class="col-md-4 col-form-label fw-semibold text-end" for="percentValue">
-                            Yüzde Kâr Oranı (%)
-                        </label>
-                        <div class="col-md-8">
-                            <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required min="0" />
-                        </div>
-                    </div>
+                    <!-- Card Container -->
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
 
-                    <!-- Komisyon -->
-                    <div class="row mb-3 align-items-center">
-                        <label class="col-md-4 col-form-label fw-semibold text-end" for="applyCommission">
-                            Komisyon (%)
-                        </label>
-                        <div class="col-md-8 d-flex align-items-center">
-                            <div class="form-check me-3">
-                                <input class="form-check-input" type="checkbox" id="applyCommission">
-                            </div>
-                            <div id="commissionBox" style="display:none; flex:1;">
-                                <input type="number" step="0.01" class="form-control" id="percentCommissionValue" value="10" min="0" placeholder="Komisyon %" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kargo -->
-                    <div class="row mb-3 align-items-center">
-                        <label class="col-md-4 col-form-label fw-semibold text-end" for="applyShipping">
-                            Kargo
-                        </label>
-                        <div class="col-md-8 d-flex align-items-center">
-                            <div class="form-check me-3">
-                                <input class="form-check-input" type="checkbox" id="applyShipping">
-                            </div>
-                            <div id="shippingBox" style="display:none; flex:1;">
-                                <input type="number" step="0.01" class="form-control" id="shippingFee" value="10" min="0" placeholder="Kargo ücreti" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Uygulanacak Sütunlar -->
-                    <div class="col-12 mt-3">
-                        <label class="form-label fw-semibold d-block mb-2">Uygulanacak Sütunlar</label>
-                        <div class="row g-2">
-
-                            <!-- Liste fiyatı -->
-                            <div class="col-md-3 col-6">
-                                <div class="form-check">
-                                    <input class="form-check-input apply-column" type="checkbox" value="Price" id="colPrice">
-                                    <label class="form-check-label" for="colPrice">Liste Fiyatı</label>
+                                <!-- Yüzde Kâr Oranı -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="percentValue">
+                                        Yüzde Kâr Oranı (%)
+                                    </label>
+                                    <input type="number" step="0.01" class="form-control" id="percentValue" value="10" required min="0" />
+                                    <small class="text-muted">Ürün fiyatına uygulanacak kâr yüzdesi.</small>
                                 </div>
-                            </div>
 
-                            <!-- Satış fiyatı -->
-                            <div class="col-md-3 col-6">
-                                <div class="form-check">
-                                    <input class="form-check-input apply-column" type="checkbox" value="SalePrice" id="colSalePrice">
-                                    <label class="form-check-label" for="colSalePrice">Satış Fiyatı</label>
-                                </div>
-                            </div>
-
-                            <!-- Integration fiyatları -->
-                            @if (Model != null && Model.Any())
-                            {
-                                foreach (var header in Model.First().IntegrationPrices.Keys)
-                                {
-                                    <div class="col-md-3 col-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input apply-column" type="checkbox" value="@header" id="col_@header">
-                                            <label class="form-check-label" for="col_@header">@header</label>
+                                <!-- Komisyon & Kargo yan yana -->
+                                <div class="row mb-3">
+                                    <!-- Komisyon -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" for="applyCommission">
+                                            Komisyon (%)
+                                        </label>
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check me-3">
+                                                <input class="form-check-input" type="checkbox" id="applyCommission">
+                                                <label class="form-check-label" for="applyCommission">Uygula</label>
+                                            </div>
+                                            <div id="commissionBox" class="flex-grow-1" style="display:none;">
+                                                <input type="number" step="0.01" class="form-control" id="percentCommissionValue" value="10" min="0" placeholder="Komisyon %" />
+                                            </div>
                                         </div>
+                                        <small class="text-muted">İsteğe bağlı olarak komisyon oranı ekleyebilirsiniz.</small>
                                     </div>
-                                }
-                            }
+
+                                    <!-- Kargo -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold" for="applyShipping">
+                                            Kargo
+                                        </label>
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check me-3">
+                                                <input class="form-check-input" type="checkbox" id="applyShipping">
+                                                <label class="form-check-label" for="applyShipping">Uygula</label>
+                                            </div>
+                                            <div id="shippingBox" class="flex-grow-1" style="display:none;">
+                                                <input type="number" step="0.01" class="form-control" id="shippingFee" value="10" min="0" placeholder="Kargo ücreti" />
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">İsteğe bağlı kargo ücreti eklenebilir.</small>
+                                    </div>
+                                </div>
+
+                                <hr />
+
+                                <!-- Uygulanacak Sütunlar -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold d-block mb-2">Uygulanacak Sütunlar</label>
+                                    <div class="row g-2">
+
+                                        <!-- Liste fiyatı -->
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input apply-column" type="checkbox" value="Price" id="colPrice">
+                                                <label class="form-check-label" for="colPrice">Liste Fiyatı</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Satış fiyatı -->
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input apply-column" type="checkbox" value="SalePrice" id="colSalePrice">
+                                                <label class="form-check-label" for="colSalePrice">Satış Fiyatı</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Integration fiyatları -->
+                                        @if (Model != null && Model.Any())
+                                        {
+                                            foreach (var header in Model.First().IntegrationPrices.Keys)
+                                            {
+                                                <div class="col-md-3 col-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input apply-column" type="checkbox" value="@header" id="col_@header">
+                                                        <label class="form-check-label" for="col_@header">@header</label>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
+
 
                     <!-- Buttons -->
                     <div class="col-12 text-center pt-3">
@@ -332,6 +368,7 @@
 
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="/assets/js/entegro.bulkupdateprices.js" asp-append-version="true"></script>
     <script>
         $(function () {
@@ -339,103 +376,8 @@
         });
     </script>
 
-
-
     <script>
-        document.getElementById("uploadExcel").addEventListener("click", function () {
-            var fileInput = document.getElementById("excelFile");
-            var file = fileInput.files[0];
-            var brandId = "@selectedBrandId";
-
-            if (!file) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Dosya Seçilmedi",
-                    text: "Lütfen bir Excel dosyası seçiniz."
-                });
-                return;
-            }
-
-            var allowedExtensions = [".xls", ".xlsx"];
-            var fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            if (!allowedExtensions.includes(fileExt)) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Geçersiz Dosya Tipi",
-                    text: "Sadece Excel (.xls, .xlsx) dosyaları yüklenebilir."
-                });
-                return;
-            }
-
-            var formData = new FormData();
-            formData.append("file", file);
-            formData.append("brandId", brandId);
-
-            fetch("@Url.Action("ExcelImport", "Import")", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) throw new Error("Yükleme başarısız");
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({
-                    icon: "success",
-                    title: "Başarılı",
-                    text: "Excel başarıyla yüklendi. " + data.count + " kayıt işlendi."
-                }).then(() => {
-                    location.reload(); // sayfayı yenile
-                });
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: "error",
-                    title: "Hata",
-                    text: error.message
-                });
-            });
-        });
+        window.excelImportUrl = '@Url.Action("ExcelImport", "Import")';
     </script>
-    <script>
-                document.getElementById("excelFile").addEventListener("change", function () {
-            var file = this.files[0];
-            var brandId = "@selectedBrandId";
-
-            if (!file) {
-                Swal.fire({ icon: "warning", title: "Dosya Seçilmedi", text: "Lütfen bir Excel dosyası seçiniz." });
-                return;
-            }
-
-            var allowedExtensions = [".xls", ".xlsx"];
-            var fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            if (!allowedExtensions.includes(fileExt)) {
-                Swal.fire({ icon: "error", title: "Geçersiz Dosya Tipi", text: "Sadece Excel (.xls, .xlsx) dosyaları yüklenebilir." });
-                return;
-            }
-
-            var formData = new FormData();
-            formData.append("file", file);
-            formData.append("brandId", brandId);
-
-            fetch("@Url.Action("ExcelImport", "Import")", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) throw new Error("Yükleme başarısız");
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({ icon: "success", title: "Başarılı", text: "Excel başarıyla yüklendi. " + data.count + " kayıt işlendi." })
-                    .then(() => location.reload());
-            })
-            .catch(error => {
-                Swal.fire({ icon: "error", title: "Hata", text: error.message });
-            });
-        });
-
-    </script>
-
 }
 
