@@ -714,8 +714,6 @@ namespace Entegro.Web.Controllers
 
             return Json(new { success = true });
         }
-
-
         [HttpGet]
         public async Task<IActionResult> ExcelExport(int brandId)
         {
@@ -819,7 +817,6 @@ namespace Entegro.Web.Controllers
 
             return File(exportData.ToArray(), "application/vnd.ms-excel", "urunler.xls");
         }
-
         [HttpPost]
         public async Task<IActionResult> ExcelImport([FromForm] ExcelImportRequest request)
         {
