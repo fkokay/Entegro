@@ -916,13 +916,13 @@ namespace Entegro.Web.Controllers
                         }
                         else
                         {
-
+                            Console.WriteLine($"{product.Id} - {product.Name} ürünün entegrasyonu bulunmuyor.");
                         }
                     }
                 }
                 else
                 {
-
+                    notUpdatedProductCount++;
                 }
             }
 
