@@ -750,7 +750,7 @@ namespace Entegro.Web.Controllers
             var workbook = new HSSFWorkbook();
             var sheet = workbook.CreateSheet("Ürün Listesi");
 
-            // HEADER
+
             var headerRow = sheet.CreateRow(0);
             int col = 0;
             headerRow.CreateCell(col++).SetCellValue("Id");
@@ -762,7 +762,7 @@ namespace Entegro.Web.Controllers
             headerRow.CreateCell(col++).SetCellValue("Liste Fiyatı");
             headerRow.CreateCell(col++).SetCellValue("Satış Fiyatı");
 
-            // Integration key + Id eşleştirmesi
+
             var integrationKeyMap = viewModel
                 .SelectMany(v => v.IntegrationPrices)
                 .GroupBy(x => x.Key)
@@ -773,13 +773,12 @@ namespace Entegro.Web.Controllers
                 })
                 .ToList();
 
-            // Entegrasyon başlıklarını tek sütun olacak şekilde ekle
+
             foreach (var item in integrationKeyMap)
             {
                 headerRow.CreateCell(col++).SetCellValue($"{item.Key}_Fiyat_IntegrationSystemId_{item.IntegrationSystemId}");
             }
 
-            // DATA ROWS
             int rowNumber = 1;
             foreach (var item in viewModel)
             {
@@ -804,7 +803,7 @@ namespace Entegro.Web.Controllers
                     }
                     else
                     {
-                        row.CreateCell(col++).SetCellValue(0); // Fiyat yok
+                        row.CreateCell(col++).SetCellValue(0);
                     }
                 }
             }
@@ -887,7 +886,7 @@ namespace Entegro.Web.Controllers
                     }
                 }
             }
-            int notUpdatedIntegrationCount = 0;
+            int notUpdatedProductCount = 0;
             foreach (var item in importedData)
             {
                 var product = await _productService.GetProductByIdAsync(item.ProductId);
@@ -917,9 +916,13 @@ namespace Entegro.Web.Controllers
                         }
                         else
                         {
-                            notUpdatedIntegrationCount++;
+
                         }
                     }
+                }
+                else
+                {
+
                 }
             }
 
@@ -927,7 +930,7 @@ namespace Entegro.Web.Controllers
             {
                 success = true,
                 count = importedData.Count,
-                notUpdatedIntegrationCount = notUpdatedIntegrationCount
+                notUpdatedProductCount = notUpdatedProductCount
             });
 
         }

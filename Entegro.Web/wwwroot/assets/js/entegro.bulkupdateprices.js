@@ -342,8 +342,8 @@ Entegro.bulkupdateprices = (function ($) {
                             window.hideLoading();
 
                             let message = `Excel başarıyla yüklendi. ${data.count} kayıt işlendi.`;
-                            if (data.notUpdatedIntegrationCount && data.notUpdatedIntegrationCount > 0) {
-                                message += ` ${data.notUpdatedIntegrationCount} entegrasyon fiyatı güncellenemedi.`;
+                            if (data.notUpdatedProductCount && data.notUpdatedProductCount > 0) {
+                                message += ` ${data.notUpdatedProductCount} ürün fiyatı güncellenemedi.`;
                             }
 
                             Swal.fire({
