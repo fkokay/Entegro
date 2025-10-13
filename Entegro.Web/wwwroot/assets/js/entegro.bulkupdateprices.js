@@ -93,10 +93,10 @@ Entegro.bulkupdateprices = (function ($) {
             link.addEventListener('click', function (e) {
                 const href = this.getAttribute('href');
 
-                // Eğer href yoksa, # ise, javascript: ise → uyarma
+             
                 if (!href || href === "#" || href.startsWith("javascript:")) return;
 
-                // Eğer Bootstrap gibi özelliklerle açılıyorsa → uyarma
+
                 if (this.hasAttribute("data-bs-toggle") ||
                     this.hasAttribute("data-bs-target") ||
                     this.closest(".dropdown-menu")) {
@@ -105,7 +105,6 @@ Entegro.bulkupdateprices = (function ($) {
 
                 const targetUrl = new URL(href, window.location.origin);
 
-                // Aynı sayfanın sadece query değişimi ise → uyarma
                 const isSamePage =
                     targetUrl.origin === currentOrigin &&
                     targetUrl.pathname === currentPath;
