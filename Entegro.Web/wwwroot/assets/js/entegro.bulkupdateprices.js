@@ -11,7 +11,6 @@ Entegro.bulkupdateprices = (function ($) {
             input.addEventListener('change', () => {
                 isFormChanged = true;
 
-                // ilgili satırdaki IsChanged hidden inputunu bul ve true yap
                 const row = input.closest('tr');
                 if (row) {
                     const isChangedInput = row.querySelector('input[name*="IsChanged"]');
@@ -19,8 +18,8 @@ Entegro.bulkupdateprices = (function ($) {
                         isChangedInput.value = "true";
                     }
 
-                    // satırı renklendir
-                    row.classList.add("row-changed");
+                    // Satır yerine sadece input'u işaretle
+                    input.classList.add("input-changed");
                 }
             });
         });
@@ -36,7 +35,7 @@ Entegro.bulkupdateprices = (function ($) {
                     customClass: { confirmButton: 'btn btn-primary' },
                     buttonsStyling: false
                 });
-                return; 
+                return;
             }
 
             const formData = new FormData(form);
@@ -56,9 +55,9 @@ Entegro.bulkupdateprices = (function ($) {
                         toast.show();
                         isFormChanged = false;
 
-                        // Kaydedildikten sonra renkleri temizle
-                        form.querySelectorAll("tr.row-changed").forEach(r => {
-                            r.classList.remove("row-changed");
+                        // Kaydedildikten sonra işaretlemeleri temizle
+                        form.querySelectorAll("input.input-changed").forEach(inp => {
+                            inp.classList.remove("input-changed");
                         });
                     } else {
                         Swal.fire({
@@ -86,13 +85,32 @@ Entegro.bulkupdateprices = (function ($) {
         });
     }
     function initLeaveWarning() {
+        const currentUrl = new URL(window.location.href);
+        const currentOrigin = currentUrl.origin;
+        const currentPath = currentUrl.pathname;
+
         document.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function (e) {
                 const href = this.getAttribute('href');
 
-                if (!href || href.startsWith('#')) return;
+                // Eğer href yoksa, # ise, javascript: ise → uyarma
+                if (!href || href === "#" || href.startsWith("javascript:")) return;
 
-                if (isFormChanged) {
+                // Eğer Bootstrap gibi özelliklerle açılıyorsa → uyarma
+                if (this.hasAttribute("data-bs-toggle") ||
+                    this.hasAttribute("data-bs-target") ||
+                    this.closest(".dropdown-menu")) {
+                    return;
+                }
+
+                const targetUrl = new URL(href, window.location.origin);
+
+                // Aynı sayfanın sadece query değişimi ise → uyarma
+                const isSamePage =
+                    targetUrl.origin === currentOrigin &&
+                    targetUrl.pathname === currentPath;
+
+                if (isFormChanged && !isSamePage) {
                     e.preventDefault();
                     Swal.fire({
                         title: 'Uyarı',
@@ -110,6 +128,7 @@ Entegro.bulkupdateprices = (function ($) {
             });
         });
     }
+
     function initPriceUpdatePopup() {
         const applyBtn = document.getElementById("applyPercentBtn");
         if (!applyBtn) return;
@@ -118,9 +137,11 @@ Entegro.bulkupdateprices = (function ($) {
             const percent = parseFloat(document.getElementById("percentValue").value) || 0;
             const commissionPercent = parseFloat(document.getElementById("percentCommissionValue").value) || 0;
             const shippingFee = parseFloat(document.getElementById("shippingFee").value) || 0;
+            const extraCost = parseFloat(document.getElementById("extraCostValue")?.value) || 0;
 
             const applyCommission = document.getElementById("applyCommission")?.checked;
             const applyShipping = document.getElementById("applyShipping")?.checked;
+            const applyExtraCost = document.getElementById("applyExtraCost")?.checked;
 
             const checkedCols = Array.from(document.querySelectorAll(".apply-column:checked"));
 
@@ -137,7 +158,6 @@ Entegro.bulkupdateprices = (function ($) {
             const columns = checkedCols.map(c => c.value);
 
             document.querySelectorAll("tbody tr").forEach(row => {
-                // 4. sütun maliyet fiyatı
                 const costText = row.querySelector("td:nth-child(4)")?.innerText || "0";
                 const cost = parseFloat(costText.replace(",", ".")) || 0;
                 if (cost <= 0) return;
@@ -156,21 +176,23 @@ Entegro.bulkupdateprices = (function ($) {
                     }
 
                     if (input) {
-                        const oldVal = parseFloat(input.value.replace(",", ".")) || 0;
+                       
+                        let result = cost * (1 + percent / 100); // maliyet + kar
 
-                        let result = oldVal + (cost * percent / 100);
+                        if (applyExtraCost) {
+                            result += extraCost; // ek maliyet ekle
+                        }
 
                         if (applyShipping) {
-                            result = result + shippingFee;
+                            result += shippingFee; // kargo ekle
                         }
 
                         if (applyCommission) {
-                            result = result + (result * commissionPercent / 100);
+                            result = result / (1 - (commissionPercent / 100));
                         }
 
                         input.value = result.toFixed(2);
 
-                        // değişiklik flag
                         const flag = row.querySelector(".is-changed-flag");
                         if (flag) flag.value = "true";
 
@@ -187,6 +209,8 @@ Entegro.bulkupdateprices = (function ($) {
         const commissionBox = document.getElementById("commissionBox");
         const applyShipping = document.getElementById("applyShipping");
         const shippingBox = document.getElementById("shippingBox");
+        const applyExtraCost = document.getElementById("applyExtraCost");
+        const extraCostBox = document.getElementById("extraCostBox");
 
         if (applyCommission && commissionBox) {
             applyCommission.checked = false;
@@ -203,6 +227,15 @@ Entegro.bulkupdateprices = (function ($) {
 
             applyShipping.addEventListener("change", function () {
                 shippingBox.style.display = this.checked ? "block" : "none";
+            });
+        }
+
+        if (applyExtraCost && extraCostBox) {
+            applyExtraCost.checked = false;
+            extraCostBox.style.display = "none";
+
+            applyExtraCost.addEventListener("change", function () {
+                extraCostBox.style.display = this.checked ? "block" : "none";
             });
         }
     }
