@@ -1,11 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Interfaces.Repositories
 {
@@ -20,5 +14,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(Customer customer);
         Task UpdateAsync(Customer customer);
         Task DeleteAsync(Customer customer);
+        Task<int> GetCustomerCount();
+        Task<int> GetCurrentMonthCustomerCountAsync();
     }
 }

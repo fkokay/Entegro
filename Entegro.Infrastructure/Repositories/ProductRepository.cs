@@ -227,5 +227,38 @@ namespace Entegro.Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<List<Product>> GetTopSellingProductsAsync(int topCount, int orderStatusId)
+        {
+            var topProducts = await _context.OrderItems
+                    .Where(oi => _context.Orders
+                        .Where(o => o.OrderStatusId == orderStatusId)
+                        .Select(o => o.Id)
+                        .Contains(oi.OrderId))
+                    .GroupBy(oi => oi.ProductId)
+                    .OrderByDescending(g => g.Sum(x => x.Quantity))
+                    .Select(g => g.Key)
+                    .Take(topCount)
+                    .ToListAsync();
+
+
+            if (topProducts.Any())
+            {
+                var query = IncludeAllProperties(_context.Products.AsNoTracking());
+                return await query.Where(p => topProducts.Contains(p.Id))
+                                     .ToListAsync();
+            }
+
+            return new List<Product>();
+        }
+
+        public async Task<List<Product>> GetRandomProductsAsync(int count)
+        {
+            return await IncludeAllProperties(_context.Products.AsNoTracking())
+                             .Where(p => !p.Deleted && !p.Published)
+                             .OrderBy(x => x.Id)
+                             .Take(count)
+                             .ToListAsync();
+        }
     }
 }

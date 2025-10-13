@@ -15,5 +15,8 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<OrderDto> UpdateAsync(UpdateOrderDto updateOrder);
         Task DeleteAsync(int orderId);
         Task<OrderListPageDto> GetOrderPageAsync();
+        Task<decimal> GetTotalSalesAsync();
+        Task<int> CompleteOrderStatusCount();
+        Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year);
     }
 }

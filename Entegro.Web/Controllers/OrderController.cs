@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Checkout.Orders;
+using Entegro.Web.Models.Dashboard;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,10 +48,10 @@ namespace Entegro.Web.Controllers
             return List();
         }
 
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(int orderStatusId = 1)
         {
 
-
+            ViewBag.OrderStatusId = orderStatusId;
             var orderPage = await _orderService.GetOrderPageAsync();
             var model = _mapper.Map<OrderListModel>(orderPage);
 
@@ -170,6 +171,22 @@ namespace Entegro.Web.Controllers
 
 
             return Json(new { success = true });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetMonthlySales(int year)
+        {
+            var data = await _orderService.GetMonthlySalesByYearAsync(year);
+            return Json(data.Select(d => new { Month = d.Month, TotalAmount = d.TotalAmount }));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductSalesByMarketplace(int groupByType)
+        {
+            var productSalesDto = await _orderItemService.GetProductSalesByMarketplaceAsync(groupByType);
+            var productSales = _mapper.Map<List<ProductSalesViewModel>>(productSalesDto);
+            return Json(productSales);
         }
     }
 }

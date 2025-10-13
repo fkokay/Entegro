@@ -240,5 +240,15 @@ namespace Entegro.Application.Services.Base
             var productDto = _mapper.Map<List<ProductDto?>>(product);
             return productDto;
         }
+
+        public async Task<List<ProductDto>> GetTopOrRandomProductsAsync(int topCount, int orderStatusId)
+        {
+            var topSelling = await _productRepository.GetTopSellingProductsAsync(topCount, orderStatusId);
+
+            if (topSelling != null && topSelling.Any())
+                return _mapper.Map<List<ProductDto>>(topSelling);
+            var randomProducts = await _productRepository.GetRandomProductsAsync(topCount);
+            return _mapper.Map<List<ProductDto>>(randomProducts);
+        }
     }
 }

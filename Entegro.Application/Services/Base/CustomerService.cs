@@ -42,6 +42,11 @@ namespace Entegro.Application.Services.Base
             return await _customerRepository.ExistsByEmailAsync(email);
         }
 
+        public async Task<int> GetCurrentMonthCustomerCountAsync()
+        {
+            return await _customerRepository.GetCurrentMonthCustomerCountAsync();
+        }
+
         public async Task<CustomerDto?> GetCustomerByEmailAsync(string email)
         {
             var customer = await _customerRepository.GetByEmailAsync(email);
@@ -64,6 +69,11 @@ namespace Entegro.Application.Services.Base
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
             return customerDto;
+        }
+
+        public async Task<int> GetCustomerCount()
+        {
+            return await _customerRepository.GetCustomerCount();
         }
 
         public async Task<IEnumerable<CustomerDto>> GetCustomersAsync()

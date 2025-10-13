@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.OrderItem;
+using Entegro.Application.DTOs.Product;
 
 namespace Entegro.Application.Interfaces.Services.Base
 {
@@ -13,5 +14,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<OrderItemDto> AddAsync(CreateOrderItemDto orderItem);
         Task<OrderItemDto> UpdateAsync(UpdateOrderItemDto orderItem);
         Task DeleteAsync(int id);
+        Task<List<ProductSalesDto>> GetProductSalesByMarketplaceAsync(int groupByType);
     }
 }

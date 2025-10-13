@@ -4,10 +4,7 @@ using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
-using Entegro.Domain.Entities.Common;
-using Entegro.Domain.Entities.Content;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -27,6 +24,11 @@ namespace Entegro.Infrastructure.Repositories
         {
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> CompleteOrderStatusCount()
+        {
+            return await _context.Orders.CountAsync(x => x.OrderStatusId == (int)Domain.Enums.OrderStatus.Complete);
         }
 
         public async Task DeleteAsync(Order order)
@@ -78,6 +80,22 @@ namespace Entegro.Infrastructure.Repositories
 
 
             return order;
+        }
+
+        public async Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year)
+        {
+            var result = await _context.Orders
+                .Where(o => o.OrderStatusId == 30 && o.OrderDateUtc.Year == year)
+                .GroupBy(o => o.OrderDateUtc.Month)
+                .Select(g => new { Month = g.Key, Total = g.Sum(x => x.OrderTotal) })
+                .ToListAsync();
+
+            var list = Enumerable.Range(1, 12)
+                .Select(m => (Month: m,
+                              TotalAmount: result.FirstOrDefault(x => x.Month == m)?.Total ?? 0m))
+                .ToList();
+
+            return list;
         }
 
         public async Task<OrderListPageDto> GetOrderPageAsync()
@@ -233,6 +251,11 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = (gridCommand.Start / gridCommand.Length) + 1,
                 PageSize = gridCommand.Length
             };
+        }
+
+        public async Task<decimal> GetTotalSalesAsync()
+        {
+            return await _context.Orders.Where(x => x.OrderStatusId == (int)Domain.Enums.OrderStatus.Complete).SumAsync(x => x.OrderTotal);
         }
 
         public async Task UpdateAsync(Order order)

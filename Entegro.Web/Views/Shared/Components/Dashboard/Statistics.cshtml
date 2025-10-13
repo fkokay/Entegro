@@ -1,4 +1,6 @@
-﻿<div class="col-xl-8 mb-4 col-lg-7 col-12">
+﻿@model StatisticsViewModel
+
+<div class="col-xl-8 mb-4 col-lg-7 col-12">
     <div class="card h-100">
         <div class="card-header">
             <div class="d-flex justify-content-between mb-3">
@@ -14,7 +16,7 @@
                             <i class="ti ti-chart-pie-2 ti-sm"></i>
                         </div>
                         <div class="card-info">
-                            <h5 class="mb-0">230k</h5>
+                            <h5 class="mb-0"> @string.Format(new System.Globalization.CultureInfo("tr-TR"), "{0:N2} ₺", Model.TotalOrderPrice)</h5>
                             <small>Satış</small>
                         </div>
                     </div>
@@ -25,7 +27,7 @@
                             <i class="ti ti-users ti-sm"></i>
                         </div>
                         <div class="card-info">
-                            <h5 class="mb-0">8.549k</h5>
+                            <h5 class="mb-0">@Model.CustomerCount</h5>
                             <small>Müşteriler</small>
                         </div>
                     </div>
@@ -36,7 +38,7 @@
                             <i class="ti ti-shopping-cart ti-sm"></i>
                         </div>
                         <div class="card-info">
-                            <h5 class="mb-0">1.423k</h5>
+                            <h5 class="mb-0">@Model.ProductCount</h5>
                             <small>Ürünler</small>
                         </div>
                     </div>
@@ -47,8 +49,8 @@
                             <i class="ti ti-currency-dollar ti-sm"></i>
                         </div>
                         <div class="card-info">
-                            <h5 class="mb-0">$9745</h5>
-                            <small>Hasılat</small>
+                            <h5 class="mb-0">@Model.CompleteOrderStatusCount</h5>
+                            <small>Teslim Edilen Sipariş Sayısı</small>
                         </div>
                     </div>
                 </div>

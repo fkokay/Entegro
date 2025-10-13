@@ -114,5 +114,21 @@ namespace Entegro.Infrastructure.Repositories
                 PageSize = gridCommand.Length
             };
         }
+
+        public async Task<int> GetCustomerCount()
+        {
+            return await _context.Customers.CountAsync();
+        }
+
+        public async Task<int> GetCurrentMonthCustomerCountAsync()
+        {
+            var now = DateTime.UtcNow;
+            var firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
+            var firstDayOfNextMonth = firstDayOfMonth.AddMonths(1);
+
+            return await _context.Customers
+                .Where(c => c.CreatedOnUtc >= firstDayOfMonth && c.CreatedOnUtc < firstDayOfNextMonth)
+                .CountAsync();
+        }
     }
 }

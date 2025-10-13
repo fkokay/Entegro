@@ -1,16 +1,23 @@
-﻿<div class="col-lg-8">
-    <div class="card h-100">
+﻿<div class="col-xl-12 mb-4 col-md-12">
+    <div class="card h-100 p-3">
+        <div class="d-flex justify-content-start mb-3">
+            <select id="groupBySelect" class="form-select w-auto">
+                <option value="1">Haftalık</option>
+                <option value="2">Aylık</option>
+                <option value="3">Yıllık</option>
+            </select>
+        </div>
         <div class="table-responsive card-datatable">
-            <table class="table datatable-invoice border-top">
+            <table class="table datatable-salesproduct border-top">
                 <thead>
                     <tr>
                         <th></th>
                         <th>ID</th>
-                        <th><i class="ti ti-trending-up"></i></th>
-                        <th>Total</th>
-                        <th>Issued Date</th>
-                        <th>Invoice Status</th>
-                        <th>Actions</th>
+                        <th>Market Yeri / E-Ticaret</th>
+                        <th>Ürün Adı</th>
+                        <th>Mağaza</th>
+                        <th>Toplam Satış</th>
+                        <th>Dönem</th>
                     </tr>
                 </thead>
             </table>

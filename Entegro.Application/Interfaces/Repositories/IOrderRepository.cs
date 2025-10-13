@@ -9,11 +9,16 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<Order?> GetByIdAsync(int id);
         Task<List<Order>> GetAllAsync();
         Task<PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize);
-        Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand,int orderStatus);
+        Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, int orderStatus);
         Task AddAsync(Order order);
         Task UpdateAsync(Order order);
         Task DeleteAsync(Order order);
         Task<bool> ExistsByOrderNoAsync(string orderNo);
         Task<OrderListPageDto> GetOrderPageAsync();
+        Task<decimal> GetTotalSalesAsync();
+        Task<int> CompleteOrderStatusCount();
+
+        Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year);
+
     }
 }

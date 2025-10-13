@@ -8,6 +8,7 @@
     </div>
     <div class="card">
         <div class="order-actions border-bottom p-4 d-flex">
+
             <button class="btn active" data-order-status="1">Paketlenecek <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
             <div class="split"></div>
             <button class="btn" data-order-status="2">Gönderime Hazır <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
@@ -153,9 +154,9 @@
     <script src="/assets/js/entegro.order.list.js" asp-append-version="true"></script>
     <script>
         $(function () {
-            Entegro.order.OrderList.initTable(1);
-            Entegro.order.OrderList.initTab();
+            
+            var orderStatusId = @((ViewBag.OrderStatusId ?? 1));
+            Entegro.order.OrderList.initTab(orderStatusId);
         });
-
     </script>
 }

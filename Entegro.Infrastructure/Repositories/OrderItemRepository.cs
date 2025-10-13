@@ -1,6 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +33,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<PagedResult<OrderItem>> GetAllAsync(int pageNumber, int pageSize)
         {
-            var query = _context.OrderItems.Include(m=>m.Product).AsQueryable();
+            var query = _context.OrderItems.Include(m => m.Product).AsQueryable();
 
             var totalCount = await query.CountAsync();
 
@@ -55,7 +54,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<OrderItem>> GetAllIntegrationSkuWithAsync(string integrationSku)
         {
-            return await _context.OrderItems.Where(m=>m.IntegrationSku == integrationSku).ToListAsync();
+            return await _context.OrderItems.Where(m => m.IntegrationSku == integrationSku).ToListAsync();
         }
 
         public async Task<OrderItem?> GetByIdAsync(int id)
@@ -80,6 +79,17 @@ namespace Entegro.Infrastructure.Repositories
                 Quantity = x.Quantity,
                 TaxRate = x.TaxRate,
             }).ToList();
+        }
+
+        public async Task<List<OrderItem>> GetOrderItemsWithProductAndIntegrationAsync()
+        {
+            return await _context.OrderItems
+             .Include(oi => oi.Product)
+             .Include(oi => oi.Order)
+                 .ThenInclude(o => o.IntegrationSystem)
+                     .ThenInclude(isys => isys.IntegrationSystemParameters)
+             .Where(oi => oi.Order.OrderStatusId == 30)
+             .ToListAsync();
         }
 
         public async Task UpdateAsync(OrderItem orderItem)

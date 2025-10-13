@@ -14,5 +14,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<bool> UpdateAsync(UpdateCustomerDto updateCustomer);
         Task<bool> DeleteAsync(int customerId);
         Task<bool> ExistsByEmailAsync(string email);
+        Task<int> GetCustomerCount();
+        Task<int> GetCurrentMonthCustomerCountAsync();
     }
 }

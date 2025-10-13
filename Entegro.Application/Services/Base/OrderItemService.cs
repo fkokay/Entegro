@@ -1,8 +1,10 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.OrderItem;
+using Entegro.Application.DTOs.Product;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Domain.Entities.Checkout;
+using Entegro.Domain.Enums;
 using MapsterMapper;
 
 namespace Entegro.Application.Services.Base
@@ -80,5 +82,95 @@ namespace Entegro.Application.Services.Base
             var orderItemDtos = _mapper.Map<IEnumerable<OrderItemDto>>(orderItems);
             return orderItemDtos.ToList();
         }
+
+        public async Task<List<ProductSalesDto>> GetProductSalesByMarketplaceAsync(int groupByType)
+        {
+            var (startDate, endDate) = GetPeriodDateRange(groupByType);
+
+            var orderItems = await _orderItemRepository.GetOrderItemsWithProductAndIntegrationAsync();
+
+            var filteredItems = orderItems
+                .Where(oi =>
+                    oi.Order.OrderStatusId == (int)OrderStatus.Complete &&
+                    oi.Order.OrderDateUtc >= startDate &&
+                    oi.Order.OrderDateUtc < endDate &&
+                    oi.Order.IntegrationSystem?.IntegrationSystemParameters != null
+                )
+                .SelectMany(oi =>
+                    oi.Order.IntegrationSystem.IntegrationSystemParameters
+                        .Where(p => p.Key == "CommerceType" || p.Key == "MarketplaceType")
+                        .Select(p => new
+                        {
+                            ProductId = oi.Product.Id,
+                            ProductName = oi.Product.Name,
+                            IntegrationSystemName = oi.Order.IntegrationSystem.Name,
+                            IntegrationKey = p.Key,
+                            IntegrationValue = p.Value,
+                            Quantity = oi.Quantity,
+                            OrderDate = oi.Order.OrderDateUtc
+                        })
+                );
+
+            var grouped = filteredItems
+                .GroupBy(x => new
+                {
+                    x.ProductId,
+                    x.ProductName,
+                    x.IntegrationSystemName,
+                    x.IntegrationKey,
+                    x.IntegrationValue
+                })
+                .Select(g => new ProductSalesDto
+                {
+                    ProductId = g.Key.ProductId,
+                    ProductName = g.Key.ProductName,
+                    IntegrationSystemName = g.Key.IntegrationSystemName,
+                    IntegrationKey = g.Key.IntegrationKey,
+                    IntegrationValue = g.Key.IntegrationValue,
+                    Period = GetPeriodName(groupByType), // Aylık, Yıllık vs.
+                    TotalQuantitySold = g.Sum(x => x.Quantity)
+                })
+                .OrderByDescending(x => x.TotalQuantitySold)
+                .ToList();
+
+            return grouped;
+        }
+
+
+        private string GetPeriodName(int groupByType)
+        {
+            return groupByType switch
+            {
+                1 => "Haftalık",
+                2 => "Aylık",
+                3 => "Yıllık",
+                _ => "Bilinmeyen"
+            };
+        }
+        private (DateTime startDate, DateTime endDate) GetPeriodDateRange(int groupByType)
+        {
+            var today = DateTime.UtcNow.Date;
+
+            return groupByType switch
+            {
+                1 => GetWeekRange(today),
+                2 => (new DateTime(today.Year, today.Month, 1),
+                      new DateTime(today.Year, today.Month, 1).AddMonths(1)),
+                3 => (new DateTime(today.Year, 1, 1),
+                      new DateTime(today.Year + 1, 1, 1)),
+                _ => throw new ArgumentOutOfRangeException(nameof(groupByType), "Geçersiz grup türü")
+            };
+        }
+
+        private (DateTime startDate, DateTime endDate) GetWeekRange(DateTime today)
+        {
+            var diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+            var startOfWeek = today.AddDays(-1 * diff).Date;
+            var endOfWeek = startOfWeek.AddDays(7);
+            return (startOfWeek, endOfWeek);
+        }
+
+
+
     }
 }

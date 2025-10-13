@@ -1,7 +1,7 @@
 ﻿<div class="col-12 col-xl-8 mb-4 col-lg-7">
     <div class="card">
         <div class="card-header pb-3">
-            <h5 class="m-0 me-2 card-title">Revenue Report</h5>
+            <h5 class="m-0 me-2 card-title">Yıllık Satış Grafiği (₺)</h5>
         </div>
         <div class="card-body">
             <div class="row row-bordered g-0">
@@ -17,37 +17,16 @@
                                     data-bs-toggle="dropdown"
                                     aria-haspopup="true"
                                     aria-expanded="false">
-                                <script>
-                                    document.write(new Date().getFullYear());
-                                </script>
+                                <span id="currentYear"></span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="budgetId">
-                                <a class="dropdown-item prev-year1" href="javascript:void(0);">
-                                    <script>
-                                        document.write(new Date().getFullYear() - 1);
-                                    </script>
-                                </a>
-                                <a class="dropdown-item prev-year2" href="javascript:void(0);">
-                                    <script>
-                                        document.write(new Date().getFullYear() - 2);
-                                    </script>
-                                </a>
-                                <a class="dropdown-item prev-year3" href="javascript:void(0);">
-                                    <script>
-                                        document.write(new Date().getFullYear() - 3);
-                                    </script>
-                                </a>
-                            </div>
+                            <div class="dropdown-menu dropdown-menu-end" id="yearDropdown"></div>
                         </div>
                     </div>
-                    <h3 class="text-center pt-4 mb-0">$25,825</h3>
-                    <p class="mb-4 text-center"><span class="fw-semibold">Budget: </span>56,800</p>
-                    <div class="px-3">
-                        <div id="budgetChart"></div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button type="button" class="btn btn-primary">Increase Button</button>
-                    </div>
+                    <h3 class="text-center pt-4 mb-0" id="yearlyTotal">0 ₺</h3>
+                    <p class="mb-4 text-center">
+                        <span class="fw-semibold">Yıllık Toplam: </span>
+                        <span id="yearlyBudget">0</span>
+                    </p>
                 </div>
             </div>
         </div>

@@ -22,5 +22,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId);
         Task<List<ProductDto?>> GetProductIntegrationMatrixAsync(int brandId);
         Task<ProductDto?> GetProductIntegrationMatrixByIdAsync(int productId);
+        Task<List<ProductDto>> GetTopOrRandomProductsAsync(int topCount = 10, int orderStatusId = 30);
     }
 }

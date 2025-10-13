@@ -19,6 +19,8 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<List<Product>?> GetProductIntegrationMatrixAsync(int pageNumber, int pageSize, int brandId);
         Task<List<Product>?> GetProductIntegrationMatrixAsync(int brandId);
         Task<Product?> GetProductIntegrationMatrixByIdAsync(int productId);
+        Task<List<Product>> GetTopSellingProductsAsync(int topCount = 10, int orderStatusId = 30);
+        Task<List<Product>> GetRandomProductsAsync(int count = 10);
 
     }
 }

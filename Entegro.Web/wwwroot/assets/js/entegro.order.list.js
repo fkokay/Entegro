@@ -343,7 +343,8 @@ Entegro.order.OrderList = (function ($) {
         }, 100);
     };
 
-    const initTab = function () {
+    const initTab = function (defaultOrderStatus) {
+        // Tüm tab (buton) tıklamaları için olay bağla
         $(".order-actions .btn").click(function () {
             var orderStatus = $(this).data("order-status");
             $(".order-actions .btn").removeClass("active");
@@ -351,7 +352,19 @@ Entegro.order.OrderList = (function ($) {
 
             initTable(orderStatus);
         });
+
+        // Sayfa yüklendiğinde varsayılan orderStatus varsa ona göre başlat
+        if (defaultOrderStatus !== undefined && defaultOrderStatus !== null) {
+            var $defaultBtn = $('.order-actions .btn[data-order-status="' + defaultOrderStatus + '"]');
+            if ($defaultBtn.length > 0) {
+                $(".order-actions .btn").removeClass("active");
+                $defaultBtn.addClass("active");
+
+                initTable(defaultOrderStatus);
+            }
+        }
     };
+
 
     const OrderPackage = function OrderPackage(id) {
         $.ajax({

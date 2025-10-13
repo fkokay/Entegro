@@ -1,5 +1,6 @@
 ﻿using Entegro.Web.Models.Catalog.Attributes;
 using Entegro.Web.Models.Catalog.Brands;
+using Entegro.Web.Models.Content;
 
 namespace Entegro.Web.Models.Catalog.Products
 {
@@ -35,6 +36,7 @@ namespace Entegro.Web.Models.Catalog.Products
         public bool Published { get; set; } = true;
         public BrandModel? Brand { get; set; }
         public string? PictureUrl { get; set; }
+        public MediaFileModel? MainPicture { get; set; }
         public List<ProductMediaFileModel> ProductMediaFiles { get; set; } = new List<ProductMediaFileModel>();
         public List<ProductVariantAttributeModel> ProductVariantAttributes { get; set; } = new List<ProductVariantAttributeModel>();
         public List<ProductVariantAttributeCombinationModel> ProductVariantAttributeCombinations { get; set; } = new List<ProductVariantAttributeCombinationModel>();

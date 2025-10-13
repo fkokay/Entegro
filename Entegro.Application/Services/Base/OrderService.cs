@@ -42,6 +42,11 @@ namespace Entegro.Application.Services.Base
             return _mapper.Map<OrderDto>(order);
         }
 
+        public async Task<int> CompleteOrderStatusCount()
+        {
+            return await _orderRepository.CompleteOrderStatusCount();
+        }
+
         public async Task DeleteAsync(int orderId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
@@ -55,6 +60,11 @@ namespace Entegro.Application.Services.Base
         }
 
         public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _orderRepository.ExistsByOrderNoAsync(orderNo);
+
+        public Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year)
+        {
+            return _orderRepository.GetMonthlySalesByYearAsync(year);
+        }
 
         public async Task<OrderDto> GetOrderByIdAsync(int orderId)
         {
@@ -139,6 +149,11 @@ namespace Entegro.Application.Services.Base
                 PageNumber = orders.PageNumber,
                 PageSize = orders.PageSize
             };
+        }
+
+        public async Task<decimal> GetTotalSalesAsync()
+        {
+            return await _orderRepository.GetTotalSalesAsync();
         }
 
         public async Task<OrderDto> UpdateAsync(UpdateOrderDto updateOrder)
