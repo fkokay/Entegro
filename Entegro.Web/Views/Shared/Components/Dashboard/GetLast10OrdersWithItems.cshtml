@@ -1,0 +1,48 @@
+﻿@model List<OrderModel>
+
+
+<div class="col-xl-12 mb-4 col-md-3 col-6">
+    <div class="card">
+        <div class="card-header pb-0">
+            <h5 class="card-title mb-0">Son 10 Sipariş</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mt-3">
+                <table class="table table-sm table-striped table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sipariş No</th>
+                            <th>Tarih</th>
+                            <th>Müşteri</th>
+                            <th>Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            int index = 1;
+                            foreach (var o in Model)
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    <td>@o.OrderNumber</td>
+                                    <td>@o.OrderDateUtc.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>@o.Customer.Name</td>
+                                    <td>@string.Format(new System.Globalization.CultureInfo("tr-TR"), "{0:N2} ₺", o.OrderTotal)</td>
+                                </tr>
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Kayıt bulunamadı</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

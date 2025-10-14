@@ -13,6 +13,6 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(OrderItem orderItem);
         Task UpdateAsync(OrderItem orderItem);
         Task DeleteAsync(OrderItem orderItem);
-        Task<List<OrderItem>> GetOrderItemsWithProductAndIntegrationAsync();
+        Task<PagedResult<OrderItem>> GetOrderItemsWithProductAndIntegrationAsync(GridCommand gridCommand);
     }
 }

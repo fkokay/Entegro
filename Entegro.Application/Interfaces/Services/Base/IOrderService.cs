@@ -18,5 +18,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<decimal> GetTotalSalesAsync();
         Task<int> CompleteOrderStatusCount();
         Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year);
+        Task<List<OrderDto>> GetLast10OrdersWithItemsAsync();
     }
 }

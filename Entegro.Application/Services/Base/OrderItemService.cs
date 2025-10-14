@@ -83,60 +83,69 @@ namespace Entegro.Application.Services.Base
             return orderItemDtos.ToList();
         }
 
-        public async Task<List<ProductSalesDto>> GetProductSalesByMarketplaceAsync(int groupByType)
+        public async Task<PagedResult<MarketplaceSalesDto>> GetMarketplaceSalesAsync(GridCommand gridCommand, int groupByType)
         {
             var (startDate, endDate) = GetPeriodDateRange(groupByType);
+            var orderItems = await _orderItemRepository.GetOrderItemsWithProductAndIntegrationAsync(gridCommand);
 
-            var orderItems = await _orderItemRepository.GetOrderItemsWithProductAndIntegrationAsync();
-
-            var filteredItems = orderItems
-                .Where(oi =>
-                    oi.Order.OrderStatusId == (int)OrderStatus.Complete &&
-                    oi.Order.OrderDateUtc >= startDate &&
-                    oi.Order.OrderDateUtc < endDate &&
-                    oi.Order.IntegrationSystem?.IntegrationSystemParameters != null
-                )
-                .SelectMany(oi =>
-                    oi.Order.IntegrationSystem.IntegrationSystemParameters
-                        .Where(p => p.Key == "CommerceType" || p.Key == "MarketplaceType")
-                        .Select(p => new
-                        {
-                            ProductId = oi.Product.Id,
-                            ProductName = oi.Product.Name,
-                            IntegrationSystemName = oi.Order.IntegrationSystem.Name,
-                            IntegrationKey = p.Key,
-                            IntegrationValue = p.Value,
-                            Quantity = oi.Quantity,
-                            OrderDate = oi.Order.OrderDateUtc
-                        })
-                );
+            var filteredItems = orderItems.Items
+               .Where(oi =>
+                   oi.Order.OrderStatusId == (int)OrderStatus.Complete &&
+                   oi.Order.OrderDateUtc >= startDate &&
+                   oi.Order.OrderDateUtc < endDate &&
+                   oi.Order.IntegrationSystem?.IntegrationSystemParameters != null
+               )
+               .SelectMany(oi =>
+                   oi.Order.IntegrationSystem.IntegrationSystemParameters
+                       .Where(p => p.Key == "CommerceType" || p.Key == "MarketplaceType")
+                       .Select(p => new
+                       {
+                           IntegrationSystemName = oi.Order.IntegrationSystem.Name,
+                           IntegrationKey = p.Key,
+                           IntegrationValue = p.Value,
+                           Quantity = oi.Quantity,
+                           OrderTotal = oi.Order.OrderTotal
+                       })
+               );
 
             var grouped = filteredItems
                 .GroupBy(x => new
                 {
-                    x.ProductId,
-                    x.ProductName,
                     x.IntegrationSystemName,
                     x.IntegrationKey,
                     x.IntegrationValue
                 })
-                .Select(g => new ProductSalesDto
+                .Select(g => new MarketplaceSalesDto
                 {
-                    ProductId = g.Key.ProductId,
-                    ProductName = g.Key.ProductName,
                     IntegrationSystemName = g.Key.IntegrationSystemName,
                     IntegrationKey = g.Key.IntegrationKey,
                     IntegrationValue = g.Key.IntegrationValue,
-                    Period = GetPeriodName(groupByType), // Aylık, Yıllık vs.
-                    TotalQuantitySold = g.Sum(x => x.Quantity)
+                    Period = GetPeriodName(groupByType),
+                    TotalQuantitySold = g.Sum(x => x.Quantity),
+                    TotalOrderAmount = g.Sum(x => x.OrderTotal)
                 })
-                .OrderByDescending(x => x.TotalQuantitySold)
+                .OrderByDescending(x => x.TotalOrderAmount)
                 .ToList();
+            var items = grouped.Select(x =>
+            {
+                var model = _mapper.Map<MarketplaceSalesDto>(x);
+                model.Period = GetPeriodName(groupByType);
+                model.TotalQuantitySold = x.TotalQuantitySold;
+                model.TotalOrderAmount = x.TotalOrderAmount;
+                model.IntegrationSystemName = x.IntegrationSystemName;
+                model.IntegrationKey = x.IntegrationKey;
+                model.IntegrationValue = x.IntegrationValue;
 
-            return grouped;
+                return model;
+            }).ToList();
+            return new PagedResult<MarketplaceSalesDto>
+            {
+                Items = items,
+                TotalCount = orderItems.TotalCount,
+                PageNumber = orderItems.PageNumber,
+                PageSize = orderItems.PageSize
+            };
         }
-
-
         private string GetPeriodName(int groupByType)
         {
             return groupByType switch
@@ -169,7 +178,6 @@ namespace Entegro.Application.Services.Base
             var endOfWeek = startOfWeek.AddDays(7);
             return (startOfWeek, endOfWeek);
         }
-
 
 
     }

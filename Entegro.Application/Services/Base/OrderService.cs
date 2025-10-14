@@ -61,6 +61,13 @@ namespace Entegro.Application.Services.Base
 
         public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _orderRepository.ExistsByOrderNoAsync(orderNo);
 
+        public async Task<List<OrderDto>> GetLast10OrdersWithItemsAsync()
+        {
+            var orders = await _orderRepository.GetLast10OrdersWithItemsAsync();
+            var orderDtos = _mapper.Map<List<OrderDto>>(orders);
+            return orderDtos;
+        }
+
         public Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year)
         {
             return _orderRepository.GetMonthlySalesByYearAsync(year);

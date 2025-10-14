@@ -4,7 +4,6 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Checkout.Orders;
-using Entegro.Web.Models.Dashboard;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -146,6 +145,15 @@ namespace Entegro.Web.Controllers
             createProductIntegration.Active = true;
             createProductIntegration.LastSyncDate = null;
 
+            var ifExistingProductIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(productId, integrationSystemId);
+            if (ifExistingProductIntegration != null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Ürün zaten eşleştirilmiş.",
+                });
+            }
             await _productIntegrationService.AddAsync(createProductIntegration);
 
             var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(integrationCode);
@@ -180,13 +188,17 @@ namespace Entegro.Web.Controllers
             var data = await _orderService.GetMonthlySalesByYearAsync(year);
             return Json(data.Select(d => new { Month = d.Month, TotalAmount = d.TotalAmount }));
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetProductSalesByMarketplace(int groupByType)
+        [HttpPost]
+        public async Task<IActionResult> GetMarketplaceSalesList([FromBody] GridCommand gridCommand, int groupByType)
         {
-            var productSalesDto = await _orderItemService.GetProductSalesByMarketplaceAsync(groupByType);
-            var productSales = _mapper.Map<List<ProductSalesViewModel>>(productSalesDto);
-            return Json(productSales);
+            var result = await _orderItemService.GetMarketplaceSalesAsync(gridCommand, groupByType);
+            return Json(new
+            {
+                draw = gridCommand.Draw,
+                recordsTotal = result.TotalCount,
+                recordsFiltered = result.TotalCount,
+                data = result.Items
+            });
         }
     }
 }

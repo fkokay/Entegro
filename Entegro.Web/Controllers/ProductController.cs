@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.Marketplace.Hepsiburada;
 using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
+using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductIntegration;
@@ -16,6 +17,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.DTOs.RelatedProduct;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
@@ -59,6 +61,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
         private readonly ICrossSellProductService _crossSellProductService;
         private readonly IRelatedProductService _relatedProductService;
+        private readonly IOrderItemService _orderItemService;
         private readonly IMapper _mapper;
         public ProductController(
             IProductService productService,
@@ -80,7 +83,8 @@ namespace Entegro.Web.Controllers
             IMapper mapper,
             IProductVariantAttributeValueService productVariantAttributeValueService,
             ICrossSellProductService crossSellProductService,
-            IRelatedProductService relatedProductService)
+            IRelatedProductService relatedProductService,
+            IOrderItemService orderItemService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -102,6 +106,7 @@ namespace Entegro.Web.Controllers
             _productVariantAttributeValueService = productVariantAttributeValueService;
             _crossSellProductService = crossSellProductService;
             _relatedProductService = relatedProductService;
+            _orderItemService = orderItemService;
         }
 
         #region Product list / create / edit / delete
@@ -1884,6 +1889,112 @@ namespace Entegro.Web.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateIfNotExistProductTrendyol([FromBody] TrendyolProductRequest model)
+        {
+            try
+            {
+                var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
+
+                if (integrationSystem == null)
+                {
+                    return Json(new { success = false, message = "Entegrasyon sistemi bulunamadı.", errorCode = "IntegrationSystemNotFound" });
+                }
+
+                TrendyolApiContext context = new TrendyolApiContext
+                {
+                    SupplierId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "SupplierId")?.Value,
+                    ApiUser = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiUser")?.Value,
+                    ApiPassword = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiPassword")?.Value,
+                };
+
+                var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, model.ProductIntegrationSku);
+                if (existingTrendyolProduct == null)
+                {
+                    return Json(new { success = false, message = "Trendyol'da bu barkoda sahip ürün bulunamadı.", errorCode = "ProductNotFoundOnTrendyol" });
+                }
+
+                var mappedProduct = TrendyolProductMapper.ToDto(existingTrendyolProduct);
+
+                var ifExistingProduct = await _productService.ExistsByCodeAsync(mappedProduct.Code);
+                if (ifExistingProduct)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Bu ürün zaten sistemde kayıtlı.",
+                        code = mappedProduct.Code
+                    });
+                }
+
+                var createProduct = _mapper.Map<CreateProductDto>(mappedProduct);
+                var product = await _productService.AddAsync(createProduct);
+
+                var productIntegration = new CreateProductIntegrationDto
+                {
+                    ProductId = product.Id,
+                    IntegrationSystemId = model.IntegrationSystemId,
+                    Active = true,
+                    Price = createProduct.Price,
+                    IntegrationCode = product.Code
+                };
+
+                var ifExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, productIntegration.IntegrationCode);
+                if (ifExistingProductIntegration != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Ürün zaten Trendyol ile eşleştirilmiş.",
+                        code = productIntegration.IntegrationCode
+                    });
+                }
+                await _productIntegrationService.AddAsync(productIntegration);
+                var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration.IntegrationCode);
+                foreach (var orderItem in orderItems)
+                {
+                    UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                    updateOrderItem.Id = orderItem.Id;
+                    updateOrderItem.Sku = product.Code;
+                    updateOrderItem.ProductId = product.Id;
+                    updateOrderItem.ProductCost = orderItem.ProductCost;
+                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                    updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                    updateOrderItem.Quantity = orderItem.Quantity;
+                    updateOrderItem.Price = orderItem.Price;
+                    updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                    updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                    updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                    updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                    updateOrderItem.OrderId = orderItem.OrderId;
+
+                    await _orderItemService.UpdateAsync(updateOrderItem);
+                }
+                return Json(new
+                {
+                    success = true,
+                    message = "Ürün başarıyla kaydedildi ve Trendyol ile eşleştirildi.",
+                    data = new
+                    {
+                        productId = product.Id,
+                        integrationCode = product.Code
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new
+                {
+                    success = false,
+                    message = "İşlem sırasında bir hata oluştu: " + ex.Message,
+                    errorCode = "ServerError"
+                });
             }
         }
         #endregion

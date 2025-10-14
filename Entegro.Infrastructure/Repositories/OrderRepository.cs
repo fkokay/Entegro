@@ -82,6 +82,15 @@ namespace Entegro.Infrastructure.Repositories
             return order;
         }
 
+        public async Task<List<Order>> GetLast10OrdersWithItemsAsync()
+        {
+            return await _context.Orders
+              .Include(o => o.OrderItems)
+              .OrderByDescending(o => o.OrderDateUtc)
+              .Take(10)
+              .ToListAsync();
+        }
+
         public async Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year)
         {
             var result = await _context.Orders

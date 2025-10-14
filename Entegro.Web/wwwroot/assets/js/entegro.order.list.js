@@ -75,14 +75,22 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
+                        const orderDate = moment(row.OrderDate);
+                        const dueDate = moment(row.DueDate);
+                        const duration = moment.duration(dueDate.diff(orderDate));
+
+                        const days = Math.floor(duration.asDays());
+                        const hours = duration.hours();
+                        const minutes = duration.minutes();
+
                         return `
                         <div>
                             <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
-                            <div>Sipariş Tarihi : <b>${moment(row.OrderDate).format("DD.MM.yyyy HH:mm")}</b></div>
+                            <div>Sipariş Tarihi : <b>${orderDate.format("DD.MM.yyyy HH:mm")}</b></div>
                             <div class="mb-3">Paket No : <b>${row.PackageNo}</b></div>
                             <div class="text-primary">
                                 <div>Kalan Süre:</div>
-                                <div>1 gün 07 saat 37 dakika</div>
+                                <div>${days} gün ${hours} saat ${minutes} dakika</div>
                             </div>
                         </div>`;
                     }
@@ -341,10 +349,12 @@ Entegro.order.OrderList = (function ($) {
                 });
             });
         }, 100);
+
+        checkAndInit();
     };
 
     const initTab = function (defaultOrderStatus) {
-        // Tüm tab (buton) tıklamaları için olay bağla
+       
         $(".order-actions .btn").click(function () {
             var orderStatus = $(this).data("order-status");
             $(".order-actions .btn").removeClass("active");
@@ -353,13 +363,12 @@ Entegro.order.OrderList = (function ($) {
             initTable(orderStatus);
         });
 
-        // Sayfa yüklendiğinde varsayılan orderStatus varsa ona göre başlat
+      
         if (defaultOrderStatus !== undefined && defaultOrderStatus !== null) {
             var $defaultBtn = $('.order-actions .btn[data-order-status="' + defaultOrderStatus + '"]');
             if ($defaultBtn.length > 0) {
                 $(".order-actions .btn").removeClass("active");
                 $defaultBtn.addClass("active");
-
                 initTable(defaultOrderStatus);
             }
         }
@@ -629,6 +638,91 @@ Entegro.order.OrderList = (function ($) {
             });
         });
     }
+
+
+  
+    function initCustomScriptForOrderStatus2() {
+        const btn = document.getElementById("createIfNotExistBtn");
+        if (!btn) return;
+
+        // Eski eventleri temizlemek için clone
+        btn.replaceWith(btn.cloneNode(true));
+        const newBtn = document.getElementById("createIfNotExistBtn");
+
+        newBtn.addEventListener("click", function () {
+            const integrationSystemId = parseInt(document.getElementById("IntegrationSystemId")?.value || 0);
+            const productIntegrationSku = document.getElementById("ProductIntegrationSku")?.value || "";
+
+            if (!integrationSystemId || !productIntegrationSku) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Eksik Bilgi',
+                    text: 'Lütfen tüm alanları doldurun.'
+                });
+                return;
+            }
+
+            
+            window.showLoading("Lütfen bekleyiniz..");
+
+            fetch('/Product/CreateIfNotExistProductTrendyol', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    integrationSystemId: integrationSystemId,
+                    productIntegrationSku: productIntegrationSku
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+            
+                    window.hideLoading();
+
+                    if (result.success === false) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'İşlem Başarısız',
+                            text: result.message || "Bir hata oluştu. Lütfen tekrar deneyin.",
+                            footer: result.errorCode ? `Hata Kodu: ${result.errorCode}` : null
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: result.message || "İşlem başarıyla tamamlandı."
+                    }).then(() => {
+                        const modalEl = document.getElementById('ProudctIntegrationModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                 
+                    window.hideLoading();
+
+                    console.error("Fetch hatası:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sunucu Hatası',
+                        text: "Sunucuya bağlanırken bir sorun oluştu. Lütfen internet bağlantınızı kontrol edin."
+                    });
+                });
+        });
+    }
+
+
+   
+    function checkAndInit() {
+        const activeOrderStatus = parseInt($('.order-actions .btn.active').data('order-status')) || 0;
+        if (activeOrderStatus === 2) {
+            initCustomScriptForOrderStatus2();
+        }
+    }
+
+  
 
     return {
         initTable: initTable,

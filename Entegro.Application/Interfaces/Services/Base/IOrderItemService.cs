@@ -14,6 +14,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<OrderItemDto> AddAsync(CreateOrderItemDto orderItem);
         Task<OrderItemDto> UpdateAsync(UpdateOrderItemDto orderItem);
         Task DeleteAsync(int id);
-        Task<List<ProductSalesDto>> GetProductSalesByMarketplaceAsync(int groupByType);
+        Task<PagedResult<MarketplaceSalesDto>> GetMarketplaceSalesAsync(GridCommand gridCommand, int groupByType);
     }
 }

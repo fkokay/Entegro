@@ -81,7 +81,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
             </div>
             <div class="modal-body">
-                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
@@ -126,6 +125,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
                     <button type="submit" class="btn btn-warning">Eşleştir</button>
+                    <button type="button" id="createIfNotExistBtn" class="btn btn-danger">Ürün Yoksa Kaydet</button>
                 </div>
             </form>
         </div>
@@ -140,7 +140,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
             </div>
             <div class="modal-body">
-               
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
@@ -154,9 +153,13 @@
     <script src="/assets/js/entegro.order.list.js" asp-append-version="true"></script>
     <script>
         $(function () {
-            
+
             var orderStatusId = @((ViewBag.OrderStatusId ?? 1));
             Entegro.order.OrderList.initTab(orderStatusId);
+
         });
     </script>
+
+   
+
 }

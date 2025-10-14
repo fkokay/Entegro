@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Catalog.Products;
+using Entegro.Web.Models.Checkout.Orders;
 using Entegro.Web.Models.Dashboard;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +58,13 @@ namespace Entegro.Web.Components
                     Products = _mapper.Map<List<ProductModel>>(productsDto)
                 };
                 return View(dashboardType, productModels);
+            }
+
+            else if (dashboardType == "GetLast10OrdersWithItems")
+            {
+                var orderDtos = await _orderService.GetLast10OrdersWithItemsAsync();
+                var order = _mapper.Map<List<OrderModel>>(orderDtos);
+                return View(dashboardType, order);
             }
 
             else if (dashboardType == "InvoiceTable")

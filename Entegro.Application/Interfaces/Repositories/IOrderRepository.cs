@@ -17,8 +17,8 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<OrderListPageDto> GetOrderPageAsync();
         Task<decimal> GetTotalSalesAsync();
         Task<int> CompleteOrderStatusCount();
-
         Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year);
+        Task<List<Order>> GetLast10OrdersWithItemsAsync();
 
     }
 }
