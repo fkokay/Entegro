@@ -61,6 +61,18 @@ namespace Entegro.Application.Services.Base
 
         public async Task<bool> ExistsByOrderNoAsync(string orderNo) => await _orderRepository.ExistsByOrderNoAsync(orderNo);
 
+        public async Task<OrderDto?> GetByOrderNoAsync(string orderNo)
+        {
+            var order = await _orderRepository.GetByOrderNoAsync(orderNo);
+            if (order == null)
+            {
+                throw new KeyNotFoundException($"Order with No {orderNo} not found.");
+            }
+
+            var orderDto = _mapper.Map<OrderDto>(order);
+            return orderDto;
+        }
+
         public async Task<List<OrderDto>> GetLast10OrdersWithItemsAsync()
         {
             var orders = await _orderRepository.GetLast10OrdersWithItemsAsync();
@@ -165,8 +177,16 @@ namespace Entegro.Application.Services.Base
 
         public async Task<OrderDto> UpdateAsync(UpdateOrderDto updateOrder)
         {
-            await _orderRepository.UpdateAsync(_mapper.Map<Order>(updateOrder));
-            return _mapper.Map<OrderDto>(updateOrder);
+            if (updateOrder == null)
+                throw new ArgumentNullException(nameof(updateOrder));
+
+            var existingOrder = await _orderRepository.GetByIdAsync(updateOrder.Id);
+            if (existingOrder == null)
+                throw new KeyNotFoundException($"ID {updateOrder.Id} ile Order bulunamadı.");
+
+            _mapper.Map(updateOrder, existingOrder);
+            await _orderRepository.UpdateAsync(existingOrder);
+            return _mapper.Map<OrderDto>(existingOrder);
         }
     }
 }

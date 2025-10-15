@@ -75,24 +75,34 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
-                        const orderDate = moment(row.OrderDate);
-                        const dueDate = moment(row.DueDate);
-                        const duration = moment.duration(dueDate.diff(orderDate));
+                        
+                        const orderDate = moment.utc(row.OrderDate);         
+                        const dueDate = moment.utc(row.DueDate);           
+                        const now = moment.utc();                      
 
+                        let diffMs = dueDate.diff(now);                 
+                        const overdue = diffMs < 0;
+                        if (overdue) diffMs = Math.abs(diffMs);
+
+                        const duration = moment.duration(diffMs);
                         const days = Math.floor(duration.asDays());
                         const hours = duration.hours();
                         const minutes = duration.minutes();
 
+                        const kalanMetin = overdue
+                            ? `Süre aşıldı: ${days} gün ${hours} saat ${minutes} dakika`
+                            : `${days} gün ${hours} saat ${minutes} dakika`;
+
                         return `
-                        <div>
-                            <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
-                            <div>Sipariş Tarihi : <b>${orderDate.format("DD.MM.yyyy HH:mm")}</b></div>
-                            <div class="mb-3">Paket No : <b>${row.PackageNo}</b></div>
-                            <div class="text-primary">
-                                <div>Kalan Süre:</div>
-                                <div>${days} gün ${hours} saat ${minutes} dakika</div>
-                            </div>
-                        </div>`;
+                         <div>
+                           <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
+                           <div>Sipariş Tarihi : <b>${orderDate.format("DD.MM.YYYY HH:mm")}</b></div>
+                           <div class="mb-3">Paket No : <b>${row.PackageNo}</b></div>
+                           <div class="${overdue ? 'text-danger' : 'text-primary'}">
+                             <div>Kalan Süre:</div>
+                             <div>${kalanMetin}</div>
+                           </div>
+                         </div>`;
                     }
                 },
                 {
@@ -398,7 +408,17 @@ Entegro.order.OrderList = (function ($) {
         $("#ProductIntegrationSku").val(productIntegrationSku);
         $("#IntegrationCode").val(productIntegrationSku);
         $("#ProductId").select2({
-            language: "tr",
+            language: {
+                noResults: function () {
+                    return $(
+                        `<div style="padding: 6px; text-align: center;">
+                    <button type="button" id="createIfNotExistBtn" class="btn btn-outline-danger btn-sm">
+                        Aradığınız Ürün Yok Kaydet Ve Eşleştir
+                    </button>
+                </div>`
+                    );
+                }
+            },
             placeholder: 'Ürün seçiniz',
             allowClear: true,
             dropdownParent: $('#ProudctIntegrationModal'),
@@ -642,14 +662,8 @@ Entegro.order.OrderList = (function ($) {
 
   
     function initCustomScriptForOrderStatus2() {
-        const btn = document.getElementById("createIfNotExistBtn");
-        if (!btn) return;
-
-        // Eski eventleri temizlemek için clone
-        btn.replaceWith(btn.cloneNode(true));
-        const newBtn = document.getElementById("createIfNotExistBtn");
-
-        newBtn.addEventListener("click", function () {
+        // Delegated event binding
+        $(document).on("click", "#createIfNotExistBtn", function () {
             const integrationSystemId = parseInt(document.getElementById("IntegrationSystemId")?.value || 0);
             const productIntegrationSku = document.getElementById("ProductIntegrationSku")?.value || "";
 
@@ -662,7 +676,6 @@ Entegro.order.OrderList = (function ($) {
                 return;
             }
 
-            
             window.showLoading("Lütfen bekleyiniz..");
 
             fetch('/Product/CreateIfNotExistProductTrendyol', {
@@ -675,7 +688,6 @@ Entegro.order.OrderList = (function ($) {
             })
                 .then(response => response.json())
                 .then(result => {
-            
                     window.hideLoading();
 
                     if (result.success === false) {
@@ -700,7 +712,6 @@ Entegro.order.OrderList = (function ($) {
                     });
                 })
                 .catch(error => {
-                 
                     window.hideLoading();
 
                     console.error("Fetch hatası:", error);
@@ -712,6 +723,7 @@ Entegro.order.OrderList = (function ($) {
                 });
         });
     }
+
 
 
    

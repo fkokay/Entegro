@@ -70,14 +70,28 @@ namespace Entegro.Infrastructure.Repositories
             var query = _context.Orders
                 .Include(o => o.OrderItems)
                 .Include(c => c.Customer)
-                .Include(s => s.Shipments)
-            .AsNoTracking();
+                .Include(s => s.Shipments);
 
-            var order = await query.FirstOrDefaultAsync(o => o.Id == id);
+            var order = await query.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
 
             if (order is null)
                 return new Order();
 
+
+            return order;
+        }
+
+        public async Task<Order?> GetByOrderNoAsync(string orderNo)
+        {
+            var query = _context.Orders
+                           .Include(o => o.OrderItems)
+                           .Include(c => c.Customer)
+                           .Include(s => s.Shipments);
+
+            var order = await query.AsNoTracking().FirstOrDefaultAsync(o => o.OrderNumber == orderNo);
+
+            if (order is null)
+                return new Order();
 
             return order;
         }
@@ -215,8 +229,8 @@ namespace Entegro.Infrastructure.Repositories
                     ShipmentCarrier = x.shipment != null ? x.shipment.Carrier : "",
                     ShippingTrackingNumber = x.shipment != null ? x.shipment.TrackingNumber : "",
                     OrderSubTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) : x.order.OrderSubTotal,
-                    OrderDiscount = 0,
-                    OrderTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) : x.order.OrderTotal,
+                    OrderDiscount = x.order.OrderDiscount,
+                    OrderTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) - x.order.OrderDiscount : x.order.OrderTotal,
                     PaymentMethod = x.order.PaymentMethod,
                     PaymentStatus = x.order.PaymentStatusLabelHint,
                     OrderItems = (x.shipment != null

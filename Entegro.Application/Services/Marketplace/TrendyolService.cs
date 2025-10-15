@@ -1,26 +1,18 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.CategoryAttribute;
-using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
-using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
-using Entegro.Application.Services.Commerce.Smartstore;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services.Marketplace
 {
@@ -34,8 +26,8 @@ namespace Entegro.Application.Services.Marketplace
         private readonly ILogger<TrendyolService> _logger;
 
         public TrendyolService(
-            IHttpClientFactory httpClientFactory, 
-            IProductIntegrationService productIntegrationService, 
+            IHttpClientFactory httpClientFactory,
+            IProductIntegrationService productIntegrationService,
             IProductService productService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             INotificationService notificationService,
@@ -107,9 +99,9 @@ namespace Entegro.Application.Services.Marketplace
                         stockQuantity = product.StockQuantity;
                     }
 
-                        var request = new TrendyolPriceAndStockUpdateRequest
-                        {
-                            Items = new List<TrendyolPriceAndStockUpdateDto>
+                    var request = new TrendyolPriceAndStockUpdateRequest
+                    {
+                        Items = new List<TrendyolPriceAndStockUpdateDto>
                             {
                                 new TrendyolPriceAndStockUpdateDto
                                 {
@@ -119,9 +111,9 @@ namespace Entegro.Application.Services.Marketplace
                                     Quantity = stockQuantity
                                 }
                             }
-                        };
+                    };
 
-                    await UpdatePriceAndStockAsync(apiContext,request);
+                    await UpdatePriceAndStockAsync(apiContext, request);
 
 
                     await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Trendyol {product.Name} stok ve fiyat güncellendi");
@@ -129,7 +121,7 @@ namespace Entegro.Application.Services.Marketplace
                 }
             }
         }
-        
+
         public async Task<IEnumerable<BrandDto>> GetBrandsAsync(TrendyolApiContext context)
         {
             using var client = CreateHttpClient(context);
@@ -270,7 +262,7 @@ namespace Entegro.Application.Services.Marketplace
             return categories;
         }
 
-        public async Task<CategoryAttributeDto> GetCategoryAttibutesAsync(TrendyolApiContext context,int categoryId)
+        public async Task<CategoryAttributeDto> GetCategoryAttibutesAsync(TrendyolApiContext context, int categoryId)
         {
             using var client = CreateHttpClient(context);
             var url = $"product/product-categories/{categoryId}/attributes";
@@ -290,7 +282,7 @@ namespace Entegro.Application.Services.Marketplace
             return categoryAttribute;
         }
 
-        public async Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(TrendyolApiContext context,int pageSize = 50)
+        public async Task<IEnumerable<TrendyolProductDto>> GetProductsAsync(TrendyolApiContext context, int pageSize = 50)
         {
             using var client = CreateHttpClient(context);
             var allProducts = new List<TrendyolProductDto>();
@@ -327,7 +319,7 @@ namespace Entegro.Application.Services.Marketplace
             return allProducts;
         }
 
-        public async Task<TrendyolProductDto?> GetProductWithBarcodeAsync(TrendyolApiContext context,string barcode)
+        public async Task<TrendyolProductDto?> GetProductWithBarcodeAsync(TrendyolApiContext context, string barcode)
         {
             using var client = CreateHttpClient(context);
             var url = $"product/sellers/{context.SupplierId}/products?barcode={barcode}";
@@ -348,7 +340,7 @@ namespace Entegro.Application.Services.Marketplace
             return data.content.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(TrendyolApiContext context,int pageSize = 50)
+        public async Task<IEnumerable<TrendyolShipmentPackageDto>> GetShipmentPackagesAsync(TrendyolApiContext context, int pageSize = 50)
         {
 
             using var client = CreateHttpClient(context);
@@ -387,7 +379,7 @@ namespace Entegro.Application.Services.Marketplace
             return allShipmentPackages;
         }
 
-        public async Task UpdatePriceAndStockAsync(TrendyolApiContext context,TrendyolPriceAndStockUpdateRequest request)
+        public async Task UpdatePriceAndStockAsync(TrendyolApiContext context, TrendyolPriceAndStockUpdateRequest request)
         {
             using var client = CreateHttpClient(context);
 

@@ -14,6 +14,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task UpdateAsync(Order order);
         Task DeleteAsync(Order order);
         Task<bool> ExistsByOrderNoAsync(string orderNo);
+        Task<Order?> GetByOrderNoAsync(string orderNo);
         Task<OrderListPageDto> GetOrderPageAsync();
         Task<decimal> GetTotalSalesAsync();
         Task<int> CompleteOrderStatusCount();

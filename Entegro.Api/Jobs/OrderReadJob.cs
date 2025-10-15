@@ -21,7 +21,6 @@ using Entegro.Application.Mappings.Marketplace.N11;
 using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using MapsterMapper;
-using Polly;
 using Quartz;
 
 namespace Entegro.Api.Jobs
@@ -436,6 +435,13 @@ namespace Entegro.Api.Jobs
                 TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 
+
+                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10588130205").FirstOrDefault();
+                var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
+
+
+
+
                 foreach (var order in orders)
                 {
                     try
@@ -445,7 +451,11 @@ namespace Entegro.Api.Jobs
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {
-                            _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
+                            var existingOrder = await _orderService.GetByOrderNoAsync(order.OrderNumber);
+                            var mapped = _mapper.Map(existingOrder, order);
+                            var updatedOrder = _mapper.Map<UpdateOrderDto>(mapped);
+                            await _orderService.UpdateAsync(updatedOrder);
+                            _logger.LogInformation("'{OrderNumber}' nolu sipariş güncellendi", order.OrderNumber);
                             continue;
                         }
                         #endregion

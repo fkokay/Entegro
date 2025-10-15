@@ -1,6 +1,7 @@
 ﻿using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Shipment;
+using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Entegro.Application.Mappings.Marketplace.Trendyol
@@ -26,19 +27,24 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             order.OrderNumber = trendyolShipmentPackage.OrderNumber;
             order.OrderGuid = Guid.NewGuid();
             order.OrderTax = 0;
-            order.OrderDiscount = 0;
             order.RefundedAmount = 0;
             order.OrderTotal = trendyolShipmentPackage.TotalPrice;
             order.PaymentMethod = "Trendyol";
             order.OrderDateUtc = FromUnixTimeMilliseconds(trendyolShipmentPackage.OrderDate);
             order.Deleted = false;
             order.IsTransient = true;
+            order.OrderDiscount = trendyolShipmentPackage.TotalDiscount;//ekledim
+            order.OrderSubTotal = trendyolShipmentPackage.GrossAmount;//ekledim
 
 
-            order.OrderStatus = Domain.Enums.OrderStatus.Pending;
-            order.PaymentStatus = Domain.Enums.PaymentStatus.Paid;
+
+            order.OrderStatus = TrendyolStatusMapper.MapOrderStatus(trendyolShipmentPackage.Status);
+            order.PaymentStatus = TrendyolStatusMapper.MapPaymentStatus(trendyolShipmentPackage.Status);
             order.ShippingMethod = trendyolShipmentPackage.CargoProviderName;
-            order.ShippingStatus = Domain.Enums.ShippingStatus.Shipped;
+            //order.ShippingStatus = TrendyolStatusMapper.MapShippingStatus(trendyolShipmentPackage.ShipmentPackageStatus);
+            order.ShippingStatus = TrendyolStatusMapper.MapShippingStatus(trendyolShipmentPackage.ShipmentPackageStatus);
+
+
             order.DueDateUtc = FromUnixTimeMilliseconds(trendyolShipmentPackage.AgreedDeliveryDate);
             order.Customer = new DTOs.Customer.CustomerDto()
             {
