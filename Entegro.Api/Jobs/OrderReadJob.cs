@@ -451,10 +451,13 @@ namespace Entegro.Api.Jobs
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {
-                            //var existingOrder = await _orderService.GetByOrderNoAsync(order.OrderNumber);
-                            //var mapped = _mapper.Map(existingOrder, order);
-                            //var updatedOrder = _mapper.Map<UpdateOrderDto>(mapped);
-                            //await _orderService.UpdateAsync(updatedOrder);
+                            var existingOrder = await _orderService.GetByOrderNoAsync(order.OrderNumber);
+                            if (existingOrder == null)
+                                continue;
+
+                            existingOrder.OrderStatus = order.OrderStatus;
+
+                            await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
                             _logger.LogInformation("'{OrderNumber}' nolu sipariş güncellendi", order.OrderNumber);
                             continue;
                         }

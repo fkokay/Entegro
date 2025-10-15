@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.Interfaces.Repositories;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -283,6 +284,8 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Order order)
         {
+            _context.Entry(order).State = EntityState.Modified;
+            _context.Entry(order).Collection(p => p.OrderItems).IsModified = false;
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
         }
