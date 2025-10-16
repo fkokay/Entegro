@@ -15,6 +15,8 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.DTOs.RelatedProduct;
+using Entegro.Application.DTOs.SpecificationAttribute;
+using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
@@ -36,7 +38,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using System.Net;
-
+using System.Text.Json;
 namespace Entegro.Web.Controllers
 {
     [Authorize]
@@ -46,6 +48,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductCategoryService _productCategoryMappingService;
         private readonly IBrandService _brandService;
         private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeValueService _productAttributeValueService;
         private readonly IProductVariantAttributeService _productVariantAttributeService;
         private readonly IProductMediaFileMappingService _productMediaFileMappingService;
         private readonly IIntegrationSystemService _integrationSystemService;
@@ -62,7 +65,11 @@ namespace Entegro.Web.Controllers
         private readonly ICrossSellProductService _crossSellProductService;
         private readonly IRelatedProductService _relatedProductService;
         private readonly IOrderItemService _orderItemService;
+        private readonly ISettingService _settingService;
+        private readonly HttpClient _client;
         private readonly IMapper _mapper;
+        private readonly ISpecificationAttributeService _specificationAttributeService;
+        private readonly ISpecificationAttributeOptionService _specificationAttributeOptionService;
         public ProductController(
             IProductService productService,
             IProductCategoryService productCategoryMappingService,
@@ -84,7 +91,12 @@ namespace Entegro.Web.Controllers
             IProductVariantAttributeValueService productVariantAttributeValueService,
             ICrossSellProductService crossSellProductService,
             IRelatedProductService relatedProductService,
-            IOrderItemService orderItemService)
+            IOrderItemService orderItemService,
+            ISettingService settingService,
+            HttpClient client,
+            IProductAttributeValueService productAttributeValueService,
+            ISpecificationAttributeService specificationAttributeService,
+            ISpecificationAttributeOptionService specificationAttributeOptionService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -107,6 +119,11 @@ namespace Entegro.Web.Controllers
             _crossSellProductService = crossSellProductService;
             _relatedProductService = relatedProductService;
             _orderItemService = orderItemService;
+            _settingService = settingService;
+            _client = client;
+            _productAttributeValueService = productAttributeValueService;
+            _specificationAttributeService = specificationAttributeService;
+            _specificationAttributeOptionService = specificationAttributeOptionService;
         }
 
         #region Product list / create / edit / delete
@@ -1893,7 +1910,6 @@ namespace Entegro.Web.Controllers
         }
 
 
-
         [HttpPost]
         public async Task<IActionResult> CreateIfNotExistProductTrendyol([FromBody] TrendyolProductRequest model)
         {
@@ -1919,8 +1935,10 @@ namespace Entegro.Web.Controllers
                     return Json(new { success = false, message = "Trendyol'da bu barkoda sahip ürün bulunamadı.", errorCode = "ProductNotFoundOnTrendyol" });
                 }
 
-                var mappedProduct = TrendyolProductMapper.ToDto(existingTrendyolProduct);
 
+
+                #region product add
+                var mappedProduct = TrendyolProductMapper.ToDto(existingTrendyolProduct);
                 var ifExistingProduct = await _productService.ExistsByCodeAsync(mappedProduct.Code);
                 if (ifExistingProduct)
                 {
@@ -1934,7 +1952,9 @@ namespace Entegro.Web.Controllers
 
                 var createProduct = _mapper.Map<CreateProductDto>(mappedProduct);
                 var product = await _productService.AddAsync(createProduct);
+                #endregion
 
+                #region product integration 
                 var productIntegration = new CreateProductIntegrationDto
                 {
                     ProductId = product.Id,
@@ -1955,6 +1975,103 @@ namespace Entegro.Web.Controllers
                     });
                 }
                 await _productIntegrationService.AddAsync(productIntegration);
+                #endregion
+
+                #region product image upload
+                var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                {
+                    Console.WriteLine("Sistem URL'si ayarlanmamış.");
+                }
+                if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                {
+                    Console.WriteLine("hata");
+                }
+
+                using var httpClient = new HttpClient
+                {
+                    BaseAddress = baseUri
+                };
+
+                try
+                {
+                    var images = existingTrendyolProduct.images.Select(image => image.url).ToList();
+                    List<int> mediaFiles = await UploadImagesAsync(images, httpClient);
+                    foreach (var item in mediaFiles)
+                    {
+                        CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                        createProductMediaFile.MediaFileId = item;
+                        createProductMediaFile.ProductId = product.Id;
+
+                        await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                #endregion
+
+                #region product specification attribute
+
+                var trendyolAttributes = existingTrendyolProduct.attributes;
+                foreach (var item in trendyolAttributes)
+                {
+                    var ifExistSpecificationAttribute = await _specificationAttributeService.ExistsByNameAsync(item.attributeName);
+                    if (!ifExistSpecificationAttribute)
+                    {
+                        var mappedSpecificationAttribute = new CreateSpecificationAttributeDto
+                        {
+                            Name = item.attributeName
+                        };
+                        var createdSpecificationAttribute = await _specificationAttributeService.AddAsync(mappedSpecificationAttribute);
+
+                        var specificationAttributeOption = await _specificationAttributeOptionService.ExistsByNameAsync(item.attributeValue);
+                        if (!specificationAttributeOption)
+                        {
+                            var createdSpecificationAttributeDtoOption = new CreateSpecificationAttributeOptionDto
+                            {
+                                SpecificationAttributeId = createdSpecificationAttribute.Id,
+                                DisplayOrder = 0,
+                                Name = item.attributeValue
+                            };
+
+                            var createdSpecificationAttributeOption = await _specificationAttributeOptionService.AddAsync(createdSpecificationAttributeDtoOption);
+
+                            await _productSpecificationAttributeMappingService.AddAsync(new CreateProductSpecificationAttributeDto
+                            {
+                                ProductId = product.Id,
+                                DisplayOrder = 0,
+                                SpecificationAttributeOptionId = createdSpecificationAttributeOption.Id
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var specificationAttributeOption = await _specificationAttributeOptionService.ExistsByNameAsync(item.attributeValue);
+                        if (!specificationAttributeOption)
+                        {
+                            var specificationAttribute = await _specificationAttributeService.GetByNameAsync(item.attributeName);
+                            var createdSpecificationAttributeDtoOption = new CreateSpecificationAttributeOptionDto
+                            {
+                                SpecificationAttributeId = specificationAttribute.Id,
+                                DisplayOrder = 0,
+                                Name = item.attributeValue
+                            };
+                            var createdSpecificationAttributeOption = await _specificationAttributeOptionService.AddAsync(createdSpecificationAttributeDtoOption);
+
+                            await _productSpecificationAttributeMappingService.AddAsync(new CreateProductSpecificationAttributeDto
+                            {
+                                ProductId = product.Id,
+                                DisplayOrder = 0,
+                                SpecificationAttributeOptionId = createdSpecificationAttributeOption.Id
+                            });
+                        }
+                    }
+                }
+                #endregion
+
+                #region orderitem update
                 var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration.IntegrationCode);
                 foreach (var orderItem in orderItems)
                 {
@@ -1975,6 +2092,8 @@ namespace Entegro.Web.Controllers
 
                     await _orderItemService.UpdateAsync(updateOrderItem);
                 }
+                #endregion
+
                 return Json(new
                 {
                     success = true,
@@ -1997,6 +2116,8 @@ namespace Entegro.Web.Controllers
                 });
             }
         }
+
+
         #endregion
 
         #region ProductVariantAttributeCombination
@@ -2483,7 +2604,83 @@ namespace Entegro.Web.Controllers
 
             return results;
         }
+        public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
+        {
+            List<int> fileIds = new();
 
+            if (imageUrls != null && imageUrls.Any())
+            {
+                var multipartContent = new MultipartFormDataContent();
+                multipartContent.Add(new StringContent("catalog"), "path");
+                multipartContent.Add(new StringContent("False"), "isTransient");
+
+                foreach (var imageUrl in imageUrls)
+                {
+                    try
+                    {
+                        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+                        var imageName = Path.GetFileName(imageUrl);
+
+                        if (string.IsNullOrWhiteSpace(imageName))
+                            imageName = "default.jpg";
+
+                        var nameWithoutExtension = Path.GetFileNameWithoutExtension(imageName);
+                        var extension = Path.GetExtension(imageName);
+                        var uniqueSuffix = $"trendyol_{Guid.NewGuid():N}";
+                        imageName = $"{nameWithoutExtension}_{uniqueSuffix}{extension}";
+
+                        var byteContent = new ByteArrayContent(imageBytes);
+                        byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+                        multipartContent.Add(byteContent, "upload-file", imageName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"HATA (indirilemedi): {imageUrl} → {ex.Message}");
+                    }
+                }
+
+
+                var uploadUrl = "media/upload";
+                var response = await httpClient.PostAsync(uploadUrl, multipartContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    using var document = JsonDocument.Parse(result);
+                    var root = document.RootElement;
+
+                    if (root.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var item in root.EnumerateArray())
+                        {
+                            if (item.TryGetProperty("id", out var idProp))
+                            {
+                                int imageId = idProp.GetInt32();
+                                fileIds.Add(imageId);
+                                Console.WriteLine($"id: {imageId}");
+                            }
+                        }
+                    }
+                    else if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        if (root.TryGetProperty("id", out var idProp))
+                        {
+                            int imageId = idProp.GetInt32();
+                            fileIds.Add(imageId);
+                            Console.WriteLine($"id: {imageId}");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Resim yükleme başarısız oldu. Durum kodu:" + response.StatusCode);
+                }
+            }
+
+            return fileIds;
+        }
 
     }
 }

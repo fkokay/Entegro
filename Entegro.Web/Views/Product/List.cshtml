@@ -52,6 +52,33 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="CreateIfNotExistProductTrendyolModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <form id="CreateIfNotExistProductTrendyolForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="CreateIfNotExistProductTrendyolModalLabel">Ürün Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-5">
+                        
+                        <input type="hidden" id="IntegrationSystemId" value="31" />
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductIntegrationSku">Trendyol Ürün Kodu</label>
+                            <input type="text" id="ProductIntegrationSku" class="form-control" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                    <button type="submit" class="btn btn-warning">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script src="/assets/js/entegro.product.list.js" asp-append-version="true"></script>
@@ -62,6 +89,46 @@
 
             Entegro.product.list.initList();
             Entegro.product.list.editIntegration();
+           
         });
     </script>
+
+    <script>
+        $('#CreateIfNotExistProductTrendyolForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var modal = $('#CreateIfNotExistProductTrendyolModal');
+
+            var formData = {
+                IntegrationSystemId: $('#IntegrationSystemId').val(),
+                ProductIntegrationSku: $('#ProductIntegrationSku').val()
+            };
+
+            $.ajax({
+                url: '/Product/CreateIfNotExistProductTrendyol',
+                type: 'POST',
+                data: JSON.stringify(formData),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                processData: false,
+                success: function (response) {
+                    modal.modal('hide');
+
+                    if (response.success) {
+                        toastr.success(response.message || "Ürün başarıyla eklendi ve eşleştirildi.");
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        toastr.warning(response.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    modal.modal('hide');
+                    toastr.error("Sunucu hatası oluştu: " + error);
+                }
+            });
+        });
+    </script>
+
 }

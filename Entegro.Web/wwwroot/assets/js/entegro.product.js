@@ -2268,63 +2268,12 @@ Entegro.product = (function ($) {
         return table;
     }
 
-    function initSpecificationAttributeDropdowns() {
-        $('#SpecificationAttributeId').select2({
-            language: "tr",
-            placeholder: 'Özellik seçiniz',
-            allowClear: true,
-            dropdownParent: $('#ProductSpecificationAttributeModal'),
-            width: '100%',
-            ajax: {
-                url: "/SpecificationAttribute/AllSpecificationAttribute",
-                type: 'POST',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        term: params.term || '',
-                        page: params.page || 1
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.results,
-                        pagination: {
-                            more: data.pagination?.more === true
-                        }
-                    };
-                },
-                cache: true
-            }
-        });
-
-      
-        $('#SpecificationAttributeId').on('select2:select', function (e) {
-            const selected = e.params.data;
-            const options = selected.specificationAttributeOptions || [];
-
-            $('#SpecificationAttributeOptionId').empty();
-
-            options.forEach(opt => {
-                const newOption = new Option(opt.text, opt.id, false, false);
-                $('#SpecificationAttributeOptionId').append(newOption);
-            });
-
-            $('#SpecificationAttributeOptionId').val(null).trigger('change');
-        });
-
-
-        $('#SpecificationAttributeOptionId').select2({
-            language: "tr",
-            placeholder: 'Özellik değeri seçiniz',
-            allowClear: true,
-            dropdownParent: $('#ProductSpecificationAttributeModal'),
-            width: '100%'
-        });
+    function initCreateIfNotExistProductTrendyolForm() {
+       
     }
 
 
+     
 
     return {
         Init: Init,
@@ -2345,7 +2294,6 @@ Entegro.product = (function ($) {
         initCrossSellList: initCrossSellList,
         initRelatedProductList: initRelatedProductList,
         initProductSpecificationAttributeTable: initProductSpecificationAttributeTable,
-        initSpecificationAttributeDropdowns: initSpecificationAttributeDropdowns,
         addFilterDropdown: addFilterDropdown,
         addFilterText: addFilterText
     };

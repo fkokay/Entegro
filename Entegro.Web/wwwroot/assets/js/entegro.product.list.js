@@ -463,8 +463,16 @@ Entegro.product.list = (function ($) {
                             },
                             {
                                 text: `<i class="icon-base ti ti-plus me-1"></i><span>Yeni Kayıt</span>`,
-                                className: "btn btn-primary",
+                                className: "btn btn-primary me-3",
                                 action: () => window.location.href = "Create"
+                            },
+                            {
+                                text: `<i class="icon-base ti ti-cloud-download me-1"></i><span>Trendyol'dan Yeni Kayıt</span>`,
+                                className: "btn btn-warning",
+                                action: () => {
+                                    $('#CreateIfNotExistProductTrendyolForm')[0].reset();
+                                    $('#CreateIfNotExistProductTrendyolModal').modal('show');
+                                }
                             }
                         ]
                     }]

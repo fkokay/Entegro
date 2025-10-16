@@ -275,6 +275,7 @@ namespace Entegro.Application.Services.Marketplace
                 PropertyNameCaseInsensitive = true
             });
 
+            var a = data.CategoryAttributes.Where(m => m.Slicer == true).ToList();
 
             TrendyolCategoryAttributeMapper.ConfigureLogger(_logger);
             var categoryAttribute = TrendyolCategoryAttributeMapper.ToDto(data);
