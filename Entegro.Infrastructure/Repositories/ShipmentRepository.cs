@@ -41,17 +41,17 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<bool> ExistsByIdAsync(int id)
         {
-            return await _context.Shipments.AnyAsync(o => o.Id == id);
+            return await _context.Shipments.AsNoTracking().AnyAsync(o => o.Id == id);
         }
 
         public async Task<bool> ExistsByOrderIdAsync(int orderId)
         {
-            return await _context.Shipments.AnyAsync(o => o.OrderId == orderId);
+            return await _context.Shipments.AsNoTracking().AnyAsync(o => o.OrderId == orderId);
         }
 
         public async Task<bool> ExistsByTrackingNumberAsync(string trackingNumber)
         {
-            return await _context.Shipments.AnyAsync(o => o.TrackingNumber == trackingNumber);
+            return await _context.Shipments.AsNoTracking().AnyAsync(o => o.TrackingNumber == trackingNumber);
         }
 
         public async Task<List<Shipment>> GetAllAsync()
@@ -84,12 +84,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Shipment?> GetByIdAsync(int id)
         {
-            return await _context.Shipments.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.Shipments.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<Shipment?> GetByOrderIdAsync(int orderId)
         {
-            return await _context.Shipments.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            return await _context.Shipments.AsNoTracking().FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
 
         public async Task<Shipment?> GetByTrackingNumberAsync(string trackingNumber)
@@ -145,6 +145,8 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(Shipment shipment)
         {
+            _context.Entry(shipment).State = EntityState.Modified;
+            _context.Entry(shipment).Collection(p => p.ShipmentItems).IsModified = false;
             _context.Shipments.Update(shipment);
             await _context.SaveChangesAsync();
         }

@@ -58,7 +58,7 @@ namespace Entegro.Application.Services.Base
                 throw new ArgumentOutOfRangeException(nameof(orderId));
             }
 
-            return await _shipmentRepository.ExistsByIdAsync(orderId);
+            return await _shipmentRepository.ExistsByOrderIdAsync(orderId);
         }
 
         public async Task<bool> ExistsByTrackingNumberAsync(string trackingNumber)
@@ -188,10 +188,12 @@ namespace Entegro.Application.Services.Base
             if (existingShipment == null)
                 throw new KeyNotFoundException($"ID {shipment.Id} ile shipment bulunamadı.");
 
-            _mapper.Map(shipment, existingShipment);
-            await _shipmentRepository.UpdateAsync(existingShipment);
+            var dto = _mapper.Map(shipment, existingShipment);
+            dto.ShippedDateUtc = shipment.ShippedDate?.ToLocalTime();
+            dto.DeliveryDateUtc = shipment.DeliveryDate?.ToLocalTime();
+            await _shipmentRepository.UpdateAsync(dto);
 
-            return _mapper.Map<ShipmentDto>(existingShipment);
+            return _mapper.Map<ShipmentDto>(dto);
         }
 
         public async Task<ShipmentDto> UpdateByDeliveryDateAsync(int id)

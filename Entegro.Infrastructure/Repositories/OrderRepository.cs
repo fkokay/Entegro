@@ -4,8 +4,8 @@ using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.Interfaces.Repositories;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Entities.Checkout;
+using Entegro.Domain.Enums;
 using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -127,8 +127,8 @@ namespace Entegro.Infrastructure.Repositories
             OrderListPageDto orderListPage = new OrderListPageDto();
             orderListPage.ToBePackedQuantity = await _context.Orders.Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => (int?)si.Quantity ?? 0))).CountAsync();
             orderListPage.ReadyToShipQuantity = await _context.Orders.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null)).CountAsync();
-            orderListPage.ShippedQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null)).CountAsync();
-            orderListPage.DeliveredQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null)).CountAsync();
+            orderListPage.ShippedQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Shipped).CountAsync();
+            orderListPage.DeliveredQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Delivered).CountAsync();
             orderListPage.UnDeliverdQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc == null)).CountAsync();
             orderListPage.PaymentAwaitingQuantity = await _context.Orders.Where(o => o.PaymentStatusId == (int)Domain.Enums.PaymentStatus.Pending).CountAsync();
             orderListPage.CancalledQuantity = await _context.Orders.Where(o => o.OrderStatusId == (int)Domain.Enums.OrderStatus.Cancelled).CountAsync();
@@ -179,10 +179,10 @@ namespace Entegro.Infrastructure.Repositories
                     query = query.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null));
                     break;
                 case 3: // Kargoda
-                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null));
+                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Shipped);
                     break;
                 case 4: // Teslim Edildi
-                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null));
+                    query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Delivered);
                     break;
                 case 5: // Teslim Edilemedi
                     query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc == null));
@@ -229,6 +229,10 @@ namespace Entegro.Infrastructure.Repositories
                     CustomerOrderCounts = x.order.Customer.Orders.Count(),
                     ShipmentCarrier = x.shipment != null ? x.shipment.Carrier : "",
                     ShippingTrackingNumber = x.shipment != null ? x.shipment.TrackingNumber : "",
+                    ShippedDateUtc = x.shipment != null && x.shipment.ShippedDateUtc != null ? x.shipment.ShippedDateUtc.Value : DateTime.MinValue,
+                    DeliveryDateUtc = x.shipment != null && x.shipment.DeliveryDateUtc != null ? x.shipment.DeliveryDateUtc.Value : DateTime.MinValue,
+                    OrderStatusId = x.order.OrderStatusId,
+                    ShippingStatusId = x.order.ShippingStatusId,
                     OrderSubTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) : x.order.OrderSubTotal,
                     OrderDiscount = x.order.OrderDiscount,
                     OrderTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) - x.order.OrderDiscount : x.order.OrderTotal,

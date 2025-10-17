@@ -76,12 +76,12 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ShipmentItem?> GetByIdAsync(int id)
         {
-            return await _context.ShipmentItems.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ShipmentItems.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<ShipmentItem?> GetByShipmentIdAsync(int shipmentId)
         {
-            return await _context.ShipmentItems.FirstOrDefaultAsync(o => o.ShipmentId == shipmentId);
+            return await _context.ShipmentItems.AsNoTracking().FirstOrDefaultAsync(o => o.ShipmentId == shipmentId);
         }
 
         public async Task<Application.DTOs.Common.PagedResult<ShipmentItem>> GetPagedAsync(GridCommand gridCommand)

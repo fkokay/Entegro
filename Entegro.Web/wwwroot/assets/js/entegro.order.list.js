@@ -75,36 +75,81 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
-                        
-                        const orderDate = moment.utc(row.OrderDate);         
-                        const dueDate = moment.utc(row.DueDate);           
-                        const now = moment.utc();                      
 
-                        let diffMs = dueDate.diff(now);                 
-                        const overdue = diffMs < 0;
-                        if (overdue) diffMs = Math.abs(diffMs);
+                        const orderDate = moment.utc(row.OrderDate);
+                        const dueDate = moment.utc(row.DueDate);
+                        const now = moment.utc();
 
-                        const duration = moment.duration(diffMs);
-                        const days = Math.floor(duration.asDays());
-                        const hours = duration.hours();
-                        const minutes = duration.minutes();
+                        let html = `
+                           <div>
+                               <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
+                               <div>Sipariş Tarihi : <b>${orderDate.format("DD.MM.YYYY HH:mm")}</b></div>
+                               <div class="mb-3">Paket No : <b>${row.PackageNo}</b></div>
+        `               ;
 
-                        const kalanMetin = overdue
-                            ? `Süre aşıldı: ${days} gün ${hours} saat ${minutes} dakika`
-                            : `${days} gün ${hours} saat ${minutes} dakika`;
+                        if (row.ShippingStatusId == 30) {
+                            // Kargoda
+                            if (row.ShippedDateUtc) {
+                                const shippedDate = moment.utc(row.ShippedDateUtc);
+                                const diffDays = now.diff(shippedDate, 'days');
+                                const diffHours = now.diff(shippedDate, 'hours') % 24;
+                                const diffMinutes = now.diff(shippedDate, 'minutes') % 60;
 
-                        return `
-                         <div>
-                           <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
-                           <div>Sipariş Tarihi : <b>${orderDate.format("DD.MM.YYYY HH:mm")}</b></div>
-                           <div class="mb-3">Paket No : <b>${row.PackageNo}</b></div>
-                           <div class="${overdue ? 'text-danger' : 'text-primary'}">
-                             <div>Kalan Süre:</div>
-                             <div>${kalanMetin}</div>
-                           </div>
-                         </div>`;
+                                html += `
+                                <div class="text-info">
+                                    <div>Taşıma Durumunda: <b>${shippedDate.format("DD.MM.YYYY HH:mm")}</b></div>
+                                    <div>${diffDays} gün ${diffHours} saat ${diffMinutes} dakikadır kargoda</div>
+                                </div>
+                            `;
+                            } else {
+                                html += `<div class="text-warning">Kargo bilgisi bekleniyor</div>`;
+                            }
+                        }
+                        else if (row.ShippingStatusId == 40) {
+                            // Teslim Edildi
+                            if (row.DeliveryDateUtc) {
+                                const deliveryDate = moment.utc(row.DeliveryDateUtc);
+                                const diffDays = now.diff(deliveryDate, 'days');
+                                const diffHours = now.diff(deliveryDate, 'hours') % 24;
+                                const diffMinutes = now.diff(deliveryDate, 'minutes') % 60;
+
+                                html += `
+                                <div class="text-success">
+                                    <div>Teslim Edildi: <b>${deliveryDate.format("DD.MM.YYYY HH:mm")}</b></div>
+                                </div>
+                            `;
+                            } else {
+                                html += `<div class="text-warning">Teslim tarihi bilgisi yok</div>`;
+                            }
+                        }
+                        else {
+                            // Diğer durumlar (kalan süre / süre aşıldı)
+                            let diffMs = dueDate.diff(now);
+                            const overdue = diffMs < 0;
+                            if (overdue) diffMs = Math.abs(diffMs);
+
+                            const duration = moment.duration(diffMs);
+                            const days = Math.floor(duration.asDays());
+                            const hours = duration.hours();
+                            const minutes = duration.minutes();
+
+                            const kalanMetin = overdue
+                                ? `Süre aşıldı: ${days} gün ${hours} saat ${minutes} dakika`
+                                : `${days} gün ${hours} saat ${minutes} dakika`;
+
+                            html += `
+                                <div class="${overdue ? 'text-danger' : 'text-primary'}">
+                                    <div>Kalan Süre:</div>
+                                    <div>${kalanMetin}</div>
+                                </div>
+                            `;
+                        }
+
+                        html += `</div>`;
+                        return html;
                     }
                 },
+
                 {
                     targets: 4,
                     orderable: false,
@@ -364,7 +409,7 @@ Entegro.order.OrderList = (function ($) {
     };
 
     const initTab = function (defaultOrderStatus) {
-       
+
         $(".order-actions .btn").click(function () {
             var orderStatus = $(this).data("order-status");
             $(".order-actions .btn").removeClass("active");
@@ -373,7 +418,7 @@ Entegro.order.OrderList = (function ($) {
             initTable(orderStatus);
         });
 
-      
+
         if (defaultOrderStatus !== undefined && defaultOrderStatus !== null) {
             var $defaultBtn = $('.order-actions .btn[data-order-status="' + defaultOrderStatus + '"]');
             if ($defaultBtn.length > 0) {
@@ -410,13 +455,13 @@ Entegro.order.OrderList = (function ($) {
         $("#ProductId").select2({
             language: {
                 noResults: function () {
-                    return $(
-                        `<div style="padding: 6px; text-align: center;">
-                    <button type="button" id="createIfNotExistBtn" class="btn btn-outline-danger btn-sm">
-                        Aradığınız Ürün Yok Kaydet Ve Eşleştir
-                    </button>
-                </div>`
-                    );
+                    return $(`
+                        <div style="padding: 6px; text-align: center;">
+                            <button type="button" id="createIfNotExistBtn" class="btn btn-outline-danger btn-sm">
+                                Aradığınız Ürün Yok Kaydet Ve Eşleştir
+                            </button>
+                        </div>
+                    `);
                 }
             },
             placeholder: 'Ürün seçiniz',
@@ -456,7 +501,7 @@ Entegro.order.OrderList = (function ($) {
         $("#ProductId").change(function () {
             var productId = $(this).val();
             const select = document.getElementById("ProductVariantAttributeCombinationId");
-       
+
             if (productId == undefined) {
                 select.innerHTML = "";
                 $("#ProductVariantAttributeCombination").hide();
@@ -467,7 +512,7 @@ Entegro.order.OrderList = (function ($) {
                     type: 'POST',
                     success: function (response) {
                         if (response.length > 0) {
-                           
+
                             select.innerHTML = "";
 
                             response.forEach(item => {
@@ -660,10 +705,13 @@ Entegro.order.OrderList = (function ($) {
     }
 
 
-  
+
     function initCustomScriptForOrderStatus2() {
-        // Delegated event binding
-        $(document).on("click", "#createIfNotExistBtn", function () {
+       
+        $(document).off("click", "#createIfNotExistBtn").on("click", "#createIfNotExistBtn", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
             const integrationSystemId = parseInt(document.getElementById("IntegrationSystemId")?.value || 0);
             const productIntegrationSku = document.getElementById("ProductIntegrationSku")?.value || "";
 
@@ -686,9 +734,13 @@ Entegro.order.OrderList = (function ($) {
                     productIntegrationSku: productIntegrationSku
                 })
             })
-                .then(response => response.json())
+                .then(response => {
+                    console.log("Fetch cevabı geldi:", response);
+                    return response.json();
+                })
                 .then(result => {
                     window.hideLoading();
+                    console.log("Fetch result:", result);
 
                     if (result.success === false) {
                         Swal.fire({
@@ -713,7 +765,6 @@ Entegro.order.OrderList = (function ($) {
                 })
                 .catch(error => {
                     window.hideLoading();
-
                     console.error("Fetch hatası:", error);
                     Swal.fire({
                         icon: 'error',
@@ -726,15 +777,18 @@ Entegro.order.OrderList = (function ($) {
 
 
 
-   
+
+
+
+
     function checkAndInit() {
         const activeOrderStatus = parseInt($('.order-actions .btn.active').data('order-status')) || 0;
-        if (activeOrderStatus === 2) {
+        if (activeOrderStatus > 0) {
             initCustomScriptForOrderStatus2();
         }
     }
 
-  
+
 
     return {
         initTable: initTable,

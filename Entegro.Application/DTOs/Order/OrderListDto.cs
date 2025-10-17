@@ -1,10 +1,5 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.OrderItem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.Order
 {
@@ -21,6 +16,10 @@ namespace Entegro.Application.DTOs.Order
         public int CustomerOrderCounts { get; set; }
         public string ShipmentCarrier { get; set; }
         public string ShippingTrackingNumber { get; set; }
+        public DateTime ShippedDateUtc { get; set; }
+        public DateTime DeliveryDateUtc { get; set; }
+        public int OrderStatusId { get; set; }
+        public int ShippingStatusId { get; set; }
         public decimal OrderSubTotal { get; set; }
         public decimal OrderDiscount { get; set; }
         public decimal OrderTotal { get; set; }

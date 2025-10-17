@@ -456,8 +456,71 @@ namespace Entegro.Api.Jobs
                                 continue;
 
                             existingOrder.OrderStatus = order.OrderStatus;
-
                             await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
+
+                            var shipmentPackages = trendyolShipmentPackages.Where(x => x.OrderNumber == existingOrder.OrderNumber).ToList();
+
+                            foreach (var sp in shipmentPackages)
+                            {
+                                var existingShipment = existingOrder.Shipments.FirstOrDefault();
+
+                                if (existingShipment != null)
+                                {
+
+                                    var shipment = await _shipmentService.GetByIdAsync(existingShipment.Id);
+                                    var updateShipment = new UpdateShipmentDto
+                                    {
+                                        Id = existingShipment.Id,
+                                        OrderId = existingOrder.Id,
+                                        Carrier = sp.CargoProviderName,
+                                        TrackingNumber = sp.CargoTrackingNumber.ToString(),
+                                        TrackingUrl = sp.CargoTrackingLink,
+                                        TotalWeight = sp.CargoDeci,
+                                        ShippedDate = sp.PackageHistories != null
+                                         ? sp.PackageHistories.FirstOrDefault(x => x.Status == "Shipped") is { } shippedHistory
+                                             ? DateTimeOffset.FromUnixTimeMilliseconds(shippedHistory.CreatedDate).UtcDateTime
+                                             : (DateTime?)null
+                                         : null,
+
+                                        DeliveryDate = sp.PackageHistories != null
+                                         ? sp.PackageHistories.FirstOrDefault(x => x.Status == "Delivered") is { } deliveredHistory
+                                             ? DateTimeOffset.FromUnixTimeMilliseconds(deliveredHistory.CreatedDate).UtcDateTime
+                                             : (DateTime?)null
+                                         : null,
+                                        CreatedOn = DateTimeOffset.FromUnixTimeMilliseconds(sp.OrderDate).UtcDateTime,
+                                    };
+
+                                    updateShipment.PackageNo = shipment.PackageNo;
+                                    var updatedShipment = await _shipmentService.UpdateAsync(updateShipment);
+
+
+                                    foreach (var line in sp.Lines)
+                                    {
+                                        var orderItem = existingOrder.OrderItems
+                                            .FirstOrDefault(x => x.Sku == line.Barcode || x.IntegrationSku == line.Barcode);
+
+                                        if (orderItem != null)
+                                        {
+                                            var existingShipmentItem = await _shipmentItemService.GetByShipmentIdAsync(updatedShipment.Id);
+
+                                            if (existingShipmentItem is not null)
+                                            {
+
+                                                var mapped = await _shipmentItemService.UpdateAsync(new UpdateShipmentItemDto
+                                                {
+                                                    Id = existingShipmentItem.Id,
+                                                    OrderItemId = orderItem.Id,
+                                                    Quantity = line.Quantity,
+                                                    ShipmentId = updatedShipment.Id
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+
                             _logger.LogInformation("'{OrderNumber}' nolu sipariş güncellendi", order.OrderNumber);
                             continue;
                         }
