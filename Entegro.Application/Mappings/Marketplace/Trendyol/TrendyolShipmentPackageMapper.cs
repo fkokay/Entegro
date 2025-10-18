@@ -37,11 +37,9 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             order.OrderSubTotal = trendyolShipmentPackage.GrossAmount;//ekledim
 
 
-
             order.OrderStatus = TrendyolStatusMapper.MapOrderStatus(trendyolShipmentPackage.Status);
             order.PaymentStatus = TrendyolStatusMapper.MapPaymentStatus(trendyolShipmentPackage.Status);
             order.ShippingMethod = trendyolShipmentPackage.CargoProviderName;
-            //order.ShippingStatus = TrendyolStatusMapper.MapShippingStatus(trendyolShipmentPackage.ShipmentPackageStatus);
             order.ShippingStatus = TrendyolStatusMapper.MapShippingStatus(trendyolShipmentPackage.ShipmentPackageStatus);
 
 

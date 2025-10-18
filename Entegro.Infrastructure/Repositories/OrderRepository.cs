@@ -144,9 +144,60 @@ namespace Entegro.Infrastructure.Repositories
                 .Include(o => o.Shipments)
                 .AsNoTracking();
 
-            if (!string.IsNullOrEmpty(gridCommand.Search?.Value))
+            if (gridCommand.Columns != null)
             {
-                query = query.Where(o => o.OrderNumber.Contains(gridCommand.Search.Value));
+                foreach (var col in gridCommand.Columns)
+                {
+                    if (!string.IsNullOrEmpty(col.Search?.Value))
+                    {
+                        var searchVal = col.Search.Value.Trim('^', '$');
+
+                        // ilgili property’nin tipini bul
+                        var prop = typeof(OrderListDto).GetProperty(col.Data);
+                        if (prop == null) continue;
+
+                        if (prop.PropertyType == typeof(string))
+                        {
+                            query = query.Where($"{col.Data}.Contains(@0)", searchVal);
+                        }
+                        else if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
+                        {
+                            if (int.TryParse(searchVal, out var intVal))
+                                query = query.Where($"{col.Data} == @0", intVal);
+                        }
+                        else if (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?))
+                        {
+                            if (bool.TryParse(searchVal, out var boolVal))
+                                query = query.Where($"{col.Data} == @0", boolVal);
+                        }
+                        else if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+                        {
+                            if (DateTime.TryParse(searchVal, out var dt))
+                                query = query.Where($"{col.Data}.Date == @0", dt.Date);
+                        }
+                    }
+                }
+            }
+
+            if (gridCommand.Search != null)
+            {
+                if (!string.IsNullOrEmpty(gridCommand.Search.Value))
+                {
+                    query = query.Where(b =>
+                    b.Customer.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                }
+            }
+
+            if (gridCommand.Order.Any())
+            {
+                foreach (var item in gridCommand.Order)
+                {
+                    query = query.OrderBy($"{gridCommand.Columns[item.Column].Data} {(item.Dir ?? "asc")}");
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
             }
 
             IOrderedQueryable<Order> orderedQuery = null;
@@ -176,7 +227,7 @@ namespace Entegro.Infrastructure.Repositories
                     query = query.Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => (int?)si.Quantity ?? 0)));
                     break;
                 case 2: // Gönderime Hazır
-                    query = query.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null));
+                    query = query.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null) && o.OrderStatusId != (int)OrderStatus.Cancelled);
                     break;
                 case 3: // Kargoda
                     query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Shipped);
@@ -229,6 +280,7 @@ namespace Entegro.Infrastructure.Repositories
                     CustomerOrderCounts = x.order.Customer.Orders.Count(),
                     ShipmentCarrier = x.shipment != null ? x.shipment.Carrier : "",
                     ShippingTrackingNumber = x.shipment != null ? x.shipment.TrackingNumber : "",
+                    TrackingUrl = x.shipment != null ? x.shipment.TrackingUrl : "",
                     ShippedDateUtc = x.shipment != null && x.shipment.ShippedDateUtc != null ? x.shipment.ShippedDateUtc.Value : DateTime.MinValue,
                     DeliveryDateUtc = x.shipment != null && x.shipment.DeliveryDateUtc != null ? x.shipment.DeliveryDateUtc.Value : DateTime.MinValue,
                     OrderStatusId = x.order.OrderStatusId,

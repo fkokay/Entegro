@@ -16,6 +16,7 @@ namespace Entegro.Application.DTOs.Order
         public int CustomerOrderCounts { get; set; }
         public string ShipmentCarrier { get; set; }
         public string ShippingTrackingNumber { get; set; }
+        public string TrackingUrl { get; set; }
         public DateTime ShippedDateUtc { get; set; }
         public DateTime DeliveryDateUtc { get; set; }
         public int OrderStatusId { get; set; }

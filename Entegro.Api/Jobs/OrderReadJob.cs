@@ -436,11 +436,11 @@ namespace Entegro.Api.Jobs
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 
 
-                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10588130205").FirstOrDefault();
+                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10600545109").FirstOrDefault();
                 var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
 
 
-
+                // var returnOrders = await _trendyol.GetReturnsAsync(context);
 
                 foreach (var order in orders)
                 {
@@ -448,14 +448,52 @@ namespace Entegro.Api.Jobs
                     {
                         order.IntegrationSystemId = item.Id;
 
+                        #region Customer
+                        var customer = await _customerService.GetCustomerByEmailAsync(order.Customer.Email);
+                        if (customer == null)
+                        {
+                            var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
+
+                            customer = await CreateCustomer(createCustomer);
+
+                            order.CustomerId = customer.Id;
+                            order.Customer = null;
+                        }
+                        else
+                        {
+                            order.CustomerId = customer.Id;
+                            order.Customer = null;
+                        }
+                        #endregion
+
+                        #region Address
+                        if (order.ShippingAddress != null)
+                        {
+                            var createShippingAddress = _mapper.Map<CreateAddressDto>(order.ShippingAddress);
+                            var address = await CreateAddress(createShippingAddress);
+                            order.ShippingAddressId = address.Id;
+                            order.ShippingAddress = null;
+                        }
+
+                        if (order.BillingAddress != null)
+                        {
+                            var createShippingAddress = _mapper.Map<CreateAddressDto>(order.BillingAddress);
+                            var address = await CreateAddress(createShippingAddress);
+                            order.BillingAddressId = address.Id;
+                            order.BillingAddress = null;
+                        }
+                        #endregion
+
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {
                             var existingOrder = await _orderService.GetByOrderNoAsync(order.OrderNumber);
+
                             if (existingOrder == null)
                                 continue;
 
                             existingOrder.OrderStatus = order.OrderStatus;
+                            existingOrder.ShippingStatus = order.ShippingStatus;
                             await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
 
                             var shipmentPackages = trendyolShipmentPackages.Where(x => x.OrderNumber == existingOrder.OrderNumber).ToList();
@@ -523,42 +561,6 @@ namespace Entegro.Api.Jobs
 
                             _logger.LogInformation("'{OrderNumber}' nolu sipariş güncellendi", order.OrderNumber);
                             continue;
-                        }
-                        #endregion
-
-                        #region Customer
-                        var customer = await _customerService.GetCustomerByEmailAsync(order.Customer.Email);
-                        if (customer == null)
-                        {
-                            var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
-
-                            customer = await CreateCustomer(createCustomer);
-
-                            order.CustomerId = customer.Id;
-                            order.Customer = null;
-                        }
-                        else
-                        {
-                            order.CustomerId = customer.Id;
-                            order.Customer = null;
-                        }
-                        #endregion
-
-                        #region Address
-                        if (order.ShippingAddress != null)
-                        {
-                            var createShippingAddress = _mapper.Map<CreateAddressDto>(order.ShippingAddress);
-                            var address = await CreateAddress(createShippingAddress);
-                            order.ShippingAddressId = address.Id;
-                            order.ShippingAddress = null;
-                        }
-
-                        if (order.BillingAddress != null)
-                        {
-                            var createShippingAddress = _mapper.Map<CreateAddressDto>(order.BillingAddress);
-                            var address = await CreateAddress(createShippingAddress);
-                            order.BillingAddressId = address.Id;
-                            order.BillingAddress = null;
                         }
                         #endregion
 

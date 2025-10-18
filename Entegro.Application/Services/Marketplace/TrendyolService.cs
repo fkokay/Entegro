@@ -395,9 +395,6 @@ namespace Entegro.Application.Services.Marketplace
 
             var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
-
-
-
         }
     }
 }

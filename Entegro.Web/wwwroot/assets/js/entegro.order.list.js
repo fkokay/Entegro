@@ -4,6 +4,11 @@ Entegro.order = Entegro.order || {};
 
 Entegro.order.OrderList = (function ($) {
 
+  
+
+
+
+
     const initTable = function (orderStatus) {
         const table = $('#OrderTable').DataTable({
             destroy: true,
@@ -122,6 +127,9 @@ Entegro.order.OrderList = (function ($) {
                                 html += `<div class="text-warning">Teslim tarihi bilgisi yok</div>`;
                             }
                         }
+                        else if (row.ShippingStatusId == 20) {
+                            html += `<div class="text-danger">#İptal Edildi</div>`;
+                        }
                         else {
                             // Diğer durumlar (kalan süre / süre aşıldı)
                             let diffMs = dueDate.diff(now);
@@ -211,17 +219,32 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
-                        if (row.ShippingTrackingNumber == null || row.ShippingTrackingNumber == "") {
+                        if (!row.ShippingTrackingNumber) {
                             return ``;
                         }
-                        return `
-                        <div>
-                            <div><img src="https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg" width="100px" style="margin:0px auto;display:block;"/></div>
-                            <div class="text-center">${row.ShippingTrackingNumber}</div>
-                        </div>`;
 
+                        let logoUrl = "";
+
+                        // Kargo firması kontrolü
+                        if (row.ShipmentCarrier === "Trendyol Express Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/17.png";
+                        } else if (row.ShipmentCarrier === "Aras Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/7.png";
+                        } else if (row.ShipmentCarrier === "Yurtiçi Kargo Marketplace") {
+                            logoUrl = "https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg";
+                        } else {
+                            // Varsayılan logo (istersen boş bırakabilirsin)
+                            logoUrl = "https://via.placeholder.com/100x40?text=Kargo";
+                        }
+
+                        return `
+                          <div>
+                              <div><img src="${logoUrl}" width="100px" style="margin:0px auto;display:block;"/></div>
+                              <div class="text-center">${row.ShippingTrackingNumber}</div>
+                          </div>`;
                     }
                 },
+
                 {
                     targets: 7,
                     orderable: false,
@@ -238,13 +261,9 @@ Entegro.order.OrderList = (function ($) {
                             <div class="btn-group">
                               <button type="button" class="btn btn-outline-secondary dropdown-toggle waves-effect" data-bs-toggle="dropdown" aria-expanded="false">Fatura İşlemleri</button>
                               <ul class="dropdown-menu">
-                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Action</a></li>
-                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Another action</a></li>
-                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Something else here</a></li>
-                                <li>
-                                  <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Separated link</a></li>
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Oluştur</a></li>
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Bilgileri</a></li>
+                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Yükle</a></li>
                               </ul>
                             </div>
                         </div>`;
@@ -277,30 +296,38 @@ Entegro.order.OrderList = (function ($) {
                             return `<div><button class="btn btn-warning" onclick="Entegro.order.OrderList.OrderPackage(${row.Id})">Paketle</button></div>`;
                         } else if (orderStatus == 2) {
                             return `
-                            <div>
-                                <button class="btn btn-warning mb-4" style="width:200px;" onclick="Entegro.order.OrderList.OrderPrint(${row.Id},'${row.PackageNo}')">Etiketi Yazıdr</button>
-                                <div class="btn-group" style="width:200px;">
-                                  <button type="button" class="btn btn-info waves-effect waves-light">Diğer İşlemler</button>
-                                  <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split waves-effect waves-light" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="visually-hidden">Toggle Dropdown</span>
-                                  </button>
-                                  <ul class="dropdown-menu" style="">
-                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Action</a></li>
-                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Another action</a></li>
-                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Something else here</a></li>
-                                    <li>
-                                      <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Separated link</a></li>
-                                  </ul>
-                                </div>
-                            </div>`;
+                             <div>
+                                 <button class="btn btn-warning mb-4" style="width:200px;" onclick="Entegro.order.OrderList.OrderPrint(${row.Id}, '${row.PackageNo}')">Etiketi Yazdır</button>
+                                 <div class="btn-group" style="width:200px;">
+                                   <button type="button" class="btn btn-info waves-effect waves-light">Diğer İşlemler</button>
+                                   <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split waves-effect waves-light" data-bs-toggle="dropdown" aria-expanded="false">
+                                     <span class="visually-hidden">Toggle Dropdown</span>
+                                   </button>
+                                   <ul class="dropdown-menu">
+                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Oluştur</a></li>
+                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Bilgileri</a></li>
+                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Yükle</a></li>
+                                   </ul>
+                                 </div>
+                             </div>`;
+                        } else if (orderStatus == 3 || orderStatus == 4) {
+                             if (row.TrackingUrl && row.TrackingUrl.trim() !== "") {
+                                 return `
+                             <div>
+                                 <button class="btn btn-warning btn-sm" onclick="window.open('${row.TrackingUrl}', '_blank')">Kargo Takibi</button>
+                             </div>`;
+                             }else {
+                                return `
+                                    <div>
+                                        <button class="btn btn-secondary" disabled>Kargo Takibi (Yok)</button>
+                                    </div>`;
+                             }
                         }
-
 
                         return ``;
                     }
                 }
+
             ],
             select: {
                 style: "multi",
@@ -382,7 +409,9 @@ Entegro.order.OrderList = (function ($) {
                     features: ["info"]
                 },
                 bottomEnd: "paging"
-            }
+            },
+
+
         });
 
         setTimeout(() => {
@@ -405,6 +434,7 @@ Entegro.order.OrderList = (function ($) {
             });
         }, 100);
 
+       
         checkAndInit();
     };
 
@@ -415,6 +445,7 @@ Entegro.order.OrderList = (function ($) {
             $(".order-actions .btn").removeClass("active");
             $(this).addClass("active");
 
+         
             initTable(orderStatus);
         });
 
@@ -424,11 +455,11 @@ Entegro.order.OrderList = (function ($) {
             if ($defaultBtn.length > 0) {
                 $(".order-actions .btn").removeClass("active");
                 $defaultBtn.addClass("active");
+                
                 initTable(defaultOrderStatus);
             }
         }
     };
-
 
     const OrderPackage = function OrderPackage(id) {
         $.ajax({
@@ -703,9 +734,6 @@ Entegro.order.OrderList = (function ($) {
             });
         });
     }
-
-
-
     function initCustomScriptForOrderStatus2() {
        
         $(document).off("click", "#createIfNotExistBtn").on("click", "#createIfNotExistBtn", function (e) {
@@ -775,12 +803,6 @@ Entegro.order.OrderList = (function ($) {
         });
     }
 
-
-
-
-
-
-
     function checkAndInit() {
         const activeOrderStatus = parseInt($('.order-actions .btn.active').data('order-status')) || 0;
         if (activeOrderStatus > 0) {
@@ -788,9 +810,8 @@ Entegro.order.OrderList = (function ($) {
         }
     }
 
-
-
     return {
+     
         initTable: initTable,
         initTab: initTab,
         OrderPackage: OrderPackage,
