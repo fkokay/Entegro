@@ -494,6 +494,7 @@ namespace Entegro.Api.Jobs
 
                             existingOrder.OrderStatus = order.OrderStatus;
                             existingOrder.ShippingStatus = order.ShippingStatus;
+                            existingOrder.PaymentStatus = order.PaymentStatus;
                             await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
 
                             var shipmentPackages = trendyolShipmentPackages.Where(x => x.OrderNumber == existingOrder.OrderNumber).ToList();

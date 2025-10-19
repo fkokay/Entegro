@@ -153,7 +153,11 @@ namespace Entegro.Infrastructure.Repositories
                         var searchVal = col.Search.Value.Trim('^', '$');
 
                         // ilgili property’nin tipini bul
-                        var prop = typeof(OrderListDto).GetProperty(col.Data);
+                        var propName = col.Data.Contains(".")
+                        ? col.Data.Replace(".", "")
+                        : col.Data;
+
+                        var prop = typeof(OrderListDto).GetProperty(propName);
                         if (prop == null) continue;
 
                         if (prop.PropertyType == typeof(string))

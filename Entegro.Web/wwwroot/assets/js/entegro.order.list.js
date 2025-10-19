@@ -3,10 +3,21 @@ Entegro.order = Entegro.order || {};
 
 
 Entegro.order.OrderList = (function ($) {
+    function addFilterText(column, containerSelector, placeholder) {
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Filter container bulunamadı: ${containerSelector}`);
+            return;
+        }
 
-  
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control order-filter-input";
+        input.placeholder = placeholder;
+        input.dataset.columnIndex = column.index(); 
 
-
+        container.appendChild(input);
+    }
 
 
     const initTable = function (orderStatus) {
@@ -111,7 +122,7 @@ Entegro.order.OrderList = (function ($) {
                             }
                         }
                         else if (row.ShippingStatusId == 40) {
-                            // Teslim Edildi
+                           
                             if (row.DeliveryDateUtc) {
                                 const deliveryDate = moment.utc(row.DeliveryDateUtc);
                                 const diffDays = now.diff(deliveryDate, 'days');
@@ -131,7 +142,7 @@ Entegro.order.OrderList = (function ($) {
                             html += `<div class="text-danger">#İptal Edildi</div>`;
                         }
                         else {
-                            // Diğer durumlar (kalan süre / süre aşıldı)
+                     
                             let diffMs = dueDate.diff(now);
                             const overdue = diffMs < 0;
                             if (overdue) diffMs = Math.abs(diffMs);
@@ -161,7 +172,7 @@ Entegro.order.OrderList = (function ($) {
                 {
                     targets: 4,
                     orderable: false,
-                    searchable: false,
+                    searchable: true,
                     responsivePriority: 3,
                     render: function (data, type, row) {
                         return `
@@ -205,8 +216,6 @@ Entegro.order.OrderList = (function ($) {
                                 `;
                             }
                         }
-
-
                         return `
                         <div>
                             ${items}
@@ -323,7 +332,6 @@ Entegro.order.OrderList = (function ($) {
                                     </div>`;
                              }
                         }
-
                         return ``;
                     }
                 }
@@ -410,10 +418,8 @@ Entegro.order.OrderList = (function ($) {
                 },
                 bottomEnd: "paging"
             },
-
-
         });
-
+        
         setTimeout(() => {
             const adjustments = [
                 { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -816,7 +822,8 @@ Entegro.order.OrderList = (function ($) {
         initTab: initTab,
         OrderPackage: OrderPackage,
         ProductIntegration: ProductIntegration,
-        OrderPrint: OrderPrint
+        OrderPrint: OrderPrint,
+        addFilterText: addFilterText
     };
 
     function getIntegrationLogo(value) {

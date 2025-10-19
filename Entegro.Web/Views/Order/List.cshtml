@@ -8,7 +8,6 @@
     </div>
     <div class="card">
         <div class="order-actions border-bottom p-4 d-flex">
-
             <button class="btn active" data-order-status="1">Paketlenecek <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
             <div class="split"></div>
             <button class="btn" data-order-status="2">Gönderime Hazır <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
@@ -25,29 +24,34 @@
         </div>
         <div class="p-5">
             <div class="row">
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Müşteri Adı" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Sipariş No" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Paket No" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Barkod" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Kargo Kodu" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Sipariş Başlangıç Tarihi" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Sipariş Bitiş Tarihi" />
-                </div>
-                <div class="col-2 mb-2">
-                    <input type="text" class="form-control" placeholder="Ürün Adı/Model Kodu" />
+                <div class="row">
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterCustomerName" placeholder="Müşteri Adı" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterOrderNo" placeholder="Sipariş No" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterPackageNo" placeholder="Paket No" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterBarcode" placeholder="Barkod" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterCargoCode" placeholder="Kargo Kodu" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterStartDate" placeholder="Sipariş Başlangıç Tarihi" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterEndDate" placeholder="Sipariş Bitiş Tarihi" />
+                    </div>
+                    <div class="col-2 mb-2">
+                        <input type="text" class="form-control" id="filterProduct" placeholder="Ürün Adı/Model Kodu" />
+                    </div>
+                    <div class="col-2">
+                        <button id="btnFilter" class="btn btn-primary w-100">Filtrele</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -159,6 +163,32 @@
         });
     </script>
 
-   
+    <script>
+        $(document).off("click", "#btnFilter").on("click", "#btnFilter", function () {
+            const table = $('#OrderTable').DataTable();
+
+           
+            const filters = {
+                "Customer.Name": $("#filterCustomerName").val() || "",
+                "OrderNo": $("#filterOrderNo").val() || "",
+                "PackageNo": $("#filterPackageNo").val() || "",
+                "Barcode": $("#filterBarcode").val() || "",
+                "CargoCode": $("#filterCargoCode").val() || "",
+                "StartDate": $("#filterStartDate").val() || "",
+                "EndDate": $("#filterEndDate").val() || "",
+                "ProductName": $("#filterProduct").val() || ""
+            };
+
+            table.columns().every(function () {
+                const column = this;
+                const columnName = column.dataSrc();
+
+                if (filters[columnName] !== undefined) {
+                    column.search(filters[columnName], false, false);
+                }
+            });
+            table.draw();
+        });
+    </script>
 
 }
