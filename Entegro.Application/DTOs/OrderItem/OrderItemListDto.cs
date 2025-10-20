@@ -15,5 +15,6 @@
         public decimal UnitPrice { get; set; }
         public string? IntegrationProductName { get; set; }
         public string? IntegrationSku { get; set; }
+        public string? IntegrationProductImageUrl { get; set; }
     }
 }

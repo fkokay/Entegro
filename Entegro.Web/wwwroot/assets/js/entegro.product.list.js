@@ -446,19 +446,25 @@ Entegro.product.list = (function ($) {
                             {
                                 extend: "collection",
                                 className: "btn btn-label-secondary dropdown-toggle me-4",
-                                text: `<span class="d-flex align-items-center gap-1"><i class="icon-base ti ti-import icon-xs"></i><span>E-Ticaret Entegrasyonu</span></span>`,
+                                text: `<span class="d-flex align-items-center gap-1">
+                                   <i class="icon-base ti ti-import icon-xs"></i>
+                                   <span>E-Ticaret Entegrasyonu</span>
+                                 </span>`,
                                 buttons: window.commerces.map(c => ({
                                     className: "dropdown-item text-center",
-                                    text: `Tüm Ürünleri<br>${c.Name}<br> Mağazasına Bağla`,
+                                    text: `Tüm Ürünleri<br>${c.Name}<br>Mağazasına Bağla`,
                                     action: () => {
-                                        Entegro.product.list.productIntegration(c.Id)
+                                        Entegro.product.list.productIntegration(c.Id);
                                     }
                                 }))
                             },
                             {
                                 extend: "collection",
                                 className: "btn btn-label-secondary dropdown-toggle me-4",
-                                text: `<span class="d-flex align-items-center gap-1"><i class="icon-base ti ti-upload icon-xs"></i><span>Dışarı Aktar</span></span>`,
+                                text: `<span class="d-flex align-items-center gap-1">
+                                   <i class="icon-base ti ti-upload icon-xs"></i>
+                                   <span>Dışarı Aktar</span>
+                                 </span>`,
                                 buttons: ["print", "csv", "excel", "pdf", "copy"]
                             },
                             {
@@ -467,12 +473,29 @@ Entegro.product.list = (function ($) {
                                 action: () => window.location.href = "Create"
                             },
                             {
-                                text: `<i class="icon-base ti ti-cloud-download me-1"></i><span>Trendyol'dan Yeni Kayıt</span>`,
-                                className: "btn btn-warning",
-                                action: () => {
-                                    $('#CreateIfNotExistProductTrendyolForm')[0].reset();
-                                    $('#CreateIfNotExistProductTrendyolModal').modal('show');
-                                }
+                                extend: "collection",
+                                className: "btn btn-warning dropdown-toggle",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                   <i class="icon-base ti ti-cloud-download icon-xs"></i>
+                                   <span>Pazaryerinden Ürün Kayıt</span>
+                                 </span>`,
+                                buttons: window.marketPlaces.map(market => {
+                                    const logoSrc = Entegro.product.list.getIntegrationLogo(market.Value);
+
+                                    return {
+                                        className: "dropdown-item d-flex align-items-center gap-2",
+                                        text: `
+                                          <img src="${logoSrc}" alt="${market.Name}" style="width: 20px; height: 20px; object-fit: contain;">
+                                          <span>${market.Name}</span>
+                                        `,
+                                        action: () => {
+                                            $('#CreateIfNotExistProductTrendyolForm')[0].reset();
+                                            $('#CreateIfNotExistProductTrendyolModal').modal('show');
+                                            $('#CreateIfNotExistProductTrendyolForm input[name="MarketplaceId"]').val(market.Id);
+                                            $('#IntegrationSystemId').val(market.Id);
+                                        }
+                                    };
+                                })
                             }
                         ]
                     }]

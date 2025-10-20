@@ -39,8 +39,24 @@ Entegro.order.OrderList = (function ($) {
                 type: 'POST',
                 contentType: 'application/json',
                 data: function (d) {
-                    return JSON.stringify(d);
-                },
+                    
+                    const filters = {
+                        customerName: $("#filterCustomerName").val() || "",
+                        orderNo: $("#filterOrderNo").val() || "",
+                        packageNo: $("#filterPackageNo").val() || "",
+                        barcode: $("#filterBarcode").val() || "",
+                        cargoCode: $("#filterCargoCode").val() || "",
+                        productName: $("#filterProduct").val() || "",
+                        startDate: $("#filterStartDate").val() || null,
+                        endDate: $("#filterEndDate").val() || null
+                    };
+
+                   
+                    return JSON.stringify({
+                        grid: d,        // GridCommand
+                        filters: filters // OrderListFilter
+                    });
+                }
             },
             columns: [
                 { data: 'Id', orderable: false }, // checkbox
@@ -138,7 +154,7 @@ Entegro.order.OrderList = (function ($) {
                                 html += `<div class="text-warning">Teslim tarihi bilgisi yok</div>`;
                             }
                         }
-                        else if (row.ShippingStatusId == 20) {
+                        else if (row.ShippingStatusId == 20 && row.OrderStatusId!=20) {
                             html += `<div class="text-danger">#İptal Edildi</div>`;
                         }
                         else {
@@ -193,11 +209,22 @@ Entegro.order.OrderList = (function ($) {
                             if (row.OrderItems[i].ProductId == null) {
                                 items +=
                                     `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.IntegrationSystemId}, '${row.OrderItems[i].IntegrationProductName}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
-                                        <div class="p-5">
-                                            <div class="order-item-no-integration-title">Eşleştirilmemiş Ürün, Eşleştirme Yapmak İçin Tıklayın.</div>
-                                            <div class="order-item-no-integration-info">${row.OrderItems[i].IntegrationProductName}</div>
-                                            <div class="order-item-no-integration-info">${row.OrderItems[i].IntegrationSku}</div>
+                                       <div class="p-5 d-flex align-items-start gap-3">
+                                          <img src="${row.OrderItems[i].IntegrationProductImageUrl}" width="60" style="flex-shrink: 0;" />
+                                        
+                                          <div>
+                                            <div class="order-item-no-integration-title">
+                                              Eşleştirilmemiş Ürün, Eşleştirme Yapmak İçin Tıklayın.
+                                            </div>
+                                            <div class="order-item-no-integration-info">
+                                              ${row.OrderItems[i].IntegrationProductName}
+                                            </div>
+                                            <div class="order-item-no-integration-info">
+                                              ${row.OrderItems[i].IntegrationSku}
+                                            </div>
+                                          </div>
                                         </div>
+
                                     </div>`;
                             } else {
                                 items +=
@@ -240,7 +267,13 @@ Entegro.order.OrderList = (function ($) {
                         } else if (row.ShipmentCarrier === "Aras Kargo Marketplace") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/7.png";
                         } else if (row.ShipmentCarrier === "Yurtiçi Kargo Marketplace") {
-                            logoUrl = "https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg";
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/4.png";
+                        } else if (row.ShipmentCarrier === "Horoz Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/6.png";
+                        }else if (row.ShipmentCarrier === "Sürat Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/9.png";
+                        }else if (row.ShipmentCarrier === "MNG Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/10.png";
                         } else {
                             // Varsayılan logo (istersen boş bırakabilirsin)
                             logoUrl = "https://via.placeholder.com/100x40?text=Kargo";
@@ -346,20 +379,15 @@ Entegro.order.OrderList = (function ($) {
                 topStart: {
                     rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
                     features: [{
-                        search: {
-                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
-                            placeholder: "Ara..",
-                            text: "_INPUT_"
-                        }
-                    }]
-                },
-                topEnd: {
-                    rowClass: "row m-3 my-0 justify-content-between",
-                    features: [{
                         pageLength: {
                             menu: [10, 25, 50, 100],
                             text: "_MENU_"
                         },
+                }]
+                },
+                topEnd: {
+                    rowClass: "row m-3 my-0 justify-content-between",
+                    features: [{
                         buttons: [
                             {
                                 extend: "collection",
@@ -406,7 +434,7 @@ Entegro.order.OrderList = (function ($) {
                                        <span class="d-none d-sm-inline-block">Yeni Sipariş</span>`,
                                 className: "add-new btn btn-primary",
                                 action: function () {
-                                    window.location.href = "/Order/Create";
+                                    window.location.href = "#";
                                 }
                             }
                         ]

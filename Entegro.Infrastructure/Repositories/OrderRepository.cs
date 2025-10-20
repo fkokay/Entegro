@@ -126,7 +126,7 @@ namespace Entegro.Infrastructure.Repositories
         {
             OrderListPageDto orderListPage = new OrderListPageDto();
             orderListPage.ToBePackedQuantity = await _context.Orders.Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => (int?)si.Quantity ?? 0))).CountAsync();
-            orderListPage.ReadyToShipQuantity = await _context.Orders.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null)).CountAsync();
+            orderListPage.ReadyToShipQuantity = await _context.Orders.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null) && o.OrderStatusId == (int)OrderStatus.Processing).CountAsync();
             orderListPage.ShippedQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Shipped).CountAsync();
             orderListPage.DeliveredQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Delivered).CountAsync();
             orderListPage.UnDeliverdQuantity = await _context.Orders.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.DeliveryDateUtc == null)).CountAsync();
@@ -136,13 +136,42 @@ namespace Entegro.Infrastructure.Repositories
             return orderListPage;
         }
 
-        public async Task<Application.DTOs.Common.PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, int orderStatus)
+        public async Task<Application.DTOs.Common.PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, OrderListFilterDto filters, int orderStatus)
         {
             var query = _context.Orders
                 .Include(o => o.OrderItems)
                 .Include(o => o.Customer)
                 .Include(o => o.Shipments)
                 .AsNoTracking();
+
+            if (filters != null)
+            {
+                if (!string.IsNullOrEmpty(filters.CustomerName))
+                    query = query.Where(o => o.Customer.Name.Contains(filters.CustomerName));
+
+                if (!string.IsNullOrEmpty(filters.OrderNo))
+                    query = query.Where(o => o.OrderNumber.Contains(filters.OrderNo));
+
+                if (!string.IsNullOrEmpty(filters.PackageNo))
+                    query = query.Where(o => o.Shipments.Any(s => s.PackageNo.Contains(filters.PackageNo)));
+
+                if (!string.IsNullOrEmpty(filters.Barcode))
+                    query = query.Where(o => o.OrderItems.Any(oi => oi.Product.Barcode.Contains(filters.Barcode)));
+
+                if (!string.IsNullOrEmpty(filters.CargoCode))
+                    query = query.Where(o => o.Shipments.Any(s => s.TrackingNumber.Contains(filters.CargoCode)));
+
+                if (!string.IsNullOrEmpty(filters.ProductName))
+                    query = query.Where(o => o.OrderItems.Any(oi => oi.Product.Name.Contains(filters.ProductName)
+                                                                 || oi.Product.Code.Contains(filters.ProductName)));
+
+                if (filters.StartDate.HasValue)
+                    query = query.Where(o => o.OrderDateUtc >= filters.StartDate.Value);
+
+                if (filters.EndDate.HasValue)
+                    query = query.Where(o => o.OrderDateUtc <= filters.EndDate.Value);
+            }
+
 
             if (gridCommand.Columns != null)
             {
@@ -231,7 +260,7 @@ namespace Entegro.Infrastructure.Repositories
                     query = query.Where(o => o.OrderItems.Any(oi => oi.Quantity > oi.ShipmentItems.Sum(si => (int?)si.Quantity ?? 0)));
                     break;
                 case 2: // Gönderime Hazır
-                    query = query.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null) && o.OrderStatusId != (int)OrderStatus.Cancelled);
+                    query = query.Where(o => o.Shipments.Any() && !o.Shipments.Any(s => s.ShippedDateUtc != null) && o.OrderStatusId == (int)OrderStatus.Processing);
                     break;
                 case 3: // Kargoda
                     query = query.Where(o => o.Shipments.Any() && o.Shipments.Any(s => s.ShippedDateUtc != null) && o.ShippingStatusId == (int)ShippingStatus.Shipped);
@@ -307,7 +336,8 @@ namespace Entegro.Infrastructure.Repositories
                               ProductMainPictureId = si.OrderItem.Product.MainPictureId,
                               Quantity = si.Quantity,
                               IntegrationSku = si.OrderItem.IntegrationSku,
-                              IntegrationProductName = si.OrderItem.IntegrationProductName
+                              IntegrationProductName = si.OrderItem.IntegrationProductName,
+                              IntegrationProductImageUrl = si.OrderItem.IntegrationProductImageUrl
                           }).ToList()
                           : x.order.OrderItems.Select(oi => new OrderItemListDto
                           {
@@ -321,7 +351,8 @@ namespace Entegro.Infrastructure.Repositories
                               ProductMainPictureId = oi.Product != null ? oi.Product.MainPictureId : null,
                               Quantity = oi.Quantity,
                               IntegrationSku = oi.IntegrationSku,
-                              IntegrationProductName = oi.IntegrationProductName
+                              IntegrationProductName = oi.IntegrationProductName,
+                              IntegrationProductImageUrl = oi.IntegrationProductImageUrl
                           }).ToList())
                 })
                 .Skip(gridCommand.Start)

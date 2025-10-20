@@ -58,17 +58,19 @@ namespace Entegro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> OrderList([FromBody] GridCommand gridCommand, int orderStatus)
+        public async Task<IActionResult> OrderList([FromBody] OrderListRequest request, int orderStatus)
         {
-            var result = await _orderService.GetPagedAsync(gridCommand, orderStatus);
+            var result = await _orderService.GetPagedAsync(request.Grid, request.Filters, orderStatus);
+
             return Json(new
             {
-                draw = gridCommand.Draw,
+                draw = request.Grid.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
         }
+
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {

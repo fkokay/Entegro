@@ -571,16 +571,18 @@ namespace Entegro.Api.Jobs
                             if (orderItem.Product != null)
                             {
                                 var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.Product.Code);
-
+                                var product = await _trendyol.GetProductWithBarcodeAsync(context, orderItem.Product.Code);
                                 if (productIntegration != null)
                                 {
                                     orderItem.Product = null;
                                     orderItem.ProductId = productIntegration.ProductId;
+                                    orderItem.IntegrationProductImageUrl = product.images.FirstOrDefault().url;
                                 }
                                 else
                                 {
                                     orderItem.Product = null;
                                     orderItem.ProductId = null;
+                                    orderItem.IntegrationProductImageUrl = product.images.FirstOrDefault().url;
                                 }
                             }
                         }

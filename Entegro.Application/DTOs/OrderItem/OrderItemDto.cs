@@ -1,10 +1,4 @@
-﻿using Entegro.Application.DTOs.Order;
-using Entegro.Application.DTOs.Product;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entegro.Application.DTOs.Product;
 
 namespace Entegro.Application.DTOs.OrderItem
 {
@@ -24,7 +18,7 @@ namespace Entegro.Application.DTOs.OrderItem
         public decimal ProductCost { get; set; }
         public string? IntegrationSku { get; set; }
         public string? IntegrationProductName { get; set; }
-
+        public string? IntegrationProductImageUrl { get; set; }//pazaryerinden gelen ve eşleştirilmeyen ürün resmi
         public ProductDto? Product { get; set; }
     }
 }

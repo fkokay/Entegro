@@ -1,6 +1,5 @@
 ﻿using Entegro.Domain.Entities.Catalog;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities.Checkout
@@ -34,8 +33,9 @@ namespace Entegro.Domain.Entities.Checkout
         public decimal ProductCost { get; set; }
         public string? IntegrationSku { get; set; }
         public string? IntegrationProductName { get; set; }
+        public string? IntegrationProductImageUrl { get; set; }//pazaryerinden gelen ve eşleştirilmeyen ürün resmi
 
         public virtual ICollection<ShipmentItem> ShipmentItems { get; set; } = new List<ShipmentItem>();
-    
+
     }
 }

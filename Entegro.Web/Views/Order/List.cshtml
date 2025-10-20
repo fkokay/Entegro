@@ -10,7 +10,7 @@
         <div class="order-actions border-bottom p-4 d-flex">
             <button class="btn active" data-order-status="1">Paketlenecek <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-order-status="2">Gönderime Hazır <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ToBePackedQuantity</span></button>
+            <button class="btn" data-order-status="2">Gönderime Hazır <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ReadyToShipQuantity</span></button>
             <div class="split"></div>
             <button class="btn" data-order-status="3">Kargoda <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.ShippedQuantity</span></button>
             <div class="split"></div>
@@ -24,36 +24,44 @@
         </div>
         <div class="p-5">
             <div class="row">
-                <div class="row">
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterCustomerName" placeholder="Müşteri Adı" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterOrderNo" placeholder="Sipariş No" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterPackageNo" placeholder="Paket No" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterBarcode" placeholder="Barkod" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterCargoCode" placeholder="Kargo Kodu" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterStartDate" placeholder="Sipariş Başlangıç Tarihi" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterEndDate" placeholder="Sipariş Bitiş Tarihi" />
-                    </div>
-                    <div class="col-2 mb-2">
-                        <input type="text" class="form-control" id="filterProduct" placeholder="Ürün Adı/Model Kodu" />
-                    </div>
-                    <div class="col-2">
-                        <button id="btnFilter" class="btn btn-primary w-100">Filtrele</button>
-                    </div>
+                <div class="col-2 mb-2">
+                    <label for="filterCustomerName" class="form-label">Müşteri Adı</label>
+                    <input type="text" class="form-control" id="filterCustomerName" placeholder="Müşteri Adı" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterOrderNo" class="form-label">Sipariş No</label>
+                    <input type="text" class="form-control" id="filterOrderNo" placeholder="Sipariş No" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterPackageNo" class="form-label">Paket No</label>
+                    <input type="text" class="form-control" id="filterPackageNo" placeholder="Paket No" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterBarcode" class="form-label">Barkod</label>
+                    <input type="text" class="form-control" id="filterBarcode" placeholder="Barkod" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterCargoCode" class="form-label">Kargo Kodu</label>
+                    <input type="text" class="form-control" id="filterCargoCode" placeholder="Kargo Kodu" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterProduct" class="form-label">Ürün Adı / Model Kodu</label>
+                    <input type="text" class="form-control" id="filterProduct" placeholder="Ürün Adı / Model Kodu" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterStartDate" class="form-label">Sipariş Başlangıç Tarihi</label>
+                    <input type="date" class="form-control" id="filterStartDate" placeholder="Başlangıç Tarihi" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterEndDate" class="form-label">Sipariş Bitiş Tarihi</label>
+                    <input type="date" class="form-control" id="filterEndDate" placeholder="Bitiş Tarihi" />
+                </div>
+                <div class="col-2 mb-2 d-flex gap-2 align-items-end">
+                    <button id="btnFilter" class="btn btn-primary w-100">Filtrele</button>
+                    <button id="btnClear" class="btn btn-secondary w-100">Temizle</button>
                 </div>
             </div>
+
         </div>
 
         <div class="card-datatable table-responsive border-top">
@@ -164,31 +172,50 @@
     </script>
 
     <script>
-        $(document).off("click", "#btnFilter").on("click", "#btnFilter", function () {
-            const table = $('#OrderTable').DataTable();
+        $(document).ready(function () {
+  
+            $("#filterStartDate").on("change", function () {
+                const startDate = $(this).val();
 
-           
-            const filters = {
-                "Customer.Name": $("#filterCustomerName").val() || "",
-                "OrderNo": $("#filterOrderNo").val() || "",
-                "PackageNo": $("#filterPackageNo").val() || "",
-                "Barcode": $("#filterBarcode").val() || "",
-                "CargoCode": $("#filterCargoCode").val() || "",
-                "StartDate": $("#filterStartDate").val() || "",
-                "EndDate": $("#filterEndDate").val() || "",
-                "ProductName": $("#filterProduct").val() || ""
-            };
+                if (startDate) {
+                   
+                    $("#filterEndDate").attr("min", startDate);
 
-            table.columns().every(function () {
-                const column = this;
-                const columnName = column.dataSrc();
-
-                if (filters[columnName] !== undefined) {
-                    column.search(filters[columnName], false, false);
+                    const endDate = $("#filterEndDate").val();
+                    if (endDate && endDate < startDate) {
+                        $("#filterEndDate").val("");
+                    }
+                } else {
+                  
+                    $("#filterEndDate").removeAttr("min");
                 }
             });
-            table.draw();
+
+            // Filtrele butonu
+            $(document).off("click", "#btnFilter").on("click", "#btnFilter", function () {
+                const table = $('#OrderTable').DataTable();
+                table.ajax.reload();
+            });
+
+            // Temizle butonu
+            $(document).off("click", "#btnClear").on("click", "#btnClear", function () {
+                // Tüm filtre inputlarını temizle
+                $("#filterCustomerName").val("");
+                $("#filterOrderNo").val("");
+                $("#filterPackageNo").val("");
+                $("#filterBarcode").val("");
+                $("#filterCargoCode").val("");
+                $("#filterProduct").val("");
+                $("#filterStartDate").val("");
+                $("#filterEndDate").val("");
+                $("#filterEndDate").removeAttr("min"); // min değerini sıfırla
+
+                const table = $('#OrderTable').DataTable();
+                table.ajax.reload();
+            });
         });
     </script>
+
+
 
 }
