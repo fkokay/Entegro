@@ -12,6 +12,7 @@ namespace Entegro.Application.DTOs.Order
         public string OrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime DueDate { get; set; }
+        public int? CustomerId { get; set; }
         public string CustomerName { get; set; }
         public int CustomerOrderCounts { get; set; }
         public string ShipmentCarrier { get; set; }

@@ -4,6 +4,7 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Checkout.Orders;
+using Entegro.Web.Models.Common;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ namespace Entegro.Web.Controllers
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IOrderItemService _orderItemService;
         private readonly IProductService _productService;
+        private readonly IAddressService _addressService;
         private readonly IMapper _mapper;
         public OrderController(
             IOrderService orderService,
@@ -30,7 +32,8 @@ namespace Entegro.Web.Controllers
             IIntegrationSystemService integrationSystemService,
             IOrderItemService orderItemService,
             IProductService productService,
-            IMapper mapper)
+            IMapper mapper,
+            IAddressService addressService)
         {
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _shipmentService = shipmentService;
@@ -40,6 +43,7 @@ namespace Entegro.Web.Controllers
             _orderItemService = orderItemService;
             _productService = productService;
             _mapper = mapper;
+            _addressService = addressService;
         }
 
         public Task<IActionResult> Index()
@@ -183,7 +187,21 @@ namespace Entegro.Web.Controllers
             return Json(new { success = true });
         }
 
-
+        [HttpGet]
+        public async Task<IActionResult> GetOrderInvoiceAddressess(int orderId)
+        {
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+            var address = new AddressModel();
+            var orderInvoiceModel = new OrderInvoiceModel();
+            if (order.BillingAddressId != null)
+                orderInvoiceModel.BillingAddress = _mapper.Map<AddressModel>(await _addressService.GetByIdAsync(order.BillingAddressId.Value)).Address1;
+            if (order.ShippingAddressId != null)
+                orderInvoiceModel.ShippingAddress = _mapper.Map<AddressModel>(await _addressService.GetByIdAsync(order.ShippingAddressId.Value)).Address1;
+            orderInvoiceModel.CustomerName = order.Customer.Name;
+            orderInvoiceModel.Phone = order.Customer.PhoneNumber;
+            orderInvoiceModel.Email = order.Customer.Email;
+            return PartialView("_OrderInvoiceAddresses", orderInvoiceModel);
+        }
         [HttpGet]
         public async Task<IActionResult> GetMonthlySales(int year)
         {

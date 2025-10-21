@@ -453,9 +453,7 @@ namespace Entegro.Api.Jobs
                         if (customer == null)
                         {
                             var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
-
                             customer = await CreateCustomer(createCustomer);
-
                             order.CustomerId = customer.Id;
                             order.Customer = null;
                         }

@@ -309,6 +309,7 @@ namespace Entegro.Infrastructure.Repositories
                     OrderNumber = x.order.OrderNumber,
                     OrderDate = x.order.OrderDateUtc,
                     DueDate = x.order.DueDateUtc,
+                    CustomerId = x.order.CustomerId,
                     CustomerName = x.order.Customer.Name,
                     CustomerOrderCounts = x.order.Customer.Orders.Count(),
                     ShipmentCarrier = x.shipment != null ? x.shipment.Carrier : "",

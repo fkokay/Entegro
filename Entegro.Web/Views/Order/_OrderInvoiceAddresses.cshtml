@@ -1,0 +1,28 @@
+﻿@model OrderInvoiceModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Fatura Bilgileri</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="mb-3">
+        <h6><strong>Ad-Soyad:</strong> @Model.CustomerName</h6>
+    </div>
+    <div class="mb-3">
+        <h6 class="text-primary">Teslimat Adresi</h6>
+        <p>@Model.ShippingAddress</p>
+    </div>
+    <div class="mb-3">
+        <h6 class="text-success">Fatura Adresi</h6>
+        <p>@Model.BillingAddress</p>
+    </div>
+    <div class="mb-3">
+        <h6>Telefon</h6>
+        <p>@Model.Phone</p>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+</div>

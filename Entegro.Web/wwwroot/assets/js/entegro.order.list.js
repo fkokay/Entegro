@@ -210,8 +210,10 @@ Entegro.order.OrderList = (function ($) {
                                 items +=
                                     `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.IntegrationSystemId}, '${row.OrderItems[i].IntegrationProductName}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
                                        <div class="p-5 d-flex align-items-start gap-3">
-                                          <img src="${row.OrderItems[i].IntegrationProductImageUrl}" width="60" style="flex-shrink: 0;" />
-                                        
+                                              <div class="me-5 position-relative">
+                                                 <img src="${row.OrderItems[i].IntegrationProductImageUrl}" width="60"/>
+                                                 <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">${row.OrderItems[i].Quantity}</span>
+                                             </div>
                                           <div>
                                             <div class="order-item-no-integration-title">
                                               Eşleştirilmemiş Ürün, Eşleştirme Yapmak İçin Tıklayın.
@@ -304,7 +306,12 @@ Entegro.order.OrderList = (function ($) {
                               <button type="button" class="btn btn-outline-secondary dropdown-toggle waves-effect" data-bs-toggle="dropdown" aria-expanded="false">Fatura İşlemleri</button>
                               <ul class="dropdown-menu">
                                 <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Oluştur</a></li>
-                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Bilgileri</a></li>
+                                 <li>
+                                     <a class="dropdown-item waves-effect" href="javascript:void(0);"
+                                        onclick="Entegro.order.OrderList.showOrderAddresses(${row.Id})">
+                                        Fatura Bilgileri
+                                     </a>
+                                 </li>
                                 <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Yükle</a></li>
                               </ul>
                             </div>
@@ -843,7 +850,13 @@ Entegro.order.OrderList = (function ($) {
             initCustomScriptForOrderStatus2();
         }
     }
-
+    function showOrderAddresses(orderId) {
+        $.get('/Order/GetOrderInvoiceAddressess', { orderId: orderId }, function (html) {
+            $("#orderAddressModalContent").html(html);
+            var modal = new bootstrap.Modal(document.getElementById('orderAddressModal'));
+            modal.show();
+        });
+    }
     return {
      
         initTable: initTable,
@@ -851,7 +864,8 @@ Entegro.order.OrderList = (function ($) {
         OrderPackage: OrderPackage,
         ProductIntegration: ProductIntegration,
         OrderPrint: OrderPrint,
-        addFilterText: addFilterText
+        addFilterText: addFilterText,
+        showOrderAddresses: showOrderAddresses
     };
 
     function getIntegrationLogo(value) {
