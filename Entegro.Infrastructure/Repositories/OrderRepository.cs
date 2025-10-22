@@ -324,6 +324,7 @@ namespace Entegro.Infrastructure.Repositories
                     OrderTotal = x.shipment != null ? x.shipment.ShipmentItems.Sum(si => si.OrderItem.UnitPrice * si.Quantity) - x.order.OrderDiscount : x.order.OrderTotal,
                     PaymentMethod = x.order.PaymentMethod,
                     PaymentStatus = x.order.PaymentStatusLabelHint,
+                    InvoiceLink = x.order.InvoiceLink,
                     OrderItems = (x.shipment != null
                           ? x.shipment.ShipmentItems.Select(si => new OrderItemListDto
                           {

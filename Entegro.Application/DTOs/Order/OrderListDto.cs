@@ -27,6 +27,7 @@ namespace Entegro.Application.DTOs.Order
         public decimal OrderTotal { get; set; }
         public string PaymentMethod { get; set; }
         public string PaymentStatus { get; set; }
+        public string? InvoiceLink { get; set; }
         public List<OrderItemListDto> OrderItems { get; set; } = new List<OrderItemListDto>();
     }
 }

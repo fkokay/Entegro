@@ -38,7 +38,7 @@ namespace Entegro.Application.DTOs.Order
         public DateTime? PaidDateUtc { get; set; }
         public DateTime DueDateUtc { get; set; }
         public int OrderStatusId { get; set; }
-
+        public string? InvoiceLink { get; set; }
         [NotMapped]
         public OrderStatus OrderStatus
         {

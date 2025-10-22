@@ -277,7 +277,6 @@ Entegro.order.OrderList = (function ($) {
                         }else if (row.ShipmentCarrier === "MNG Kargo Marketplace") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/10.png";
                         } else {
-                            // Varsayılan logo (istersen boş bırakabilirsin)
                             logoUrl = "https://via.placeholder.com/100x40?text=Kargo";
                         }
 
@@ -295,6 +294,35 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
+                        if (row.InvoiceLink && row.InvoiceLink.trim() !== "") {
+                            return `
+                        <div>
+                            <div>Tutar  :${row.OrderSubTotal} TL</div>
+                            <div>İndirim:${row.OrderDiscount} TL</div>
+                            <div>Faturalanacak Tutar</div>
+                            <div class="mb-4"><b>${row.OrderTotal} TL</b></div>
+                            <div>
+                               <a href="${row.InvoiceLink}" target="_blank" class="text-success fw-bold">Faturayı Gör</a>
+                            </div>
+                            <div class="btn-group mt-2">
+                              <button type="button" class="btn btn-outline-secondary dropdown-toggle waves-effect" data-bs-toggle="dropdown" aria-expanded="false">Fatura İşlemleri</button>
+                              <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item waves-effect" href="${row.InvoiceLink}">Fatura Görüntüle</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura İptal Et</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item waves-effect" href="javascript:void(0);" 
+                                       onclick="Entegro.order.OrderList.showOrderAddresses(${row.Id}, '${row.InvoiceLink}')">
+                                       Fatura Bilgileri
+                                    </a>
+                                </li>
+                              </ul>
+                            </div>
+                        </div>`;
+                        } else {
                         return `
                         <div>
                             <div>Tutar  :${row.OrderSubTotal} TL</div>
@@ -306,17 +334,17 @@ Entegro.order.OrderList = (function ($) {
                               <button type="button" class="btn btn-outline-secondary dropdown-toggle waves-effect" data-bs-toggle="dropdown" aria-expanded="false">Fatura İşlemleri</button>
                               <ul class="dropdown-menu">
                                 <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Oluştur</a></li>
-                                 <li>
-                                     <a class="dropdown-item waves-effect" href="javascript:void(0);"
-                                        onclick="Entegro.order.OrderList.showOrderAddresses(${row.Id})">
-                                        Fatura Bilgileri
-                                     </a>
-                                 </li>
+                                <li>
+                                    <a class="dropdown-item waves-effect" href="javascript:void(0);" 
+                                       onclick="Entegro.order.OrderList.showOrderAddresses(${row.Id})">
+                                       Fatura Bilgileri
+                                    </a>
+                                </li>
                                 <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Yükle</a></li>
                               </ul>
                             </div>
                         </div>`;
-
+                        }
                     }
                 },
                 {
@@ -353,9 +381,9 @@ Entegro.order.OrderList = (function ($) {
                                      <span class="visually-hidden">Toggle Dropdown</span>
                                    </button>
                                    <ul class="dropdown-menu">
-                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Oluştur</a></li>
-                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Bilgileri</a></li>
-                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Yükle</a></li>
+                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Başka Kargo Firması İle Gönder</a></li>
+                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">İptal Et</a></li>
+                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Mağaza Kartı Yazdır</a></li>
                                    </ul>
                                  </div>
                              </div>`;

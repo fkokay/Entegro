@@ -436,7 +436,7 @@ namespace Entegro.Api.Jobs
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 
 
-                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10600545109").FirstOrDefault();
+                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10603539280").FirstOrDefault();
                 var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
 
 
@@ -493,6 +493,7 @@ namespace Entegro.Api.Jobs
                             existingOrder.OrderStatus = order.OrderStatus;
                             existingOrder.ShippingStatus = order.ShippingStatus;
                             existingOrder.PaymentStatus = order.PaymentStatus;
+                            existingOrder.InvoiceLink = order.InvoiceLink;
                             await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
 
                             var shipmentPackages = trendyolShipmentPackages.Where(x => x.OrderNumber == existingOrder.OrderNumber).ToList();

@@ -35,7 +35,7 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             order.IsTransient = true;
             order.OrderDiscount = trendyolShipmentPackage.TotalDiscount;//ekledim
             order.OrderSubTotal = trendyolShipmentPackage.GrossAmount;//ekledim
-
+            order.InvoiceLink = trendyolShipmentPackage.InvoiceLink;//ekledim
 
             order.OrderStatus = TrendyolStatusMapper.MapOrderStatus(trendyolShipmentPackage.Status);
             order.PaymentStatus = TrendyolStatusMapper.MapPaymentStatus(trendyolShipmentPackage.Status);

@@ -3,14 +3,8 @@ using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.OrderNote;
-using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.DTOs.Order
 {
@@ -42,7 +36,7 @@ namespace Entegro.Application.DTOs.Order
         public DateTime? PaidDateUtc { get; set; }
         public DateTime DueDateUtc { get; set; }
         public int OrderStatusId { get; set; }
-
+        public string? InvoiceLink { get; set; }
         [NotMapped]
         public OrderStatus OrderStatus
         {

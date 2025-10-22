@@ -1,28 +1,57 @@
 ﻿@model OrderInvoiceModel
-
-<div class="modal-header">
-    <h5 class="modal-title">Fatura Bilgileri</h5>
+<div class="modal-header bg-light text-light border-bottom">
+    <h5 class="modal-title fw-bold">Fatura Bilgileri</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<div class="modal-body">
-    <div class="mb-3">
-        <h6><strong>Ad-Soyad:</strong> @Model.CustomerName</h6>
+<div class="modal-body px-4 py-4">
+    <!-- Teslimat Adresi -->
+    <div class="mb-3 border rounded p-3">
+        <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">Teslimat Adresi</h6>
+        <div class="row mb-2">
+            <div class="col-4 fw-semibold">Ad-Soyad:</div>
+            <div class="col-8">@Model.CustomerName</div>
+        </div>
+        <div class="row">
+            <div class="col-4 fw-semibold">Adres:</div>
+            <div class="col-8">@Model.ShippingAddress</div>
+        </div>
     </div>
-    <div class="mb-3">
-        <h6 class="text-primary">Teslimat Adresi</h6>
-        <p>@Model.ShippingAddress</p>
+
+    <!-- Fatura Adresi -->
+    <div class="mb-3 border rounded p-3">
+        <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">Fatura Adresi</h6>
+        <div class="row mb-2">
+            <div class="col-4 fw-semibold">Ad-Soyad:</div>
+            <div class="col-8">@Model.CustomerName</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-4 fw-semibold">Adres:</div>
+            <div class="col-8">@Model.BillingAddress</div>
+        </div>
+        <div class="row">
+            <div class="col-4 fw-semibold">E-Fatura Mükellefi:</div>
+            <div class="col-8">Hayır</div>
+        </div>
     </div>
-    <div class="mb-3">
-        <h6 class="text-success">Fatura Adresi</h6>
-        <p>@Model.BillingAddress</p>
+
+    <!-- E-Posta -->
+    <div class="mb-3 border rounded p-3">
+        <div class="row">
+            <div class="col-4 fw-semibold">E-Posta Adresi:</div>
+            <div class="col-8">@Model.Email</div>
+        </div>
     </div>
-    <div class="mb-3">
-        <h6>Telefon</h6>
-        <p>@Model.Phone</p>
+
+    <!-- Telefon -->
+    <div class="border rounded p-3">
+        <div class="row">
+            <div class="col-4 fw-semibold">Telefon Numarası:</div>
+            <div class="col-8">@Model.Phone</div>
+        </div>
     </div>
 </div>
 
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+<div class="modal-footer d-flex justify-content-end">
+    <button type="button" class="btn btn-secondary  px-4" data-bs-dismiss="modal">Vazgeç</button>
 </div>
