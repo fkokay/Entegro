@@ -24,14 +24,26 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task DeleteAsync(ProductIntegration productIntegration)
         {
-            var model = await _context.ProductIntegrations.FindAsync(productIntegration.Id);
+            var model = await _context.ProductIntegrations
+                               .FirstOrDefaultAsync(x => x.Id == productIntegration.Id);
+
             if (model != null)
             {
+
+                var orderItems = await _context.OrderItems
+                                               .Where(oi => oi.ProductId == model.ProductId)
+                                               .ToListAsync();
+
+                foreach (var item in orderItems)
+                {
+                    item.ProductId = null;
+                }
+
+                _context.OrderItems.UpdateRange(orderItems);
                 _context.ProductIntegrations.Remove(model);
                 await _context.SaveChangesAsync();
 
             }
-
         }
 
         public async Task<List<ProductIntegration>> GetAllAsync()
@@ -48,7 +60,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<ProductIntegration>> GetAllAsync(int productId)
         {
-            return await _context.ProductIntegrations.Where(m=>m.ProductId == productId).AsNoTracking()
+            return await _context.ProductIntegrations.Where(m => m.ProductId == productId).AsNoTracking()
                 .Include(m => m.IntegrationSystem).ThenInclude(m => m.IntegrationSystemParameters)
                 .Include(m => m.Product).ThenInclude(m => m.Brand)
                 .Include(m => m.Product.ProductCategories).ThenInclude(m => m.Category).ThenInclude(m => m.Parent)

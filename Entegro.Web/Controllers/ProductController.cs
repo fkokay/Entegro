@@ -1942,6 +1942,49 @@ namespace Entegro.Web.Controllers
                 var ifExistingProduct = await _productService.ExistsByCodeAsync(mappedProduct.Code);
                 if (ifExistingProduct)
                 {
+                    var existingProduct = await _productService.GetProductByCodeAsync(mappedProduct.Code);
+                    var ifDbExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, mappedProduct.Code);
+                    if (ifDbExistingProductIntegration == null)
+                    {
+                        var productIntegration = new CreateProductIntegrationDto
+                        {
+                            ProductId = existingProduct.Id,
+                            IntegrationSystemId = model.IntegrationSystemId,
+                            Active = true,
+                            Price = existingProduct.Price,
+                            IntegrationCode = existingProduct.Code
+                        };
+                        await _productIntegrationService.AddAsync(productIntegration);
+
+                        var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration.IntegrationCode);
+                        foreach (var orderItem in orderItems)
+                        {
+                            UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                            updateOrderItem.Id = orderItem.Id;
+                            updateOrderItem.Sku = existingProduct.Code;
+                            updateOrderItem.ProductId = existingProduct.Id;
+                            updateOrderItem.ProductCost = orderItem.ProductCost;
+                            updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                            updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                            updateOrderItem.Quantity = orderItem.Quantity;
+                            updateOrderItem.Price = orderItem.Price;
+                            updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                            updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                            updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                            updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                            updateOrderItem.OrderId = orderItem.OrderId;
+                            updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+
+                            await _orderItemService.UpdateAsync(updateOrderItem);
+                        }
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Mevcut Ürün başarıyla Trendyol ile eşleştirildi.",
+                            code = productIntegration.IntegrationCode
+                        });
+                    }
                     return Json(new
                     {
                         success = false,
@@ -1951,11 +1994,13 @@ namespace Entegro.Web.Controllers
                 }
 
                 var createProduct = _mapper.Map<CreateProductDto>(mappedProduct);
+                createProduct.Published = true;
+                createProduct.Currency = "TL";
                 var product = await _productService.AddAsync(createProduct);
                 #endregion
 
                 #region product integration 
-                var productIntegration = new CreateProductIntegrationDto
+                var productIntegration2 = new CreateProductIntegrationDto
                 {
                     ProductId = product.Id,
                     IntegrationSystemId = model.IntegrationSystemId,
@@ -1964,17 +2009,17 @@ namespace Entegro.Web.Controllers
                     IntegrationCode = product.Code
                 };
 
-                var ifExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, productIntegration.IntegrationCode);
+                var ifExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, productIntegration2.IntegrationCode);
                 if (ifExistingProductIntegration != null)
                 {
                     return Json(new
                     {
                         success = false,
                         message = "Ürün zaten Trendyol ile eşleştirilmiş.",
-                        code = productIntegration.IntegrationCode
+                        code = productIntegration2.IntegrationCode
                     });
                 }
-                await _productIntegrationService.AddAsync(productIntegration);
+                await _productIntegrationService.AddAsync(productIntegration2);
                 #endregion
 
                 #region product image upload
@@ -2072,8 +2117,8 @@ namespace Entegro.Web.Controllers
                 #endregion
 
                 #region orderitem update
-                var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration.IntegrationCode);
-                foreach (var orderItem in orderItems)
+                var orderItems2 = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration2.IntegrationCode);
+                foreach (var orderItem in orderItems2)
                 {
                     UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
                     updateOrderItem.Id = orderItem.Id;
@@ -2089,7 +2134,7 @@ namespace Entegro.Web.Controllers
                     updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
                     updateOrderItem.ItemWeight = orderItem.ItemWeight;
                     updateOrderItem.OrderId = orderItem.OrderId;
-
+                    updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
                     await _orderItemService.UpdateAsync(updateOrderItem);
                 }
                 #endregion
