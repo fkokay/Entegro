@@ -553,7 +553,6 @@ Entegro.product.list = (function ($) {
 
             }
         });
-
         table.on('draw.dt', function () {
             table.rows({ page: 'current' }).every(function () {
                 var row = this;
@@ -561,42 +560,68 @@ Entegro.product.list = (function ($) {
 
                 if (row.data().ProductIntegrations?.length) {
                     row.data().ProductIntegrations.forEach(pi => {
-
                         var typeValue = "";
                         switch (pi.IntegrationSystem.IntegrationSystemType) {
                             //Commerce
                             case 2:
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "CommerceType").Value;
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "CommerceType")?.Value;
                                 break;
                             //Marketplace
                             case 3:
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "MarketplaceType").Value;
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "MarketplaceType")?.Value;
                                 break;
-                            default:
                         }
 
                         let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
 
+                        // --- Varyantları çöz (sadece pazaryeri için) ---
+                        let variantNames = "";
+                        if (pi.IntegrationSystem.IntegrationSystemType === 3) { // sadece pazaryeri
+                            if (row.data().ProductVariantAttributeCombinations?.length && row.data().ProductVariantAttributes?.length) {
+                                row.data().ProductVariantAttributeCombinations.forEach(comb => {
+                                    try {
+                                        let attrs = JSON.parse(comb.RawAttribute);
+                                        attrs.forEach(attr => {
+                                            row.data().ProductVariantAttributes.forEach(pa => {
+                                                let val = pa.ProductVariantAttributeValues?.find(v => v.Id === attr.ProductVariantAttributeValueId);
+                                                if (val) {
+                                                    variantNames += (variantNames ? ", " : "") + val.Name;
+                                                }
+                                            });
+                                        });
+                                    } catch (e) {
+                                        console.error("RawAttribute parse error", e);
+                                    }
+                                });
+                            }
+                        }
+
+                 
                         integrationHtml += `
-                                <div class="col-2 mb-2">
-                                    <div class="d-flex align-items-center product-integration">
-                                        <div class="product-integration-image">
-                                            <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
-                                        </div>
-                                        <div class="product-integration-info">
-                                            <span class="integration-name"
-                                                data-product-id="${row.data().Id}"
-                                                data-product-integration-id="${pi.Id}"
-                                                data-integration-system-id="${pi.IntegrationSystem.Id}">
-                                                ${pi.IntegrationSystem.Name}
-                                            </span>
-                                            <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
-                                        </div>
-                                        <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
-                                            Satışta
-                                        </span>
-                                    </div>
-                                </div>`;
+                    <div class="col-2 mb-2">
+                        <div class="d-flex align-items-center product-integration">
+                            <div class="product-integration-image">
+                                <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                            </div>
+                            <div class="product-integration-info">
+                                <div class="d-flex flex-column">
+                                    <span class="integration-name"
+                                        data-product-id="${row.data().Id}"
+                                        data-product-integration-id="${pi.Id}"
+                                        data-integration-system-id="${pi.IntegrationSystem.Id}">
+                                        ${pi.IntegrationSystem.Name}
+                                    </span>
+                                    ${pi.IntegrationSystem.IntegrationSystemType === 3 && variantNames
+                                ? `<small class="text-muted">${variantNames}</small>`
+                                : ""}
+                                </div>
+                                <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
+                            </div>
+                            <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
+                                Satışta
+                            </span>
+                        </div>
+                    </div>`;
                     });
                 }
 
@@ -605,6 +630,58 @@ Entegro.product.list = (function ($) {
                 }
             });
         });
+
+        //table.on('draw.dt', function () {
+        //    table.rows({ page: 'current' }).every(function () {
+        //        var row = this;
+        //        let integrationHtml = "";
+
+        //        if (row.data().ProductIntegrations?.length) {
+        //            row.data().ProductIntegrations.forEach(pi => {
+        //                console.log(row.data());
+        //                var typeValue = "";
+        //                switch (pi.IntegrationSystem.IntegrationSystemType) {
+        //                    //Commerce
+        //                    case 2:
+        //                        typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "CommerceType").Value;
+        //                        break;
+        //                    //Marketplace
+        //                    case 3:
+        //                        typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "MarketplaceType").Value;
+        //                        break;
+        //                    default:
+        //                }
+
+        //                let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
+
+        //                integrationHtml += `
+        //                        <div class="col-2 mb-2">
+        //                            <div class="d-flex align-items-center product-integration">
+        //                                <div class="product-integration-image">
+        //                                    <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+        //                                </div>
+        //                                <div class="product-integration-info">
+        //                                    <span class="integration-name"
+        //                                        data-product-id="${row.data().Id}"
+        //                                        data-product-integration-id="${pi.Id}"
+        //                                        data-integration-system-id="${pi.IntegrationSystem.Id}">
+        //                                        ${pi.IntegrationSystem.Name}
+        //                                    </span>
+        //                                    <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
+        //                                </div>
+        //                                <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
+        //                                    Satışta
+        //                                </span>
+        //                            </div>
+        //                        </div>`;
+        //            });
+        //        }
+
+        //        if (!row.child.isShown()) {
+        //            row.child('<div class="row">' + integrationHtml + '</div>').show();
+        //        }
+        //    });
+        //});
 
         setTimeout(() => {
             const adjustments = [{
