@@ -10,12 +10,14 @@ namespace Entegro.Application.Services.Base
     public class ProductVariantAttributeService : IProductVariantAttributeService
     {
         private readonly IProductVariantAttributeRepository _productAttributeMappingRepository;
+        private readonly IProductVariantAttributeCombinationRepository _productVariantAttributeCombinationRepository;
         private readonly IMapper _mapper;
 
-        public ProductVariantAttributeService(IProductVariantAttributeRepository productAttributeMapping, IMapper mapper)
+        public ProductVariantAttributeService(IProductVariantAttributeRepository productAttributeMapping, IMapper mapper, IProductVariantAttributeCombinationRepository productVariantAttributeCombinationRepository)
         {
             _productAttributeMappingRepository = productAttributeMapping ?? throw new ArgumentNullException(nameof(productAttributeMapping));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _productVariantAttributeCombinationRepository = productVariantAttributeCombinationRepository;
         }
 
         public async Task<ProductVariantAttributeDto> AddAsync(CreateProductVariantAttributeDto productAttributeMapping)
@@ -27,14 +29,27 @@ namespace Entegro.Application.Services.Base
 
         public async Task DeleteAsync(int productAttributeMappingId)
         {
+
             var model = await _productAttributeMappingRepository.GetByIdAsync(productAttributeMappingId);
 
             if (model == null)
             {
-                throw new KeyNotFoundException($"ProductAttribute with ID {productAttributeMappingId} not found.");
+                throw new KeyNotFoundException($"ProductAttributeMapping with ID {productAttributeMappingId} not found.");
             }
+
+            var existsInCombination = await _productVariantAttributeCombinationRepository.GetByProductIdAsync(model.ProductId);
+
+            if (existsInCombination.Any())
+            {
+                throw new InvalidOperationException(
+                    "Silme işlemi yapılamaz.Lütfen Önce Özellik Kombinasyonları Silin"
+                );
+            }
+
+
             await _productAttributeMappingRepository.DeleteAsync(model);
         }
+
 
         public async Task<List<ProductVariantAttributeDto>> GetAllAsync()
         {

@@ -942,7 +942,6 @@ Entegro.product = (function ($) {
     function initDeleteAttributeHandler(tableSelector = '#AttributesTable') {
         $(document).on('click', '.btn-delete-attribute', function () {
             const attributeId = $(this).data('id');
-
             if (!attributeId) return;
 
             Swal.fire({
@@ -959,21 +958,39 @@ Entegro.product = (function ($) {
                     $.ajax({
                         url: `/Product/DeleteProductVariantAttribute?id=${attributeId}`,
                         type: 'POST',
-                        success: function () {
-                            Swal.fire({
-                                title: 'Silindi!',
-                                text: 'Öğe başarıyla silindi.',
-                                icon: 'success',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
+                        success: function (response) {
+                            
+                            if (response && response.success) {
+                                Swal.fire({
+                                    title: 'Silindi!',
+                                    text: 'Öğe başarıyla silindi.',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
 
-                            $(tableSelector).DataTable().ajax.reload(null, false);
+                                $(tableSelector).DataTable().ajax.reload(null, false);
+                            } else {
+                                Swal.fire({
+                                    title: 'Hata!',
+                                    text: response.message || 'Silme işlemi başarısız oldu.',
+                                    icon: 'error'
+                                });
+                            }
                         },
                         error: function (xhr) {
+                            
+                            let msg = 'Silme işlemi sırasında bir hata oluştu.';
+                            if (xhr.responseText) {
+                                try {
+                                    const res = JSON.parse(xhr.responseText);
+                                    if (res.message) msg = res.message;
+                                } catch (_) { }
+                            }
+
                             Swal.fire({
                                 title: 'Hata!',
-                                text: 'Silme işlemi sırasında bir hata oluştu.',
+                                text: msg,
                                 icon: 'error'
                             });
                         }
@@ -982,6 +999,7 @@ Entegro.product = (function ($) {
             });
         });
     }
+
     function initViewVariantAttributeValues() {
         $(document).on('click', '.btn-view-values', function () {
             const attributeId = $(this).data('attribute-id');
@@ -2268,10 +2286,7 @@ Entegro.product = (function ($) {
         return table;
     }
 
-    function initCreateIfNotExistProductTrendyolForm() {
-       
-    }
-
+   
 
      
 

@@ -1473,6 +1473,31 @@ namespace Entegro.Web.Controllers
                     await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
+                var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(model.IntegrationCode);
+                if (orderItems.Any())
+                {
+                    foreach (var orderItem in orderItems)
+                    {
+                        UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                        updateOrderItem.Id = orderItem.Id;
+                        updateOrderItem.Sku = model.IntegrationCode;
+                        updateOrderItem.ProductId = model.ProductId;
+                        updateOrderItem.ProductCost = orderItem.ProductCost;
+                        updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                        updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                        updateOrderItem.Quantity = orderItem.Quantity;
+                        updateOrderItem.Price = orderItem.Price;
+                        updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                        updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                        updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                        updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                        updateOrderItem.OrderId = orderItem.OrderId;
+                        updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+
+                        await _orderItemService.UpdateAsync(updateOrderItem);
+                    }
+                }
+
                 return Json(new { success = true });
             }
             catch (Exception ex)
