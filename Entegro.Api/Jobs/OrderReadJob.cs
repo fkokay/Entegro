@@ -9,6 +9,7 @@ using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.Interfaces.Services.Base;
@@ -21,6 +22,7 @@ using Entegro.Application.Mappings.Marketplace.N11;
 using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using MapsterMapper;
+using Newtonsoft.Json;
 using Quartz;
 
 namespace Entegro.Api.Jobs
@@ -45,6 +47,10 @@ namespace Entegro.Api.Jobs
         private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
         private readonly ILogger<OrderReadJob> _logger;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        private readonly IProductVariantAttributeService _productVariantAttributeService;
+        private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
+        private readonly IOrderItemService _orderItemService;
         public OrderReadJob(
             IN11Service n11,
             IPazaramaService pazarama,
@@ -62,7 +68,11 @@ namespace Entegro.Api.Jobs
             IShipmentItemService shipmentItemService,
             INotificationService notificationService,
             IMapper mapper,
-            ILogger<OrderReadJob> logger)
+            ILogger<OrderReadJob> logger,
+            IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
+            IProductVariantAttributeService productVariantAttributeService,
+            IProductVariantAttributeValueService productVariantAttributeValueService,
+            IOrderItemService orderItemService)
         {
             _n11 = n11;
             _pazarama = pazarama;
@@ -81,6 +91,10 @@ namespace Entegro.Api.Jobs
             _notificationService = notificationService;
             _mapper = mapper;
             _logger = logger;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _productVariantAttributeService = productVariantAttributeService;
+            _productVariantAttributeValueService = productVariantAttributeValueService;
+            _orderItemService = orderItemService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -436,7 +450,7 @@ namespace Entegro.Api.Jobs
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 
 
-                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10603539280").FirstOrDefault();
+                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10619860330").FirstOrDefault();
                 var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
 
 
@@ -494,7 +508,68 @@ namespace Entegro.Api.Jobs
                             existingOrder.ShippingStatus = order.ShippingStatus;
                             existingOrder.PaymentStatus = order.PaymentStatus;
                             existingOrder.InvoiceLink = order.InvoiceLink;
-                            await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
+
+
+                            foreach (var ordItem in existingOrder.OrderItems)
+                            {
+                                if (ordItem.Product != null)
+                                {
+                                    var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(ordItem.Product.Code);
+                                    var product = await _trendyol.GetProductWithBarcodeAsync(context, ordItem.Product.Code);
+                                    var attributeCombination = productIntegration?.ProductVariantAttributeCombinationId != null
+                                     ? await _productVariantAttributeCombinationService
+                                         .GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value)
+                                     : null;
+
+                                    string attributeDescription = "";
+
+                                    if (attributeCombination != null && !string.IsNullOrEmpty(attributeCombination.RawAttribute))
+                                    {
+
+                                        var rawAttributes = JsonConvert.DeserializeObject<List<Dictionary<string, int>>>(attributeCombination.RawAttribute);
+
+                                        foreach (var raw in rawAttributes)
+                                        {
+                                            if (raw.TryGetValue("ProductVariantAttributeId", out var attributeId) &&
+                                                raw.TryGetValue("ProductVariantAttributeValueId", out var valueId))
+                                            {
+
+                                                var attribute = await _productVariantAttributeService.GetByIdAsync(attributeId);
+                                                var attributeValue = await _productVariantAttributeValueService.GetByIdAsync(valueId);
+
+                                                var attributeName = attribute?.ProductAttribute?.Name;
+                                                var attributeValueName = attributeValue?.Name;
+
+                                                if (!string.IsNullOrEmpty(attributeName) && !string.IsNullOrEmpty(attributeValueName))
+                                                {
+                                                    attributeDescription += $"{attributeName}: {attributeValueName} | ";
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (productIntegration != null)
+                                    {
+                                        ordItem.Product = null;
+                                        ordItem.ProductId = productIntegration.ProductId;
+                                        ordItem.IntegrationProductImageUrl = product.images.FirstOrDefault()?.url;
+                                        ordItem.AttributesXml = attributeCombination?.RawAttribute;
+                                        ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
+                                    }
+                                    else
+                                    {
+                                        ordItem.Product = null;
+                                        ordItem.ProductId = null;
+                                        ordItem.IntegrationProductImageUrl = product.images.FirstOrDefault()?.url;
+                                        ordItem.AttributesXml = attributeCombination?.RawAttribute;
+                                        ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
+                                    }
+                                    await _orderItemService.UpdateAsync(_mapper.Map<UpdateOrderItemDto>(ordItem));
+                                }
+                            }
+
+                            var map = _mapper.Map<UpdateOrderDto>(existingOrder);
+                            await _orderService.UpdateAsync(map);
 
                             var shipmentPackages = trendyolShipmentPackages.Where(x => x.OrderNumber == existingOrder.OrderNumber).ToList();
 
@@ -532,28 +607,28 @@ namespace Entegro.Api.Jobs
                                     var updatedShipment = await _shipmentService.UpdateAsync(updateShipment);
 
 
-                                    foreach (var line in sp.Lines)
-                                    {
-                                        var orderItem = existingOrder.OrderItems
-                                            .FirstOrDefault(x => x.Sku == line.Barcode || x.IntegrationSku == line.Barcode);
+                                    //foreach (var line in sp.Lines)
+                                    //{
+                                    //    var orderItem = existingOrder.OrderItems
+                                    //        .FirstOrDefault(x => x.Sku == line.Barcode || x.IntegrationSku == line.Barcode);
 
-                                        if (orderItem != null)
-                                        {
-                                            var existingShipmentItem = await _shipmentItemService.GetByShipmentIdAsync(updatedShipment.Id);
+                                    //    if (orderItem != null)
+                                    //    {
+                                    //        var existingShipmentItem = await _shipmentItemService.GetByShipmentIdAsync(updatedShipment.Id);
 
-                                            if (existingShipmentItem is not null)
-                                            {
+                                    //        if (existingShipmentItem is not null)
+                                    //        {
 
-                                                var mapped = await _shipmentItemService.UpdateAsync(new UpdateShipmentItemDto
-                                                {
-                                                    Id = existingShipmentItem.Id,
-                                                    OrderItemId = orderItem.Id,
-                                                    Quantity = line.Quantity,
-                                                    ShipmentId = updatedShipment.Id
-                                                });
-                                            }
-                                        }
-                                    }
+                                    //            var mapped = await _shipmentItemService.UpdateAsync(new UpdateShipmentItemDto
+                                    //            {
+                                    //                Id = existingShipmentItem.Id,
+                                    //                OrderItemId = orderItem.Id,
+                                    //                Quantity = line.Quantity,
+                                    //                ShipmentId = updatedShipment.Id
+                                    //            });
+                                    //        }
+                                    //    }
+                                    //}
                                 }
                             }
 

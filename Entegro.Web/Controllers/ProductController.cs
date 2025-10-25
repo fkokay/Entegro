@@ -2160,6 +2160,8 @@ namespace Entegro.Web.Controllers
                     updateOrderItem.ItemWeight = orderItem.ItemWeight;
                     updateOrderItem.OrderId = orderItem.OrderId;
                     updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                    updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
                     await _orderItemService.UpdateAsync(updateOrderItem);
                 }
                 #endregion

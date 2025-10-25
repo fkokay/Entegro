@@ -196,11 +196,9 @@ Entegro.product.list = (function ($) {
             const IntegrationSystemId = $(this).data('integration-system-id') || $el.data('integration-system-id');
             const IntegrationValue = $(this).data('integration-value') || $el.data('integration-value') || '';
 
-
             const ProductIntegrationId = $(this).hasClass('open-integration') ?
                 0 :
                 ($(this).data('product-integration-id') || $el.data('product-integration-id'));
-
 
             $.ajax({
                 url: '/Product/ProductIntegrationDialog',
@@ -211,6 +209,9 @@ Entegro.product.list = (function ($) {
                     IntegrationSystemId,
                     ProductId,
                     IntegrationValue
+                },
+                beforeSend: function () {
+                    window.showLoading("Lütfen bekleyiniz..");
                 },
                 success: function (html) {
                     $('#integrationDialogContainer').html(html);
@@ -224,23 +225,12 @@ Entegro.product.list = (function ($) {
                     $("#Custom_ManageInventoryMethod").change(function () {
                         var manageInventoryMethod = $(this).val();
                         if (manageInventoryMethod == 0) {
-                            $("#pnlStockQuantity").hide();
-                            $("#pnlDisplayStockAvailability").hide();
-                            $("#pnlDisplayStockQuantity").hide();
-                            $("#pnlMinStockQuantity").hide();
-                            $("#pnlLowStockActivity").hide();
+                            $("#pnlStockQuantity, #pnlDisplayStockAvailability, #pnlDisplayStockQuantity, #pnlMinStockQuantity, #pnlLowStockActivity").hide();
                         } else if (manageInventoryMethod == 1) {
-                            $("#pnlStockQuantity").show();
-                            $("#pnlDisplayStockAvailability").show();
-                            $("#pnlDisplayStockQuantity").show();
-                            $("#pnlMinStockQuantity").show();
-                            $("#pnlLowStockActivity").show();
+                            $("#pnlStockQuantity, #pnlDisplayStockAvailability, #pnlDisplayStockQuantity, #pnlMinStockQuantity, #pnlLowStockActivity").show();
                         } else if (manageInventoryMethod == 2) {
-                            $("#pnlStockQuantity").hide();
-                            $("#pnlDisplayStockAvailability").show();
-                            $("#pnlDisplayStockQuantity").show();
-                            $("#pnlMinStockQuantity").hide();
-                            $("#pnlLowStockActivity").hide();
+                            $("#pnlStockQuantity, #pnlMinStockQuantity, #pnlLowStockActivity").hide();
+                            $("#pnlDisplayStockAvailability, #pnlDisplayStockQuantity").show();
                         }
                     });
 
@@ -251,10 +241,15 @@ Entegro.product.list = (function ($) {
                 error: function (xhr) {
                     console.error(xhr.responseText);
                     alert('Form yüklenemedi.');
+                },
+                complete: function () {
+                    
+                    window.hideLoading();
                 }
             });
         });
     }
+
     function initList() {
         $(document).off('submit.integration')
             .on('submit.integration', '#integrationDialog', function (e) {
@@ -574,54 +569,54 @@ Entegro.product.list = (function ($) {
 
                         let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
 
-                        // --- Varyantları çöz (sadece pazaryeri için) ---
-                        let variantNames = "";
-                        if (pi.IntegrationSystem.IntegrationSystemType === 3) { // sadece pazaryeri
-                            if (row.data().ProductVariantAttributeCombinations?.length && row.data().ProductVariantAttributes?.length) {
-                                row.data().ProductVariantAttributeCombinations.forEach(comb => {
-                                    try {
-                                        let attrs = JSON.parse(comb.RawAttribute);
-                                        attrs.forEach(attr => {
-                                            row.data().ProductVariantAttributes.forEach(pa => {
-                                                let val = pa.ProductVariantAttributeValues?.find(v => v.Id === attr.ProductVariantAttributeValueId);
-                                                if (val) {
-                                                    variantNames += (variantNames ? ", " : "") + val.Name;
-                                                }
-                                            });
-                                        });
-                                    } catch (e) {
-                                        console.error("RawAttribute parse error", e);
-                                    }
-                                });
+
+                        let variantName = "";
+                        if (pi.IntegrationSystem.IntegrationSystemType === 3 && pi.ProductVariantAttributeCombinationId) {
+                            let comb = row.data().ProductVariantAttributeCombinations
+                                ?.find(c => c.Id === pi.ProductVariantAttributeCombinationId);
+
+                            if (comb) {
+                                try {
+                                    let attrs = JSON.parse(comb.RawAttribute);
+                                    let attr = attrs[0]; 
+                                    row.data().ProductVariantAttributes.forEach(pa => {
+                                        let val = pa.ProductVariantAttributeValues
+                                            ?.find(v => v.Id === attr.ProductVariantAttributeValueId);
+                                        if (val) {
+                                            variantName = val.Name;
+                                        }
+                                    });
+                                } catch (e) {
+                                    console.error("RawAttribute parse error", e);
+                                }
                             }
                         }
 
-                 
                         integrationHtml += `
-                    <div class="col-2 mb-2">
-                        <div class="d-flex align-items-center product-integration">
-                            <div class="product-integration-image">
-                                <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
-                            </div>
-                            <div class="product-integration-info">
-                                <div class="d-flex flex-column">
-                                    <span class="integration-name"
-                                        data-product-id="${row.data().Id}"
-                                        data-product-integration-id="${pi.Id}"
-                                        data-integration-system-id="${pi.IntegrationSystem.Id}">
-                                        ${pi.IntegrationSystem.Name}
-                                    </span>
-                                    ${pi.IntegrationSystem.IntegrationSystemType === 3 && variantNames
-                                ? `<small class="text-muted">${variantNames}</small>`
-                                : ""}
-                                </div>
-                                <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
-                            </div>
-                            <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
-                                Satışta
-                            </span>
-                        </div>
-                    </div>`;
+                         <div class="col-2 mb-2">
+                             <div class="d-flex align-items-center product-integration">
+                                 <div class="product-integration-image">
+                                     <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                 </div>
+                                 <div class="product-integration-info">
+                                     <div class="d-flex flex-column">
+                                         <span class="integration-name"
+                                             data-product-id="${row.data().Id}"
+                                             data-product-integration-id="${pi.Id}"
+                                             data-integration-system-id="${pi.IntegrationSystem.Id}">
+                                             ${pi.IntegrationSystem.Name}
+                                         </span>
+                                         ${variantName
+                                             ? `<small class="text-muted">${variantName}</small>`
+                                             : ""}
+                                     </div>
+                                     <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
+                                 </div>
+                                 <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
+                                     Satışta
+                                 </span>
+                             </div>
+                         </div>`;
                     });
                 }
 
@@ -630,6 +625,7 @@ Entegro.product.list = (function ($) {
                 }
             });
         });
+
 
         //table.on('draw.dt', function () {
         //    table.rows({ page: 'current' }).every(function () {

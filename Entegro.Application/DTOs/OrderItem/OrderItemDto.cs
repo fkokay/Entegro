@@ -13,7 +13,8 @@ namespace Entegro.Application.DTOs.OrderItem
         public decimal Price { get; set; }
         public decimal TaxRate { get; set; }
         public decimal DiscountAmount { get; set; }
-        public string AttributesXml { get; set; }
+        public string? AttributesXml { get; set; }
+        public string? AttributesDescription { get; set; }
         public decimal ItemWeight { get; set; }
         public decimal ProductCost { get; set; }
         public string? IntegrationSku { get; set; }
