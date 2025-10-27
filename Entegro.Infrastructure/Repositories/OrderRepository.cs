@@ -122,6 +122,21 @@ namespace Entegro.Infrastructure.Repositories
             return list;
         }
 
+        public async Task<List<Order>> GetOrderByIntegrationIdAsync(int integrationId)
+        {
+            var query = _context.Orders
+                           .Include(o => o.OrderItems)
+                           .Include(c => c.Customer)
+                           .Include(s => s.Shipments);
+
+            var orders = await query.AsNoTracking().Where(o => o.IntegrationSystemId == integrationId).ToListAsync();
+
+            if (orders is null)
+                return new List<Order>();
+
+            return orders;
+        }
+
         public async Task<OrderListPageDto> GetOrderPageAsync()
         {
             OrderListPageDto orderListPage = new OrderListPageDto();
@@ -339,7 +354,8 @@ namespace Entegro.Infrastructure.Repositories
                               Quantity = si.Quantity,
                               IntegrationSku = si.OrderItem.IntegrationSku,
                               IntegrationProductName = si.OrderItem.IntegrationProductName,
-                              IntegrationProductImageUrl = si.OrderItem.IntegrationProductImageUrl
+                              IntegrationProductImageUrl = si.OrderItem.IntegrationProductImageUrl,
+                              AttributeDescription = si.OrderItem.AttributesDescription
                           }).ToList()
                           : x.order.OrderItems.Select(oi => new OrderItemListDto
                           {
@@ -354,7 +370,8 @@ namespace Entegro.Infrastructure.Repositories
                               Quantity = oi.Quantity,
                               IntegrationSku = oi.IntegrationSku,
                               IntegrationProductName = oi.IntegrationProductName,
-                              IntegrationProductImageUrl = oi.IntegrationProductImageUrl
+                              IntegrationProductImageUrl = oi.IntegrationProductImageUrl,
+                              AttributeDescription = oi.AttributesDescription
                           }).ToList())
                 })
                 .Skip(gridCommand.Start)
@@ -368,6 +385,43 @@ namespace Entegro.Infrastructure.Repositories
                 PageNumber = (gridCommand.Start / gridCommand.Length) + 1,
                 PageSize = gridCommand.Length
             };
+        }
+
+        public async Task<List<StoreProductSalesDto>> GetStoreProductSalesAsync()
+        {
+            var query = await _context.Orders
+                .Where(o => o.OrderStatusId != 40)
+                .Join(_context.OrderItems,
+                    o => o.Id,
+                    oi => oi.OrderId,
+                    (o, oi) => new { o, oi })
+                .Join(_context.Products,
+                    x => x.oi.ProductId,
+                    p => p.Id,
+                    (x, p) => new { x.o, x.oi, p })
+                .Join(_context.IntegrationSystems,
+                    x => x.o.IntegrationSystemId,
+                    ins => ins.Id,
+                    (x, ins) => new { x.o, x.oi, x.p, ins })
+                .Join(_context.IntegrationSystemParameters,
+                    x => x.ins.Id,
+                    isp => isp.IntegrationSystemId,
+                    (x, isp) => new { x.o, x.oi, x.p, isp })
+                .Where(x => x.isp.Key == "CommerceType" || x.isp.Key == "MarketplaceType")
+                .GroupBy(g => new { g.isp.Value, g.p.Id, g.p.Name, g.p.Barcode })
+                .OrderBy(g => g.Key.Value)
+                .ThenByDescending(g => g.Sum(x => x.oi.Quantity))
+                .Select(g => new StoreProductSalesDto
+                {
+                    StoreName = g.Key.Value,
+                    ProductId = g.Key.Id,
+                    ProductName = g.Key.Name,
+                    Barcode = g.Key.Barcode,
+                    TotalQuantity = g.Sum(x => x.oi.Quantity)
+                })
+                .ToListAsync();
+
+            return query;
         }
 
         public async Task<decimal> GetTotalSalesAsync()

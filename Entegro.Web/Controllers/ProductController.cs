@@ -65,6 +65,7 @@ namespace Entegro.Web.Controllers
         private readonly ICrossSellProductService _crossSellProductService;
         private readonly IRelatedProductService _relatedProductService;
         private readonly IOrderItemService _orderItemService;
+        private readonly IOrderService _orderService;
         private readonly ISettingService _settingService;
         private readonly HttpClient _client;
         private readonly IMapper _mapper;
@@ -96,7 +97,8 @@ namespace Entegro.Web.Controllers
             HttpClient client,
             IProductAttributeValueService productAttributeValueService,
             ISpecificationAttributeService specificationAttributeService,
-            ISpecificationAttributeOptionService specificationAttributeOptionService)
+            ISpecificationAttributeOptionService specificationAttributeOptionService,
+            IOrderService orderService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -124,6 +126,7 @@ namespace Entegro.Web.Controllers
             _productAttributeValueService = productAttributeValueService;
             _specificationAttributeService = specificationAttributeService;
             _specificationAttributeOptionService = specificationAttributeOptionService;
+            _orderService = orderService;
         }
 
         #region Product list / create / edit / delete
@@ -1469,13 +1472,13 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.LastSyncDate = null;
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-
                     await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
                 var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(model.IntegrationCode);
                 if (orderItems.Any())
                 {
+
                     foreach (var orderItem in orderItems)
                     {
                         UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
@@ -1493,7 +1496,7 @@ namespace Entegro.Web.Controllers
                         updateOrderItem.ItemWeight = orderItem.ItemWeight;
                         updateOrderItem.OrderId = orderItem.OrderId;
                         updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
-
+                        updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
                         await _orderItemService.UpdateAsync(updateOrderItem);
                     }
                 }
@@ -2031,7 +2034,8 @@ namespace Entegro.Web.Controllers
                     IntegrationSystemId = model.IntegrationSystemId,
                     Active = true,
                     Price = createProduct.Price,
-                    IntegrationCode = product.Code
+                    IntegrationCode = product.Code,
+
                 };
 
                 var ifExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, productIntegration2.IntegrationCode);
@@ -2754,5 +2758,12 @@ namespace Entegro.Web.Controllers
             return fileIds;
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> GetStoreProductSales()
+        {
+            var result = await _orderService.GetStoreProductSalesReportAsync();
+            return Json(result);
+        }
     }
 }

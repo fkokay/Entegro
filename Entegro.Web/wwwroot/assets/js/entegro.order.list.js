@@ -240,6 +240,7 @@ Entegro.order.OrderList = (function ($) {
                                         <div>Stok Kodu   : ${row.OrderItems[i].ProductCode}</div>
                                         <div>Barkod      : ${row.OrderItems[i].ProductBarcode ?? ""}</div>
                                         <div>Birim Fiyat : ${row.OrderItems[i].UnitPrice} TL</div>
+                                        <div><b class="text-mute">${row.OrderItems[i].AttributeDescription}<b></div>
                                     </div>
                                 </div>
                                 `;

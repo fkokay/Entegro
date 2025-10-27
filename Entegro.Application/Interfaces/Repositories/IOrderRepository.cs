@@ -9,6 +9,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<Order?> GetByIdAsync(int id);
         Task<List<Order>> GetAllAsync();
         Task<PagedResult<Order>> GetAllAsync(int pageNumber, int pageSize);
+        Task<List<Order>> GetOrderByIntegrationIdAsync(int integrationId);
         Task<PagedResult<OrderListDto>> GetPagedAsync(GridCommand gridCommand, OrderListFilterDto filters, int orderStatus);
         Task AddAsync(Order order);
         Task UpdateAsync(Order order);
@@ -20,6 +21,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<int> CompleteOrderStatusCount();
         Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year);
         Task<List<Order>> GetLast10OrdersWithItemsAsync();
+        Task<List<StoreProductSalesDto>> GetStoreProductSalesAsync();
 
     }
 }

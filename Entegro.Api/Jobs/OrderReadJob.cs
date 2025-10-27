@@ -450,7 +450,7 @@ namespace Entegro.Api.Jobs
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 
 
-                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10619860330").FirstOrDefault();
+                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10619124388").FirstOrDefault();
                 var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
 
 
@@ -510,66 +510,7 @@ namespace Entegro.Api.Jobs
                             existingOrder.InvoiceLink = order.InvoiceLink;
 
 
-                            foreach (var ordItem in existingOrder.OrderItems)
-                            {
-                                if (ordItem.Product != null)
-                                {
-                                    var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(ordItem.Product.Code);
-                                    var product = await _trendyol.GetProductWithBarcodeAsync(context, ordItem.Product.Code);
-                                    var attributeCombination = productIntegration?.ProductVariantAttributeCombinationId != null
-                                     ? await _productVariantAttributeCombinationService
-                                         .GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value)
-                                     : null;
-
-                                    string attributeDescription = "";
-
-                                    if (attributeCombination != null && !string.IsNullOrEmpty(attributeCombination.RawAttribute))
-                                    {
-
-                                        var rawAttributes = JsonConvert.DeserializeObject<List<Dictionary<string, int>>>(attributeCombination.RawAttribute);
-
-                                        foreach (var raw in rawAttributes)
-                                        {
-                                            if (raw.TryGetValue("ProductVariantAttributeId", out var attributeId) &&
-                                                raw.TryGetValue("ProductVariantAttributeValueId", out var valueId))
-                                            {
-
-                                                var attribute = await _productVariantAttributeService.GetByIdAsync(attributeId);
-                                                var attributeValue = await _productVariantAttributeValueService.GetByIdAsync(valueId);
-
-                                                var attributeName = attribute?.ProductAttribute?.Name;
-                                                var attributeValueName = attributeValue?.Name;
-
-                                                if (!string.IsNullOrEmpty(attributeName) && !string.IsNullOrEmpty(attributeValueName))
-                                                {
-                                                    attributeDescription += $"{attributeName}: {attributeValueName} | ";
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (productIntegration != null)
-                                    {
-                                        ordItem.Product = null;
-                                        ordItem.ProductId = productIntegration.ProductId;
-                                        ordItem.IntegrationProductImageUrl = product.images.FirstOrDefault()?.url;
-                                        ordItem.AttributesXml = attributeCombination?.RawAttribute;
-                                        ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
-                                    }
-                                    else
-                                    {
-                                        ordItem.Product = null;
-                                        ordItem.ProductId = null;
-                                        ordItem.IntegrationProductImageUrl = product.images.FirstOrDefault()?.url;
-                                        ordItem.AttributesXml = attributeCombination?.RawAttribute;
-                                        ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
-                                    }
-                                    await _orderItemService.UpdateAsync(_mapper.Map<UpdateOrderItemDto>(ordItem));
-                                }
-                            }
-
-                            var map = _mapper.Map<UpdateOrderDto>(existingOrder);
-                            await _orderService.UpdateAsync(map);
+                            await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(existingOrder));
 
                             var shipmentPackages = trendyolShipmentPackages.Where(x => x.OrderNumber == existingOrder.OrderNumber).ToList();
 
@@ -633,7 +574,63 @@ namespace Entegro.Api.Jobs
                             }
 
 
+                            foreach (var ordItem in existingOrder.OrderItems)
+                            {
+                                if (ordItem.Product != null)
+                                {
+                                    var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(ordItem.Product.Code);
+                                    var product = await _trendyol.GetProductWithBarcodeAsync(context, ordItem.Product.Code);
+                                    var attributeCombination = productIntegration?.ProductVariantAttributeCombinationId != null
+                                     ? await _productVariantAttributeCombinationService
+                                         .GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value)
+                                     : null;
 
+                                    string attributeDescription = "";
+
+                                    if (attributeCombination != null && !string.IsNullOrEmpty(attributeCombination.RawAttribute))
+                                    {
+
+                                        var rawAttributes = JsonConvert.DeserializeObject<List<Dictionary<string, int>>>(attributeCombination.RawAttribute);
+
+                                        foreach (var raw in rawAttributes)
+                                        {
+                                            if (raw.TryGetValue("ProductVariantAttributeId", out var attributeId) &&
+                                                raw.TryGetValue("ProductVariantAttributeValueId", out var valueId))
+                                            {
+
+                                                var attribute = await _productVariantAttributeService.GetByIdAsync(attributeId);
+                                                var attributeValue = await _productVariantAttributeValueService.GetByIdAsync(valueId);
+
+                                                var attributeName = attribute?.ProductAttribute?.Name;
+                                                var attributeValueName = attributeValue?.Name;
+
+                                                if (!string.IsNullOrEmpty(attributeName) && !string.IsNullOrEmpty(attributeValueName))
+                                                {
+                                                    attributeDescription += $"{attributeName}: {attributeValueName} | ";
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (productIntegration != null)
+                                    {
+                                        ordItem.Product = null;
+                                        ordItem.ProductId = productIntegration.ProductId;
+                                        ordItem.IntegrationProductImageUrl = product.images.FirstOrDefault()?.url;
+                                        ordItem.AttributesXml = attributeCombination?.RawAttribute;
+                                        ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
+                                    }
+                                    else
+                                    {
+                                        ordItem.Product = null;
+                                        ordItem.ProductId = null;
+                                        ordItem.IntegrationProductImageUrl = product.images.FirstOrDefault()?.url;
+                                        ordItem.AttributesXml = attributeCombination?.RawAttribute;
+                                        ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
+                                    }
+                                    await _orderItemService.UpdateAsync(_mapper.Map<UpdateOrderItemDto>(ordItem));
+                                }
+                            }
                             _logger.LogInformation("'{OrderNumber}' nolu sipariş güncellendi", order.OrderNumber);
                             continue;
                         }

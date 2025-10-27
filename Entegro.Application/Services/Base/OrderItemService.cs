@@ -70,7 +70,7 @@ namespace Entegro.Application.Services.Base
 
 
             _mapper.Map(orderItem, existingOrderItem);
-
+            existingOrderItem.ProductId = orderItem.ProductId;
             await _orderItemRepository.UpdateAsync(existingOrderItem);
 
             return _mapper.Map<OrderItemDto>(existingOrderItem);

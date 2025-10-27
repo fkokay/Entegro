@@ -52,7 +52,8 @@
             return trendyolStatus switch
             {
                 "Created" or "Picking" or "Invoiced" or "Delivered" => PaymentStatus.Paid,
-                "Cancelled" or "UnDelivered" => PaymentStatus.Refunded,
+                "Cancelled" => PaymentStatus.Refunded,
+                "UnDelivered" => PaymentStatus.Pending,
                 _ => PaymentStatus.Pending
             };
         }

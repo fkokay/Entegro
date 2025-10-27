@@ -116,5 +116,17 @@ namespace Entegro.Application.Services.Base
         {
             return _mapper.Map<IEnumerable<ProductIntegrationDto>>(await _productIntegrationRepository.GetAllAsync(productId));
         }
+
+        public async Task<ProductIntegrationDto?> GetByProductAndIntegrationSystemAsync(int productId, int integrationSystemId, int productVariantAttributeCombinationId)
+        {
+            var productIntegration = await _productIntegrationRepository.GetByProductIdandIntegrationSystemIdAsync(productId, integrationSystemId, productVariantAttributeCombinationId);
+            if (productIntegration == null)
+            {
+                return null;
+            }
+
+            var productIntegrationDto = _mapper.Map<ProductIntegrationDto>(productIntegration);
+            return productIntegrationDto;
+        }
     }
 }

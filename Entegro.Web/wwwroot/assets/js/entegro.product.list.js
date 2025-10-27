@@ -251,6 +251,22 @@ Entegro.product.list = (function ($) {
     }
 
     function initList() {
+        var salesData = []; 
+
+        
+        $.ajax({
+            url: '/Product/GetStoreProductSales',
+            type: 'POST',
+            success: function (result) {
+                salesData = result; // JSON result burada tutuluyor
+                console.log("GetStoreProductSales sonucu:", salesData);
+            },
+            error: function (xhr) {
+                console.error("Satış raporu hatası:", xhr.responseText);
+            }
+        });
+
+
         $(document).off('submit.integration')
             .on('submit.integration', '#integrationDialog', function (e) {
                 e.preventDefault();
@@ -328,16 +344,16 @@ Entegro.product.list = (function ($) {
                     render: (data, type, row) => {
                         const image = row.MainPicture ? `<img src="${row.MainPicture.Url}" class="rounded">` : "";
                         return `
-                        <div class="d-flex align-items-center product-name">
-                          <div class="avatar-wrapper">
-                            <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">${image}</div>
-                          </div>
-                          <div class="d-flex flex-column">
-                            <h6 class="mb-0">${row.Name}</h6>
-                            <small class="text-truncate">${row.Code || ""}</small>
-                            <small class="text-truncate">${row.Brand?.Name || ""}</small>
-                          </div>
-                        </div>`;
+                     <div class="d-flex align-items-center product-name">
+                       <div class="avatar-wrapper">
+                         <div class="avatar me-2 me-sm-4 rounded-2 bg-label-secondary">${image}</div>
+                       </div>
+                       <div class="d-flex flex-column">
+                         <h6 class="mb-0">${row.Name}</h6>
+                         <small class="text-truncate">${row.Code || ""}</small>
+                         <small class="text-truncate">${row.Brand?.Name || ""}</small>
+                       </div>
+                     </div>`;
                     }
                 },
                 {
@@ -349,7 +365,7 @@ Entegro.product.list = (function ($) {
                         return $.fn.dataTable.render.number('.', ',', 2).display(data) + ' ' + row.Currency;
                     }
                 },
-                { data: 'StockQuantity'},
+                { data: 'StockQuantity' },
                 {
                     data: 'UpdatedOn',
                     name: 'UpdatedOnUtc',
@@ -364,9 +380,9 @@ Entegro.product.list = (function ($) {
                         const checked = data ? "checked" : "";
                         const titleText = data ? "Yayında" : "Yayında Değil";
                         return `
-                        <div class="form-check d-inline-flex justify-content-center">
-                          <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
-                        </div>`;
+                     <div class="form-check d-inline-flex justify-content-center">
+                       <input class="form-check-input" type="checkbox" ${checked} onclick="return false;" title="${titleText}">
+                     </div>`;
                     }
                 },
                 {
@@ -379,28 +395,28 @@ Entegro.product.list = (function ($) {
                         let pazarYeriLinks = Entegro.product.list.createDropdownLinks(window.marketPlaces, row, "marketplace");
 
                         return `
-                        <div class="d-inline-block text-nowrap">
-                          <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill btn-icon">
-                            <i class="icon-base ti ti-pencil icon-22px"></i>
-                          </a>
-                          <button class="btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
-                                  data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                            <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                          </button>
-                          <ul class="dropdown-menu dropdown-menu-end m-0">
-                            <li><a href="Edit?id=${row.Id}" class="dropdown-item">Düzenle</a></li>
-                            <li><a href="javascript:void(0);" class="dropdown-item text-danger" onclick="Entegro.product.list.deleteProduct(${row.Id})">Sil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li class="dropend">
-                              <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">E-Ticaret Bağlantıları</a>
-                              <ul class="dropdown-menu">${eTicaretLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
-                            </li>
-                            <li class="dropend">
-                              <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">Pazaryeri Bağlantıları</a>
-                              <ul class="dropdown-menu">${pazarYeriLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
-                            </li>
-                          </ul>
-                        </div>`;
+                     <div class="d-inline-block text-nowrap">
+                       <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill btn-icon">
+                         <i class="icon-base ti ti-pencil icon-22px"></i>
+                       </a>
+                       <button class="btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
+                               data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                         <i class="icon-base ti ti-dots-vertical icon-22px"></i>
+                       </button>
+                       <ul class="dropdown-menu dropdown-menu-end m-0">
+                         <li><a href="Edit?id=${row.Id}" class="dropdown-item">Düzenle</a></li>
+                         <li><a href="javascript:void(0);" class="dropdown-item text-danger" onclick="Entegro.product.list.deleteProduct(${row.Id})">Sil</a></li>
+                         <li><hr class="dropdown-divider"></li>
+                         <li class="dropend">
+                           <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">E-Ticaret Bağlantıları</a>
+                           <ul class="dropdown-menu">${eTicaretLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
+                         </li>
+                         <li class="dropend">
+                           <a href="javascript:void(0);" class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown">Pazaryeri Bağlantıları</a>
+                           <ul class="dropdown-menu">${pazarYeriLinks || '<li><span class="dropdown-item text-muted">Bağlantı yok</span></li>'}</ul>
+                         </li>
+                       </ul>
+                     </div>`;
                     }
                 }
             ],
@@ -442,9 +458,9 @@ Entegro.product.list = (function ($) {
                                 extend: "collection",
                                 className: "btn btn-label-secondary dropdown-toggle me-4",
                                 text: `<span class="d-flex align-items-center gap-1">
-                                   <i class="icon-base ti ti-import icon-xs"></i>
-                                   <span>E-Ticaret Entegrasyonu</span>
-                                 </span>`,
+                                <i class="icon-base ti ti-import icon-xs"></i>
+                                <span>E-Ticaret Entegrasyonu</span>
+                              </span>`,
                                 buttons: window.commerces.map(c => ({
                                     className: "dropdown-item text-center",
                                     text: `Tüm Ürünleri<br>${c.Name}<br>Mağazasına Bağla`,
@@ -457,9 +473,9 @@ Entegro.product.list = (function ($) {
                                 extend: "collection",
                                 className: "btn btn-label-secondary dropdown-toggle me-4",
                                 text: `<span class="d-flex align-items-center gap-1">
-                                   <i class="icon-base ti ti-upload icon-xs"></i>
-                                   <span>Dışarı Aktar</span>
-                                 </span>`,
+                                <i class="icon-base ti ti-upload icon-xs"></i>
+                                <span>Dışarı Aktar</span>
+                              </span>`,
                                 buttons: ["print", "csv", "excel", "pdf", "copy"]
                             },
                             {
@@ -471,18 +487,18 @@ Entegro.product.list = (function ($) {
                                 extend: "collection",
                                 className: "btn btn-warning dropdown-toggle",
                                 text: `<span class="d-flex align-items-center gap-1">
-                                   <i class="icon-base ti ti-cloud-download icon-xs"></i>
-                                   <span>Pazaryerinden Ürün Kayıt</span>
-                                 </span>`,
+                                <i class="icon-base ti ti-cloud-download icon-xs"></i>
+                                <span>Pazaryerinden Ürün Kayıt</span>
+                              </span>`,
                                 buttons: window.marketPlaces.map(market => {
                                     const logoSrc = Entegro.product.list.getIntegrationLogo(market.Value);
 
                                     return {
                                         className: "dropdown-item d-flex align-items-center gap-2",
                                         text: `
-                                          <img src="${logoSrc}" alt="${market.Name}" style="width: 20px; height: 20px; object-fit: contain;">
-                                          <span>${market.Name}</span>
-                                        `,
+                                       <img src="${logoSrc}" alt="${market.Name}" style="width: 20px; height: 20px; object-fit: contain;">
+                                       <span>${market.Name}</span>
+                                     `,
                                         action: () => {
                                             $('#CreateIfNotExistProductTrendyolForm')[0].reset();
                                             $('#CreateIfNotExistProductTrendyolModal').modal('show');
@@ -504,7 +520,7 @@ Entegro.product.list = (function ($) {
             initComplete: function () {
                 this.api().columns().every(function () {
                     if (this.dataSrc() === "Code") {
-                        Entegro.product.list.addFilterText(this,".productFilterCode", "Ürün Kodu");
+                        Entegro.product.list.addFilterText(this, ".productFilterCode", "Ürün Kodu");
                     } else if (this.dataSrc() === "Name") {
                         Entegro.product.list.addFilterText(this, ".productFilterName", "Ürün Adı");
                     } else if (this.dataSrc() === "Barcode") {
@@ -569,7 +585,6 @@ Entegro.product.list = (function ($) {
 
                         let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
 
-
                         let variantName = "";
                         if (pi.IntegrationSystem.IntegrationSystemType === 3 && pi.ProductVariantAttributeCombinationId) {
                             let comb = row.data().ProductVariantAttributeCombinations
@@ -578,7 +593,7 @@ Entegro.product.list = (function ($) {
                             if (comb) {
                                 try {
                                     let attrs = JSON.parse(comb.RawAttribute);
-                                    let attr = attrs[0]; 
+                                    let attr = attrs[0];
                                     row.data().ProductVariantAttributes.forEach(pa => {
                                         let val = pa.ProductVariantAttributeValues
                                             ?.find(v => v.Id === attr.ProductVariantAttributeValueId);
@@ -592,31 +607,47 @@ Entegro.product.list = (function ($) {
                             }
                         }
 
+
+                        let quantity = "";
+                        if (salesData && row.data().Code) {
+                            let match = salesData.find(x => x.Barcode === row.data().Code);
+                           
+                            if (match) {
+                                quantity = `
+                                <span class="fw-bold text-success">
+                                   ${match.TotalQuantity}
+                                </span>`;
+                            }
+
+                        }
+
                         integrationHtml += `
-                         <div class="col-2 mb-2">
-                             <div class="d-flex align-items-center product-integration">
-                                 <div class="product-integration-image">
-                                     <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
-                                 </div>
-                                 <div class="product-integration-info">
-                                     <div class="d-flex flex-column">
-                                         <span class="integration-name"
-                                             data-product-id="${row.data().Id}"
-                                             data-product-integration-id="${pi.Id}"
-                                             data-integration-system-id="${pi.IntegrationSystem.Id}">
-                                             ${pi.IntegrationSystem.Name}
-                                         </span>
-                                         ${variantName
-                                             ? `<small class="text-muted">${variantName}</small>`
-                                             : ""}
-                                     </div>
-                                     <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
-                                 </div>
-                                 <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
-                                     Satışta
-                                 </span>
-                             </div>
-                         </div>`;
+                      <div class="col-2 mb-2">
+                          <div class="d-flex align-items-center product-integration">
+                              <div class="product-integration-image">
+                                  <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                              </div>
+                              <div class="product-integration-info">
+                                  <div class="d-flex flex-column">
+                                      <span class="integration-name"
+                                          data-product-id="${row.data().Id}"
+                                          data-product-integration-id="${pi.Id}"
+                                          data-integration-system-id="${pi.IntegrationSystem.Id}">
+                                          ${pi.IntegrationSystem.Name}
+                                      </span>
+                                      ${variantName
+                                ? `<b class="text-muted">${variantName}</b>`
+                                : ""}
+                              </div>
+                                  <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
+                                  <span class="price"> Sipariş Sayısı: ${quantity}</span>
+                              </div>
+                          
+                              <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
+                                  Satışta 
+                              </span>
+                          </div>
+                      </div>`;
                     });
                 }
 
@@ -627,57 +658,6 @@ Entegro.product.list = (function ($) {
         });
 
 
-        //table.on('draw.dt', function () {
-        //    table.rows({ page: 'current' }).every(function () {
-        //        var row = this;
-        //        let integrationHtml = "";
-
-        //        if (row.data().ProductIntegrations?.length) {
-        //            row.data().ProductIntegrations.forEach(pi => {
-        //                console.log(row.data());
-        //                var typeValue = "";
-        //                switch (pi.IntegrationSystem.IntegrationSystemType) {
-        //                    //Commerce
-        //                    case 2:
-        //                        typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "CommerceType").Value;
-        //                        break;
-        //                    //Marketplace
-        //                    case 3:
-        //                        typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "MarketplaceType").Value;
-        //                        break;
-        //                    default:
-        //                }
-
-        //                let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
-
-        //                integrationHtml += `
-        //                        <div class="col-2 mb-2">
-        //                            <div class="d-flex align-items-center product-integration">
-        //                                <div class="product-integration-image">
-        //                                    <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
-        //                                </div>
-        //                                <div class="product-integration-info">
-        //                                    <span class="integration-name"
-        //                                        data-product-id="${row.data().Id}"
-        //                                        data-product-integration-id="${pi.Id}"
-        //                                        data-integration-system-id="${pi.IntegrationSystem.Id}">
-        //                                        ${pi.IntegrationSystem.Name}
-        //                                    </span>
-        //                                    <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
-        //                                </div>
-        //                                <span class="w-px-30 h-px-30 d-flex justify-content-center align-items-center me-4 product-status">
-        //                                    Satışta
-        //                                </span>
-        //                            </div>
-        //                        </div>`;
-        //            });
-        //        }
-
-        //        if (!row.child.isShown()) {
-        //            row.child('<div class="row">' + integrationHtml + '</div>').show();
-        //        }
-        //    });
-        //});
 
         setTimeout(() => {
             const adjustments = [{
@@ -737,6 +717,7 @@ Entegro.product.list = (function ($) {
             })
         }, 100);
     }
+
     function deleteProduct(productId) {
         Swal.fire({
             title: 'Emin misiniz?',

@@ -141,6 +141,8 @@ namespace Entegro.Web.Controllers
             var integrationSystem = await _integrationSystemService.GetByIdAsync(integrationSystemId);
             var product = await _productService.GetProductByIdAsync(productId);
 
+            ProductIntegrationDto? ifExistingProductIntegration = new();
+
             CreateProductIntegrationDto createProductIntegration = new CreateProductIntegrationDto();
             createProductIntegration.ProductId = productId;
             createProductIntegration.ProductVariantAttributeCombinationId = productVariantAttributeCombinationId;
@@ -151,16 +153,33 @@ namespace Entegro.Web.Controllers
             createProductIntegration.Active = true;
             createProductIntegration.LastSyncDate = null;
 
-            var ifExistingProductIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(productId, integrationSystemId);
-            if (ifExistingProductIntegration != null)
+            if (productVariantAttributeCombinationId == null)
             {
-                return Json(new
+                ifExistingProductIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(productId, integrationSystemId);
+                if (ifExistingProductIntegration != null)
                 {
-                    success = false,
-                    message = "Ürün zaten eşleştirilmiş.",
-                });
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Ürün zaten eşleştirilmiş.",
+                    });
+                }
+                await _productIntegrationService.AddAsync(createProductIntegration);
             }
-            await _productIntegrationService.AddAsync(createProductIntegration);
+            else
+            {
+                ifExistingProductIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(productId, integrationSystemId, productVariantAttributeCombinationId.Value);
+                if (ifExistingProductIntegration != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Ürün varyantı zaten eşleştirilmiş.",
+                    });
+                }
+                await _productIntegrationService.AddAsync(createProductIntegration);
+            }
+
 
             var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(integrationCode);
             foreach (var orderItem in orderItems)
@@ -171,6 +190,7 @@ namespace Entegro.Web.Controllers
                 updateOrderItem.ProductId = productId;
                 updateOrderItem.ProductCost = orderItem.ProductCost;
                 updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
                 updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
                 updateOrderItem.Quantity = orderItem.Quantity;
                 updateOrderItem.Price = orderItem.Price;
@@ -179,7 +199,8 @@ namespace Entegro.Web.Controllers
                 updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
                 updateOrderItem.ItemWeight = orderItem.ItemWeight;
                 updateOrderItem.OrderId = orderItem.OrderId;
-
+                updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
+                updateOrderItem.AttributesXml = orderItem.AttributesXml;
                 await _orderItemService.UpdateAsync(updateOrderItem);
             }
 

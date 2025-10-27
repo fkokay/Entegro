@@ -54,7 +54,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<List<OrderItem>> GetAllIntegrationSkuWithAsync(string integrationSku)
         {
-            return await _context.OrderItems.Where(m => m.IntegrationSku == integrationSku).ToListAsync();
+            return await _context.OrderItems.AsNoTracking().Where(m => m.IntegrationSku == integrationSku).ToListAsync();
         }
 
         public async Task<OrderItem?> GetByIdAsync(int id)

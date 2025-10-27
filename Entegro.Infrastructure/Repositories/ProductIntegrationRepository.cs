@@ -144,6 +144,12 @@ namespace Entegro.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.ProductId == productId && t.IntegrationSystemId == integrationSystemId);
         }
 
+        public async Task<ProductIntegration?> GetByProductIdandIntegrationSystemIdAsync(int productId, int integrationSystemId, int productVariantAttributeCombinationId)
+        {
+            return await _context.ProductIntegrations.Include(c => c.Product).AsNoTracking()
+               .FirstOrDefaultAsync(t => t.ProductId == productId && t.IntegrationSystemId == integrationSystemId && t.ProductVariantAttributeCombinationId == productVariantAttributeCombinationId);
+        }
+
         public async Task UpdateAsync(ProductIntegration productIntegration)
         {
             _context.ProductIntegrations.Update(productIntegration);

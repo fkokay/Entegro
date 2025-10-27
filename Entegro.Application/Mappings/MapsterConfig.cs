@@ -103,7 +103,7 @@ namespace Entegro.Application.Mappings
             config.NewConfig<OrderItem, CreateOrderItemDto>().TwoWays();
             config.NewConfig<OrderItem, UpdateOrderItemDto>().TwoWays();
             config.NewConfig<OrderNote, OrderNoteDto>().TwoWays();
-
+            config.NewConfig<UpdateOrderItemDto, OrderItem>().Ignore(dest => dest.ProductId);
             // ---------------- Customer ----------------
             config.NewConfig<Customer, CustomerDto>().TwoWays();
             config.NewConfig<Customer, CreateCustomerDto>().TwoWays();

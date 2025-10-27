@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Services.Base
     {
         Task<OrderDto> GetOrderByIdAsync(int orderId);
         Task<OrderPrintDto> GetOrderPrintByIdAsync(int orderId, string packageNo);
+        Task<IEnumerable<OrderDto>> GetOrderByIntegrationIdAsync(int integrationId);
         Task<bool> ExistsByOrderNoAsync(string orderNo);
         Task<OrderDto?> GetByOrderNoAsync(string orderNo);
         Task<IEnumerable<OrderDto>> GetOrdersAsync();
@@ -20,5 +21,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<int> CompleteOrderStatusCount();
         Task<List<(int Month, decimal TotalAmount)>> GetMonthlySalesByYearAsync(int year);
         Task<List<OrderDto>> GetLast10OrdersWithItemsAsync();
+        Task<List<StoreProductSalesDto>> GetStoreProductSalesReportAsync();
     }
 }

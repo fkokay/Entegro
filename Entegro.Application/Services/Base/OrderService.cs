@@ -97,6 +97,13 @@ namespace Entegro.Application.Services.Base
             return orderDto;
         }
 
+        public async Task<IEnumerable<OrderDto>> GetOrderByIntegrationIdAsync(int integrationId)
+        {
+            var orders = await _orderRepository.GetOrderByIntegrationIdAsync(integrationId);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDto>>(orders);
+            return orderDtos;
+        }
+
         public async Task<OrderListPageDto> GetOrderPageAsync()
         {
             var orderPage = await _orderRepository.GetOrderPageAsync();
@@ -168,6 +175,11 @@ namespace Entegro.Application.Services.Base
                 PageNumber = orders.PageNumber,
                 PageSize = orders.PageSize
             };
+        }
+
+        public async Task<List<StoreProductSalesDto>> GetStoreProductSalesReportAsync()
+        {
+            return await _orderRepository.GetStoreProductSalesAsync();
         }
 
         public async Task<decimal> GetTotalSalesAsync()
