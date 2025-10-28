@@ -258,7 +258,7 @@ Entegro.product.list = (function ($) {
             url: '/Product/GetStoreProductSales',
             type: 'POST',
             success: function (result) {
-                salesData = result; // JSON result burada tutuluyor
+                salesData = result;
                 console.log("GetStoreProductSales sonucu:", salesData);
             },
             error: function (xhr) {
@@ -614,7 +614,7 @@ Entegro.product.list = (function ($) {
                            
                             if (match) {
                                 quantity = `
-                                <span class="fw-bold text-success">
+                                <span class="fw-bold text-black">
                                    ${match.TotalQuantity}
                                 </span>`;
                             }
@@ -625,7 +625,18 @@ Entegro.product.list = (function ($) {
                       <div class="col-2 mb-2">
                           <div class="d-flex align-items-center product-integration">
                               <div class="product-integration-image">
-                                  <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                  
+                                  <div class="me-5 position-relative">
+                                       <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                       <span style="background: #fff; font-size: 12px;
+                                              width: 20px; height: 20px; border-radius: 50%;
+                                              text-align: center; line-height: 24px;
+                                              display: block; left: -10px; top: -10px;
+                                              position: absolute; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                                              ${quantity}
+                                        </span>
+                                    </div>
+
                               </div>
                               <div class="product-integration-info">
                                   <div class="d-flex flex-column">
@@ -640,7 +651,6 @@ Entegro.product.list = (function ($) {
                                 : ""}
                               </div>
                                   <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
-                                  <span class="price"> Sipariş Sayısı: ${quantity}</span>
                               </div>
                           
                               <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">

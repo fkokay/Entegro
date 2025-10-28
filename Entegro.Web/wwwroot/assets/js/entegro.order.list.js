@@ -208,7 +208,7 @@ Entegro.order.OrderList = (function ($) {
                         for (var i = 0; i < row.OrderItems.length; i++) {
                             if (row.OrderItems[i].ProductId == null) {
                                 items +=
-                                    `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.IntegrationSystemId}, '${row.OrderItems[i].IntegrationProductName}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
+                                    `<div onclick="Entegro.order.OrderList.ProductIntegration(${row.IntegrationSystemId}, '${row.OrderItems[i].IntegrationProductName.replace(/'/g, "\\'")}', '${row.OrderItems[i].IntegrationSku}')" class="order-item-no-integration">
                                        <div class="p-5 d-flex align-items-start gap-3">
                                               <div class="me-5 position-relative">
                                                  <img src="${row.OrderItems[i].IntegrationProductImageUrl}" width="60"/>

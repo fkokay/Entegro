@@ -128,7 +128,6 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task UpdateAsync(OrderItem orderItem)
         {
-            _context.Entry(orderItem).State = EntityState.Modified;
             _context.OrderItems.Update(orderItem);
             await _context.SaveChangesAsync();
         }

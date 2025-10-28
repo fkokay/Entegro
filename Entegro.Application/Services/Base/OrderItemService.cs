@@ -69,11 +69,10 @@ namespace Entegro.Application.Services.Base
                 throw new KeyNotFoundException($"ID {existingOrderItem.Id} ile OrderItem bulunamadı.");
 
 
-            _mapper.Map(orderItem, existingOrderItem);
-            existingOrderItem.ProductId = orderItem.ProductId;
-            await _orderItemRepository.UpdateAsync(existingOrderItem);
-
-            return _mapper.Map<OrderItemDto>(existingOrderItem);
+            var map = _mapper.Map(orderItem, existingOrderItem);
+            map.ProductId = orderItem.ProductId;
+            await _orderItemRepository.UpdateAsync(map);
+            return _mapper.Map<OrderItemDto>(map);
         }
 
         public async Task<List<OrderItemDto>> GetAllWithIntegrationSkuAsync(string integrationSku)

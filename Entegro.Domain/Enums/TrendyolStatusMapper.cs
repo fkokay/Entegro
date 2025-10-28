@@ -13,7 +13,6 @@
                 _ => OrderStatus.Pending
             };
         }
-
         public static ShippingStatus MapShippingStatus(string trendyolStatus)
         {
             return trendyolStatus switch
@@ -45,8 +44,6 @@
                 _ => ShippingStatus.NotYetShipped
             };
         }
-
-
         public static PaymentStatus MapPaymentStatus(string trendyolStatus)
         {
             return trendyolStatus switch
@@ -57,7 +54,6 @@
                 _ => PaymentStatus.Pending
             };
         }
-
         public static ReturnRequestStatus MapReturnStatus(string trendyolStatus)
         {
             return trendyolStatus switch

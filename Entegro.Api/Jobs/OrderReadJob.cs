@@ -578,7 +578,7 @@ namespace Entegro.Api.Jobs
                             {
                                 if (ordItem.Product != null)
                                 {
-                                    var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(ordItem.Product.Code);
+                                    var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(ordItem.Sku ?? ordItem.IntegrationSku);
                                     var product = await _trendyol.GetProductWithBarcodeAsync(context, ordItem.Product.Code);
                                     var attributeCombination = productIntegration?.ProductVariantAttributeCombinationId != null
                                      ? await _productVariantAttributeCombinationService
@@ -628,6 +628,8 @@ namespace Entegro.Api.Jobs
                                         ordItem.AttributesXml = attributeCombination?.RawAttribute;
                                         ordItem.AttributesDescription = attributeDescription.TrimEnd(' ', '|');
                                     }
+
+
                                     await _orderItemService.UpdateAsync(_mapper.Map<UpdateOrderItemDto>(ordItem));
                                 }
                             }
