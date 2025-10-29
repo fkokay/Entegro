@@ -1,0 +1,26 @@
+﻿@model OrderInvoiceRequest
+
+
+<div class="modal-header p-0 position-relative" style="height: 80px;">
+    <div class="d-flex justify-content-center align-items-center w-100 h-100">
+        <h5 class="modal-title m-0">Fatura Yükle</h5>
+    </div>
+</div>
+
+<div class="modal-body px-4 py-4">
+    <form id="invoiceForm" class="row g-4">
+        <input type="hidden" asp-for="OrderNo" id="orderNo" />
+        <div class="col-12">
+            <label class="form-label fw-semibold" for="Name">Fatura Linki</label>
+            <input type="text" class="form-control" id="invoiceLink" asp-for="InvoiceLink" placeholder="https://..." required />
+        </div>
+        <div class="col-12 text-center pt-3">
+            <button type="submit" class="btn btn-success px-4 me-2" id="saveInvoiceBtn">
+                <i class="bi bi-check-circle me-1"></i> Kaydet
+            </button>
+            <button type="reset" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                <i class="bi bi-x-circle me-1"></i> Kapat
+            </button>
+        </div>
+    </form>
+</div>

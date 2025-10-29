@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
@@ -241,5 +242,60 @@ namespace Entegro.Web.Controllers
                 data = result.Items
             });
         }
+
+        [HttpGet]
+        public IActionResult InvoiceModal(string orderNo)
+        {
+            var model = new OrderInvoiceRequest
+            {
+                OrderNo = orderNo
+            };
+
+            return PartialView("_InvoiceModal", model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> OrderInvoice([FromBody] OrderInvoiceRequest model)
+        {
+            try
+            {
+                var order = await _orderService.GetByOrderNoAsync(model.OrderNo);
+
+                if (order == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Sipariş bulunamadı.",
+                        errorCode = "OrderNotFound"
+                    });
+                }
+
+                order.InvoiceLink = model.InvoiceLink;
+                await _orderService.UpdateAsync(_mapper.Map<UpdateOrderDto>(order));
+                return Json(new
+                {
+                    success = true,
+                    message = "Ürün başarıyla kaydedildi ve Trendyol ile eşleştirildi.",
+                    data = new
+                    {
+                        orderId = order.Id,
+                        orderNo = order.OrderNumber
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new
+                {
+                    success = false,
+                    message = "İşlem sırasında bir hata oluştu: " + ex.Message,
+                    errorCode = "ServerError"
+                });
+            }
+        }
+
     }
 }

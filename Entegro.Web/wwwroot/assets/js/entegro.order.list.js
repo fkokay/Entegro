@@ -345,7 +345,10 @@ Entegro.order.OrderList = (function ($) {
                                        Fatura Bilgileri
                                     </a>
                                 </li>
-                                <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Fatura Yükle</a></li>
+                                <a class="dropdown-item waves-effect" href="javascript:void(0);"
+                                     onclick="Entegro.order.OrderList.showInvoiceModal('${row.OrderNumber}')">
+                                 Fatura Yükle
+                                  </a>
                               </ul>
                             </div>
                         </div>`;
@@ -890,6 +893,65 @@ Entegro.order.OrderList = (function ($) {
             modal.show();
         });
     }
+
+    function showInvoiceModal(orderNo) {
+        $.get('/Order/InvoiceModal', { orderNo: orderNo }, function (html) {
+            $("#invoiceModalContent").html(html);
+
+            const modalEl = document.getElementById('invoiceModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            // Kaydet butonu
+            $(document).off("click", "#saveInvoiceBtn").on("click", "#saveInvoiceBtn", function () {
+                const orderNo = $("#orderNo").val();
+                const invoiceLink = $("#invoiceLink").val();
+
+                if (!invoiceLink || invoiceLink.trim() === "") {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Eksik Bilgi",
+                        text: "Lütfen fatura linkini giriniz."
+                    });
+                    return;
+                }
+
+                fetch('/Order/OrderInvoice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ OrderNo: orderNo, InvoiceLink: invoiceLink })
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı',
+                                text: 'Fatura başarıyla oluşturuldu.'
+                            }).then(() => {
+                                modal.hide();
+                                $('#OrderTable').DataTable().ajax.reload(null, false);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Hata',
+                                text: result.message || "Bir hata oluştu."
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sunucu Hatası',
+                            text: 'Sunucuya bağlanırken bir hata oluştu.'
+                        });
+                    });
+            });
+        });
+    }
+
     return {
      
         initTable: initTable,
@@ -898,7 +960,8 @@ Entegro.order.OrderList = (function ($) {
         ProductIntegration: ProductIntegration,
         OrderPrint: OrderPrint,
         addFilterText: addFilterText,
-        showOrderAddresses: showOrderAddresses
+        showOrderAddresses: showOrderAddresses,
+        showInvoiceModal: showInvoiceModal
     };
 
     function getIntegrationLogo(value) {
