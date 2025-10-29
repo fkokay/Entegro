@@ -26,32 +26,25 @@
                 <!-- Expenses -->
                 @* @await Component.InvokeAsync("Dashboard", new { dashboardType = "Expenses" }) *@
                 <!--/ Expenses -->
-                <!-- Profit last month -->
-                @await Component.InvokeAsync("Dashboard", new { dashboardType = "GetLast10OrdersWithItems" })
-                <!--/ Profit last month -->
                 <!-- Generated Leads -->
                 @await Component.InvokeAsync("Dashboard", new { dashboardType = "GeneratedLeads" })
                 <!--/ Generated Leads -->
+                <!-- Profit last month -->
+                @await Component.InvokeAsync("Dashboard", new { dashboardType = "GetLast10OrdersWithItems" })
+                <!--/ Profit last month -->
             </div>
         </div>
-        <!-- Revenue Report -->
-        @await Component.InvokeAsync("Dashboard", new { dashboardType = "RevenueReport" })
-        <!--/ Revenue Report -->
-        <!-- Earning Reports -->
-        @* @await Component.InvokeAsync("Dashboard", new { dashboardType = "EarningReports" }) *@
-        <!--/ Earning Reports -->
-        <!-- Popular Product -->
-        @await Component.InvokeAsync("Dashboard", new { dashboardType = "PopularProduct" })
-        <!--/ Popular Product -->
-        <!-- Sales by Countries tabs-->
-        @* @await Component.InvokeAsync("Dashboard", new { dashboardType = "SalesbyCountries" }) *@
-        <!--/ Sales by Countries tabs -->
-        <!-- Transactions -->
-        @* @await Component.InvokeAsync("Dashboard", new { dashboardType = "Transactions" }) *@
-        <!--/ Transactions -->
-        <!-- Invoice table -->
-        @await Component.InvokeAsync("Dashboard", new { dashboardType = "InvoiceTable" })
-        <!-- /Invoice table -->
+        <div class="col-12 col-xl-8 mb-4 col-lg-7">
+            <!-- Revenue Report -->
+            @await Component.InvokeAsync("Dashboard", new { dashboardType = "RevenueReport" })
+            <!--/ Revenue Report -->
+            <!-- Popular Product -->
+            @await Component.InvokeAsync("Dashboard", new { dashboardType = "PopularProduct" })
+            <!--/ Popular Product -->
+            <!-- Invoice table -->
+            @await Component.InvokeAsync("Dashboard", new { dashboardType = "InvoiceTable" })
+            <!-- /Invoice table -->
+        </div>
     </div>
 </div>
 
