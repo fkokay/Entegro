@@ -2091,23 +2091,23 @@ namespace Entegro.Web.Controllers
                 var trendyolAttributes = existingTrendyolProduct.attributes;
                 foreach (var item in trendyolAttributes)
                 {
-                    var ifExistSpecificationAttribute = await _specificationAttributeService.ExistsByNameAsync(item.attributeName);
+                    var ifExistSpecificationAttribute = await _specificationAttributeService.ExistsByNameAsync(item.AttributeName);
                     if (!ifExistSpecificationAttribute)
                     {
                         var mappedSpecificationAttribute = new CreateSpecificationAttributeDto
                         {
-                            Name = item.attributeName
+                            Name = item.AttributeName
                         };
                         var createdSpecificationAttribute = await _specificationAttributeService.AddAsync(mappedSpecificationAttribute);
 
-                        var specificationAttributeOption = await _specificationAttributeOptionService.ExistsByNameAsync(item.attributeValue);
+                        var specificationAttributeOption = await _specificationAttributeOptionService.ExistsByNameAsync(item.AttributeValue);
                         if (!specificationAttributeOption)
                         {
                             var createdSpecificationAttributeDtoOption = new CreateSpecificationAttributeOptionDto
                             {
                                 SpecificationAttributeId = createdSpecificationAttribute.Id,
                                 DisplayOrder = 0,
-                                Name = item.attributeValue
+                                Name = item.AttributeValue
                             };
 
                             var createdSpecificationAttributeOption = await _specificationAttributeOptionService.AddAsync(createdSpecificationAttributeDtoOption);
@@ -2122,15 +2122,15 @@ namespace Entegro.Web.Controllers
                     }
                     else
                     {
-                        var specificationAttributeOption = await _specificationAttributeOptionService.ExistsByNameAsync(item.attributeValue);
+                        var specificationAttributeOption = await _specificationAttributeOptionService.ExistsByNameAsync(item.AttributeValue);
                         if (!specificationAttributeOption)
                         {
-                            var specificationAttribute = await _specificationAttributeService.GetByNameAsync(item.attributeName);
+                            var specificationAttribute = await _specificationAttributeService.GetByNameAsync(item.AttributeName);
                             var createdSpecificationAttributeDtoOption = new CreateSpecificationAttributeOptionDto
                             {
                                 SpecificationAttributeId = specificationAttribute.Id,
                                 DisplayOrder = 0,
-                                Name = item.attributeValue
+                                Name = item.AttributeValue
                             };
                             var createdSpecificationAttributeOption = await _specificationAttributeOptionService.AddAsync(createdSpecificationAttributeDtoOption);
 

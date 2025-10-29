@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entegro.Application.DTOs.Marketplace.Trendyol
+﻿namespace Entegro.Application.DTOs.Marketplace.Trendyol
 {
     public class TrendyolCategoryAttributeDto
     {
@@ -14,6 +8,16 @@ namespace Entegro.Application.DTOs.Marketplace.Trendyol
         public bool AllowCustom { get; set; }
         public bool Varianter { get; set; }
         public bool Slicer { get; set; }
+        public bool AllowMultipleAttributeValues { get; set; }
         public List<TrendyolCategoryAttributeValueDto> AttributeValues { get; set; } = new();
+    }
+
+    public class TrendyolVariantDto
+    {
+        public string Barcode { get; set; }
+        public int Quantity { get; set; }
+        public decimal SalePrice { get; set; }
+        public decimal ListPrice { get; set; }
+        public List<TrendyolProductAttributeDto> VariantAttributes { get; set; } = new();
     }
 }

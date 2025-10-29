@@ -396,5 +396,99 @@ namespace Entegro.Application.Services.Marketplace
             var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task<List<TrendyolCategoryAttributeDto>?> GetCategorySlicerAttributesAsync(TrendyolApiContext context, int categoryId)
+        {
+            using var client = CreateHttpClient(context);
+            var url = $"product/product-categories/{categoryId}/attributes";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+
+            var data = JsonSerializer.Deserialize<TrendyolCategoryDto2>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return data?.CategoryAttributes.Where(a => a.Slicer).ToList() ?? new List<TrendyolCategoryAttributeDto>();
+        }
+
+        public async Task<TrendyolVariantDto?> GetProductVariantAsync(TrendyolApiContext context, string barcode)
+        {
+            var product = await GetProductWithBarcodeAsync(context, barcode);
+            if (product == null)
+                return null;
+
+            var slicers = await GetCategorySlicerAttributesAsync(context, product.pimCategoryId);// Kategorinin slicer attribute’larını çek
+
+            if (slicers.Any())
+            {
+                var products = await GetProductsByProductMainIdAsync(context, product.productMainId);
+
+                foreach (var slicer in slicers)
+                {
+                    foreach (var item in products)
+                    {
+                        var attirbutes = item.attributes.Where(m => m.AttributeId == slicer.Attribute.Id).ToList();
+                    }
+
+                }
+
+                var variantAttributes = products.Where(a => slicers.Any(s => s.Attribute.Id == 1)).ToList();
+
+                var variant = new TrendyolVariantDto
+                {
+                    Barcode = product.barcode,
+                    Quantity = product.quantity,
+                    SalePrice = product.salePrice,
+                    ListPrice = product.listPrice,
+                };
+
+                return variant;
+            }
+
+
+            return new TrendyolVariantDto();
+        }
+
+        public async Task<IEnumerable<TrendyolProductDto>> GetProductsByProductMainIdAsync(TrendyolApiContext context, string productMainId)
+        {
+            using var client = CreateHttpClient(context);
+            var allProducts = new List<TrendyolProductDto>();
+            bool moreData = true;
+            int page = 0;
+            int pageSize = 50;
+
+            while (moreData)
+            {
+
+                var url = $"product/sellers/{context.SupplierId}/products?productMainId={productMainId}&size={pageSize}&page={page}";
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<TrendyolResponse<TrendyolProductDto>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (data?.content == null || !data.content.Any())
+                {
+                    break;
+                }
+
+                allProducts.AddRange(data.content);
+
+                page += 1;
+
+                if (page >= data.totalPages)
+                {
+                    moreData = false;
+                }
+            }
+
+            return allProducts;
+        }
+
     }
 }

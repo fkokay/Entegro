@@ -454,7 +454,19 @@ namespace Entegro.Api.Jobs
                 var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
 
 
-                // var returnOrders = await _trendyol.GetReturnsAsync(context);
+                var barcode = "9680207022367";
+                var variant = await _trendyol.GetProductVariantAsync(context, barcode);
+
+                if (variant != null)
+                {
+                    Console.WriteLine($"Barcode: {variant.Barcode}");
+                    Console.WriteLine($"Price: {variant.SalePrice}, Stock: {variant.Quantity}");
+
+                    foreach (var attr in variant.VariantAttributes)
+                    {
+                        Console.WriteLine($"{attr.AttributeName}: {attr.AttributeValue}");
+                    }
+                }
 
                 foreach (var order in orders)
                 {

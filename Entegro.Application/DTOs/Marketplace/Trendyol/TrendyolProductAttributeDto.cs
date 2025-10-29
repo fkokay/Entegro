@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entegro.Application.DTOs.Marketplace.Trendyol
+﻿namespace Entegro.Application.DTOs.Marketplace.Trendyol
 {
     public class TrendyolProductAttributeDto
     {
-        public int attributeId { get; set; }
-        public string attributeName { get; set; }
-        public int? attributeValueId { get; set; }
-        public string attributeValue { get; set; }
+        public int AttributeId { get; set; }
+        public string AttributeName { get; set; }
+        public int? AttributeValueId { get; set; }
+        public string AttributeValue { get; set; }
     }
 }
