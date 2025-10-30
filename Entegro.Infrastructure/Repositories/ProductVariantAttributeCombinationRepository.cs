@@ -26,6 +26,11 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsAsync(int productId, string gtin)
+        {
+            return await _context.ProductVariantAttributeCombinations.AnyAsync(o => o.ProductId == productId && o.Gtin == gtin);
+        }
+
         public async Task<List<ProductVariantAttributeCombination>> GetAllAsync()
         {
             return await _context.ProductVariantAttributeCombinations.ToListAsync();
@@ -53,7 +58,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductVariantAttributeCombination?> GetByIdAsync(int id)
         {
-            return await _context.ProductVariantAttributeCombinations.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductVariantAttributeCombinations.AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<List<ProductVariantAttributeCombination>> GetByProductIdAsync(int productId)

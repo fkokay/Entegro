@@ -10,6 +10,7 @@
         public decimal? Price { get; set; }
         public int? StockQuantity { get; set; }
         public string RawAttribute { get; set; }
+        public string? AssignedMediaFileIds { get; set; }
 
     }
 }

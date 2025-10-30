@@ -350,7 +350,7 @@ Entegro.product.list = (function ($) {
                        </div>
                        <div class="d-flex flex-column">
                          <h6 class="mb-0">${row.Name}</h6>
-                         <small class="text-truncate">${row.Code || ""}</small>
+                         <small class="text-truncate">${row.Gtin ? `Model Kodu: ${row.Gtin}` : `Barkod: ${row.Code || ""}`}</small>
                          <small class="text-truncate">${row.Brand?.Name || ""}</small>
                        </div>
                      </div>`;

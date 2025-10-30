@@ -3,6 +3,14 @@ using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.CategoryAttribute;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
+using Entegro.Application.DTOs.OrderItem;
+using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.DTOs.ProductAttributeValue;
+using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Application.DTOs.ProductVariantAttribute;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Services.Base;
@@ -10,9 +18,11 @@ using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using ProductVariantAttributeDto = Entegro.Application.DTOs.Marketplace.Trendyol.ProductVariantAttributeDto;
 
 namespace Entegro.Application.Services.Marketplace
 {
@@ -24,14 +34,29 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly INotificationService _notificationService;
         private readonly ILogger<TrendyolService> _logger;
-
+        private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
+        private readonly IProductVariantAttributeService _productVariantAttributeService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeValueService _productAttributeValueService;
+        private readonly ISettingService _settingService;
+        private readonly IOrderItemService _orderItemService;
+        private readonly IProductMediaFileMappingService _productMediaFileMappingService;
+        private readonly ConcurrentDictionary<string, int> _attributeCache = new();
+        private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
         public TrendyolService(
             IHttpClientFactory httpClientFactory,
             IProductIntegrationService productIntegrationService,
             IProductService productService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             INotificationService notificationService,
-            ILogger<TrendyolService> logger)
+            ILogger<TrendyolService> logger,
+            IProductVariantAttributeValueService productVariantAttributeValueService,
+            IProductVariantAttributeService productVariantAttributeService,
+            IProductAttributeService productAttributeService,
+            IProductAttributeValueService productAttributeValueService,
+            ISettingService settingService,
+            IProductMediaFileMappingService productMediaFileMappingService,
+            IOrderItemService orderItemService)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
@@ -39,6 +64,13 @@ namespace Entegro.Application.Services.Marketplace
             _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
             _notificationService = notificationService;
             _logger = logger;
+            _productVariantAttributeValueService = productVariantAttributeValueService;
+            _productVariantAttributeService = productVariantAttributeService;
+            _productAttributeService = productAttributeService;
+            _productAttributeValueService = productAttributeValueService;
+            _settingService = settingService;
+            _productMediaFileMappingService = productMediaFileMappingService;
+            _orderItemService = orderItemService;
         }
 
 
@@ -413,42 +445,62 @@ namespace Entegro.Application.Services.Marketplace
             return data?.CategoryAttributes.Where(a => a.Slicer).ToList() ?? new List<TrendyolCategoryAttributeDto>();
         }
 
-        public async Task<TrendyolVariantDto?> GetProductVariantAsync(TrendyolApiContext context, string barcode)
+        public async Task<VariantProcessStatusDto> GetProductVariantAsync(TrendyolApiContext context, string barcode, int integrationSystemId)
         {
+
+            bool isSlicer = await IsSlicerProductAsync(context, barcode);
+            if (!isSlicer)
+            {
+                return new VariantProcessStatusDto
+                {
+                    HasSlicer = false,
+                    Message = "Slicer bulunamadı",
+                    AddedCount = 0
+                };
+            }
+
+
             var product = await GetProductWithBarcodeAsync(context, barcode);
+            List<TrendyolProductAttributeDto> attirbutes = new();
             if (product == null)
                 return null;
 
             var slicers = await GetCategorySlicerAttributesAsync(context, product.pimCategoryId);// Kategorinin slicer attribute’larını çek
-
-            if (slicers.Any())
+            var products = await GetProductsByProductMainIdAsync(context, product.productMainId);
+            var dbProduct = await _productService.GetProductByBarcodeAsync(barcode);
+            int addedCount = 0;
+            foreach (var slicer in slicers)
             {
-                var products = await GetProductsByProductMainIdAsync(context, product.productMainId);
-
-                foreach (var slicer in slicers)
+                foreach (var item in products)
                 {
-                    foreach (var item in products)
+                    var matchedAttributes = item.attributes
+                        .Where(m => m.AttributeId == slicer.Attribute.Id)
+                        .ToList();
+
+                    foreach (var attribute in matchedAttributes)
                     {
-                        var attirbutes = item.attributes.Where(m => m.AttributeId == slicer.Attribute.Id).ToList();
+                        await AddVariantAttributeAsync(
+                            dbProduct.Id,
+                            attribute.AttributeName,
+                            attribute.AttributeValue,
+                            dbProduct,
+                            item,
+                            integrationSystemId
+                        );
+
+                        addedCount++;
                     }
-
                 }
-
-                var variantAttributes = products.Where(a => slicers.Any(s => s.Attribute.Id == 1)).ToList();
-
-                var variant = new TrendyolVariantDto
-                {
-                    Barcode = product.barcode,
-                    Quantity = product.quantity,
-                    SalePrice = product.salePrice,
-                    ListPrice = product.listPrice,
-                };
-
-                return variant;
             }
 
-
-            return new TrendyolVariantDto();
+            return new VariantProcessStatusDto
+            {
+                HasSlicer = true,
+                Message = addedCount > 0
+                    ? $"{addedCount} kombinasyon başarıyla eklendi."
+                    : "Slicer bulundu fakat kombinasyon eklenmedi.",
+                AddedCount = addedCount
+            };
         }
 
         public async Task<IEnumerable<TrendyolProductDto>> GetProductsByProductMainIdAsync(TrendyolApiContext context, string productMainId)
@@ -489,6 +541,262 @@ namespace Entegro.Application.Services.Marketplace
 
             return allProducts;
         }
+        private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, ProductDto? product, TrendyolProductDto trendyolProduct, int integrationSystemId)
+        {
+            List<ProductVariantAttributeDto> variantAttributes = new List<ProductVariantAttributeDto>();
+            List<int> mediaFiles = new List<int>();
+            List<int> mediaFileMappingIds = new List<int>();
 
+            if (string.IsNullOrEmpty(attributeName) || string.IsNullOrEmpty(attributeValue)) return;
+
+            int attrId = await EnsureProductAttributeAsync(attributeName);
+            int attrValueId = await EnsureProductAttributeValueAsync(attrId, attributeValue);
+            var existingVariant = await _productVariantAttributeService.GetByAttibuteIdAsync(productId, attrId);
+            int variantId = existingVariant?.Id ?? (await _productVariantAttributeService.AddAsync(new CreateProductVariantAttributeDto
+            {
+                ProductId = productId,
+                ProductAttributeId = attrId,
+                DisplayOrder = 0,
+                AttributeControlTypeId = 0
+            })).Id;
+
+            var existingVariantValue = await _productVariantAttributeValueService.GetByNameAsync(variantId, attributeValue);
+            int variantValueId = existingVariantValue?.Id ?? (await _productVariantAttributeValueService.AddAsync(new CreateProductVariantAttributeValueDto()
+            {
+                Name = attributeValue,
+                ProductVariantAttributeId = variantId
+            })).Id;
+
+            variantAttributes.Add(new ProductVariantAttributeDto
+            {
+                ProductVariantAttributeId = variantId,
+                ProductVariantAttributeValueId = variantValueId
+            });
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = null,
+                WriteIndented = false
+            };
+
+            string rawAttributeJson = JsonSerializer.Serialize(variantAttributes, jsonOptions);
+            var existingCombination = await _productVariantAttributeCombinationService.ExistsAsync(product.Id, trendyolProduct.barcode);
+
+
+
+            #region product image upload
+            var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+            if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+            {
+                Console.WriteLine("Sistem URL'si ayarlanmamış.");
+            }
+            if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+            {
+                Console.WriteLine("hata");
+            }
+
+            using var httpClient = new HttpClient
+            {
+                BaseAddress = baseUri
+            };
+
+            try
+            {
+                var images = trendyolProduct.images.Select(m => m.url).ToList();
+                mediaFiles = await UploadImagesAsync(images, httpClient);
+                foreach (var item in mediaFiles)
+                {
+                    CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                    createProductMediaFile.MediaFileId = item;
+                    createProductMediaFile.ProductId = product.Id;
+                    var created = await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                    mediaFileMappingIds.Add(created.Id);
+                }
+
+                if (!existingCombination)
+                {
+                    var createProductVariantAttributeCombinationDto = new CreateProductVariantAttributeCombinationDto
+                    {
+                        ProductId = product.Id,
+                        StokCode = trendyolProduct.stockCode,
+                        StockQuantity = trendyolProduct.quantity,
+                        Gtin = trendyolProduct.barcode,
+                        Price = trendyolProduct.salePrice,
+                        RawAttribute = rawAttributeJson,
+                        AssignedMediaFileIds = string.Join(",", mediaFileMappingIds)
+                    };
+                    var productVariantAttributeCombination = await _productVariantAttributeCombinationService.AddAsync(createProductVariantAttributeCombinationDto);
+
+                    var systemId = integrationSystemId;
+                    var barcode = trendyolProduct.barcode;
+                    if (systemId > 0)
+                    {
+                        var model = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(systemId, barcode);
+                        var add = new DTOs.ProductIntegration.CreateProductIntegrationDto
+                        {
+                            IntegrationSystemId = systemId,
+                            ProductId = product.Id,
+                            ProductVariantAttributeCombinationId = productVariantAttributeCombination.Id,
+                            IntegrationCode = barcode,
+                            Price = trendyolProduct.salePrice
+                        };
+                        await _productIntegrationService.AddAsync(add);
+
+                    }
+
+                    var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(barcode);
+                    foreach (var orderItem in orderItems)
+                    {
+                        UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                        updateOrderItem.Id = orderItem.Id;
+                        updateOrderItem.Sku = product.Code;
+                        updateOrderItem.ProductId = product.Id;
+                        updateOrderItem.ProductCost = orderItem.ProductCost;
+                        updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                        updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                        updateOrderItem.Quantity = orderItem.Quantity;
+                        updateOrderItem.Price = orderItem.Price;
+                        updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                        updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                        updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                        updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                        updateOrderItem.OrderId = orderItem.OrderId;
+                        updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+                        updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                        updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
+                        await _orderItemService.UpdateAsync(updateOrderItem);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            #endregion
+
+
+        }
+        private async Task<int> EnsureProductAttributeAsync(string name)
+        {
+            if (_attributeCache.TryGetValue(name, out int id)) return id;
+
+            var productAttribute = await _productAttributeService.GetByNameAsync(name);
+            if (productAttribute is null)
+            {
+                var created = await _productAttributeService.AddAsync(new CreateProductAttributeDto
+                {
+                    Name = name,
+                    Description = "",
+                    DisplayOrder = 0
+                });
+
+                _attributeCache.TryAdd(name, created.Id);
+                return created.Id;
+            }
+
+            _attributeCache.TryAdd(name, productAttribute.Id);
+            return productAttribute.Id;
+        }
+        private async Task<int> EnsureProductAttributeValueAsync(int attributeId, string value)
+        {
+            if (_attributeValueCache.TryGetValue((attributeId, value), out int id)) return id;
+
+            var created = await _productAttributeValueService.AddAsync(new CreateProductAttributeValueDto
+            {
+                Name = value,
+                DisplayOrder = 0,
+                ProductAttributeId = attributeId
+            });
+
+            _attributeValueCache.TryAdd((attributeId, value), created.Id);
+            return created.Id;
+        }
+
+        public async Task<bool> IsSlicerProductAsync(TrendyolApiContext context, string barcode)
+        {
+            var product = await GetProductWithBarcodeAsync(context, barcode);
+            var slicers = await GetCategorySlicerAttributesAsync(context, product.pimCategoryId);// Kategorinin slicer attribute’larını çek
+            if (slicers == null || !slicers.Any())
+                return false;
+            return true;
+        }
+
+
+        public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
+        {
+            List<int> fileIds = new();
+
+            if (imageUrls != null && imageUrls.Any())
+            {
+                var multipartContent = new MultipartFormDataContent();
+                multipartContent.Add(new StringContent("catalog"), "path");
+                multipartContent.Add(new StringContent("False"), "isTransient");
+
+                foreach (var imageUrl in imageUrls)
+                {
+                    try
+                    {
+                        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+                        var imageName = Path.GetFileName(imageUrl);
+
+                        if (string.IsNullOrWhiteSpace(imageName))
+                            imageName = "default.jpg";
+
+                        var nameWithoutExtension = Path.GetFileNameWithoutExtension(imageName);
+                        var extension = Path.GetExtension(imageName);
+                        var uniqueSuffix = $"trendyol_{Guid.NewGuid():N}";
+                        imageName = $"{nameWithoutExtension}_{uniqueSuffix}{extension}";
+
+                        var byteContent = new ByteArrayContent(imageBytes);
+                        byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+                        multipartContent.Add(byteContent, "upload-file", imageName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"HATA (indirilemedi): {imageUrl} → {ex.Message}");
+                    }
+                }
+
+
+                var uploadUrl = "media/upload";
+                var response = await httpClient.PostAsync(uploadUrl, multipartContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    using var document = JsonDocument.Parse(result);
+                    var root = document.RootElement;
+
+                    if (root.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var item in root.EnumerateArray())
+                        {
+                            if (item.TryGetProperty("id", out var idProp))
+                            {
+                                int imageId = idProp.GetInt32();
+                                fileIds.Add(imageId);
+                                Console.WriteLine($"id: {imageId}");
+                            }
+                        }
+                    }
+                    else if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        if (root.TryGetProperty("id", out var idProp))
+                        {
+                            int imageId = idProp.GetInt32();
+                            fileIds.Add(imageId);
+                            Console.WriteLine($"id: {imageId}");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Resim yükleme başarısız oldu. Durum kodu:" + response.StatusCode);
+                }
+            }
+
+            return fileIds;
+        }
     }
 }

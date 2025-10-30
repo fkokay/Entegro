@@ -20,4 +20,11 @@
         public decimal ListPrice { get; set; }
         public List<TrendyolProductAttributeDto> VariantAttributes { get; set; } = new();
     }
+
+    public class VariantProcessStatusDto
+    {
+        public bool HasSlicer { get; set; }
+        public string Message { get; set; } = "";
+        public int AddedCount { get; set; }
+    }
 }

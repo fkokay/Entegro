@@ -102,12 +102,13 @@ namespace Entegro.Infrastructure.Repositories
         private IQueryable<Product> IncludeAllProperties(IQueryable<Product> query)
         {
             return query
-                .Include(x => x.Brand).AsNoTracking()
-                .Include(x => x.ProductMediaFiles).ThenInclude(pm => pm.MediaFile).ThenInclude(x => x.Folder)
-                .Include(x => x.ProductCategories).ThenInclude(pc => pc.Category)
-                .Include(x => x.ProductVariantAttributes).ThenInclude(pi => pi.ProductVariantAttributeValues)
-                .Include(x => x.ProductVariantAttributeCombinations)
-                .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters).AsNoTracking();
+          .Include(x => x.Brand)
+          .Include(x => x.ProductMediaFiles).ThenInclude(pm => pm.MediaFile).ThenInclude(x => x.Folder)
+          .Include(x => x.ProductCategories).ThenInclude(pc => pc.Category)
+          .Include(x => x.ProductVariantAttributes).ThenInclude(pi => pi.ProductVariantAttributeValues)
+          .Include(x => x.ProductVariantAttributeCombinations)
+          .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters)
+          .AsNoTracking();
         }
 
         public async Task<Application.DTOs.Common.PagedResult<Product>> GetPagedAsync(GridCommand gridCommand)
@@ -245,8 +246,9 @@ namespace Entegro.Infrastructure.Repositories
             if (topProducts.Any())
             {
                 var query = IncludeAllProperties(_context.Products.AsNoTracking());
-                return await query.Where(p => topProducts.Contains(p.Id))
-                                     .ToListAsync();
+                return new List<Product>(0);
+                //return await query.Where(p => topProducts.Contains(p.Id))
+                //                     .ToListAsync();
             }
 
             return new List<Product>();

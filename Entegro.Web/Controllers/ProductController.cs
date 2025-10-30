@@ -39,6 +39,7 @@ using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using System.Net;
 using System.Text.Json;
+using ProductVariantAttributeDto = Entegro.Application.DTOs.ProductVariantAttribute.ProductVariantAttributeDto;
 namespace Entegro.Web.Controllers
 {
     [Authorize]
@@ -2024,67 +2025,103 @@ namespace Entegro.Web.Controllers
                 var createProduct = _mapper.Map<CreateProductDto>(mappedProduct);
                 createProduct.Published = true;
                 createProduct.Currency = "TL";
+
+                var isSlicer = await _trenyolService.IsSlicerProductAsync(context, mappedProduct.Barcode);
+                if (isSlicer)
+                    createProduct.Gtin = existingTrendyolProduct.productMainId;
+
                 var product = await _productService.AddAsync(createProduct);
                 #endregion
 
-                #region product integration 
-                var productIntegration2 = new CreateProductIntegrationDto
-                {
-                    ProductId = product.Id,
-                    IntegrationSystemId = model.IntegrationSystemId,
-                    Active = true,
-                    Price = createProduct.Price,
-                    IntegrationCode = product.Code,
 
-                };
 
-                var ifExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, productIntegration2.IntegrationCode);
-                if (ifExistingProductIntegration != null)
+                if (!isSlicer)
                 {
-                    return Json(new
+                    #region product image upload
+                    var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                    if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
                     {
-                        success = false,
-                        message = "Ürün zaten Trendyol ile eşleştirilmiş.",
-                        code = productIntegration2.IntegrationCode
-                    });
-                }
-                await _productIntegrationService.AddAsync(productIntegration2);
-                #endregion
-
-                #region product image upload
-                var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
-                if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
-                {
-                    Console.WriteLine("Sistem URL'si ayarlanmamış.");
-                }
-                if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
-                {
-                    Console.WriteLine("hata");
-                }
-
-                using var httpClient = new HttpClient
-                {
-                    BaseAddress = baseUri
-                };
-
-                try
-                {
-                    var images = existingTrendyolProduct.images.Select(image => image.url).ToList();
-                    List<int> mediaFiles = await UploadImagesAsync(images, httpClient);
-                    foreach (var item in mediaFiles)
-                    {
-                        CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
-                        createProductMediaFile.MediaFileId = item;
-                        createProductMediaFile.ProductId = product.Id;
-
-                        await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                        Console.WriteLine("Sistem URL'si ayarlanmamış.");
                     }
+                    if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                    {
+                        Console.WriteLine("hata");
+                    }
+
+                    using var httpClient = new HttpClient
+                    {
+                        BaseAddress = baseUri
+                    };
+
+                    try
+                    {
+                        var images = existingTrendyolProduct.images.Select(image => image.url).ToList();
+                        List<int> mediaFiles = await UploadImagesAsync(images, httpClient);
+                        foreach (var item in mediaFiles)
+                        {
+                            CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                            createProductMediaFile.MediaFileId = item;
+                            createProductMediaFile.ProductId = product.Id;
+
+                            await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    #endregion
+
+                    #region product integration 
+                    var productIntegration2 = new CreateProductIntegrationDto
+                    {
+                        ProductId = product.Id,
+                        IntegrationSystemId = model.IntegrationSystemId,
+                        Active = true,
+                        Price = createProduct.Price,
+                        IntegrationCode = product.Code,
+
+                    };
+
+                    var ifExistingProductIntegration = await _productIntegrationService.GetByIntegrationSystemAndCodeAsync(model.IntegrationSystemId, productIntegration2.IntegrationCode);
+                    if (ifExistingProductIntegration != null)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Ürün zaten Trendyol ile eşleştirilmiş.",
+                            code = productIntegration2.IntegrationCode
+                        });
+                    }
+                    await _productIntegrationService.AddAsync(productIntegration2);
+                    #endregion
+
+                    #region orderitem update
+                    var orderItems2 = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration2.IntegrationCode);
+                    foreach (var orderItem in orderItems2)
+                    {
+                        UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                        updateOrderItem.Id = orderItem.Id;
+                        updateOrderItem.Sku = product.Code;
+                        updateOrderItem.ProductId = product.Id;
+                        updateOrderItem.ProductCost = orderItem.ProductCost;
+                        updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                        updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                        updateOrderItem.Quantity = orderItem.Quantity;
+                        updateOrderItem.Price = orderItem.Price;
+                        updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                        updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                        updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                        updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                        updateOrderItem.OrderId = orderItem.OrderId;
+                        updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+                        updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                        updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
+                        await _orderItemService.UpdateAsync(updateOrderItem);
+                    }
+                    #endregion
+
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                #endregion
 
                 #region product specification attribute
 
@@ -2145,29 +2182,12 @@ namespace Entegro.Web.Controllers
                 }
                 #endregion
 
-                #region orderitem update
-                var orderItems2 = await _orderItemService.GetAllWithIntegrationSkuAsync(productIntegration2.IntegrationCode);
-                foreach (var orderItem in orderItems2)
-                {
-                    UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
-                    updateOrderItem.Id = orderItem.Id;
-                    updateOrderItem.Sku = product.Code;
-                    updateOrderItem.ProductId = product.Id;
-                    updateOrderItem.ProductCost = orderItem.ProductCost;
-                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
-                    updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
-                    updateOrderItem.Quantity = orderItem.Quantity;
-                    updateOrderItem.Price = orderItem.Price;
-                    updateOrderItem.UnitPrice = orderItem.UnitPrice;
-                    updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
-                    updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
-                    updateOrderItem.ItemWeight = orderItem.ItemWeight;
-                    updateOrderItem.OrderId = orderItem.OrderId;
-                    updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
-                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
-                    updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
-                    await _orderItemService.UpdateAsync(updateOrderItem);
-                }
+
+
+
+                #region variant create
+                if (isSlicer)
+                    await _trenyolService.GetProductVariantAsync(context, mappedProduct.Barcode, model.IntegrationSystemId);
                 #endregion
 
                 return Json(new

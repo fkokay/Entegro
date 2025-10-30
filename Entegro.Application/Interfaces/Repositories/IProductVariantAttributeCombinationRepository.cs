@@ -5,6 +5,7 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IProductVariantAttributeCombinationRepository
     {
+        Task<bool> ExistsAsync(int productId, string gtin);
         Task<ProductVariantAttributeCombination?> GetByIdAsync(int id);
         Task<List<ProductVariantAttributeCombination>> GetByProductIdAsync(int productId);
         Task<List<ProductVariantAttributeCombination>> GetAllAsync();

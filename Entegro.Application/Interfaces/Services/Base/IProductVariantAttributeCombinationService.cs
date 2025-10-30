@@ -5,6 +5,7 @@ namespace Entegro.Application.Interfaces.Services.Base
 {
     public interface IProductVariantAttributeCombinationService
     {
+        Task<bool> ExistsAsync(int productId, string gtin);
         Task<ProductVariantAttributeCombinationDto?> GetByIdAsync(int id);
         Task<List<ProductVariantAttributeCombinationDto>> GetByProductIdAsync(int productId);
         Task<List<ProductVariantAttributeCombinationDto>> GetAllAsync();
