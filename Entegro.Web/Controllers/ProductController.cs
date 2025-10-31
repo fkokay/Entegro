@@ -1235,7 +1235,7 @@ namespace Entegro.Web.Controllers
                     ApiPassword = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ApiPassword")?.Value ?? "",
                 };
 
-                var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
+                var existingProductIntegration = await _productIntegrationService.GetByProductIdandProductIntegrationIdAsync(model.ProductId, model.ProductIntegrationId);
                 var existingTrendyolProduct = await _trenyolService.GetProductWithBarcodeAsync(context, existingProductIntegration.IntegrationCode);
 
                 var createModel = new TrendyolProductIntegrationModel

@@ -9,6 +9,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ProductIntegrationDto?> GetByIntegrationSystemAndCodeAsync(int integrationSystemId, string integrationCode);
         Task<ProductIntegrationDto?> GetByProductAndIntegrationSystemAsync(int productId, int integrationSystemId);
         Task<ProductIntegrationDto?> GetByProductAndIntegrationSystemAsync(int productId, int integrationSystemId, int productVariantAttributeCombinationId);
+        Task<ProductIntegrationDto?> GetByProductIdandProductIntegrationIdAsync(int productId, int integrationId);
         Task<ProductIntegrationDto?> GetByIntegrationCodeAsync(string productIntegrationCode);
         Task<IEnumerable<ProductIntegrationDto>> GetProductIntegrationAsync();
         Task<IEnumerable<ProductIntegrationDto>> GetProductIntegrationAllWithProductIdAsync(int productId);

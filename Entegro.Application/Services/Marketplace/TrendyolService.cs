@@ -18,10 +18,12 @@ using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 using ProductVariantAttributeDto = Entegro.Application.DTOs.Marketplace.Trendyol.ProductVariantAttributeDto;
 
 namespace Entegro.Application.Services.Marketplace
@@ -646,6 +648,39 @@ namespace Entegro.Application.Services.Marketplace
                     var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(barcode);
                     foreach (var orderItem in orderItems)
                     {
+
+                        var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.IntegrationSku);
+                        var attributeCombination = productIntegration?.ProductVariantAttributeCombinationId != null
+                            ? await _productVariantAttributeCombinationService
+                                .GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value)
+                            : null;
+
+                        string attributeDescription = "";
+
+                        if (attributeCombination != null && !string.IsNullOrEmpty(attributeCombination.RawAttribute))
+                        {
+                            var rawAttributes = JsonConvert.DeserializeObject<List<Dictionary<string, int>>>(attributeCombination.RawAttribute);
+
+                            foreach (var raw in rawAttributes)
+                            {
+                                if (raw.TryGetValue("ProductVariantAttributeId", out var attributeId) &&
+                                    raw.TryGetValue("ProductVariantAttributeValueId", out var valueId))
+                                {
+                                    var attribute = await _productVariantAttributeService.GetByIdAsync(attributeId);
+                                    var attributeValue2 = await _productVariantAttributeValueService.GetByIdAsync(valueId);
+
+                                    var attributeName2 = attribute?.ProductAttribute?.Name;
+                                    var attributeValueName2 = attributeValue2?.Name;
+
+                                    if (!string.IsNullOrEmpty(attributeName2) && !string.IsNullOrEmpty(attributeValueName2))
+                                    {
+                                        attributeDescription += $"{attributeName2}: {attributeValueName2} | ";
+                                    }
+                                }
+                            }
+                        }
+
+
                         UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
                         updateOrderItem.Id = orderItem.Id;
                         updateOrderItem.Sku = product.Code;
@@ -661,8 +696,10 @@ namespace Entegro.Application.Services.Marketplace
                         updateOrderItem.ItemWeight = orderItem.ItemWeight;
                         updateOrderItem.OrderId = orderItem.OrderId;
                         updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
-                        updateOrderItem.AttributesXml = orderItem.AttributesXml;
-                        updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
+                        updateOrderItem.AttributesXml = attributeCombination?.RawAttribute;
+                        updateOrderItem.AttributesDescription = !string.IsNullOrEmpty(attributeDescription)
+                        ? attributeDescription.TrimEnd(' ', '|')
+                        : orderItem.AttributesDescription;
                         await _orderItemService.UpdateAsync(updateOrderItem);
                     }
                 }

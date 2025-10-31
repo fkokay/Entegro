@@ -571,19 +571,22 @@ Entegro.product.list = (function ($) {
 
                 if (row.data().ProductIntegrations?.length) {
                     row.data().ProductIntegrations.forEach(pi => {
-                        var typeValue = "";
+                        let typeValue = "";
                         switch (pi.IntegrationSystem.IntegrationSystemType) {
                             //Commerce
                             case 2:
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "CommerceType")?.Value;
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters
+                                    ?.find(x => x.Key === "CommerceType")?.Value;
                                 break;
                             //Marketplace
                             case 3:
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key == "MarketplaceType")?.Value;
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters
+                                    ?.find(x => x.Key === "MarketplaceType")?.Value;
                                 break;
                         }
 
                         let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
+
 
                         let variantName = "";
                         if (pi.IntegrationSystem.IntegrationSystemType === 3 && pi.ProductVariantAttributeCombinationId) {
@@ -607,65 +610,66 @@ Entegro.product.list = (function ($) {
                             }
                         }
 
-
-                        let quantity = "";
-                        if (salesData && row.data().Code) {
-                            let match = salesData.find(x => x.Barcode === row.data().Code);
-                           
+                        
+                        let quantityHtml = "";
+                        if (salesData && pi.IntegrationCode) {
+                            let match = salesData.find(x => x.IntegrationSku === pi.IntegrationCode);
                             if (match) {
-                                quantity = `
-                                <span class="fw-bold text-black">
-                                   ${match.TotalQuantity}
-                                </span>`;
+                                quantityHtml = `
+                            <span class="fw-bold text-black">
+                                ${match.TotalQuantity}
+                            </span>`;
                             }
-
                         }
 
-                        integrationHtml += `
-                      <div class="col-2 mb-2">
-                          <div class="d-flex align-items-center product-integration">
-                              <div class="product-integration-image">
-                                  
-                                  <div class="me-5 position-relative">
-                                       <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
-                                       <span style="background: #fff; font-size: 12px;
-                                              width: 20px; height: 20px; border-radius: 50%;
-                                              text-align: center; line-height: 24px;
-                                              display: block; left: -10px; top: -10px;
-                                              position: absolute; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-                                              ${quantity}
-                                        </span>
-                                    </div>
 
-                              </div>
-                              <div class="product-integration-info">
-                                  <div class="d-flex flex-column">
-                                      <span class="integration-name"
-                                          data-product-id="${row.data().Id}"
-                                          data-product-integration-id="${pi.Id}"
-                                          data-integration-system-id="${pi.IntegrationSystem.Id}">
-                                          ${pi.IntegrationSystem.Name}
-                                      </span>
-                                      ${variantName
-                                ? `<b class="text-muted">${variantName}</b>`
-                                : ""}
-                              </div>
-                                  <span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>
-                              </div>
-                          
-                              <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
-                                  Satışta 
-                              </span>
-                          </div>
-                      </div>`;
+                        integrationHtml += `
+                    <div class="col-2 mb-2">
+                        <div class="d-flex align-items-center product-integration">
+                            <div class="product-integration-image">
+                                <div class="me-5 position-relative">
+                                    <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                    ${quantityHtml
+                                ? `<span style="background: #fff; font-size: 12px;
+                                                width: 20px; height: 20px; border-radius: 50%;
+                                                text-align: center; line-height: 24px;
+                                                display: block; left: -10px; top: -10px;
+                                                position: absolute; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                                                ${quantityHtml}
+                                           </span>`
+                                : ""
+                            }
+                                </div>
+                            </div>
+                            <div class="product-integration-info">
+                                <div class="d-flex flex-column">
+                                    <span class="integration-name"
+                                        data-product-id="${row.data().Id}"
+                                        data-product-integration-id="${pi.Id}"
+                                        data-integration-system-id="${pi.IntegrationSystem.Id}">
+                                        ${pi.IntegrationSystem.Name}
+                                    </span>
+                                    ${variantName ? `<b class="text-muted">${variantName}</b>` : ""}
+                                </div>
+                                <span class="price">
+                                    ${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
+                                </span>
+                            </div>
+                            <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
+                                Satışta 
+                            </span>
+                        </div>
+                    </div>`;
                     });
                 }
 
+               
                 if (!row.child.isShown()) {
                     row.child('<div class="row">' + integrationHtml + '</div>').show();
                 }
             });
         });
+
 
 
 

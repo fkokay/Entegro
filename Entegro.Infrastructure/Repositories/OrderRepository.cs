@@ -408,21 +408,28 @@ namespace Entegro.Infrastructure.Repositories
                     isp => isp.IntegrationSystemId,
                     (x, isp) => new { x.o, x.oi, x.p, isp })
                 .Where(x => x.isp.Key == "CommerceType" || x.isp.Key == "MarketplaceType")
-                .GroupBy(g => new { g.isp.Value, g.p.Id, g.p.Name, g.p.Barcode })
+                .GroupBy(g => new
+                {
+                    g.isp.Value,
+                    g.oi.IntegrationSku
+                })
                 .OrderBy(g => g.Key.Value)
                 .ThenByDescending(g => g.Sum(x => x.oi.Quantity))
                 .Select(g => new StoreProductSalesDto
                 {
                     StoreName = g.Key.Value,
-                    ProductId = g.Key.Id,
-                    ProductName = g.Key.Name,
-                    Barcode = g.Key.Barcode,
+                    IntegrationSku = g.Key.IntegrationSku,
+                    IntegrationProductName = g.Max(x => x.oi.IntegrationProductName),
+                    ProductId = g.Max(x => x.p.Id),
+                    ProductName = g.Max(x => x.p.Name),
+                    Barcode = g.Max(x => x.p.Barcode),
                     TotalQuantity = g.Sum(x => x.oi.Quantity)
                 })
                 .ToListAsync();
 
             return query;
         }
+
 
         public async Task<decimal> GetTotalSalesAsync()
         {

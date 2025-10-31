@@ -69,7 +69,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<ProductVariantAttribute?> GetByIdAsync(int id)
         {
-            return await _context.ProductVariantAttributes.FirstOrDefaultAsync(o => o.Id == id);
+            return await _context.ProductVariantAttributes.Include(p => p.ProductAttribute).FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<Application.DTOs.Common.PagedResult<ProductVariantAttribute>> GetPagedAsync(GridCommand gridCommand, int productId)

@@ -113,7 +113,7 @@ namespace Entegro.Infrastructure.Repositories
                          .ThenInclude(pa => pa.ProductAttributeValues)
              .Include(pi => pi.Product)
                  .ThenInclude(p => p.ProductVariantAttributeCombinations)
-             .AsNoTracking()
+             .AsNoTracking().AsSplitQuery()
              .FirstOrDefaultAsync(pi => pi.Id == id);
 
             return entity;
@@ -148,6 +148,12 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.ProductIntegrations.Include(c => c.Product).AsNoTracking()
                .FirstOrDefaultAsync(t => t.ProductId == productId && t.IntegrationSystemId == integrationSystemId && t.ProductVariantAttributeCombinationId == productVariantAttributeCombinationId);
+        }
+
+        public async Task<ProductIntegration?> GetByProductIdandProductIntegrationIdAsync(int productId, int integrationId)
+        {
+            return await _context.ProductIntegrations.Include(c => c.Product).AsNoTracking()
+                   .FirstOrDefaultAsync(t => t.ProductId == productId && t.Id == integrationId);
         }
 
         public async Task UpdateAsync(ProductIntegration productIntegration)

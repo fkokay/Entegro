@@ -53,6 +53,7 @@ namespace Entegro.Infrastructure.Repositories
         public async Task<Product?> GetByAsync(Expression<Func<Product, bool>> predicate)
         {
             var product = await IncludeAllProperties(_context.Products.AsNoTracking())
+                .AsSplitQuery()
             .FirstOrDefaultAsync(predicate);
 
             return product;
@@ -60,27 +61,37 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<Application.DTOs.Common.PagedResult<Product>> GetAllAsync(int page, string term)
         {
-            var query = IncludeAllProperties(_context.Products.AsNoTracking());
+            const int pageSize = 7;
+
+            var query = IncludeAllProperties(_context.Products.AsNoTracking())
+                .AsSplitQuery();
+
             if (!string.IsNullOrEmpty(term))
             {
                 query = query.Where(b =>
-                b.Name.Contains(term) ||
-                b.Code.Contains(term) ||
-                b.Barcode.Contains(term)).AsQueryable();
+                    b.Name.Contains(term) ||
+                    b.Code.Contains(term) ||
+                    b.Barcode.Contains(term));
             }
 
             var totalCount = await query.CountAsync();
-            var products = await query.Skip((page * 7) - 7)
-                .Take(7).ToListAsync();
+
+
+            var products = await query
+                .OrderBy(p => p.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             return new Application.DTOs.Common.PagedResult<Product>
             {
                 Items = products,
                 TotalCount = totalCount,
                 PageNumber = page,
-                PageSize = 7
+                PageSize = pageSize
             };
         }
+
 
         public async Task<List<Product>> GetAllAsync()
         {
@@ -245,10 +256,10 @@ namespace Entegro.Infrastructure.Repositories
 
             if (topProducts.Any())
             {
-                var query = IncludeAllProperties(_context.Products.AsNoTracking());
-                return new List<Product>(0);
-                //return await query.Where(p => topProducts.Contains(p.Id))
-                //                     .ToListAsync();
+                var query = IncludeAllProperties(_context.Products.AsNoTracking()).AsSplitQuery();
+
+                return await query.Where(p => topProducts.Contains(p.Id))
+                                     .ToListAsync();
             }
 
             return new List<Product>();
