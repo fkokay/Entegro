@@ -1,6 +1,4 @@
 ﻿using ClosedXML.Excel;
-using Entegro.Application.DTOs.Common;
-using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
@@ -9,9 +7,9 @@ using Entegro.Web.Models.Import;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using NPOI.HSSF.UserModel;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Entegro.Web.Controllers
 {
@@ -94,25 +92,39 @@ namespace Entegro.Web.Controllers
                     detail.ColumnMappings = headers;
                     foreach (var cell in worksheet.Row(1).CellsUsed())
                     {
+                        var columnValues = new List<string>();
+                        int columnNumber = cell.Address.ColumnNumber;
+
+                        foreach (var row in worksheet.RowsUsed().Skip(1))
+                        {
+                            columnValues.Add(row.Cell(columnNumber).Value.ToString());
+                        }
+
                         headers.Add(new ExcelColumnMapping
                         {
-                            ExcelHeader = cell.Value.ToString()
+                            ExcelHeader = cell.Value.ToString(),
+                            Values = columnValues
                         });
                     }
 
                     ViewBag.DbColumns = new List<SelectListItem>
                     {
                         new SelectListItem { Text = "Ürün Adı", Value = "Name" },
-                        new SelectListItem { Text = "Stok", Value = "Stock" },
+                        new SelectListItem { Text = "Ürün Kodu", Value = "Code" },
+                        new SelectListItem { Text = "Açıklama", Value = "Description" },
                         new SelectListItem { Text = "Barkod", Value = "Barcode" },
+                        new SelectListItem { Text = "ManufacturerPartNumber", Value = "Üretici Numarası" },
+                        new SelectListItem { Text = "Gtin", Value = "Gtin" },
+                        new SelectListItem { Text = "Fiyat", Value = "Price" },
                         new SelectListItem { Text = "Stok Miktarı", Value = "StockQuantity" },
-                        new SelectListItem { Text = "Durum", Value = "Status" }
+                        new SelectListItem { Text = "Resimler", Value = "Images" }
                     };
                     return View(detail);
                 }
             }
             return View(new List<ExcelColumnMapping>());
         }
+
 
         [HttpPost]
         public async Task<IActionResult> ImportData(ExcelImportProfileModel detail)
@@ -141,6 +153,11 @@ namespace Entegro.Web.Controllers
                 using var workbook = new XLWorkbook(stream);
                 var worksheet = workbook.Worksheet(1);
 
+                var imageList = new List<List<string>>();
+
+                List<string> codes = new List<string>();
+                List<string> names = new List<string>();
+                List<string> descriptions = new List<string>();
                 foreach (var col in selectedColumns)
                 {
                     int colIndex = worksheet.Row(1).CellsUsed()
@@ -150,24 +167,97 @@ namespace Entegro.Web.Controllers
                     {
                         foreach (var row in worksheet.RowsUsed().Skip(1)) // Başlığı atla
                         {
-                            col.Values.Add(row.Cell(colIndex).Value.ToString());
+                            string cellValue = row.Cell(colIndex).Value.ToString();
+
+                            if (col.DbColumn.Equals("Images", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var splitImages = cellValue
+                                    .Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(s => s.Trim())
+                                    .Where(s => !string.IsNullOrEmpty(s))
+                                    .ToList();
+
+                                if (splitImages.Any())
+                                    imageList.Add(splitImages);
+                            }
+
+                            col.Values.Add(cellValue);
                         }
                     }
                 }
 
+
+                int rowCount = worksheet.RowsUsed().Count() - 1; // başlık hariç
+                for (int i = 0; i < rowCount; i++)
+                {
+                    string code = selectedColumns
+                        .FirstOrDefault(x => x.DbColumn.Equals("Code", StringComparison.OrdinalIgnoreCase))
+                        ?.Values.ElementAtOrDefault(i) ?? "";
+
+                    string name = selectedColumns
+                        .FirstOrDefault(x => x.DbColumn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                        ?.Values.ElementAtOrDefault(i) ?? "";
+
+                    string description = selectedColumns
+                        .FirstOrDefault(x => x.DbColumn.Equals("Description", StringComparison.OrdinalIgnoreCase))
+                        ?.Values.ElementAtOrDefault(i) ?? "";
+
+                    // Boş satırları atla
+                    if (string.IsNullOrWhiteSpace(code))
+                        continue;
+
+                    // 🔹 Her satırda birden fazla ürün varsa split et
+                    codes.Add(code.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()).First());
+                    names.Add(name.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(c => c.Trim()).First());
+
+                    descriptions.Add(description.Split(new[] { '|' }, StringSplitOptions.None)
+                   .Select(d => d.Trim()).First());
+
+
+                }
+
+
+                for (int j = 0; j < codes.Count; j++)
+                {
+                    string currentCode = codes[j];
+                    string currentName = names.ElementAtOrDefault(j) ?? names.FirstOrDefault() ?? "";
+                    string currentDescription = descriptions.ElementAtOrDefault(j) ?? descriptions.FirstOrDefault() ?? "";
+
+                    var productDto = new CreateProductDto
+                    {
+                        Code = currentCode,
+                        Name = currentName,
+                        Description = currentDescription,
+                        Price = 0,
+                        CostPrice = 0,
+                        Unit = "Adet",
+                        Currency = "TL",
+                        BrandId = 3,
+                        VatRate = 20,
+                        StockQuantity = 0,
+                        Published = true,
+                        Deleted = false,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
+                    };
+
+                    await _productService.AddAsync(productDto);
+                }
+                // 🔹 mappedResult JSON
                 var mappedResult = selectedColumns.Select(col => new ExcelColumnMappingResult
                 {
                     ExcelHeader = col.ExcelHeader,
                     MappedName = col.DbColumn,
-                    DefaultValue = col.DefaultValue == null ? "" : col.DefaultValue
+                    DefaultValue = col.DefaultValue ?? ""
                 }).ToList();
 
-                var mappedJson = System.Text.Json.JsonSerializer.Serialize(mappedResult, new System.Text.Json.JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+                var mappedJson = System.Text.Json.JsonSerializer.Serialize(mappedResult,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
 
                 ViewBag.MappedJson = mappedJson;
+
+                // 🔹 Profil kaydı
                 var createDto = new Application.DTOs.ImportProfile.CreateImportProfileDto
                 {
                     ProfileName = detail.ProfileName,
@@ -177,36 +267,36 @@ namespace Entegro.Web.Controllers
                     ColumnMapping = mappedJson,
                 };
                 await _importProfileService.AddAsync(createDto);
+
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Hata oluştu: {ex.Message}");
             }
 
-
             return View("ImportResult", selectedColumns);
         }
+
+
+
+
         #endregion
 
         #region XML Import
-        public async Task<IActionResult> Xml(int? profileId)
+        public IActionResult Xml()
         {
             XmlImportProfileModel model = new XmlImportProfileModel();
-            model.Id = 0;
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Xml(XmlImportProfileModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.MediaFileUrl))
+                return View(CreateErrorModel("Lütfen bir XML URL girin."));
 
-            if (profileId != null && profileId > 0)
+            try
             {
-                var profileModel = await _importProfileService.GetByIdAsync(profileId.Value);
-                model.Id = profileModel.Id;
-                model.ProfileName = profileModel.ProfileName;
-                model.Enable = profileModel.Enable;
-                model.MediaFileType = profileModel.MediaFileType;
-                model.MediaFileUrl = profileModel.MediaFileUrl;
-                model.ApplyPriceAdjustment = profileModel.ApplyPriceAdjustment;
-                model.OptionalExtraAmount = profileModel.OptionalExtraAmount;
-                model.PriceAdjustmentType = profileModel.PriceAdjustmentType;
-                model.PriceAdjustmentAmount = profileModel.PriceAdjustmentAmount;
-
                 var document = await ReadXml(model.MediaFileUrl);
                 if (document.Root == null)
                     return View(CreateErrorModel("XML kök (root) bulunamadı.", model.MediaFileUrl));
@@ -217,190 +307,52 @@ namespace Entegro.Web.Controllers
 
                 model.PreviewXml = GeneratePreviewXml(startNode);
                 model.Paths = GetDistinctPaths(startNode);
-                List<SelectListItem> xmlPathsSelectItems = new();
-                if (profileModel.ColumnMapping is not null)
-                {
-                    var mappings = JsonConvert.DeserializeObject<List<XmlColumnMappingResult>>(profileModel.ColumnMapping);
-                    model.ProductImport.Name = mappings.FirstOrDefault(m => m.MappedName == "Name")?.XmlHeader;
-                    model.ProductImport.Brand = mappings.FirstOrDefault(m => m.MappedName == "Brand")?.XmlHeader;
-                    model.ProductImport.Code = mappings.FirstOrDefault(m => m.MappedName == "Code")?.XmlHeader;
-                    model.ProductImport.Barcode = mappings.FirstOrDefault(m => m.MappedName == "Barcode")?.XmlHeader;
-                    model.ProductImport.ManufacturerPartNumber = mappings.FirstOrDefault(m => m.MappedName == "ManufacturerPartNumber")?.XmlHeader;
-                    model.ProductImport.Gtin = mappings.FirstOrDefault(m => m.MappedName == "Gtin")?.XmlHeader;
-                    model.ProductImport.Price = mappings.FirstOrDefault(m => m.MappedName == "Price")?.XmlHeader;
-                    model.ProductImport.Currency = mappings.FirstOrDefault(m => m.MappedName == "Currency")?.XmlHeader;
-                    model.ProductImport.Unit = mappings.FirstOrDefault(m => m.MappedName == "VatRate")?.XmlHeader;
-                    model.ProductImport.VatInc = mappings.FirstOrDefault(m => m.MappedName == "VatInc")?.XmlHeader;
-                    model.ProductImport.StockQuantity = mappings.FirstOrDefault(m => m.MappedName == "StockQuantity")?.XmlHeader;
-                    model.ProductImport.Weight = mappings.FirstOrDefault(m => m.MappedName == "Weight")?.XmlHeader;
-                    model.ProductImport.Length = mappings.FirstOrDefault(m => m.MappedName == "Length")?.XmlHeader;
-                    model.ProductImport.Width = mappings.FirstOrDefault(m => m.MappedName == "Width")?.XmlHeader;
-                    model.ProductImport.Height = mappings.FirstOrDefault(m => m.MappedName == "Height")?.XmlHeader;
-                    model.ProductImport.MetaKeywords = mappings.FirstOrDefault(m => m.MappedName == "MetaKeywords")?.XmlHeader;
-                    model.ProductImport.MetaDescription = mappings.FirstOrDefault(m => m.MappedName == "MetaDescription")?.XmlHeader;
-                    model.ProductImport.MetaTitle = mappings.FirstOrDefault(m => m.MappedName == "MetaTitle")?.XmlHeader;
-                    model.ProductImport.Description = mappings.FirstOrDefault(m => m.MappedName == "Description")?.XmlHeader;
-                    model.ProductImport.Images = mappings.FirstOrDefault(m => m.MappedName == "Images")?.XmlHeader?.Split(',');
-                    model.ProductImport.Categories = mappings.FirstOrDefault(m => m.MappedName == "Categories")?.XmlHeader?.Split(',');
-                    model.AttributeStockCode = mappings.FirstOrDefault(m => m.MappedName == "AttributeStockCode")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
-                    model.AttributePrice = mappings.FirstOrDefault(m => m.MappedName == "AttributePrice")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
-                    model.AttributeGtin = mappings.FirstOrDefault(m => m.MappedName == "AttributeGtin")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
-                    model.AttributeManufacturerPartNumber = mappings.FirstOrDefault(m => m.MappedName == "AttributeManufacturerPartNumber")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
-                    model.AttributeSpecifications = mappings.FirstOrDefault(m => m.MappedName == "AttributeSpecifications")?.XmlHeader;
-                    model.AttributeStockQuantity = mappings.FirstOrDefault(m => m.MappedName == "AttributeStockQuantity")?.XmlHeader.Split(",").FirstOrDefault().Replace("/", "->");
 
-                }
-                ViewBag.XmlPathsSelectList = model.Paths.Select(m => new SelectListItem()
-                {
-                    Text = m,
-                    Value = m
-                }).ToList();
-
-                var variantIndices = model.Paths.SelectMany(path =>
-                {
-                    var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
-                    return parts.Where(part => int.TryParse(part, out _));
-                })
-                .Distinct().Select(int.Parse).ToList();
-
-
-                var variantCount = variantIndices.Count;
-                int targetIndex = 0;
-                var variantPaths = model.Paths.Where(path =>
-                {
-                    var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
-                    return parts.Contains(targetIndex.ToString());
-                }).ToList();
-
-                model.VariantCount = variantCount;
-                ViewBag.VariantPaths = variantPaths;
-                ViewBag.XmlPaths = model.Paths;
-                ViewBag.PreviewXml = model.PreviewXml;
-                return View(model);
+                return RedirectToAction("XmlMapping", model);
             }
-
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Xml(XmlImportProfileModel model)
-        {
-            if (string.IsNullOrWhiteSpace(model.MediaFileUrl))
-                return View(CreateErrorModel("Lütfen bir XML URL girin."));
-
-            if (model.Id == 0)
+            catch (Exception ex)
             {
-
-                var createProfile = new Application.DTOs.ImportProfile.CreateImportProfileDto();
-                createProfile.MediaFileType = "xml";
-                createProfile.MediaFileUrl = model.MediaFileUrl;
-                createProfile.ProfileName = model.ProfileName;
-                createProfile.Enable = model.Enable;
-                var profile = await _importProfileService.AddAsync(createProfile);
-
-                return RedirectToAction("Xml", new { profileId = profile.Id });
-            }
-            else
-            {
-                Type[] allowedTypes = { typeof(string), typeof(string[]) };
-                UpdateVariantMappedProperties(model);
-
-                var headerMaps = GetHeaderMappings(model);
-                var maps = model.ProductImport.GetType()
-                .GetProperties()
-                .Where(p => allowedTypes.Contains(p.PropertyType))
-                .SelectMany(p =>
-                {
-                    var value = p.GetValue(model.ProductImport);
-
-                    if (p.PropertyType == typeof(string))
-                    {
-                        var str = value as string;
-                        return new[]
-                        {
-                            new XmlColumnMappingResult
-                            {
-                                MappedName = p.Name,
-                                XmlHeader = str?.Replace("->", "/") ?? ""
-                            }
-                        };
-                    }
-                    else if (p.PropertyType == typeof(string[]))
-                    {
-                        var arr = value as string[];
-                        return new[]
-                        {
-                            new XmlColumnMappingResult
-                            {
-                                MappedName = p.Name,
-                                XmlHeader = arr == null ? "": string.Join(",",arr)
-                            }
-                        };
-                    }
-
-                    return Enumerable.Empty<XmlColumnMappingResult>();
-                })
-                .Where(h => !string.IsNullOrWhiteSpace(h.XmlHeader))
-                .ToList();
-
-
-                var columnMapping = System.Text.Json.JsonSerializer.Serialize(maps);
-
-                var updateProfile = new UpdateImportProfileDto();
-                updateProfile.Id = model.Id;
-                updateProfile.ProfileName = model.ProfileName;
-                updateProfile.ApplyPriceAdjustment = model.ApplyPriceAdjustment;
-                updateProfile.PriceAdjustmentType = model.PriceAdjustmentType;
-                updateProfile.MediaFileType = "xml";
-                updateProfile.OptionalExtraAmount = model.OptionalExtraAmount;
-                updateProfile.PriceAdjustmentAmount = model.PriceAdjustmentAmount;
-                updateProfile.MediaFileUrl = model.MediaFileUrl;
-                updateProfile.Enable = true;
-                updateProfile.ColumnMapping = columnMapping;
-
-                var profile = await _importProfileService.UpdateAsync(updateProfile);
-                return RedirectToAction("Xml", new { profileId = profile.Id });
+                return View(CreateErrorModel("İndirme/parse hatası: " + ex.Message, model.MediaFileUrl));
             }
         }
-        //public IActionResult XmlMapping(XmlImportProfileModel model)
-        //{
-        //    CreateXmlImportProfileModel createModel = new CreateXmlImportProfileModel()
-        //    {
-        //        MediaFileUrl = model.MediaFileUrl,
-        //        ProfileName = model.ProfileName,
-        //        MediaFileType = model.MediaFileType,
-        //        Enable = model.Enable,
-        //    };
-
-
-        //    var variantIndices = model.Paths.SelectMany(path =>
-        //    {
-        //        var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
-        //        return parts.Where(part => int.TryParse(part, out _));
-        //    })
-        //    .Distinct().Select(int.Parse).ToList();
-
-
-        //    var variantCount = variantIndices.Count;
-        //    int targetIndex = 0;
-        //    var variantPaths = model.Paths.Where(path =>
-        //    {
-        //        var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
-        //        return parts.Contains(targetIndex.ToString());
-        //    }).ToList();
-
-        //    ViewBag.VariantCount = variantCount;
-        //    ViewBag.VariantPaths = variantPaths;
-        //    ViewBag.XmlPaths = model.Paths;
-        //    ViewBag.PreviewXml = model.PreviewXml;
-        //    return View(createModel);
-        //}
-
-        [HttpPost]
-        public async Task<IActionResult> XmlMapping(XmlImportProfileModel model)
+        public IActionResult XmlMapping(XmlImportProfileModel model)
         {
-            UpdateVariantMappedProperties(model);
+            CreateXmlImportProfileModel createModel = new CreateXmlImportProfileModel()
+            {
+                MediaFileUrl = model.MediaFileUrl,
+                ProfileName = model.ProfileName,
+                MediaFileType = model.MediaFileType,
+                Enable = model.Enable,
+            };
+
+
+            var variantIndices = model.Paths.SelectMany(path =>
+            {
+                var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                return parts.Where(part => int.TryParse(part, out _));
+            })
+            .Distinct().Select(int.Parse).ToList();
+
+
+            var variantCount = variantIndices.Count;
+            int targetIndex = 0;
+            var variantPaths = model.Paths.Where(path =>
+            {
+                var parts = path.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                return parts.Contains(targetIndex.ToString());
+            }).ToList();
+
+            ViewBag.VariantCount = variantCount;
+            ViewBag.VariantPaths = variantPaths;
+            ViewBag.XmlPaths = model.Paths;
+            ViewBag.PreviewXml = model.PreviewXml;
+            return View(createModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> XmlMapping(CreateXmlImportProfileModel model, string SelectedImagePaths, string SelectedAttributeSpecifications, int VariantCount)
+        {
+            UpdateVariantMappedProperties(model, VariantCount);
+            UpdateImagesAndSpecifications(model, SelectedImagePaths, SelectedAttributeSpecifications, VariantCount);
 
             var headerMaps = GetHeaderMappings(model);
             PrintHeaderMapsJson(headerMaps);
@@ -408,70 +360,58 @@ namespace Entegro.Web.Controllers
             var xmlDoc = await ReadXml(model.MediaFileUrl);
             Console.WriteLine("📄 Header Map JSON:");
 
-            if (model.Id == 0)
+
+            var createModel = new Application.DTOs.ImportProfile.CreateImportProfileDto
             {
-                var createModel = new Application.DTOs.ImportProfile.CreateImportProfileDto
+                ProfileName = model.ProfileName,
+                ApplyPriceAdjustment = model.CreateXmlProduct.ApplyPriceAdjustment,
+                PriceAdjustmentType = model.CreateXmlProduct.PriceAdjustmentType,
+                MediaFileType = "xml",
+                OptionalExtraAmount = model.CreateXmlProduct.OptionalExtraAmount,
+                PriceAdjustmentAmount = model.CreateXmlProduct.PriceAdjustmentAmount,
+                MediaFileUrl = model.MediaFileUrl,
+                Enable = true,
+                ColumnMapping = System.Text.Json.JsonSerializer.Serialize(headerMaps, new System.Text.Json.JsonSerializerOptions
                 {
-                    ProfileName = model.ProfileName,
-                    ApplyPriceAdjustment = model.ApplyPriceAdjustment,
-                    PriceAdjustmentType = model.PriceAdjustmentType,
-                    MediaFileType = "xml",
-                    OptionalExtraAmount = model.OptionalExtraAmount,
-                    PriceAdjustmentAmount = model.PriceAdjustmentAmount,
-                    MediaFileUrl = model.MediaFileUrl,
-                    Enable = true,
-                    ColumnMapping = System.Text.Json.JsonSerializer.Serialize(headerMaps, new System.Text.Json.JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    })
-                };
+                    WriteIndented = true
+                })
+            };
 
-                var profile = await _importProfileService.AddAsync(createModel);
+            var profile = await _importProfileService.AddAsync(createModel);
+            var dataElements = xmlDoc.Root?.Elements();
+
+            if (dataElements != null)
+            {
+                Console.WriteLine("XML İçeriği:");
+                LogXmlDataElements(dataElements, headerMaps);
+
             }
-
             else
             {
-                var updateModel = new Application.DTOs.ImportProfile.UpdateImportProfileDto
-                {
-                    Id = model.Id,
-                    ProfileName = model.ProfileName,
-                    ApplyPriceAdjustment = model.ApplyPriceAdjustment,
-                    PriceAdjustmentType = model.PriceAdjustmentType,
-                    MediaFileType = "xml",
-                    OptionalExtraAmount = model.OptionalExtraAmount,
-                    PriceAdjustmentAmount = model.PriceAdjustmentAmount,
-                    MediaFileUrl = model.MediaFileUrl,
-                    Enable = true,
-                    ColumnMapping = System.Text.Json.JsonSerializer.Serialize(headerMaps, new System.Text.Json.JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    })
-                };
-
-                var profile = await _importProfileService.UpdateAsync(updateModel);
+                Console.WriteLine("XML'de veri bulunamadı.");
             }
 
             return RedirectToAction("List");
         }
 
-        //public async Task<IActionResult> ImportAllProductsFromXml(int profileId)
-        //{
-        //    var setting = await _settingService.GetByKeyAsync("SystemApiUrl");
-        //    if (setting == null)
-        //    {
-        //        throw new Exception($"Ayar Bulunamadı");
-        //    }
-        //    var response = await _client.PostAsync($"{setting.Value}/api/Job/run?profileId={profileId}", null);
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        var error = await response.Content.ReadAsStringAsync();
-        //        throw new Exception($"Error: {error}");
-        //    }
-        //    var resultContent = await response.Content.ReadAsStringAsync();
-        //    Console.WriteLine(resultContent);
+        public async Task<IActionResult> ImportAllProductsFromXml(int profileId)
+        {
+            var setting = await _settingService.GetByKeyAsync("SystemApiUrl");
+            if (setting == null)
+            {
+                throw new Exception($"Ayar Bulunamadı");
+            }
+            var response = await _client.PostAsync($"{setting.Value}/api/Job/run?profileId={profileId}", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error: {error}");
+            }
+            var resultContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(resultContent);
 
-        //    return View();
-        //}
+            return View();
+        }
         private async Task<XDocument> ReadXml(string url)
         {
             using var httpClient = new HttpClient();
@@ -497,46 +437,122 @@ namespace Entegro.Web.Controllers
                 }
             }
         }
-        private void UpdateVariantMappedProperties(XmlImportProfileModel model)
+        private void LogXmlDataElements(IEnumerable<XElement> dataElements, List<XmlColumnMappingResult> headerMaps)
+        {
+            foreach (var item in dataElements)
+            {
+                Console.WriteLine("Yeni Kayıt -----------------------");
+
+                foreach (var map in headerMaps)
+                {
+                    bool foundAny = false;
+
+                    var headers = map.XmlHeader.Split(',').Select(h => h.Trim()).ToList();
+
+                    foreach (var header in headers)
+                    {
+                        var parts = header.Split("/");
+
+                        var xpathParts = new List<string>();
+                        foreach (var part in parts)
+                        {
+                            if (int.TryParse(part, out int index))
+                            {
+                                if (xpathParts.Count > 0)
+                                {
+                                    var last = xpathParts[xpathParts.Count - 1];
+                                    xpathParts[xpathParts.Count - 1] = $"{last}[{index + 1}]";
+                                }
+                            }
+                            else
+                            {
+                                xpathParts.Add(part);
+                            }
+                        }
+
+                        var xpath = string.Join("/", xpathParts);
+                        var element = item.XPathSelectElement(xpath);
+
+                        if (element != null)
+                        {
+                            Console.WriteLine($"- {header}: {element.Value}");
+                            foundAny = true;
+                        }
+                    }
+
+                    Console.WriteLine("-----------------------------");
+                }
+            }
+        }
+        private void UpdateVariantMappedProperties(CreateXmlImportProfileModel model, int variantCount)
         {
             var variantMappedProps = new[]
             {
-                nameof(model.AttributePrice),
-                nameof(model.AttributeStockQuantity),
-                nameof(model.AttributeStockCode),
-                nameof(model.AttributeGtin),
-                nameof(model.AttributeManufacturerPartNumber),
+                nameof(model.CreateXmlProduct.AttributePrice),
+                nameof(model.CreateXmlProduct.AttributeStockQuantity),
+                nameof(model.CreateXmlProduct.AttributeStockCode),
+                nameof(model.CreateXmlProduct.AttributeGtin),
+                nameof(model.CreateXmlProduct.AttributeManufacturerPartNumber),
             };
 
             foreach (var propName in variantMappedProps)
             {
-                var propInfo = model.ProductImport.GetType().GetProperty(propName);
+                var propInfo = model.CreateXmlProduct.GetType().GetProperty(propName);
                 if (propInfo == null || propInfo.PropertyType != typeof(string)) continue;
 
-                var originalValue = propInfo.GetValue(model.ProductImport) as string;
+                var originalValue = propInfo.GetValue(model.CreateXmlProduct) as string;
 
                 if (!string.IsNullOrWhiteSpace(originalValue) && originalValue.Contains("variants->variant->0"))
                 {
                     var updatedPaths = new List<string>();
 
-                    for (int i = 0; i < model.VariantCount; i++)
+                    for (int i = 0; i < variantCount; i++)
                     {
                         updatedPaths.Add(originalValue.Replace("variants->variant->0", $"variants->variant->{i}"));
                     }
 
                     var newValue = string.Join(",", updatedPaths.Distinct());
-                    propInfo.SetValue(model.ProductImport, newValue);
+                    propInfo.SetValue(model.CreateXmlProduct, newValue);
                 }
             }
         }
-        private List<XmlColumnMappingResult> GetHeaderMappings(XmlImportProfileModel model)
+        private void UpdateImagesAndSpecifications(CreateXmlImportProfileModel model, string selectedImagePaths, string selectedAttributeSpecifications, int variantCount)
         {
-            return model.ProductImport.GetType().GetProperties()
+            model.CreateXmlProduct.Images = selectedImagePaths;
+            model.CreateXmlProduct.AttributeSpecifications = selectedAttributeSpecifications;
+
+            if (!string.IsNullOrWhiteSpace(selectedAttributeSpecifications) && variantCount > 0)
+            {
+                var updatedSpecifications = new List<string>();
+
+                var originalSpecs = selectedAttributeSpecifications
+                    .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .ToList();
+
+                foreach (var specPath in originalSpecs)
+                {
+                    var parts = specPath.Split("->", StringSplitOptions.RemoveEmptyEntries);
+                    var specIndexPart = parts.Last(); // Örn. "1"
+                    var specPart = $"spec->{specIndexPart}";
+
+                    for (int i = 0; i < variantCount; i++)
+                    {
+                        updatedSpecifications.Add($"variants->variant->{i}->{specPart}");
+                    }
+                }
+
+                model.CreateXmlProduct.AttributeSpecifications = string.Join(",", updatedSpecifications.Distinct());
+            }
+        }
+        private List<XmlColumnMappingResult> GetHeaderMappings(CreateXmlImportProfileModel model)
+        {
+            return model.CreateXmlProduct.GetType().GetProperties()
                 .Where(p => p.PropertyType == typeof(string))
                 .Select(p => new XmlColumnMappingResult
                 {
                     MappedName = p.Name,
-                    XmlHeader = p.GetValue(model.ProductImport)?.ToString().Replace("->", "/") ?? ""
+                    XmlHeader = p.GetValue(model.CreateXmlProduct)?.ToString().Replace("->", "/") ?? ""
                 })
                 .Where(h => !string.IsNullOrWhiteSpace(h.XmlHeader))
                 .ToList();
@@ -594,21 +610,8 @@ namespace Entegro.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-        [HttpPost]
-        public async Task<IActionResult> ImportProfileList([FromBody] GridCommand gridCommand)
-        {
-            var result = await _importProfileService.GetPagedAsync(gridCommand);
-
-            return Json(new
-            {
-                draw = gridCommand.Draw,
-                recordsTotal = result.TotalCount,
-                recordsFiltered = result.TotalCount,
-                data = result.Items
-            });
-
-        }
         #endregion
+
 
 
 

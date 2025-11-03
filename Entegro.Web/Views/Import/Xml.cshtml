@@ -1,467 +1,100 @@
 ﻿@model XmlImportProfileModel
-@{
-    int variantCount = ViewBag.VariantCount != null ? (int)ViewBag.VariantCount : 0;
-    var variantPaths = ViewBag.VariantPaths as List<string> ?? new List<string>();
-}
+
 
 <div class="container-fluid flex-grow-1 container-p-y">
-    @if (Model.Id == 0)
-    {
-        <form asp-action="Xml" asp-controller="Import" id="importFormXml">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
-                <div class="d-flex flex-column justify-content-center">
-                    <h4 class="mb-1">XML Kaynağı Oluştur</h4>
-                    <p class="mb-0">XML Kaynağı Oluştur</p>
-                </div>
-                <div class="d-flex align-content-center flex-wrap gap-4">
-                    <div class="d-flex gap-4">
-                        <a href="@Url.Action("List", "Import")" class="btn btn-label-secondary d-grid w-100 waves-effect">
-                            <span class="d-flex justify-content-center text-nowrap">
-                                <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
-                            </span>
-                        </a>
-                    </div>
-                    <button type="submit" class="btn btn-primary waves-effect waves-light">
+    <form asp-action="Xml" asp-controller="Import" id="importFormXml">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
+            <div class="d-flex flex-column justify-content-center">
+                <h4 class="mb-1">XML Kaynağı Oluştur</h4>
+                <p class="mb-0">XML Kaynağı Oluştur</p>
+            </div>
+            <div class="d-flex align-content-center flex-wrap gap-4">
+                <div class="d-flex gap-4">
+                    <a href="@Url.Action("List", "Import")" class="btn btn-label-secondary d-grid w-100 waves-effect">
                         <span class="d-flex justify-content-center text-nowrap">
-                            <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
+                            <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
                         </span>
-                    </button>
+                    </a>
                 </div>
+                <button type="submit" class="btn btn-primary waves-effect waves-light">
+                    <span class="d-flex justify-content-center text-nowrap">
+                        <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
+                    </span>
+                </button>
             </div>
-            <div class="row">
-                <div class="col-lg-12 col-12 mb-lg-0 mb-4">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Xml</h5>
-                        </div>
-                        <div class="card-body">
-                            <input type="hidden" id="mappingsInput" name="MappingsJson" />
-                            <div class="col-md-12 mt-3">
-                                <div class="row">
-                                    <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
-                                    <div class="col-sm-9">
-                                        <input asp-for="ProfileName" type="text" class="form-control" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <div class="row">
-                                    <label class="col-sm-3 col-form-label text-sm-start" for="Url">XML Kaynağı</label>
-                                    <div class="col-sm-9">
-                                        <input asp-for="MediaFileUrl" type="url" class="form-control" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-
-    }
-    else
-    {
-        <div class="container-fluid flex-grow-1 container-p-y">
-            <form asp-action="Xml" asp-controller="Import" method="post" onsubmit="return validateForm();">
-                <input type="hidden" asp-for="MediaFileUrl" />
-                <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="VariantCount" />
-
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
-                    <div class="d-flex flex-column justify-content-center">
-                        <h4 class="mb-1">XML Kaynağı Oluştur</h4>
-                        <p class="mb-0">XML Kaynağı Oluştur</p>
-                    </div>
-                    <div class="d-flex align-content-center flex-wrap gap-4">
-                        <div class="d-flex gap-4">
-                            <a href="@Url.Action("Xml", "Import")" class="btn btn-label-secondary d-grid w-100 waves-effect">
-                                <span class="d-flex justify-content-center text-nowrap">
-                                    <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
-                                </span>
-                            </a>
-                        </div>
-                        <button type="button" class="btn btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#xmlStructureModal">
-                            <span class="d-flex justify-content-center text-nowrap">
-                                <i class="ti ti-eye ti-xs me-1"></i>  XML Kaynağını İncele
-                            </span>
-
-                        </button>
-                        <button type="submit" class="btn btn-primary waves-effect waves-light">
-                            <span class="d-flex justify-content-center text-nowrap">
-                                <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-12 col-12 mb-lg-0 mb-4">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Xml</h5>
-                            </div>
-                            <div class="card-body">
-                                <input type="hidden" id="mappingsInput" name="MappingsJson" />
-                                <div class="col-md-12 mt-3">
-                                    <div class="row">
-                                        <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
-                                        <div class="col-sm-9">
-                                            <input asp-for="ProfileName" type="text" class="form-control" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 mt-3">
-                                    <div class="row">
-                                        <label class="col-sm-3 col-form-label text-sm-start" for="Url">XML Kaynağı</label>
-                                        <div class="col-sm-9">
-                                            <input asp-for="MediaFileUrl" type="text" class="form-control"  disabled/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-12 col-12 mb-lg-0 mb-4 mt-3">
-                        <div class="card">
-
-                            <!--Genel Bilgiler-->
-                            <h5 class="card-header">Genel Bilgiler</h5>
-                            <div class="card-body" id="genelBilgiler">
-
-                                <div class="row">
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Name" class="form-label">Ürün Adı *</label>
-                                        <select asp-for="ProductImport.Name" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Brand" class="form-label">Marka</label>
-                                        <select asp-for="ProductImport.Brand" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Barcode" class="form-label">Barkod *</label>
-                                        <select asp-for="ProductImport.Barcode" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.ManufacturerPartNumber" class="form-label">Üretici Numarası</label>
-                                        <select asp-for="ProductImport.ManufacturerPartNumber" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Gtin" class="form-label">Gtin </label>
-                                        <select asp-for="ProductImport.Gtin" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Height" class="form-label">Ağırlık </label>
-                                        <select asp-for="ProductImport.Height" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Unit" class="form-label">Birim </label>
-                                        <select asp-for="ProductImport.Unit" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Description" class="form-label">Açıklama </label>
-                                        <select asp-for="ProductImport.Description" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <!--Stok Bilgileri-->
-                            <hr />
-                            <h5 class="card-header">Stok Bilgiler</h5>
-                            <div class="card-body" id="stokBilgileri">
-                                <div class="row">
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Code" class="form-label">Stok Kodu *</label>
-                                        <select asp-for="ProductImport.Code" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.StockQuantity" class="form-label">Stok Adedi *</label>
-                                        <select asp-for="ProductImport.StockQuantity" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <!--Fiyat Bilgileri-->
-                            <hr />
-                            <h5 class="card-header">Fiyat Bilgileri</h5>
-                            <div class="card-body" id="fiyatBilgileri">
-                                <div class="row">
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Price" class="form-label">Mağaza Satış Fiyatı *</label>
-                                        <select asp-for="ProductImport.Price" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" required>
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Currency" class="form-label">Para Birimi</label>
-                                        <select asp-for="ProductImport.Currency" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.VatInc" class="form-label">KDV Dahil</label>
-                                        <select asp-for="ProductImport.VatInc" class="form-select select2">
-                                            <option value="">Seçiniz</option>
-                                            <option value="0">Hayır</option>
-                                            <option value="1">Evet</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.VatRate" class="form-label">KDV Oranı</label>
-                                        <select asp-for="ProductImport.VatRate" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-
-
-                                    <!-- Fiyat Artışı Alanları -->
-                                    <div class="col-md-12 mt-3">
-                                        <label class="form-label">Fiyat Artışı</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input"
-                                                   type="radio"
-                                                   asp-for="ApplyPriceAdjustment"
-                                                   value="uygula"
-                                                   id="fiyatArtisiUygula" />
-                                            <label class="form-check-label" for="fiyatArtisiUygula">
-                                                Fiyat Artışı Uygula
-                                            </label>
-                                        </div>
-
-                                        <!-- Fiyat Artışı Uygulanmadan Devam Et -->
-                                        <div class="form-check mt-2">
-                                            <input class="form-check-input" type="radio" asp-for="ApplyPriceAdjustment" value="devam" id="fiyatArtisiUygulama" checked />
-                                            <label class="form-check-label" for="fiyatArtisiUygulama">
-                                                Fiyat Artışı Uygulamadan Devam Et
-                                            </label>
-                                        </div>
-
-                                        <!-- İşlem Türü Alanları -->
-                                        <div id="islemTuruAlanlari" class="row mt-3" style="display: none;">
-                                            <div class="col-md-6">
-                                                <label asp-for="PriceAdjustmentType" class="form-label">İşlem Türü *</label>
-                                                <select asp-for="PriceAdjustmentType" class="form-select">
-                                                    <option value="">Seçiniz</option>
-                                                    <option value="yuzde">Yüzde</option>
-                                                    <option value="sabit">Sabit</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label asp-for="PriceAdjustmentAmount" class="form-label">İşlem Tutarı *</label>
-                                                <input asp-for="PriceAdjustmentAmount" class="form-control" placeholder="Örn. 30" />
-                                            </div>
-
-                                            <div class="col-md-12 mt-2">
-                                                <label asp-for="OptionalExtraAmount" class="form-label">Opsiyonel Ek Tutar</label>
-                                                <input asp-for="OptionalExtraAmount" class="form-control" placeholder="Örn. 30" />
-                                                <small class="form-text text-muted">Para birimi XML kaynağındaki para birimi ile aynıdır.</small>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Bitiş -->
-                                </div>
-                            </div>
-
-                            <!--Ürün Görselleri-->
-                            <hr />
-                            <h5 class="card-header">Ürün Görselleri</h5>
-                            <div class="card-body" id="urunGorselleri">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label asp-for="ProductImport.Images" class="form-label">Ürün Görselleri (birden fazla seçilebilir)</label>
-                                        <select asp-for="ProductImport.Images" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2" multiple="multiple">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!--Kategoriler-->
-                            <hr />
-                            <h5 class="card-header">Kategoriler</h5>
-                            <div class="card-body" id="categories">
-                                <div class="row">
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.Categories" class="form-label">Kategoriler</label>
-                                        <select asp-for="ProductImport.Categories" asp-items="ViewBag.XmlPathsSelectList"  class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                            <!--Varyantlar-->
-                            <hr />
-                            <h5 class="card-header">Varyantlar</h5>
-                            <div class="card-body" id="variantBody">
-                                <div class="row">
-                                    <!-- Varyantlı Ürün mü? seçeneği -->
-                                    <div class="col-md-6 mt-1">
-                                        <label class="form-label">Varyantlı Ürün mü?</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" asp-for="IsVariantProduct" id="variantYes" value="yes">
-                                            <label class="form-check-label" for="variantYes">Evet</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" asp-for="IsVariantProduct" id="variantNo" value="no" checked>
-                                            <label class="form-check-label" for="variantNo">Hayır</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Diğer varyant alanlarını kapsayan row -->
-                                <div class="row" id="variantFieldsRow" style="display: none;">
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="AttributeStockCode" class="form-label">Varyant Ürün Kodu</label>
-                                        <select asp-for="AttributeStockCode" class="form-select select2" >
-                                            <option value=""></option>
-                                            @foreach (var item in variantPaths)
-                                            {
-                                                <option value="@item">@item</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="AttributeManufacturerPartNumber" class="form-label">Varyant Üretici Numarası</label>
-                                        <select asp-for="AttributeManufacturerPartNumber" class="form-select select2">
-                                            <option value=""></option>
-                                            @foreach (var item in variantPaths)
-                                            {
-                                                <option value="@item">@item</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="AttributeGtin" class="form-label">Varyant Gtin </label>
-                                        <select asp-for="AttributeGtin" class="form-select select2">
-                                            <option value=""></option>
-                                            @foreach (var item in variantPaths)
-                                            {
-                                                <option value="@item">@item</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="AttributePrice" class="form-label">Varyant Fiyat </label>
-                                        <select asp-for="AttributePrice" class="form-select select2" id="variantPrice">
-                                            <option value=""></option>
-                                            @foreach (var item in variantPaths)
-                                            {
-                                                <option value="@item">@item</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="AttributeStockQuantity" class="form-label">Varyant Stok Miktarı </label>
-                                        <select asp-for="AttributeStockQuantity" class="form-select select2" id="variantStockQuantity">
-                                            <option value=""></option>
-                                            @foreach (var item in variantPaths)
-                                            {
-                                                <option value="@item">@item</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="AttributeSpecifications" class="form-label">Varyant Stok Özellikler (birden fazla seçilebilir)</label>
-                                        <select asp-for="AttributeSpecifications" class="form-select select2" multiple="multiple">
-                                            <option value=""></option>
-                                            @foreach (var item in variantPaths)
-                                            {
-                                                <option value="@item">@item</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!--Arama Motorları-->
-                            <hr />
-                            <h5 class="card-header">Arama Motorları</h5>
-                            <div class="card-body" id="searchEngine">
-                                <div class="row">
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.MetaTitle" class="form-label">Meta Başlık</label>
-                                        <select asp-for="ProductImport.MetaTitle" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.MetaKeywords" class="form-label">Anahtar Kelimeler</label>
-                                        <select asp-for="ProductImport.MetaKeywords" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-1">
-                                        <label asp-for="ProductImport.MetaDescription" class="form-label">Meta Açıklama</label>
-                                        <select asp-for="ProductImport.MetaDescription" asp-items="ViewBag.XmlPathsSelectList" class="form-select select2">
-                                            <option value=""></option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
         </div>
 
-        <div class="modal fade" id="xmlStructureModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
-                <div class="modal-content p-3 p-md-5">
-                    <div class="modal-body">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <div class="text-center mb-4">
-                            <h3 class="mb-2">XML</h3>
-                            <p class="text-muted">XML kaynağındaki ürün konumundaki ürünlerden yalnızca biri gösterilir.</p>
+        <div class="row">
+            <div class="col-lg-12 col-12 mb-lg-0 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Xml</h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" id="mappingsInput" name="MappingsJson" />
+                        <div class="col-md-12 mt-3">
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="ProfileName" type="text" class="form-control" />
+                                </div>
+                            </div>
                         </div>
-                        <pre>@Html.Raw(System.Net.WebUtility.HtmlEncode(ViewBag.PreviewXml))</pre>
+                        <div class="col-md-12 mt-3">
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label text-sm-start" for="Url">XML Kaynağı</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="MediaFileUrl" type="url" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-    }
+    </form>
 </div>
 
 
-
 @section Scripts {
-    <script src="/assets/js/entegro.import.js"></script>
     <script>
-        Entegro.import.validateXmlProductForm();
-        Entegro.import.initSelect2();
-        Entegro.import.initPriceAdjustmentToggle();
-        Entegro.import.initVariantToggle();
+        document.getElementById("importFormXml").addEventListener("submit", function (e) {
+            const profileNameInput = document.querySelector('input[name="ProfileName"]');
+            const urlInput = document.querySelector('input[name="MediaFileUrl"]');
+
+
+            if (!profileNameInput || !profileNameInput.value.trim()) {
+                e.preventDefault();
+                alert("Lütfen profil adı giriniz.");
+                if (profileNameInput) {
+                    profileNameInput.classList.add("is-invalid");
+                    profileNameInput.focus();
+                }
+                return;
+            } else {
+                profileNameInput.classList.remove("is-invalid");
+            }
+
+
+            const urlValue = urlInput.value.trim();
+            const urlPattern = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@@!$&'()*+,;=]*)?$/;
+
+            if (!urlValue) {
+                e.preventDefault();
+                alert("Lütfen bir URL giriniz.");
+                urlInput.classList.add("is-invalid");
+                urlInput.focus();
+                return;
+            } else if (!urlPattern.test(urlValue)) {
+                e.preventDefault();
+                alert("Lütfen geçerli bir URL giriniz (örn: https://example.com).");
+                urlInput.classList.add("is-invalid");
+                urlInput.focus();
+                return;
+            } else {
+                urlInput.classList.remove("is-invalid");
+            }
+        });
     </script>
 }
+

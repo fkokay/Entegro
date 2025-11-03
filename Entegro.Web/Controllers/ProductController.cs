@@ -27,6 +27,7 @@ using Entegro.Web.Models.Catalog.CrossSellProducts;
 using Entegro.Web.Models.Catalog.Products;
 using Entegro.Web.Models.Catalog.ProductSpecificationAttribute;
 using Entegro.Web.Models.Catalog.RelatedProducts;
+using Entegro.Web.Models.Commerce;
 using Entegro.Web.Models.Content;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Common;
@@ -186,7 +187,7 @@ namespace Entegro.Web.Controllers
         {
             var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null, true);
             ViewBag.Commerces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce).Select(
-                m => new { m.Id, m.Name }
+                m => new { m.Id, m.Name, Value = m.IntegrationSystemParameters.Select(x => x.Value).FirstOrDefault() }
                 ).ToList();
 
             ViewBag.Marketplaces = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Marketplace).Select(
@@ -419,6 +420,48 @@ namespace Entegro.Web.Controllers
 
         #endregion
 
+
+        #region E-Commerce Product
+
+        [HttpGet]
+        public async Task<IActionResult> CreateProductECommerceDialog(int IntegrationSystemId)
+        {
+
+            var integrationSystem = await _integrationSystemService.GetByIdAsync(IntegrationSystemId);
+            if (integrationSystem == null)
+            {
+                return NotFound();
+            }
+
+            if (integrationSystem.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Commerce)
+            {
+                var commerceType = integrationSystem.IntegrationSystemParameters
+                    .FirstOrDefault(m => m.Key == "CommerceType")?.Value;
+
+                return commerceType switch
+                {
+                    "Smartstore" => PartialView($"_CreateProductForCommerce", new RequestCreateProductECommerceModel { CommerceType = "Smartstore" }),
+                    _ => NotFound()
+                };
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProductECommerceDialog(RequestCreateProductECommerceModel model)
+        {
+            int id = 0;
+            if (id == 0)
+            {
+                return Json(new { success = true, message = "Kayıt Başarılı." });
+            }
+
+            return Json(new { success = false, message = "Entegrasyon sistemi bulunamadı.", errorCode = "IntegrationSystemNotFound" });
+
+        }
+
+
+        #endregion
         #region Product Pictures
         [HttpGet]
         public async Task<IActionResult> LoadTabImages(int productId)

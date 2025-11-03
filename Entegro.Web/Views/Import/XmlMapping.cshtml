@@ -1,4 +1,4 @@
-﻿@* @model CreateXmlImportProfileModel
+﻿@model CreateXmlImportProfileModel
 @{
     ViewData["Title"] = "XmlMapping";
     var paths = ViewBag.XmlPaths as List<string>;
@@ -234,7 +234,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input"
                                            type="radio"
-                                           asp-for="ApplyPriceAdjustment"
+                                           asp-for="CreateXmlProduct.ApplyPriceAdjustment"
                                            value="uygula"
                                            id="fiyatArtisiUygula" />
                                     <label class="form-check-label" for="fiyatArtisiUygula">
@@ -612,4 +612,3 @@
 
 
 }
- *@

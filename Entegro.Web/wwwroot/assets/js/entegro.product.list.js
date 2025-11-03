@@ -506,8 +506,72 @@ Entegro.product.list = (function ($) {
                                             $('#IntegrationSystemId').val(market.Id);
                                         }
                                     };
-                                })
+                                }),
+                            },
+                            {
+                                extend: "collection",
+                                className: "btn btn-success dropdown-toggle",
+                                                             text: `<span class="d-flex align-items-center gap-2">
+                                  <i class="icon-base ti ti-cloud-download icon-xs"></i>
+                                  <span>E-Ticaretten Ürün Kayıt</span>
+                                </span>`,
+                                                             buttons: window.commerces.map(commerce => {
+                                                                 const logoSrc = Entegro.product.list.getIntegrationLogo(commerce.Value);
+                                                                 return {
+                                                                     className: "dropdown-item d-flex align-items-center gap-2",
+                                                                     text: `
+                                     <img src="${logoSrc}" alt="${commerce.Name}" style="width: 20px; height: 20px; object-fit: contain;">
+                                     <span>${commerce.Name}</span>
+                                   `,
+                                        action: () => {
+                                            
+                                            $.get(`/Product/CreateProductECommerceDialog?IntegrationSystemId=${commerce.Id}`, function (html) {
+                                                $("#CreateIfNotExistProductCommerceModal .modal-content").html(html);
+                                                const modal = new bootstrap.Modal(document.getElementById('CreateIfNotExistProductCommerceModal'));
+                                                modal.show();
+
+                                                // Form submit işlemi
+                                                $("#CreateIfNotExistProductCommerceForm").on("submit", function (e) {
+                                                    e.preventDefault();
+                                                    const form = $(this);
+                                                    $.ajax({
+                                                        url: '/Product/CreateProductECommerceDialog',
+                                                        type: 'POST',
+                                                        data: form.serialize(),
+                                                        success: function (res) {
+                                                            if (res.success) {
+                                                                Swal.fire({
+                                                                    title: 'Başarılı!',
+                                                                    text: res.message,
+                                                                    icon: 'success',
+                                                                    confirmButtonText: 'Tamam'
+                                                                }).then(() => {
+                                                                    location.reload();
+                                                                });
+                                                            } else {
+                                                                Swal.fire({
+                                                                    title: 'Hata!',
+                                                                    text: res.message,
+                                                                    icon: 'error',
+                                                                    confirmButtonText: 'Tamam'
+                                                                });
+                                                            }
+                                                        },
+                                                        error: function () {
+                                                            Swal.fire({
+                                                                title: 'Hata!',
+                                                                text: 'İşlem sırasında bir hata oluştu.',
+                                                                icon: 'error'
+                                                            });
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        }
+                                    };
+                                }),
                             }
+
                         ]
                     }]
                 },

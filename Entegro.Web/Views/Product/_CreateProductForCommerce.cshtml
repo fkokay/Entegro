@@ -1,0 +1,23 @@
+﻿@using Entegro.Web.Models.Commerce
+@model RequestCreateProductECommerceModel
+
+
+<form id="CreateIfNotExistProductCommerceForm">
+    <div class="modal-header">
+        <h5 class="modal-title" id="CreateIfNotExistProductCommerceModalLabel">Ürün Ekle</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row g-3 mb-5">
+            <input type="hidden" asp-for="IntegrationSystemId" />
+            <div class="col-md-12">
+                <label class="form-label text-sm-start" for="ProductIntegrationSku">@Model.CommerceType Ürün Barkodu</label>
+                <input type="text" asp-for="Code" class="form-control" required />
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+        <button type="submit" class="btn btn-warning">Kaydet</button>
+    </div>
+</form>
