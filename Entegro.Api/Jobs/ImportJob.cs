@@ -103,9 +103,10 @@ namespace Entegro.Api.Jobs
             string filePath = Path.Combine(basePath, mediaFile.Name);
             await File.WriteAllBytesAsync(filePath, fileBytes);
 
-            Console.WriteLine($"Excel dosyası kaydedildi: {filePath}");
-            #endregion
 
+            _logger.LogInformation($"Excel dosyası kaydedildi: {filePath}");
+
+            #endregion
 
             #region exceljob
             try
@@ -215,19 +216,30 @@ namespace Entegro.Api.Jobs
                             continue;
                         }
 
-                        var createdProduct = await _productService.AddAsync(productDto);
+                        var existProduct = await _productService.ExistsByCodeAsync(productDto.Code);
 
-                        List<int> mediaFiles = await UploadImagesAsync(Images, httpClient);
-                        foreach (var item in mediaFiles)
+                        if (!existProduct)
                         {
-                            CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
-                            createProductMediaFile.MediaFileId = item;
-                            createProductMediaFile.ProductId = createdProduct.Id;
+                            var createdProduct = await _productService.AddAsync(productDto);
 
-                            await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                            List<int> mediaFiles = await UploadImagesAsync(Images, httpClient);
+                            foreach (var item in mediaFiles)
+                            {
+                                CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                                createProductMediaFile.MediaFileId = item;
+                                createProductMediaFile.ProductId = createdProduct.Id;
+
+                                await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                            }
+
+                            importedCount++;
+
                         }
-
-                        importedCount++;
+                        else
+                        {
+                            _logger.LogInformation($"{productDto.Code} kodlu ürün zaten mevcut.");
+                            continue;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -249,6 +261,7 @@ namespace Entegro.Api.Jobs
         {
             throw new NotImplementedException();
         }
+
 
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
         {

@@ -1,7 +1,6 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.IntegrationSystemParameter;
 using Entegro.Application.Interfaces.Services.Base;
-using Entegro.Domain.Entities.Integration;
 using Entegro.Domain.Enums;
 using Entegro.Web.Models.Integration;
 using Entegro.Web.Models.Integration.Cargo;
@@ -10,7 +9,6 @@ using Entegro.Web.Models.Integration.EInvoice;
 using Entegro.Web.Models.Integration.Erp;
 using Entegro.Web.Models.Integration.Marketplace;
 using Entegro.Web.Models.Setting;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -93,7 +91,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Erp()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP,null);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP, null);
 
             var model = new ErpListModel();
             model.ErpList = allErpIntegrationSystem.Select(m => new ErpIntegrationSystemModel
@@ -155,7 +153,7 @@ namespace Entegro.Web.Controllers
                 case "Logo":
                     return ErpSettingLogo(integrationSystemErp, erpType.Value);
                 case "Netsis":
-                   return ErpSettingNetsis(integrationSystemErp,erpType.Value);
+                    return ErpSettingNetsis(integrationSystemErp, erpType.Value);
                 case "Opak":
                     return ErpsettingOpak(integrationSystemErp, erpType.Value);
             }
@@ -487,7 +485,7 @@ namespace Entegro.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Commerce()
         {
-            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce,null);
+            var allErpIntegrationSystem = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.Commerce, null);
 
             var model = new CommerceListModel();
             model.CommerceList = allErpIntegrationSystem.Select(m => new CommerceIntegrationSystemModel
@@ -581,7 +579,7 @@ namespace Entegro.Web.Controllers
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
                 Name = model.Name,
-                Active= model.Active
+                Active = model.Active
             });
 
             if (apiUrl == null)
@@ -726,7 +724,7 @@ namespace Entegro.Web.Controllers
                     return CargoSettingYurtici(integrationSystemCargo, cargoType.Value);
 
                 case "PTT":
-                    return CargoSettingPTT(integrationSystemCargo,cargoType.Value);
+                    return CargoSettingPTT(integrationSystemCargo, cargoType.Value);
 
                 case "Aras":
                     return CargoSettingAras(integrationSystemCargo, cargoType.Value);
@@ -778,7 +776,7 @@ namespace Entegro.Web.Controllers
             return View($"Cargo.PTT", pTTCargoSettings);
         }
 
-        private IActionResult CargoSettingYurtici(IntegrationSystemDto integrationSystem,string cargoType)
+        private IActionResult CargoSettingYurtici(IntegrationSystemDto integrationSystem, string cargoType)
         {
             var apiUrl = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
             var apiUser = integrationSystem.IntegrationSystemParameters.Where(m => m.Key == "ApiUser" & m.IntegrationSystemId == integrationSystem.Id).FirstOrDefault();
@@ -1184,6 +1182,7 @@ namespace Entegro.Web.Controllers
             var id = integrationSystemMarketplace.Id;
             var name = integrationSystemMarketplace.Name;
             var description = integrationSystemMarketplace.Description;
+            var active = integrationSystemMarketplace.Active;
             var clientId = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ClientId" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
             var clientSecret = integrationSystemMarketplace.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret" & m.IntegrationSystemId == integrationSystemMarketplace.Id).FirstOrDefault();
 
@@ -1359,8 +1358,8 @@ namespace Entegro.Web.Controllers
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
                 Name = model.Name,
-                Active= model.Active
-                 
+                Active = model.Active
+
             });
 
             var appSecret = await _integrationSystemParameterService.GetByKeyAsync("AppSecret", model.IntegrationSystemId);

@@ -18,6 +18,14 @@ namespace Entegro.Application.Services.Base
             _mapper = mapper;
         }
 
+        public async Task<bool> ExistsByTypeAsync(string type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                throw new ArgumentException("Görev tipi boş olamaz.", nameof(type));
+
+            return await _taskDescriptorRepository.ExistsByTypeAsync(type);
+        }
+
         public async Task<TaskDescriptorDto?> GetByIdAsync(int id)
         {
             if (id <= 0)
@@ -43,6 +51,19 @@ namespace Entegro.Application.Services.Base
                 taskDescriptorDto.LastExecution.SucceededOn = taskDescriptor.ExecutionHistory.Last().SucceededOnUtc.ToLocalTime();
             }
             return taskDescriptorDto;
+        }
+
+        public async Task<TaskDescriptorDto?> GetByTypeAsync(string type)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                throw new ArgumentException("Görev tipi boş olamaz.", nameof(type));
+            }
+
+            var task = await _taskDescriptorRepository.GetByTypeAsync(type);
+            var taskDto = _mapper.Map<TaskDescriptorDto>(task);
+
+            return taskDto;
         }
 
         public async Task<PagedResult<TaskDescriptorDto>> GetPagedAsync(GridCommand gridCommand)

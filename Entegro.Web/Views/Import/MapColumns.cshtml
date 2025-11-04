@@ -2,14 +2,34 @@
 @{
     ViewData["Title"] = "İçe Aktar";
 }
+
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Eşleştirme Yap</span></h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">İçe Aktar</span></h4>
     <div class="row">
         <div class="col-xl-12 col-lg-7 col-md-7 order-1 order-md-0">
             <div class="card">
-                <h5 class="card-header">Eşleştirme Yap</h5>
                 <div class="card-body">
                     <form asp-action="ImportData" asp-controller="Import" method="post" id="importForm">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
+                            <div class="d-flex flex-column justify-content-center">
+                                <h4 class="mb-1">@ViewBag.Title</h4>
+                            </div>
+
+                            <div class="d-flex align-content-center flex-wrap gap-4">
+                                <div class="d-flex gap-4">
+                                    <a href="@Url.Action("List", "Import")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                                        <span class="d-flex justify-content-center text-nowrap">
+                                            <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
+                                        </span>
+                                    </a>
+                                </div>
+                                <button type="submit" class="btn btn-primary waves-effect waves-light">
+                                    <span class="d-flex justify-content-center text-nowrap">
+                                        <i class="ti ti-device-floppy ti-xs me-1"></i> Kaydet
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                         <input asp-for="MediaFileId" type="hidden" class="form-control" />
                         <div class="col-md-12 mt-3">
                             <div class="row">
@@ -53,9 +73,6 @@
                                 }
                             </tbody>
                         </table>
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-success">İçe Aktar</button>
-                        </div>
                     </form>
                 </div>
             </div>

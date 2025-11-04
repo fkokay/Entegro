@@ -26,7 +26,6 @@ Entegro.import.list = (function ($) {
             columns: [
                 { data: 'Id', orderable: false },         
                 { data: 'Id', visible: false },            
-               
                 { data: 'ProfileName' },                    
                 { data: 'MediaFileType' },                  
                 { data: 'MediaFileUrl' },                   
@@ -66,10 +65,14 @@ Entegro.import.list = (function ($) {
                     orderable: false,
                     className: "text-center",
                     render: (data, type, row) => `
+
                         <div class="d-inline-block text-nowrap">
                             <a href="/Import/Xml?profileId=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
+                            <button type="button" onclick="Entegro.import.list.runJob('ImportJob',${row.TaskId})" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="İçe Aktar">
+                                <i class="icon-base ti ti-player-play icon-22px"></i>
+                            </button>
                             <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                 <i class="icon-base ti ti-dots-vertical icon-22px"></i>
                             </button>
@@ -146,14 +149,14 @@ Entegro.import.list = (function ($) {
                                     }
                                 ]
                             },
-                            {
-                                text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
-                                        <span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
-                                className: "add-new btn btn-primary",
-                                action: function () {
-                                    window.location.href = "Create";
-                                }
-                            }
+                            //{
+                            //    text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                            //            <span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
+                            //    className: "add-new btn btn-primary",
+                            //    action: function () {
+                            //        window.location.href = "Create";
+                            //    }
+                            //}
                         ]
                     }]
                 },
@@ -246,8 +249,34 @@ Entegro.import.list = (function ($) {
         });
     }
 
+    function runJob(type, taskId) {
+        if (!type) {
+            toastr.error("Geçersiz job tipi.");
+            return;
+        }
+
+        $.ajax({
+            url: '/Scheduling/Run',
+            type: 'POST',
+            data: { type: type, taskId: taskId },
+            success: function (res) {
+                if (res.success) {
+                    toastr.success(type + " job başarıyla çalıştırıldı.");
+                    $('#SchedulingTable').DataTable().ajax.reload(null, false);
+                } else {
+                    toastr.error(res.error || "İşlem başarısız.");
+                }
+            },
+            error: function (xhr) {
+                const msg = xhr.responseText || "Bilinmeyen hata.";
+                toastr.error("Hata: " + msg);
+            }
+        });
+    }
+
     return {
-        init: initList
+        init: initList,
+        runJob: runJob
     };
 
 })(jQuery);

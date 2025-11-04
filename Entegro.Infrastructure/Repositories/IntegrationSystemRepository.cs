@@ -85,6 +85,7 @@ namespace Entegro.Infrastructure.Repositories
                 Description = m.Description,
                 IntegrationSystemParameters = m.IntegrationSystemParameters,
                 Name = m.Name,
+                Active = m.Active,
                 IntegrationSystemTypeId = m.IntegrationSystemTypeId,
                 IntegrationSystemType = m.IntegrationSystemType
             }).FirstOrDefaultAsync(o => o.Id == id);

@@ -15,9 +15,19 @@ namespace Entegro.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<bool> ExistsByTypeAsync(string type)
+        {
+            return await _context.TaskDescriptors.AsNoTracking().AnyAsync(o => o.Type == type);
+        }
+
         public async Task<TaskDescriptor?> GetByIdAsync(int id)
         {
             return await _context.TaskDescriptors.Include(b => b.ExecutionHistory).AsNoTracking().FirstOrDefaultAsync(o => o.Id == id);
+        }
+
+        public async Task<TaskDescriptor?> GetByTypeAsync(string type)
+        {
+            return await _context.TaskDescriptors.AsNoTracking().FirstOrDefaultAsync(o => o.Type == type);
         }
 
         public async Task<Application.DTOs.Common.PagedResult<TaskDescriptor>> GetPagedAsync(GridCommand gridCommand)

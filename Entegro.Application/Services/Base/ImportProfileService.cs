@@ -11,10 +11,12 @@ namespace Entegro.Application.Services.Base
     {
         private readonly IImportProfileRepository _importProfileRepository;
         private readonly IMapper _mapper;
-        public ImportProfileService(IImportProfileRepository importProfileRepository, IMapper mapper)
+        private readonly ITaskDescriptorService _taskDescriptorService;
+        public ImportProfileService(IImportProfileRepository importProfileRepository, IMapper mapper, ITaskDescriptorService taskDescriptorService)
         {
             _importProfileRepository = importProfileRepository ?? throw new ArgumentNullException(nameof(importProfileRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _taskDescriptorService = taskDescriptorService;
         }
 
         public async Task<ImportProfileDto> AddAsync(CreateImportProfileDto model)
@@ -84,18 +86,21 @@ namespace Entegro.Application.Services.Base
 
         public async Task<PagedResult<ImportProfileDto>> GetPagedAsync(GridCommand gridCommand)
         {
+            var task = await _taskDescriptorService.GetByTypeAsync("ImportJob");
             var importProfile = await _importProfileRepository.GetPagedAsync(gridCommand);
+
 
             var items = await importProfile.Items.SelectAwait(async x =>
             {
                 var model = _mapper.Map<ImportProfileDto>(x);
                 model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.TaskId = task.Id;
                 return model;
             }).AsyncToList();
 
             return new PagedResult<ImportProfileDto>
             {
-                Items = _mapper.Map<IEnumerable<ImportProfileDto>>(importProfile.Items),
+                Items = items,
                 TotalCount = importProfile.TotalCount,
                 PageNumber = importProfile.PageNumber,
                 PageSize = importProfile.PageSize
