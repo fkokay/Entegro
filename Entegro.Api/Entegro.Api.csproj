@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.9" />
+    <PackageReference Include="NPOI" Version="2.7.5" />
     <PackageReference Include="Polly" Version="8.6.3" />
     <PackageReference Include="Quartz" Version="3.15.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.15.0" />
@@ -30,7 +31,6 @@
 
   <ItemGroup>
     <Folder Include="App_Data\Media\Storage\document\" />
-    <Folder Include="Models\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

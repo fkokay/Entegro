@@ -2,12 +2,16 @@
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
+using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Web.Models.Import;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using System.Text.Json;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -25,7 +29,8 @@ namespace Entegro.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly IMapper _mapper;
         private readonly IProductIntegrationService _productIntegrationService;
-        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService, IMapper mapper, IProductIntegrationService productIntegrationService)
+        private readonly IProductMediaFileMappingService _productMediaFileMappingService;
+        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService, IMapper mapper, IProductIntegrationService productIntegrationService, IProductMediaFileMappingService productMediaFileMappingService)
         {
             _mediaFileService = mediaFileService;
             _webHostEnvironment = webHostEnvironment;
@@ -37,6 +42,7 @@ namespace Entegro.Web.Controllers
             _settingService = settingService;
             _mapper = mapper;
             _productIntegrationService = productIntegrationService;
+            _productMediaFileMappingService = productMediaFileMappingService;
         }
 
 
@@ -102,8 +108,7 @@ namespace Entegro.Web.Controllers
 
                         headers.Add(new ExcelColumnMapping
                         {
-                            ExcelHeader = cell.Value.ToString(),
-                            Values = columnValues
+                            ExcelHeader = cell.Value.ToString()
                         });
                     }
 
@@ -126,6 +131,7 @@ namespace Entegro.Web.Controllers
         }
 
 
+
         [HttpPost]
         public async Task<IActionResult> ImportData(ExcelImportProfileModel detail)
         {
@@ -137,6 +143,7 @@ namespace Entegro.Web.Controllers
             }
 
             ViewBag.ProfileName = detail.ProfileName;
+
             var selectedColumns = detail.ColumnMappings
                 .Where(x => x.IsImport && !string.IsNullOrEmpty(x.DbColumn))
                 .ToList();
@@ -149,92 +156,63 @@ namespace Entegro.Web.Controllers
 
             try
             {
+
                 using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                using var workbook = new XLWorkbook(stream);
-                var worksheet = workbook.Worksheet(1);
 
-                var imageList = new List<List<string>>();
+                IWorkbook workbook;
+                if (Path.GetExtension(filePath).Equals(".xls", StringComparison.OrdinalIgnoreCase))
+                    workbook = new HSSFWorkbook(stream);
+                else
+                    workbook = new XSSFWorkbook(stream);
 
-                List<string> codes = new List<string>();
-                List<string> names = new List<string>();
-                List<string> descriptions = new List<string>();
-                foreach (var col in selectedColumns)
+                var sheet = workbook.GetSheetAt(0);
+                if (sheet == null)
                 {
-                    int colIndex = worksheet.Row(1).CellsUsed()
-                        .FirstOrDefault(c => c.Value.ToString() == col.ExcelHeader)?.Address.ColumnNumber ?? -1;
+                    TempData["Error"] = "Excel sayfası okunamadı.";
+                    return RedirectToAction("Index");
+                }
 
-                    if (colIndex > 0)
+
+                var headerRow = sheet.GetRow(0);
+                if (headerRow == null)
+                {
+                    TempData["Error"] = "Başlık satırı bulunamadı.";
+                    return RedirectToAction("Index");
+                }
+
+                int totalRows = sheet.LastRowNum;
+
+
+                var headerMap = new Dictionary<int, string>();
+                for (int i = 0; i < headerRow.LastCellNum; i++)
+                {
+                    var headerValue = headerRow.GetCell(i)?.ToString()?.Trim();
+                    if (!string.IsNullOrEmpty(headerValue))
                     {
-                        foreach (var row in worksheet.RowsUsed().Skip(1)) // Başlığı atla
-                        {
-                            string cellValue = row.Cell(colIndex).Value.ToString();
-
-                            if (col.DbColumn.Equals("Images", StringComparison.OrdinalIgnoreCase))
-                            {
-                                var splitImages = cellValue
-                                    .Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(s => s.Trim())
-                                    .Where(s => !string.IsNullOrEmpty(s))
-                                    .ToList();
-
-                                if (splitImages.Any())
-                                    imageList.Add(splitImages);
-                            }
-
-                            col.Values.Add(cellValue);
-                        }
+                        var mapping = selectedColumns.FirstOrDefault(x => x.ExcelHeader == headerValue);
+                        if (mapping != null)
+                            headerMap[i] = mapping.DbColumn;
                     }
                 }
 
-
-                int rowCount = worksheet.RowsUsed().Count() - 1; // başlık hariç
-                for (int i = 0; i < rowCount; i++)
+                int importedCount = 0;
+                for (int rowIndex = 1; rowIndex <= totalRows; rowIndex++)
                 {
-                    string code = selectedColumns
-                        .FirstOrDefault(x => x.DbColumn.Equals("Code", StringComparison.OrdinalIgnoreCase))
-                        ?.Values.ElementAtOrDefault(i) ?? "";
-
-                    string name = selectedColumns
-                        .FirstOrDefault(x => x.DbColumn.Equals("Name", StringComparison.OrdinalIgnoreCase))
-                        ?.Values.ElementAtOrDefault(i) ?? "";
-
-                    string description = selectedColumns
-                        .FirstOrDefault(x => x.DbColumn.Equals("Description", StringComparison.OrdinalIgnoreCase))
-                        ?.Values.ElementAtOrDefault(i) ?? "";
-
-                    // Boş satırları atla
-                    if (string.IsNullOrWhiteSpace(code))
-                        continue;
-
-                    // 🔹 Her satırda birden fazla ürün varsa split et
-                    codes.Add(code.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()).First());
-                    names.Add(name.Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(c => c.Trim()).First());
-
-                    descriptions.Add(description.Split(new[] { '|' }, StringSplitOptions.None)
-                   .Select(d => d.Trim()).First());
-
-
-                }
-
-
-                for (int j = 0; j < codes.Count; j++)
-                {
-                    string currentCode = codes[j];
-                    string currentName = names.ElementAtOrDefault(j) ?? names.FirstOrDefault() ?? "";
-                    string currentDescription = descriptions.ElementAtOrDefault(j) ?? descriptions.FirstOrDefault() ?? "";
+                    List<string> Images = new List<string>();
+                    var row = sheet.GetRow(rowIndex);
+                    if (row == null) continue;
 
                     var productDto = new CreateProductDto
                     {
-                        Code = currentCode,
-                        Name = currentName,
-                        Description = currentDescription,
+                        Code = "",
+                        Name = "",
+                        Description = "",
                         Price = 0,
                         CostPrice = 0,
                         Unit = "Adet",
                         Currency = "TL",
-                        BrandId = 3,
-                        VatRate = 20,
+                        BrandId = null,
+                        VatRate = 0,
                         StockQuantity = 0,
                         Published = true,
                         Deleted = false,
@@ -242,9 +220,87 @@ namespace Entegro.Web.Controllers
                         UpdatedOn = DateTime.UtcNow
                     };
 
-                    await _productService.AddAsync(productDto);
+                    try
+                    {
+                        foreach (var kvp in headerMap)
+                        {
+                            int colIndex = kvp.Key;
+                            string dbColumn = kvp.Value;
+                            string cellValue = row.GetCell(colIndex)?.ToString()?.Trim() ?? "";
+
+                            switch (dbColumn.ToLower())
+                            {
+                                case "code":
+                                    productDto.Code = cellValue;
+                                    break;
+                                case "name":
+                                    productDto.Name = cellValue;
+                                    break;
+                                case "description":
+                                    productDto.Description = cellValue;
+                                    break;
+                                case "images":
+                                case "resimler":
+                                case "resim":
+                                    if (!string.IsNullOrWhiteSpace(cellValue))
+                                    {
+
+                                        var separators = new[] { ";", ",", "\n", "\r" };
+                                        var imageList = cellValue
+                                            .Split(separators, StringSplitOptions.RemoveEmptyEntries)
+                                            .Select(x => x.Trim())
+                                            .Where(x => !string.IsNullOrEmpty(x))
+                                            .ToList();
+
+                                        Images = imageList;
+                                    }
+                                    break;
+                            }
+                        }
+
+                        if (string.IsNullOrWhiteSpace(productDto.Code))
+                        {
+                            Console.WriteLine($"Satır {rowIndex} atlandı: 'Code' boş.");
+                            continue;
+                        }
+
+                        var createdProduct = await _productService.AddAsync(productDto);
+
+                        var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                        if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                        {
+                            Console.WriteLine("Sistem URL'si ayarlanmamış.");
+                        }
+                        if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                        {
+                            Console.WriteLine("hata");
+                        }
+
+                        using var httpClient = new HttpClient
+                        {
+                            BaseAddress = baseUri
+                        };
+
+                        List<int> mediaFiles = await UploadImagesAsync(Images, httpClient);
+                        foreach (var item in mediaFiles)
+                        {
+                            CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                            createProductMediaFile.MediaFileId = item;
+                            createProductMediaFile.ProductId = createdProduct.Id;
+
+                            await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                        }
+                        importedCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Satır {rowIndex} okunamadı: {ex.Message}");
+                        continue;
+                    }
                 }
-                // 🔹 mappedResult JSON
+
+                Console.WriteLine($"Toplam {importedCount} satır başarıyla kaydedildi.");
+
                 var mappedResult = selectedColumns.Select(col => new ExcelColumnMappingResult
                 {
                     ExcelHeader = col.ExcelHeader,
@@ -257,7 +313,6 @@ namespace Entegro.Web.Controllers
 
                 ViewBag.MappedJson = mappedJson;
 
-                // 🔹 Profil kaydı
                 var createDto = new Application.DTOs.ImportProfile.CreateImportProfileDto
                 {
                     ProfileName = detail.ProfileName,
@@ -268,11 +323,12 @@ namespace Entegro.Web.Controllers
                 };
                 await _importProfileService.AddAsync(createDto);
 
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Hata oluştu: {ex.Message}");
+                TempData["Error"] = "Excel verisi işlenirken hata oluştu.";
+                return RedirectToAction("Index");
             }
 
             return View("ImportResult", selectedColumns);
@@ -280,6 +336,83 @@ namespace Entegro.Web.Controllers
 
 
 
+        public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
+        {
+            List<int> fileIds = new();
+
+            if (imageUrls != null && imageUrls.Any())
+            {
+                var multipartContent = new MultipartFormDataContent();
+                multipartContent.Add(new StringContent("catalog"), "path");
+                multipartContent.Add(new StringContent("False"), "isTransient");
+
+                foreach (var imageUrl in imageUrls)
+                {
+                    try
+                    {
+                        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+                        var imageName = Path.GetFileName(imageUrl);
+
+                        if (string.IsNullOrWhiteSpace(imageName))
+                            imageName = "default.jpg";
+
+                        var nameWithoutExtension = Path.GetFileNameWithoutExtension(imageName);
+                        var extension = Path.GetExtension(imageName);
+                        var uniqueSuffix = $"excel_{Guid.NewGuid():N}";
+                        imageName = $"{nameWithoutExtension}_{uniqueSuffix}{extension}";
+
+                        var byteContent = new ByteArrayContent(imageBytes);
+                        byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+                        multipartContent.Add(byteContent, "upload-file", imageName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"HATA (indirilemedi): {imageUrl} → {ex.Message}");
+                    }
+                }
+
+
+                var uploadUrl = "media/upload";
+                var response = await httpClient.PostAsync(uploadUrl, multipartContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    using var document = JsonDocument.Parse(result);
+                    var root = document.RootElement;
+
+                    if (root.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var item in root.EnumerateArray())
+                        {
+                            if (item.TryGetProperty("id", out var idProp))
+                            {
+                                int imageId = idProp.GetInt32();
+                                fileIds.Add(imageId);
+                                Console.WriteLine($"id: {imageId}");
+                            }
+                        }
+                    }
+                    else if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        if (root.TryGetProperty("id", out var idProp))
+                        {
+                            int imageId = idProp.GetInt32();
+                            fileIds.Add(imageId);
+                            Console.WriteLine($"id: {imageId}");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Resim yükleme başarısız oldu. Durum kodu:" + response.StatusCode);
+                }
+            }
+
+            return fileIds;
+        }
 
         #endregion
 

@@ -49,12 +49,6 @@
                                             <input type="text" name="ColumnMappings[@i].DefaultValue" value="@Model.ColumnMappings[i].DefaultValue" class="form-control" />
                                         </td>
 
-                                        <td hidden>
-                                            <input type="hidden"
-                                                   name="ColumnMappings[@i].Values"
-                                                   value='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ColumnMappings[i].Values, new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }))' />
-                                        </td>
-
                                     </tr>
                                 }
                             </tbody>
