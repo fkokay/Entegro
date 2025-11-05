@@ -129,14 +129,25 @@ namespace Entegro.Web.Controllers
 
                     ViewBag.DbColumns = new List<SelectListItem>
                     {
-                        new SelectListItem { Text = "Ürün Adı", Value = "Name" },
                         new SelectListItem { Text = "Ürün Kodu", Value = "Code" },
+                        new SelectListItem { Text = "Ürün Adı", Value = "Name" },
                         new SelectListItem { Text = "Açıklama", Value = "Description" },
-                        new SelectListItem { Text = "Barkod", Value = "Barcode" },
-                        new SelectListItem { Text = "ManufacturerPartNumber", Value = "Üretici Numarası" },
-                        new SelectListItem { Text = "Gtin", Value = "Gtin" },
+                        new SelectListItem { Text = "Üretici Parça Numarası", Value = "ManufacturerPartNumber" },
+                        new SelectListItem { Text = "GTIN", Value = "Gtin" },
                         new SelectListItem { Text = "Fiyat", Value = "Price" },
+                        new SelectListItem { Text = "Eski Fiyat", Value = "OldPrice" },
+                        new SelectListItem { Text = "İndirimli Fiyat", Value = "SalePrice" },
+                        new SelectListItem { Text = "KDV Oranı", Value = "VatRate" },
                         new SelectListItem { Text = "Stok Miktarı", Value = "StockQuantity" },
+                        new SelectListItem { Text = "Ağırlık", Value = "Weight" },
+                        new SelectListItem { Text = "Uzunluk", Value = "Length" },
+                        new SelectListItem { Text = "Genişlik", Value = "Width" },
+                        new SelectListItem { Text = "Yükseklik", Value = "Height" },
+                        new SelectListItem { Text = "Meta Anahtar Kelimeler", Value = "MetaKeywords" },
+                        new SelectListItem { Text = "Meta Açıklama", Value = "MetaDescription" },
+                        new SelectListItem { Text = "Meta Başlık", Value = "MetaTitle" },
+                        new SelectListItem { Text = "Barkod", Value = "Barcode" },
+                        new SelectListItem { Text = "Maliyet Fiyatı", Value = "CostPrice" },
                         new SelectListItem { Text = "Resimler", Value = "Images" }
                     };
                     return View(detail);

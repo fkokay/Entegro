@@ -184,7 +184,7 @@ namespace Entegro.Api.Jobs
                 _logger.LogWarning("Trendyol'dan hiç ürün alınamadı.");
                 return;
             }
-
+            TrendyolProductMapper.ConfigureBrandService(_brandService);
             TrendyolProductMapper.ConfigureLogger(_logger);
             var products = TrendyolProductMapper.ToDtoList(trendyolProducts);
 

@@ -1,24 +1,25 @@
 ﻿using Entegro.Application.DTOs.Brand;
-using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Product;
-using Entegro.Application.Mappings.Commerce.Smartstore;
+using Entegro.Application.Interfaces.Services.Base;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Marketplace.Trendyol
 {
     public static class TrendyolProductMapper
     {
         private static ILogger? _logger;
+        private static IBrandService _brandService;
         public static void ConfigureLogger(ILogger logger)
         {
             _logger = logger;
         }
+
+        public static void ConfigureBrandService(IBrandService brandService)
+        {
+            _brandService = brandService;
+        }
+
         public static ProductDto? ToDto(TrendyolProductDto trendyolProduct)
         {
             if (trendyolProduct == null)
@@ -38,18 +39,33 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             productDto.MetaTitle = "";
             productDto.StockQuantity = trendyolProduct.quantity;
             productDto.Barcode = trendyolProduct.barcode;
-            productDto.Brand = new BrandDto()
+
+            var existBrand = _brandService.ExistsByNameAsync(trendyolProduct.brand).GetAwaiter().GetResult();
+
+            if (existBrand)
             {
-                Name = trendyolProduct.brand,
-                Description = "",
-                MetaDescription = "",
-                MetaTitle = trendyolProduct.brand,
-                MetaKeywords = trendyolProduct.brand.ToLower(),
-                DisplayOrder = 0,
-                CreatedOn = DateTime.Now,
-                UpdatedOn = DateTime.Now,
-            };
-            
+                var brand = _brandService.GetByNameAsync(trendyolProduct.brand).GetAwaiter().GetResult();
+
+                if (brand != null)
+                    productDto.BrandId = brand.Id;
+            }
+
+            else
+            {
+                productDto.Brand = new BrandDto()
+                {
+                    Name = trendyolProduct.brand,
+                    Description = "",
+                    MetaDescription = "",
+                    MetaTitle = trendyolProduct.brand,
+                    MetaKeywords = trendyolProduct.brand.ToLower(),
+                    DisplayOrder = 0,
+                    CreatedOn = DateTime.Now,
+                    UpdatedOn = DateTime.Now,
+                };
+            }
+
+
             //productDto.ProductMediaFiles = TrendyolProductImageMapper.ToDtoList(trendyolProduct.images).ToList();
 
             return productDto; ;

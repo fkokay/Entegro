@@ -187,28 +187,104 @@ namespace Entegro.Api.Jobs
                                 case "Code":
                                     productDto.Code = cellValue;
                                     break;
+
                                 case "Name":
                                     productDto.Name = cellValue;
                                     break;
+
                                 case "Description":
                                     productDto.Description = cellValue;
                                     break;
+
+                                case "ManufacturerPartNumber":
+                                    productDto.ManufacturerPartNumber = cellValue;
+                                    break;
+
+                                case "Gtin":
+                                    productDto.Gtin = cellValue;
+                                    break;
+
+                                case "Price":
+                                    if (decimal.TryParse(cellValue, out decimal price))
+                                        productDto.Price = price;
+                                    break;
+
+                                case "OldPrice":
+                                    if (decimal.TryParse(cellValue, out decimal oldPrice))
+                                        productDto.OldPrice = oldPrice;
+                                    break;
+
+                                case "SalePrice":
+                                    if (decimal.TryParse(cellValue, out decimal salePrice))
+                                        productDto.SalePrice = salePrice;
+                                    break;
+
+                                case "VatRate":
+                                    if (decimal.TryParse(cellValue, out decimal vatRate))
+                                        productDto.VatRate = vatRate;
+                                    break;
+
+
+                                case "StockQuantity":
+                                    if (int.TryParse(cellValue, out int stockQty))
+                                        productDto.StockQuantity = stockQty;
+                                    break;
+
+                                case "Weight":
+                                    if (decimal.TryParse(cellValue, out decimal weight))
+                                        productDto.Weight = weight;
+                                    break;
+
+                                case "Length":
+                                    if (decimal.TryParse(cellValue, out decimal length))
+                                        productDto.Length = length;
+                                    break;
+
+                                case "Width":
+                                    if (decimal.TryParse(cellValue, out decimal width))
+                                        productDto.Width = width;
+                                    break;
+
+                                case "Height":
+                                    if (decimal.TryParse(cellValue, out decimal height))
+                                        productDto.Height = height;
+                                    break;
+
+                                case "MetaKeywords":
+                                    productDto.MetaKeywords = cellValue;
+                                    break;
+
+                                case "MetaDescription":
+                                    productDto.MetaDescription = cellValue;
+                                    break;
+
+                                case "MetaTitle":
+                                    productDto.MetaTitle = cellValue;
+                                    break;
+
+                                case "Barcode":
+                                    productDto.Barcode = cellValue;
+                                    break;
+
+                                case "CostPrice":
+                                    if (decimal.TryParse(cellValue, out decimal costPrice))
+                                        productDto.CostPrice = costPrice;
+                                    break;
+
                                 case "Images":
                                     if (!string.IsNullOrWhiteSpace(cellValue))
                                     {
-
                                         var separators = new[] { ";", ",", "\n", "\r" };
-                                        var imageList = cellValue
+                                        Images = cellValue
                                             .Split(separators, StringSplitOptions.RemoveEmptyEntries)
                                             .Select(x => x.Trim())
                                             .Where(x => !string.IsNullOrEmpty(x))
                                             .ToList();
-
-                                        Images = imageList;
                                     }
                                     break;
                             }
                         }
+
 
                         if (string.IsNullOrWhiteSpace(productDto.Code))
                         {

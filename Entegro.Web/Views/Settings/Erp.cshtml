@@ -114,8 +114,11 @@
                             <div class="col-md-8">
                                 <div class="card-body">
                                     <h5 class="card-title">@erp.Name</h5>
-                                    <p class="card-text">
-                                        @erp.Description
+                                    <p class="card-text mb-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>@erp.Description</span>
+                                            <input class="form-check-input" type="checkbox" @(erp.Active ? "checked" : "") title="Yayında" disabled>
+                                        </div>
                                     </p>
                                 </div>
                             </div>

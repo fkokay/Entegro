@@ -2010,6 +2010,7 @@ namespace Entegro.Web.Controllers
 
 
                 #region product add
+                TrendyolProductMapper.ConfigureBrandService(_brandService);
                 var mappedProduct = TrendyolProductMapper.ToDto(existingTrendyolProduct);
                 var ifExistingProduct = await _productService.ExistsByCodeAsync(mappedProduct.Code);
                 if (ifExistingProduct)

@@ -61,7 +61,7 @@
                                             <input type="hidden" name="ColumnMappings[@i].IsImport" value="false" />
                                         </td>
                                         <td>
-                                            <select name="ColumnMappings[@i].DbColumn" class="form-control" asp-items="ViewBag.DbColumns">
+                                            <select name="ColumnMappings[@i].DbColumn" class="select2 form-select" asp-items="ViewBag.DbColumns">
                                                 <option value="">-- Seçiniz --</option>
                                             </select>
                                         </td>
@@ -76,71 +76,27 @@
                     </form>
                 </div>
             </div>
-
-        </div>
-        
-
-
-        <div id="loadingModal" style="display:none; position:fixed; top:0; left:0;
-    width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;
-    text-align:center; padding-top:200px;">
-            <div class="spinner-border text-light" role="status" style="width:4rem; height:4rem;"></div>
-            <h4 class="text-white mt-3">Lütfen bekleyiniz...</h4>
         </div>
     </div>
 </div>
 
 @section Scripts {
+   
+    <style>
+
+        .select2-container--default .select2-selection.is-invalid {
+            border: 1px solid #dc3545 !important;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, .25);
+        }
+    </style>
+
+    <script src="/assets/js/entegro.mapcolumns.js" asp-append-version="true"></script>
     <script>
-      document.getElementById("importForm").addEventListener("submit", function (e) {
-    let isValid = true;
-    let hasAnyChecked = false;
-    const rows = document.querySelectorAll("tbody tr");
-
-    rows.forEach((row, index) => {
-        const checkbox = row.querySelector(`input[name="ColumnMappings[${index}].IsImport"]`);
-        const select = row.querySelector(`select[name="ColumnMappings[${index}].DbColumn"]`);
-
-        if (checkbox && checkbox.checked) {
-            hasAnyChecked = true;
-            if (select && select.value === "") {
-                isValid = false;
-                select.classList.add("is-invalid");
-            } else if (select) {
-                select.classList.remove("is-invalid");
-            }
-        } else if (select) {
-            select.classList.remove("is-invalid");
-        }
-    });
-
-    const profileNameInput = document.querySelector('input[name="ProfileName"]');
-    if (!profileNameInput || !profileNameInput.value.trim()) {
-        e.preventDefault();
-        alert("Lütfen profil adı giriniz.");
-        if (profileNameInput) {
-            profileNameInput.classList.add("is-invalid");
-            profileNameInput.focus();
-        }
-        return;
-    } else {
-        profileNameInput.classList.remove("is-invalid");
-    }
-
-    if (!hasAnyChecked) {
-        e.preventDefault();
-        alert("Lütfen en az bir satır için 'İçe Aktarılsın mı?' kutucuğunu işaretleyin.");
-        return;
-    }
-
-    if (!isValid) {
-        e.preventDefault();
-        alert("İşaretlenen satırların veritabanı kolonu boş bırakılamaz.");
-        return;
-    }
-
-    document.getElementById("loadingModal").style.display = "block";
-});
-
+        $(function () {
+            Entegro.mapcolumns.init();
+        });
     </script>
 }
+
+
+
