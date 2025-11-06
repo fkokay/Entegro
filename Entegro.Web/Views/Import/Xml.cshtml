@@ -6,7 +6,6 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
             <div class="d-flex flex-column justify-content-center">
                 <h4 class="mb-1">XML Kaynağı Oluştur</h4>
-                <p class="mb-0">XML Kaynağı Oluştur</p>
             </div>
             <div class="d-flex align-content-center flex-wrap gap-4">
                 <div class="d-flex gap-4">
@@ -28,24 +27,18 @@
             <div class="col-lg-12 col-12 mb-lg-0 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Xml</h5>
+                        <h5 class="mb-0">XML Kaynağı Oluştur</h5>
                     </div>
                     <div class="card-body">
                         <input type="hidden" id="mappingsInput" name="MappingsJson" />
-                        <div class="col-md-12 mt-3">
-                            <div class="row">
-                                <label class="col-sm-3 col-form-label text-sm-start" for="ProfileName">Profil Adı</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="ProfileName" type="text" class="form-control" />
-                                </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label text-sm-start" for="Name">Profil Adı</label>
+                                <input asp-for="ProfileName" type="text" class="form-control" />
                             </div>
-                        </div>
-                        <div class="col-md-12 mt-3">
-                            <div class="row">
-                                <label class="col-sm-3 col-form-label text-sm-start" for="Url">XML Kaynağı</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="MediaFileUrl" type="url" class="form-control" />
-                                </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-sm-start" for="Name">XML Kaynağı</label>
+                                <input asp-for="MediaFileUrl" type="url" class="form-control" />
                             </div>
                         </div>
                     </div>
