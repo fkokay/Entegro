@@ -35,6 +35,14 @@ namespace Entegro.Api.Jobs
             _logger.LogInformation("İçe aktarım servisi başladı.");
             var profiles = await _importProfileService.GetAllAsync();
 
+
+            if (!profiles.Any())
+            {
+                _logger.LogError("Profil Bulunamadı");
+                return;
+            }
+
+
             foreach (var profile in profiles)
             {
                 if (profile.MediaFileType == "xml")
@@ -60,6 +68,12 @@ namespace Entegro.Api.Jobs
         {
             var mediaFile = await _mediaFileService.GetByIdAsync(profile.MediaFileId.Value);
 
+
+            if (mediaFile is null)
+            {
+                _logger.LogError("Dosya Bulunamadı");
+                return;
+            }
             #region dosya kaydet
             var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
             if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
