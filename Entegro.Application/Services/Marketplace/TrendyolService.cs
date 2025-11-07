@@ -835,5 +835,33 @@ namespace Entegro.Application.Services.Marketplace
 
             return fileIds;
         }
+
+        public async Task ChangeCargoProviderAsync(TrendyolApiContext context, TrendyolChangeCargoProviderRequest request)
+        {
+            using var client = CreateHttpClient(context);
+
+            var url = $"shipment-packages/{request.ShipmentPackageNumber}/cargo-provider";
+
+            var body = new
+            {
+                cargoProviderCode = request.CargoProviderCode
+            };
+
+            var json = JsonSerializer.Serialize(body, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url, content);
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Kargo firması değiştirme başarısız oldu. Kod: {response.StatusCode}, Yanıt: {result}");
+            }
+        }
+
     }
 }

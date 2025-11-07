@@ -171,10 +171,102 @@
 <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content border-0 shadow-lg" id="invoiceModalContent">
-           
         </div>
     </div>
 </div>
+
+
+
+<!-- Kargo Firması Değiştir Butonu -->
+
+
+<div class="modal fade" id="changeCargoModal" tabindex="-1" aria-labelledby="changeCargoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="changeCargoModalLabel">Paket Kargo Firması Değiştirme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="shipmentPackageNumber">
+
+                <p class="text-muted mb-3">Paketi hangi firma ile göndermek istiyorsunuz?</p>
+
+                <h6 class="fw-semibold mb-3 text-primary">Standart Kargo Firmaları (0–30 desi)</h6>
+                <div class="row row-cols-2 row-cols-md-3 g-3">
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="YKMP" value="YKMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="YKMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/4.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="SURATMP" value="SURATMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="SURATMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/9.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="PTTMP" value="PTTMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="PTTMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/19.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="KOLAYGELSIN" value="SENDEOMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="KOLAYGELSIN">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/38.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="ARASMP" value="ARASMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="ARASMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/7.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="MNG" value="MNGMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="MNG">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/10.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <h6 class="fw-semibold mb-3 text-danger">Ağır & Hacimli Kargo Firmaları (30+ desi)</h6>
+                <div class="row row-cols-2 row-cols-md-3 g-3">
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="HOROZMP" value="HOROZMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="HOROZMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/6.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="BORMP" value="BORMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="BORMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/30.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <input type="radio" class="btn-check" name="cargoProvider" id="CEVAMP" value="CEVAMP" autocomplete="off">
+                        <label class="btn btn-outline-secondary w-100" for="CEVAMP">
+                            <img src="https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/20.png" class="img-fluid mb-2" style="height:24px">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="button" id="changeCargoBtn" class="btn btn-success">İşlemi Yap</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 @section Scripts {
     <script src="/assets/js/entegro.order.list.js" asp-append-version="true"></script>
@@ -183,18 +275,20 @@
 
             var orderStatusId = @((ViewBag.OrderStatusId ?? 1));
             Entegro.order.OrderList.initTab(orderStatusId);
+            Entegro.order.OrderList.submitChangeCargoForm();
+
 
         });
     </script>
 
     <script>
         $(document).ready(function () {
-  
+
             $("#filterStartDate").on("change", function () {
                 const startDate = $(this).val();
 
                 if (startDate) {
-                   
+
                     $("#filterEndDate").attr("min", startDate);
 
                     const endDate = $("#filterEndDate").val();
@@ -202,7 +296,7 @@
                         $("#filterEndDate").val("");
                     }
                 } else {
-                  
+
                     $("#filterEndDate").removeAttr("min");
                 }
             });
@@ -231,5 +325,5 @@
             });
         });
     </script>
-    
+
 }

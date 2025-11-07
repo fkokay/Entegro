@@ -388,7 +388,13 @@ Entegro.order.OrderList = (function ($) {
                                      <span class="visually-hidden">Toggle Dropdown</span>
                                    </button>
                                    <ul class="dropdown-menu">
-                                     <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Başka Kargo Firması İle Gönder</a></li>
+
+                                     <li>
+                                      <a class="dropdown-item waves-effect" href="javascript:void(0);"
+                                         onclick="Entegro.order.OrderList.openChangeCargoModal('${row.PackageNo}')">
+                                         Başka Kargo Firması İle Gönder
+                                      </a>
+                                    </li>
                                      <li><a class="dropdown-item waves-effect" href="javascript:void(0);">İptal Et</a></li>
                                      <li><a class="dropdown-item waves-effect" href="javascript:void(0);">Mağaza Kartı Yazdır</a></li>
                                    </ul>
@@ -951,6 +957,111 @@ Entegro.order.OrderList = (function ($) {
         });
     }
 
+
+    function openChangeCargoModal(packageNo) {
+        const modalElement = document.getElementById('changeCargoModal');
+
+        
+        modalElement.querySelectorAll('input[name="cargoProvider"]').forEach(r => r.checked = false);
+        const hiddenInput = modalElement.querySelector('#shipmentPackageNumber');
+        if (hiddenInput) hiddenInput.value = "";
+
+      
+        hiddenInput.value = packageNo;
+
+
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+
+     
+        if (!modalElement.dataset.resetAttached) {
+            modalElement.addEventListener('hidden.bs.modal', function () {
+
+                modalElement.querySelectorAll('input[name="cargoProvider"]').forEach(r => r.checked = false);
+
+                const hiddenInput2 = modalElement.querySelector('#shipmentPackageNumber');
+                if (hiddenInput2) hiddenInput2.value = "";
+
+                console.log("Popup kapandı — form sıfırlandı.");
+            });
+
+            modalElement.dataset.resetAttached = "true";
+        }
+    }
+
+  
+
+    function submitChangeCargoForm() {
+        document.getElementById("changeCargoBtn").addEventListener("click", async function () {
+            const packageNo = document.getElementById("shipmentPackageNumber").value;
+            const selected = document.querySelector('input[name="cargoProvider"]:checked');
+
+            if (!selected) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Lütfen bir kargo firması seçiniz.',
+                    confirmButtonText: 'Tamam',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const request = {
+                ShipmentPackageNumber: packageNo,
+                CargoProviderCode: selected.value
+            };
+
+            if (window.showLoading) {
+                window.showLoading("Lütfen bekleyiniz..");
+            }
+            try {
+                const response = await fetch("/Order/ChangeCargo", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(request)
+                });
+
+                const result = await response.json();
+              
+                if (window.hideLoading) {
+                    window.hideLoading();
+                }
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: result.message,
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: result.message,
+                        confirmButtonText: 'Kapat',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            } catch (err) {
+
+                if (window.hideLoading) {
+                    window.hideLoading();
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Beklenmeyen Hata',
+                    text: 'Bir hata oluştu: ' + err.message,
+                    confirmButtonText: 'Kapat',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        });
+    }
     return {
      
         initTable: initTable,
@@ -960,7 +1071,9 @@ Entegro.order.OrderList = (function ($) {
         OrderPrint: OrderPrint,
         addFilterText: addFilterText,
         showOrderAddresses: showOrderAddresses,
-        showInvoiceModal: showInvoiceModal
+        showInvoiceModal: showInvoiceModal,
+        openChangeCargoModal: openChangeCargoModal,
+        submitChangeCargoForm: submitChangeCargoForm
     };
 
     function getIntegrationLogo(value) {

@@ -294,7 +294,7 @@ namespace Entegro.Api.Jobs
                 _logger.Error("Pazarama ClientSecret Ayarlanmamış");
             }
 
-            context.ClientId = item.IntegrationSystemParameters.Where(m => m.Key == "SupplierId").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.ClientId = item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Select(m => m.Value).FirstOrDefault() ?? "";
             context.ClientSecret = item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Select(m => m.Value).FirstOrDefault() ?? "";
 
             return context;

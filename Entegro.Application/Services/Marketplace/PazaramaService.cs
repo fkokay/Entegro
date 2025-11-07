@@ -2,22 +2,15 @@
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.CategoryAttribute;
 using Entegro.Application.DTOs.Commerce.Smartstore;
-using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Domain.Enums;
-using Entegro.Imaging.Barcodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services.Marketplace
 {
@@ -29,9 +22,9 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly INotificationService _notificationService;
         public PazaramaService(
-            IHttpClientFactory httpClientFactory, 
-            IProductService productService, 
-            IProductIntegrationService productIntegrationService, 
+            IHttpClientFactory httpClientFactory,
+            IProductService productService,
+            IProductIntegrationService productIntegrationService,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             INotificationService notificationService
             )
@@ -273,8 +266,8 @@ namespace Entegro.Application.Services.Marketplace
                 endDate = DateTime.Now.ToString("yyyy-MM-dd")
             };
 
-            var content = new StringContent(JsonSerializer.Serialize(request),Encoding.UTF8,"application/json");
-            var response = await client.PostAsync(url,content);
+            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url, content);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();

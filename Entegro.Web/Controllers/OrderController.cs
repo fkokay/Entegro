@@ -1,15 +1,18 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.OrderItem;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Web.Models.Checkout.Orders;
 using Entegro.Web.Models.Common;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
+using TrendyolChangeCargoProviderRequest = Entegro.Application.DTOs.Marketplace.Trendyol.TrendyolChangeCargoProviderRequest;
 
 namespace Entegro.Web.Controllers
 {
@@ -24,6 +27,7 @@ namespace Entegro.Web.Controllers
         private readonly IOrderItemService _orderItemService;
         private readonly IProductService _productService;
         private readonly IAddressService _addressService;
+        private readonly ITrendyolService _trendyolService;
         private readonly IMapper _mapper;
         public OrderController(
             IOrderService orderService,
@@ -34,7 +38,8 @@ namespace Entegro.Web.Controllers
             IOrderItemService orderItemService,
             IProductService productService,
             IMapper mapper,
-            IAddressService addressService)
+            IAddressService addressService,
+            ITrendyolService trendyolService)
         {
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
             _shipmentService = shipmentService;
@@ -45,6 +50,7 @@ namespace Entegro.Web.Controllers
             _productService = productService;
             _mapper = mapper;
             _addressService = addressService;
+            _trendyolService = trendyolService;
         }
 
         public Task<IActionResult> Index()
@@ -283,6 +289,40 @@ namespace Entegro.Web.Controllers
                         orderId = order.Id,
                         orderNo = order.OrderNumber
                     }
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new
+                {
+                    success = false,
+                    message = "İşlem sırasında bir hata oluştu: " + ex.Message,
+                    errorCode = "ServerError"
+                });
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeCargo([FromBody] TrendyolChangeCargoProviderRequest model)
+        {
+            try
+            {
+                TrendyolApiContext context = new TrendyolApiContext
+                {
+                    SupplierId = "474352",
+                    ApiUser = "9tjWr2F7zHJKnMDMbcqb",
+                    ApiPassword = "09WZjNvN6ZJU4Tg2z53r",
+                };
+
+                await _trendyolService.ChangeCargoProviderAsync(context, model);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Kargo firması değiştirme başarılı.",
+
                 });
             }
             catch (Exception ex)

@@ -13,5 +13,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
         Task<List<TrendyolCategoryAttributeDto>?> GetCategorySlicerAttributesAsync(TrendyolApiContext context, int categoryId);
         Task<VariantProcessStatusDto> GetProductVariantAsync(TrendyolApiContext context, string barcode, int integrationSystemId);
         Task<IEnumerable<TrendyolProductDto>> GetProductsByProductMainIdAsync(TrendyolApiContext context, string productMainId);
+        Task ChangeCargoProviderAsync(TrendyolApiContext context, TrendyolChangeCargoProviderRequest request);
     }
 }
