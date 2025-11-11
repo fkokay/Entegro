@@ -113,11 +113,13 @@ namespace Entegro.Application.Services.Base
                 throw new ArgumentNullException(nameof(model));
 
             var existingProfile = await _importProfileRepository.GetByIdAsync(model.Id);
+            var createDate = existingProfile.CreatedOnUtc;
             if (existingProfile == null)
                 throw new KeyNotFoundException($"ID {model.Id} ile Profile bulunamadı.");
 
-            _mapper.Map(model, existingProfile);
-            await _importProfileRepository.UpdateAsync(existingProfile);
+            var map = _mapper.Map(model, existingProfile);
+            map.CreatedOnUtc = createDate;
+            await _importProfileRepository.UpdateAsync(map);
 
             return _mapper.Map<ImportProfileDto>(existingProfile);
         }

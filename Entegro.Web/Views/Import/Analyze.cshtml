@@ -1,0 +1,176 @@
+﻿@model XmlStructure
+@{
+    ViewData["Title"] = "Analyze";
+
+    var xmlTags = (IEnumerable<string>)ViewBag.XmlTags;
+    var imageTags = (IEnumerable<string>)ViewBag.ImageTags;
+    var dbColumnDisplayNames = ViewBag.DbColumnDisplayNames as Dictionary<string, string>;
+}
+
+<div class="container-fluid flex-grow-1 container-p-y mt-6">
+    <form id="mappingForm">
+
+        <input type="hidden" id="xmlUrlHidden" value="@ViewBag.XmlUrl" />
+        <input type="hidden" id="profileId" value="@ViewBag.ProfileId" />
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-6 row-gap-4">
+
+            <div class="d-flex flex-column justify-content-center">
+                <h4 class="mb-1">Root Tag: @Model.RootName</h4>
+                <p class="mb-0">@xmlTags.Count() adet veri alanı bulundu (root, product, variant alanları hariç)</p>
+            </div>
+
+            <div class="d-flex align-content-center flex-wrap gap-4">
+                <div class="d-flex gap-4">
+                    <a href="@Url.Action("List")" class="btn btn-label-secondary d-grid w-100 waves-effect">
+                        <span class="d-flex justify-content-center text-nowrap">
+                            <i class="ti ti-circle-x ti-xs me-1"></i> Vazgeç
+                        </span>
+                    </a>
+                </div>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="saveMappings">
+                    <span class="d-flex justify-content-center text-nowrap">
+                        <i class="ti ti-device-floppy ti-xs me-1"></i> Eşleştirmeyi Kaydet
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+
+                    <div class="card-header bg-white border-bottom-0">
+                        <div class="row align-items-center">
+                            <!-- Sol taraf: Başlık -->
+                            <div class="col-md-6 col-12 mb-2 mb-md-0">
+                                <h5 class="mb-0 fw-semibold">Ürün Listesi</h5>
+                            </div>
+
+                            @if (ViewBag.HasVariants == true)
+                            {
+                                <div class="row align-items-start mt-3">
+                                    <!-- Checkbox -->
+                                    <div class="col-md-auto col-12 mb-2">
+                                        <div class="form-check d-flex align-items-center">
+                                            <input class="form-check-input me-2" type="checkbox" value="true" id="includeVariants" />
+                                            <label class="form-check-label fw-semibold mb-0" for="includeVariants">
+                                                Varyantlarla beraber kaydedilsin
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Preview panel -->
+                                    <div class="col-md col-12">
+                                        <div id="variantPreview"
+                                             class="border rounded bg-light p-3 ms-md-3 mt-2 mt-md-0"
+                                             style="display:none; max-height:300px; overflow-y:auto;">
+                                            <h6 class="fw-semibold mb-2">Varyant Önizlemesi (İlk Ürün)</h6>
+                                            <div id="variantData" class="small text-muted"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" class="text-center">Kolon Adı</th>
+                                    <th scope="col" class="text-center">XML Tag</th>
+                                    <th scope="col" class="text-center">Görsel Tag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var col in dbColumnDisplayNames.Keys)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="text"
+                                                   class="form-control form-control-sm dbColumnInput text-center"
+                                                   value="@(dbColumnDisplayNames != null && dbColumnDisplayNames.ContainsKey(col) ? dbColumnDisplayNames[col] : col)"
+                                                   data-col="@col"
+                                                   disabled />
+                                        </td>
+                                        <td>
+                                            @if (col.Equals("Images", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <select class="form-select form-select-sm select2-multi" multiple data-col="@col">
+                                                    @foreach (var tag in imageTags)
+                                                    {
+                                                        <option value="@tag">@tag</option>
+                                                    }
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <select class="form-select form-select-sm select2" data-col="@col">
+                                                    <option value="">Seçiniz...</option>
+                                                    @foreach (var tag in xmlTags)
+                                                    {
+                                                        <option value="@tag">@tag</option>
+                                                    }
+                                                </select>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input isImage" @(col.Equals("Images") ? "checked disabled" : "") disabled />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+<div class="modal fade" id="productSelectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Ürünleri Seç</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <input type="text" id="searchProductInput" class="form-control w-50" placeholder="Ürün ara (kod veya isim)...">
+                    <div>
+                        <button type="button" id="btnSelectAll" class="btn btn-sm btn-outline-success me-1">Tümünü Seç</button>
+                        <button type="button" id="btnDeselectAll" class="btn btn-sm btn-outline-danger">Seçimleri Kaldır</button>
+                    </div>
+                </div>
+                <div id="productListContainer" class="border rounded p-2 bg-light" style="max-height: 600px; overflow-y: auto;">
+                    <div class="text-center text-muted py-3">Ürünler yükleniyor...</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <span class="me-auto text-muted small" id="productCountLabel"></span>
+                <button id="btnContinueExport" type="button" class="btn btn-success">Devam Et ve Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="/assets/js/entegro.import.js" asp-append-version="true"></script>
+
+    <script>
+        $(function () {
+            Entegro.import.initImportPage();
+        });
+    </script>
+}

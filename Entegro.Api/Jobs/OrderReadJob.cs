@@ -134,12 +134,12 @@ namespace Entegro.Api.Jobs
                 case "CicekSepeti":
                     await CicekSepetiOrderSync(item);
                     break;
-                case "Pazarama":
-                    await PazaramaOrderSync(item);
-                    break;
-                case "Idefix":
-                    await IdefixOrderSync(item);
-                    break;
+                //case "Pazarama":
+                //    await PazaramaOrderSync(item);
+                //    break;
+                //case "Idefix":
+                //    await IdefixOrderSync(item);
+                //    break;
                 default:
                     _logger.LogError("{0} pazaryerine ait sipariş çekme işlemi bulunamadı", marketPlaceType);
                     break;
