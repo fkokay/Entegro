@@ -5,6 +5,7 @@ namespace Entegro.Application.Interfaces.Repositories
 {
     public interface IImportProfileRepository
     {
+        Task<bool> ExistsByNameAsync(string name);
         Task<ImportProfile?> GetByIdAsync(int id);
         Task<List<ImportProfile>> GetAllAsync();
         Task<PagedResult<ImportProfile>> GetAllAsync(int pageNumber, int pageSize);

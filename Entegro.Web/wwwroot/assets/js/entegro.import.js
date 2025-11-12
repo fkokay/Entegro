@@ -3,10 +3,38 @@ Entegro.import = Entegro.import || {};
 
 Entegro.import = (function ($) {
 
-    function initImportPage() {
-        $(document).ready(function () {
+    async function initImportPage() {
+        $(document).ready(async function () {
 
-           
+            // ✅ Global state başlat
+            window._enteGroSelectedProducts = window._enteGroSelectedProducts || new Set();
+
+            // ✅ ViewBag verilerini yükle
+            const savedMappings = window._enteGroSavedMappings || [];
+            const includeVariants = window._enteGroIncludeVariants || false;
+            const xmlUrl = window._enteGroXmlUrl || "";
+            const profileId = window._enteGroProfileId || 0;
+
+            // ✅ Inputlara ata
+            $('#xmlUrlHidden').val(xmlUrl);
+            $('#profileId').val(profileId);
+            $('#includeVariants').prop('checked', includeVariants);
+
+            // ✅ Kayıtlı mappingleri doldur
+            if (savedMappings.length > 0) {
+                savedMappings.forEach(m => {
+                    const $select = $(`select[data-col="${m.ColumnName}"]`);
+                    if ($select.length) {
+                        if (Array.isArray(m.XmlTags)) {
+                            $select.val(m.XmlTags).trigger("change");
+                        } else {
+                            $select.val([m.XmlTags]).trigger("change");
+                        }
+                    }
+                });
+            }
+
+            // 🔹 Select2 başlat
             $('.select2').select2({
                 language: "tr",
                 placeholder: "XML tag seçiniz",
@@ -20,21 +48,41 @@ Entegro.import = (function ($) {
                 width: '100%'
             });
 
+            // 🔹 Varyant kutusu toggle
             $('#includeVariants').on('change', async function () {
                 if ($(this).is(':checked')) {
                     $('#variantPreview').show();
+                    $('#variantData').html('<div class="text-muted small">Yükleniyor...</div>');
 
                     const xmlUrl = $('#xmlUrlHidden').val();
-                    const res = await fetch('/Import/GetFirstVariantPreview?xmlUrl=' + encodeURIComponent(xmlUrl));
-                    const html = await res.text();
-
-                    $('#variantData').html(html);
+                    try {
+                        const res = await fetch('/Import/GetFirstVariantPreview?xmlUrl=' + encodeURIComponent(xmlUrl));
+                        const html = await res.text();
+                        $('#variantData').html(html);
+                    } catch (err) {
+                        $('#variantData').html('<div class="text-danger small">Varyant verisi yüklenemedi.</div>');
+                    }
                 } else {
                     $('#variantPreview').hide();
                 }
             });
 
-            
+            // 🔹 Sayfa ilk yüklendiğinde varyant işaretliyse otomatik aç
+            if ($('#includeVariants').is(':checked')) {
+                $('#variantPreview').show();
+                $('#variantData').html('<div class="text-muted small">Varyantlar yükleniyor...</div>');
+                const xmlUrl = $('#xmlUrlHidden').val();
+
+                try {
+                    const res = await fetch('/Import/GetFirstVariantPreview?xmlUrl=' + encodeURIComponent(xmlUrl));
+                    const html = await res.text();
+                    $('#variantData').html(html);
+                } catch (err) {
+                    $('#variantData').html('<div class="text-danger small">Varyant önizleme yüklenemedi.</div>');
+                }
+            }
+
+            // 🔹 Eşleştirmeleri kaydet
             $('#saveMappings').on('click', async function () {
                 const mappings = [];
 
@@ -75,6 +123,29 @@ Entegro.import = (function ($) {
                 const profileId = $('#profileId').val();
                 const xmlUrl = $('#xmlUrlHidden').val();
 
+                // 🔹 Popup öncesi loading göster
+                if (window.showLoading) {
+                    window.showLoading("Lütfen bekleyiniz..");
+                }
+
+                // 🔹 Ürünleri getir
+                const productRes = await fetch(`/Import/GetProductList?xmlUrl=${encodeURIComponent(xmlUrl)}`);
+                const productData = await productRes.json();
+
+                // 🔹 Loading kapat
+                if (window.hideLoading) {
+                    window.hideLoading();
+                }
+
+                if (!productData.success || !Array.isArray(productData.data)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: productData.message || "Ürünler yüklenemedi."
+                    });
+                    return;
+                }
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Eşleştirme tamamlandı',
@@ -83,58 +154,51 @@ Entegro.import = (function ($) {
                 }).then(async (result) => {
                     if (!result.isConfirmed) return;
 
-                    const productRes = await fetch(`/Import/GetProductList?xmlUrl=${encodeURIComponent(xmlUrl)}`);
-                    const productData = await productRes.json();
-
-                    if (!productData.success || !Array.isArray(productData.data)) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Hata',
-                            text: productData.message || "Ürünler yüklenemedi."
-                        });
-                        return;
-                    }
-
                     const allProducts = productData.data;
-                    const selectedProducts = new Set();
-                    renderProductList(allProducts, selectedProducts);
 
+                    // 🔹 Ürünleri render et (önceden seçilenler işaretli gelsin)
+                    renderProductList(allProducts);
 
+                    // 🔹 Modalı göster
                     const modal = new bootstrap.Modal(document.getElementById('productSelectModal'));
                     modal.show();
 
+                    // 🔹 Arama
                     $('#searchProductInput').off('input').on('input', function () {
                         const searchTerm = $(this).val().toLowerCase();
                         const filtered = allProducts.filter(p =>
                             (p.Code || '').toLowerCase().includes(searchTerm) ||
                             (p.Name || '').toLowerCase().includes(searchTerm)
                         );
-                        renderProductList(filtered, selectedProducts);
+                        renderProductList(filtered);
                     });
 
-
+                    // 🔹 Tümünü Seç
                     $('#btnSelectAll').off('click').on('click', function () {
                         $('.productCheckbox').each(function () {
                             $(this).prop('checked', true);
-                            selectedProducts.add($(this).val());
+                            window._enteGroSelectedProducts.add($(this).val());
                         });
                     });
 
+                    // 🔹 Seçimleri Kaldır
                     $('#btnDeselectAll').off('click').on('click', function () {
                         $('.productCheckbox').each(function () {
                             $(this).prop('checked', false);
                         });
-                        selectedProducts.clear();
+                        window._enteGroSelectedProducts.clear();
                     });
 
+                    // 🔹 Checkbox değişimi
                     $(document).off('change', '.productCheckbox').on('change', '.productCheckbox', function () {
                         const val = $(this).val();
-                        if ($(this).is(':checked')) selectedProducts.add(val);
-                        else selectedProducts.delete(val);
+                        if ($(this).is(':checked')) window._enteGroSelectedProducts.add(val);
+                        else window._enteGroSelectedProducts.delete(val);
                     });
 
+                    // 🔹 Devam Et ve Kaydet
                     $('#btnContinueExport').off('click').on('click', async function () {
-                        if (selectedProducts.size === 0) {
+                        if (window._enteGroSelectedProducts.size === 0) {
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Ürün Seçilmedi',
@@ -149,9 +213,13 @@ Entegro.import = (function ($) {
                             profileId,
                             xmlUrl,
                             mappings,
-                            selectedProducts: Array.from(selectedProducts),
+                            selectedProducts: Array.from(window._enteGroSelectedProducts),
                             includeVariants
                         };
+
+                        if (window.showLoading) {
+                            window.showLoading("Kaydediliyor...");
+                        }
 
                         const res = await fetch('/Import/SaveMapping', {
                             method: 'POST',
@@ -159,18 +227,22 @@ Entegro.import = (function ($) {
                             body: JSON.stringify(payload)
                         });
 
+                        if (window.hideLoading) {
+                            window.hideLoading();
+                        }
+
                         const data = await res.json();
 
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Kaydedildi',
-                                text: 'Eşleştirme ve ürün seçimleri başarıyla kaydedildi. Aktarılması için onay bekleniyor.',
+                                text: 'Eşleştirme ve ürün seçimleri başarıyla kaydedildi.',
                                 confirmButtonText: 'Tamam'
                             }).then(() => {
-                                window.location.href = 'list';
+                                modal.hide();
+                                window.location.href = '/Import/List';
                             });
-                            modal.hide();
                         } else {
                             Swal.fire({ icon: 'error', title: 'Hata', text: data.message });
                         }
@@ -178,16 +250,15 @@ Entegro.import = (function ($) {
                 });
             });
 
-
-          
-            function renderProductList(products, selectedProducts) {
+            // 🔹 Ürün listesi oluşturucu
+            function renderProductList(products) {
                 let html = "";
                 if (products.length === 0) {
                     html = '<div class="text-center text-muted py-3">Eşleşen ürün bulunamadı</div>';
                 } else {
                     html += '<div class="row">';
-                    products.forEach((p, i) => {
-                        const checked = selectedProducts.has(p.Code) ? 'checked' : '';
+                    products.forEach((p) => {
+                        const checked = window._enteGroSelectedProducts.has(p.Code) ? 'checked' : '';
                         html += `
                             <div class="col-md-4 mb-2">
                                 <label class="form-check-label d-block border rounded bg-white px-2 py-1">
@@ -203,7 +274,6 @@ Entegro.import = (function ($) {
                 $('#productListContainer').html(html);
                 $('#productCountLabel').text(`${products.length} ürün listelendi`);
             }
-
         });
     }
 

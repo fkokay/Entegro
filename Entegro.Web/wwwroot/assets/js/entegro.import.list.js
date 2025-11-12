@@ -24,12 +24,12 @@ Entegro.import.list = (function ($) {
                 }
             },
             columns: [
-                { data: 'Id', orderable: false },         
-                { data: 'Id', visible: false },            
-                { data: 'ProfileName' },                    
-                { data: 'MediaFileType' },                  
-                { data: 'MediaFileUrl' },                   
-                { data: 'Id' }                              
+                { data: 'Id', orderable: false },
+                { data: 'Id', visible: false },
+                { data: 'ProfileName' },
+                { data: 'MediaFileType' },
+                { data: 'MediaFileUrl' },
+                { data: 'Id' }
             ],
             columnDefs: [
                 {
@@ -42,7 +42,7 @@ Entegro.import.list = (function ($) {
                     },
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 },
-                
+
                 {
                     targets: 2,
                     responsivePriority: 1,
@@ -64,25 +64,31 @@ Entegro.import.list = (function ($) {
                     searchable: false,
                     orderable: false,
                     className: "text-center",
-                    render: (data, type, row) => `
+                    render: (data, type, row) => {
+                        const editUrl = row.MediaFileType === "xml"
+                            ? `/Import/Xml?profileId=${row.Id}`
+                            : "#";
 
+                        return `
                         <div class="d-inline-block text-nowrap">
-                            <a href="/Import/Xml?profileId=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
+                            <a href="${editUrl}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
-                            <button type="button" onclick="Entegro.import.list.runJob('ImportJob',${row.TaskId})" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="İçe Aktar">
+                            <button type="button" onclick="Entegro.import.list.runJob('ImportJob', ${row.TaskId})" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="İçe Aktar">
                                 <i class="icon-base ti ti-player-play icon-22px"></i>
                             </button>
                             <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                 <i class="icon-base ti ti-dots-vertical icon-22px"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end m-0">
-                            <a href="ImportAllProductsFromXml?profileId=${row.Id}" class="dropdown-item">Bütün Ürünleri Kaydet</a>
-                         
+                                <a href="ImportAllProductsFromXml?profileId=${row.Id}" class="dropdown-item">Bütün Ürünleri Kaydet</a>
                                 <div class="dropdown-divider"></div>
                                 <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Sil</a>
                             </div>
-                        </div>`
+                        </div>
+                     `;
+                    }
+
                 }
             ],
             select: {
@@ -149,14 +155,27 @@ Entegro.import.list = (function ($) {
                                     }
                                 ]
                             },
-                            //{
-                            //    text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
-                            //            <span class="d-none d-sm-inline-block">Yeni Ekle</span>`,
-                            //    className: "add-new btn btn-primary",
-                            //    action: function () {
-                            //        window.location.href = "Create";
-                            //    }
-                            //}
+                            {
+                                text: `
+                                <i class="icon-base ti ti-file-spreadsheet me-0 me-sm-1 icon-16px"></i>
+                                <span class="d-none d-sm-inline-block">Excel Ekle</span>
+                            `   ,
+                                className: "add-new btn btn-primary",
+                                action: function () {
+                                    window.location.href = "Excel";
+                                }
+                            },
+                            {
+                                text: `
+                                <i class="icon-base ti ti-file-code me-0 me-sm-1 icon-16px"></i>
+                                <span class="d-none d-sm-inline-block">XML Ekle</span>
+                            `,
+                                className: "add-new btn btn-success",
+                                action: function () {
+                                    window.location.href = "Xml";
+                                }
+                            }
+
                         ]
                     }]
                 },

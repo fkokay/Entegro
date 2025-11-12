@@ -38,6 +38,11 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            return await _context.ImportProfiles.AsNoTracking().AnyAsync(o => o.ProfileName == name);
+        }
+
         public async Task<List<ImportProfile>> GetAllAsync()
         {
             return await _context.ImportProfiles.AsNoTracking().OrderBy(b => b.Id).ToListAsync();

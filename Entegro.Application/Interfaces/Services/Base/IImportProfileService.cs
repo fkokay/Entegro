@@ -5,6 +5,7 @@ namespace Entegro.Application.Interfaces.Services.Base
 {
     public interface IImportProfileService
     {
+        Task<bool> ExistsByNameAsync(string name);
         Task<ImportProfileDto?> GetByIdAsync(int id);
         Task<IEnumerable<ImportProfileDto>> GetAllAsync();
         Task<PagedResult<ImportProfileDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);

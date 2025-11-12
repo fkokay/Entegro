@@ -227,7 +227,24 @@ namespace Entegro.Web.Controllers
 
         #region XML Import
 
-        public IActionResult Xml() => View(new XmlImportProfileModel());
+        public async Task<IActionResult> Xml(int profileId = 0)
+        {
+
+            var importProfile = new XmlImportProfileModel();
+            if (profileId == 0)
+            {
+                return View(new XmlImportProfileModel());
+            }
+
+            var profileDto = await _importProfileService.GetByIdAsync(profileId);
+            if (profileDto != null)
+            {
+                importProfile = _mapper.Map<XmlImportProfileModel>(profileDto);
+
+            }
+            return View(importProfile);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Analyze(XmlImportProfileModel model)
@@ -237,7 +254,7 @@ namespace Entegro.Web.Controllers
 
             try
             {
-                var (xmlContent, profileId) = await DownloadAndSaveXmlAsync(model.MediaFileUrl, model.ProfileName);
+                var (xmlContent, profileId) = await DownloadAndSaveXmlAsync(model);
                 var structure = AnalyzeXml(xmlContent);
 
                 structure.Tags = structure.Tags
@@ -248,12 +265,39 @@ namespace Entegro.Web.Controllers
 
                 var xDoc = XDocument.Parse(xmlContent);
 
+
+                ImportProfileDto importProfile = null;
+                if (model.Id > 0)
+                {
+                    importProfile = await _importProfileService.GetByIdAsync(model.Id);
+                }
+
+
+                if (importProfile != null && !string.IsNullOrEmpty(importProfile.ColumnMapping))
+                {
+                    try
+                    {
+                        var mappingData = JsonConvert.DeserializeObject<MappingSaveRequest>(importProfile.ColumnMapping);
+
+                        ViewBag.SavedMappings = mappingData?.Mappings ?? new List<XmlMapping>();
+                        ViewBag.IncludeVariants = mappingData?.IncludeVariants ?? false;
+                        ViewBag.SelectedProducts = mappingData?.SelectedProducts ?? new List<string>();
+                        ViewBag.XmlUrl = mappingData?.XmlUrl ?? importProfile.MediaFileUrl;
+                    }
+                    catch (Exception ex)
+                    {
+                        return View(CreateErrorModel($"Mapping JSON parse hatası (ProfileId: {{ProfileId}}) {ex.Message}", importProfile?.Id.ToString()));
+
+                    }
+                }
+
+
                 ViewBag.HasVariants = xDoc.Descendants("variant").Any();
                 ViewBag.ImageTags = GetImageTags(xDoc);
                 ViewBag.DbColumnDisplayNames = DbColumnDisplayNames;
                 ViewBag.XmlTags = structure.Tags;
-                ViewBag.ProfileId = profileId;
-                ViewBag.XmlUrl = model.MediaFileUrl;
+                ViewBag.ProfileId = importProfile?.Id ?? profileId;
+                ViewBag.XmlUrl ??= model.MediaFileUrl;
 
                 return View(structure);
             }
@@ -262,6 +306,7 @@ namespace Entegro.Web.Controllers
                 return View(CreateErrorModel($"İndirme/parse hatası: {ex.Message}", model.MediaFileUrl));
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetFirstVariantPreview(string xmlUrl)
@@ -379,20 +424,29 @@ namespace Entegro.Web.Controllers
 
         #region Private Helpers
 
-        private async Task<(string XmlContent, int ProfileId)> DownloadAndSaveXmlAsync(string url, string profileName)
+        private async Task<(string XmlContent, int ProfileId)> DownloadAndSaveXmlAsync(XmlImportProfileModel model)
         {
+            if (model.Id > 0)
+            {
+                var importProfile = await _importProfileService.GetByIdAsync(model.Id);
+                if (importProfile != null)
+                {
+                    var map = _mapper.Map<UpdateImportProfileDto>(importProfile);
+                    var updated = await _importProfileService.UpdateAsync(map);
+                    return (await DownloadXmlAsync(model.MediaFileUrl), updated.Id);
+                }
+            }
             var createModel = new CreateXmlImportProfileModel
             {
-                MediaFileUrl = url,
-                ProfileName = profileName,
+                MediaFileUrl = model.MediaFileUrl,
+                ProfileName = model.ProfileName,
                 MediaFileType = "xml",
                 Enable = false,
             };
 
             var dto = _mapper.Map<CreateImportProfileDto>(createModel);
             var profile = await _importProfileService.AddAsync(dto);
-
-            return (await DownloadXmlAsync(url), profile.Id);
+            return (await DownloadXmlAsync(model.MediaFileUrl), profile.Id);
         }
 
         private static async Task<string> DownloadXmlAsync(string url)

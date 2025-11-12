@@ -42,6 +42,14 @@ namespace Entegro.Application.Services.Base
             await _importProfileRepository.DeleteAsync(importProfile);
         }
 
+        public async Task<bool> ExistsByNameAsync(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Profil adı boş olamaz.", nameof(name));
+
+            return await _importProfileRepository.ExistsByNameAsync(name);
+        }
+
         public async Task<IEnumerable<ImportProfileDto>> GetAllAsync()
         {
             var importProfiles = await _importProfileRepository.GetAllAsync();

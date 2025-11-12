@@ -1,4 +1,5 @@
-﻿@model XmlStructure
+﻿@using Newtonsoft.Json
+@model XmlStructure
 @{
     ViewData["Title"] = "Analyze";
 
@@ -169,6 +170,13 @@
     <script src="/assets/js/entegro.import.js" asp-append-version="true"></script>
 
     <script>
+        
+        window._enteGroSavedMappings = @Html.Raw(JsonConvert.SerializeObject(ViewBag.SavedMappings ?? new List<object>()));
+        window._enteGroIncludeVariants = @Html.Raw(JsonConvert.SerializeObject(ViewBag.IncludeVariants ?? false));
+        window._enteGroSelectedProducts = new Set(@Html.Raw(JsonConvert.SerializeObject(ViewBag.SelectedProducts ?? new List<string>())));
+        window._enteGroXmlUrl = @Html.Raw(JsonConvert.SerializeObject(ViewBag.XmlUrl ?? ""));
+        window._enteGroProfileId = @Html.Raw(JsonConvert.SerializeObject(ViewBag.ProfileId ?? 0));
+
         $(function () {
             Entegro.import.initImportPage();
         });
