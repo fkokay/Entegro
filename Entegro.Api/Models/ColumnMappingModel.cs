@@ -13,4 +13,14 @@
         public List<string> XmlTags { get; set; }
         public bool IsImage { get; set; }
     }
+
+
+    public class VariantModel
+    {
+        public string ProductCode { get; set; }
+        public string Barcode { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+        public Dictionary<string, string> Specs { get; set; }
+    }
 }

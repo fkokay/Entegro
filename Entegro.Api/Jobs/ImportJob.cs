@@ -532,7 +532,7 @@ namespace Entegro.Api.Jobs
 
                     await _productCategoryService.AddAsync(productCategoryDto);
 
-
+                    #region Variants
                     if (mapping.IncludeVariants)
                     {
                         var variantNodes = product.Element("variants")?.Elements("variant");
@@ -616,6 +616,8 @@ namespace Entegro.Api.Jobs
                             }
                         }
                     }
+                    #endregion
+
 
                 }
                 else
@@ -626,7 +628,6 @@ namespace Entegro.Api.Jobs
 
 
             }
-            throw new NotImplementedException();
         }
 
         private decimal ParsePrice(string? input)
@@ -670,16 +671,16 @@ namespace Entegro.Api.Jobs
 
             return 0;
         }
-        private List<VariantDto> ReadVariants(XElement product)
+        private List<VariantModel> ReadVariants(XElement product)
         {
-            var list = new List<VariantDto>();
+            var list = new List<VariantModel>();
 
             var variantNodes = product.Element("variants")?.Elements("variant");
             if (variantNodes == null) return list;
 
             foreach (var v in variantNodes)
             {
-                var dto = new VariantDto
+                var dto = new VariantModel
                 {
                     ProductCode = v.Element("productCode")?.Value?.Trim(),
                     Barcode = v.Element("barcode")?.Value?.Trim(),
@@ -787,13 +788,6 @@ namespace Entegro.Api.Jobs
         }
 
 
-        public class VariantDto
-        {
-            public string ProductCode { get; set; }
-            public string Barcode { get; set; }
-            public int Quantity { get; set; }
-            public decimal Price { get; set; }
-            public Dictionary<string, string> Specs { get; set; }
-        }
+
     }
 }
