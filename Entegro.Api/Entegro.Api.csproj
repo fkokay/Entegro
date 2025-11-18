@@ -1,11 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.9" />
@@ -24,14 +23,16 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Entegro.Infrastructure\Entegro.Infrastructure.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="App_Data\Media\Storage\document\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="System.ServiceModel.Http" Version="8.*" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="8.*" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.*" />
+  </ItemGroup>
 </Project>

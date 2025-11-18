@@ -1,17 +1,15 @@
-﻿using Entegro.Application.DTOs.Shipment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ArasCargo;
+using Entegro.Application.DTOs.Shipment;
 
 namespace Entegro.Application.Interfaces.Services.Cargo
 {
     public interface IArasCargoService
     {
         Task SendCargo(ShipmentDto shipmentDto, bool isDoorPayment);
-        Task GetBarcode(string integrationCode);
-        Task CancelDispatch(string integrationCode);
-        Task GetCargo(string queryType,string integrationCode);
+        Task<BarcodeResult?> GetBarcode(string integrationCode);
+        Task<DispatchResultInfo> CancelDispatch(string integrationCode);
+        Task GetCargo(string queryType, string integrationCode);
+        Task<GetCargoSearchResponseGetCargoSearchResult?> GetCargoSearch(string seri, string documentNo, string refCode);
+        Task<GetCargoSearchByCodeResponseGetCargoSearchByCodeResult?> GetCargoSearchByCode(string code);
     }
 }

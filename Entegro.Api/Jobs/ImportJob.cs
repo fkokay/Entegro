@@ -1,13 +1,17 @@
 ﻿using Entegro.Api.Models;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.Interfaces.Services.Base;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using Quartz;
+using System.Globalization;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace Entegro.Api.Jobs
 {
@@ -18,9 +22,12 @@ namespace Entegro.Api.Jobs
         private readonly IMediaFileService _mediaFileService;
         private readonly ISettingService _settingService;
         private readonly IProductService _productService;
+        private readonly IProductCategoryService _productCategoryService;
+        private readonly IBrandService _brandService;
+        private readonly ICategoryService _categoryService;
         private readonly ILogger<ImportJob> _logger;
         private readonly IProductMediaFileMappingService _productMediaFileMappingService;
-        public ImportJob(IImportProfileService importProfileService, IMediaFileService mediaFileService, ILogger<ImportJob> logger, ISettingService settingService, IProductService productService, IProductMediaFileMappingService productMediaFileMappingService)
+        public ImportJob(IImportProfileService importProfileService, IMediaFileService mediaFileService, ILogger<ImportJob> logger, ISettingService settingService, IProductService productService, IProductMediaFileMappingService productMediaFileMappingService, IBrandService brandService, ICategoryService categoryService, IProductCategoryService productCategoryService)
         {
             _importProfileService = importProfileService;
             _mediaFileService = mediaFileService;
@@ -28,6 +35,9 @@ namespace Entegro.Api.Jobs
             _productService = productService;
             _logger = logger;
             _productMediaFileMappingService = productMediaFileMappingService;
+            _brandService = brandService;
+            _categoryService = categoryService;
+            _productCategoryService = productCategoryService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -47,12 +57,12 @@ namespace Entegro.Api.Jobs
             {
                 if (profile.MediaFileType == "xml")
                 {
-
+                    await XmlJob(profile);
                 }
 
                 else if (profile.MediaFileType == "excel")
                 {
-                    await ExcelJob(profile);
+                    // await ExcelJob(profile);
                 }
 
                 else
@@ -349,9 +359,355 @@ namespace Entegro.Api.Jobs
 
         public async Task XmlJob(ImportProfileDto profile)
         {
+
+            var mapping = JsonSerializer.Deserialize<ColumnMappingModel>(profile.ColumnMapping);
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
+            var xmlData = await client.GetStringAsync(mapping.XmlUrl);
+            var xdoc = XDocument.Parse(xmlData);
+            var products = xdoc.Descendants("Product").ToList();
+            var filtered = products.Where(p =>
+            {
+                var code = p.Element("Product_code")?.Value;
+                return mapping.SelectedProducts.Contains(code);
+            }).ToList();
+
+
+
+
+            foreach (var product in filtered)
+            {
+                var dict = new Dictionary<string, object>();
+
+                foreach (var map in mapping.Mappings)
+                {
+                    if (map.IsImage)
+                    {
+
+                        var imgList = map.XmlTags
+                            .Select(tag => product.Element(tag)?.Value)
+                            .Where(v => !string.IsNullOrWhiteSpace(v))
+                            .ToList();
+
+                        dict[map.ColumnName] = imgList;
+                    }
+                    else
+                    {
+                        var val = map.XmlTags
+                            .Select(tag => product.Element(tag)?.Value)
+                            .FirstOrDefault(v => v != null);
+                        dict[map.ColumnName] = val;
+                    }
+                }
+
+                decimal price = 0;
+                if (dict.ContainsKey("Price"))
+                {
+                    price = ParsePrice(dict["Price"]?.ToString());
+                }
+
+                int brandId = 0;
+                if (dict.ContainsKey("Brand"))
+                {
+                    var brandName = dict.ContainsKey("Brand") ? dict["Brand"]?.ToString() : "";
+                    var brand = await _brandService.ExistsByNameAsync(brandName);
+                    if (!brand)
+                    {
+                        var createdBrand = await _brandService.AddAsync(new Application.DTOs.Brand.CreateBrandDto
+                        {
+                            Name = brandName,
+                            DisplayOrder = 0,
+                            Published = true
+                        });
+                        brandId = createdBrand.Id;
+                    }
+                    else
+                    {
+                        var existBrand = await _brandService.GetByNameAsync(brandName);
+                        brandId = existBrand.Id;
+                    }
+
+                }
+                int categoryId = 0;
+                if (dict.ContainsKey("Category"))
+                {
+                    var categoryName = dict.ContainsKey("Category") ? dict["Category"]?.ToString() : "";
+                    var category = await _categoryService.ExistsByNameAsync(categoryName);
+                    if (!category)
+                    {
+                        var createdCategory = await _categoryService.AddAsync(new CreateCategoryDto
+                        {
+                            Name = categoryName,
+                            DisplayOrder = 0,
+                            Published = true
+                        });
+                        categoryId = createdCategory.Id;
+                    }
+                    else
+                    {
+                        var existCategory = await _categoryService.GetCategoryByNameAsync(categoryName);
+                        categoryId = existCategory.Id;
+                    }
+
+                }
+
+                int stock = 0;
+                if (dict.ContainsKey("StockQuantity") && dict["StockQuantity"] != null)
+                {
+                    var stockQuantity = dict["StockQuantity"]?.ToString();
+
+                    stockQuantity = stockQuantity.Replace(".", ",");
+                    if (decimal.TryParse(stockQuantity, new CultureInfo("tr-TR"), out var decStock))
+                    {
+                        stock = (int)decStock;
+                    }
+                }
+
+                List<string> Images = new List<string>();
+
+                if (dict.ContainsKey("Images") && dict["Images"] is List<string> imgList2)
+                    Images = imgList2;
+                else
+                    Images = new List<string>();
+
+                var productDto = new CreateProductDto
+                {
+                    Code = dict.ContainsKey("Code") ? dict["Code"]?.ToString() : "",
+                    Name = dict.ContainsKey("Name") ? dict["Name"]?.ToString() : "",
+                    Description = dict.ContainsKey("Description") ? dict["Description"]?.ToString() : "",
+                    Price = price,
+                    Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : "",
+                    CostPrice = 0,
+                    Unit = "Adet",
+                    Currency = "TL",
+                    BrandId = brandId > 0 ? brandId : null,
+                    VatRate = 0,
+                    StockQuantity = stock,
+                    Published = true,
+                    Deleted = false,
+                    CreatedOn = DateTime.UtcNow,
+                    UpdatedOn = DateTime.UtcNow
+                };
+
+                var existProduct = await _productService.ExistsByCodeAsync(productDto.Code);
+
+                if (!existProduct)
+                {
+                    var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                    if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                    {
+                        _logger.LogError("Sistem URL'si ayarlanmamış.");
+                        return;
+                    }
+
+                    if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                    {
+                        _logger.LogError("Geçersiz SystemUrl formatı.");
+                        return;
+                    }
+
+                    using var httpClient = new HttpClient
+                    {
+                        BaseAddress = baseUri
+                    };
+                    var createdProduct = await _productService.AddAsync(productDto);
+
+                    List<int> mediaFiles = await UploadImagesAsync(Images, httpClient);
+                    foreach (var item in mediaFiles)
+                    {
+                        CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                        createProductMediaFile.MediaFileId = item;
+                        createProductMediaFile.ProductId = createdProduct.Id;
+
+                        await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                    }
+
+
+                    var productCategoryDto = new CreateProductCategoryDto
+                    {
+                        ProductId = createdProduct.Id,
+                        CategoryId = categoryId
+                    };
+
+                    await _productCategoryService.AddAsync(productCategoryDto);
+
+
+                    if (mapping.IncludeVariants)
+                    {
+                        var variantNodes = product.Element("variants")?.Elements("variant");
+
+                        if (variantNodes != null)
+                        {
+                            foreach (var variant in variantNodes)
+                            {
+                                // varyant alanlarını oku
+                                string vCode = variant.Element("productCode")?.Value?.Trim() ?? "";
+                                string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
+                                string vPriceStr = variant.Element("price")?.Value ?? "";
+                                string vStockStr = variant.Element("quantity")?.Value ?? "";
+
+                                decimal vPrice = ParsePrice(vPriceStr);
+                                int vStock = ParseStock(vStockStr);
+
+                                // specs -> beden / renk vs
+                                var specs = variant.Elements("spec")
+                                                   .ToDictionary(
+                                                       x => x.Attribute("name")?.Value ?? "",
+                                                       x => x.Value?.Trim() ?? ""
+                                                    );
+
+                                // Ürün adı: Ana + specs
+                                string vName = productDto.Name;
+                                if (specs.Any())
+                                {
+                                    vName += " (" + string.Join(" - ", specs.Select(s => $"{s.Key}:{s.Value}")) + ")";
+                                }
+
+                                // Varyant dto
+                                var variantDto = new CreateProductDto
+                                {
+                                    Code = vCode,
+                                    Name = vName,
+                                    Description = productDto.Description,
+                                    Price = vPrice,
+                                    Barcode = vBarcode,
+                                    CostPrice = productDto.CostPrice,
+                                    Unit = "Adet",
+                                    Currency = "TL",
+                                    BrandId = productDto.BrandId,
+                                    VatRate = productDto.VatRate,
+                                    StockQuantity = vStock,
+                                    Published = true,
+                                    Deleted = false,
+                                    CreatedOn = DateTime.UtcNow,
+                                    UpdatedOn = DateTime.UtcNow
+                                };
+
+                                // exist kontrol
+                                //var existVariant = await _productService.ExistsByCodeAsync(variantDto.Code);
+                                //if (!existVariant)
+                                //{
+                                //    var createdVariant = await _productService.AddAsync(variantDto);
+
+                                //    // varyant resimleri ana ürün ile aynıdır
+                                //    List<int> vMediaFiles = await UploadImagesAsync(Images, httpClient);
+                                //    foreach (var item in vMediaFiles)
+                                //    {
+                                //        await _productMediaFileMappingService.AddAsync(
+                                //            new CreateProductMediaFileDto
+                                //            {
+                                //                MediaFileId = item,
+                                //                ProductId = createdVariant.Id
+                                //            });
+                                //    }
+
+                                //    // kategori bağla
+                                //    await _productCategoryService.AddAsync(new CreateProductCategoryDto
+                                //    {
+                                //        ProductId = createdVariant.Id,
+                                //        CategoryId = categoryId
+                                //    });
+                                //}
+                                //else
+                                //{
+                                //    _logger.LogInformation($"{variantDto.Code} kodlu varyant zaten mevcut.");
+                                //}
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    _logger.LogInformation($"{productDto.Code} kodlu ürün zaten mevcut.");
+                    continue;
+                }
+
+
+            }
             throw new NotImplementedException();
         }
 
+        private decimal ParsePrice(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return 0;
+
+            var cleaned = new string(input.Where(c => char.IsDigit(c) || c == ',' || c == '.').ToArray());
+
+            if (string.IsNullOrWhiteSpace(cleaned))
+                return 0;
+
+            var tr = new CultureInfo("tr-TR");
+
+
+            if (cleaned.Contains(',') && cleaned.Contains('.'))
+            {
+                cleaned = cleaned.Replace(".", "");
+                if (decimal.TryParse(cleaned, NumberStyles.Number, tr, out var val1))
+                    return val1;
+            }
+
+            else if (cleaned.Contains(','))
+            {
+                if (decimal.TryParse(cleaned, NumberStyles.Number, tr, out var val2))
+                    return val2;
+            }
+
+            else if (cleaned.Contains('.'))
+            {
+                cleaned = cleaned.Replace('.', ',');
+                if (decimal.TryParse(cleaned, NumberStyles.Number, tr, out var val3))
+                    return val3;
+            }
+
+            else
+            {
+                if (decimal.TryParse(cleaned, NumberStyles.Number, CultureInfo.InvariantCulture, out var val4))
+                    return val4;
+            }
+
+            return 0;
+        }
+        private List<VariantDto> ReadVariants(XElement product)
+        {
+            var list = new List<VariantDto>();
+
+            var variantNodes = product.Element("variants")?.Elements("variant");
+            if (variantNodes == null) return list;
+
+            foreach (var v in variantNodes)
+            {
+                var dto = new VariantDto
+                {
+                    ProductCode = v.Element("productCode")?.Value?.Trim(),
+                    Barcode = v.Element("barcode")?.Value?.Trim(),
+                    Quantity = ParseStock(v.Element("quantity")?.Value),
+                    Price = ParsePrice(v.Element("price")?.Value),
+                    Specs = v.Elements("spec")
+                             .ToDictionary(
+                                 x => x.Attribute("name")?.Value ?? "",
+                                 x => x.Value?.Trim() ?? ""
+                             )
+                };
+
+                list.Add(dto);
+            }
+
+            return list;
+        }
+        private int ParseStock(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return 0;
+
+            input = input.Replace(".", ",");
+            if (decimal.TryParse(input, new CultureInfo("tr-TR"), out var dec))
+                return (int)dec;
+
+            return 0;
+        }
 
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
         {
@@ -430,5 +786,14 @@ namespace Entegro.Api.Jobs
             return fileIds;
         }
 
+
+        public class VariantDto
+        {
+            public string ProductCode { get; set; }
+            public string Barcode { get; set; }
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
+            public Dictionary<string, string> Specs { get; set; }
+        }
     }
 }
