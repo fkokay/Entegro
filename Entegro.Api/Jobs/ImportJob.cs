@@ -10,6 +10,7 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
+using MapsterMapper;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -44,7 +45,8 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeService _productVariantAttributeService;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeValueService _productAttributeValueService;
-        public ImportJob(IImportProfileService importProfileService, IMediaFileService mediaFileService, ILogger<ImportJob> logger, ISettingService settingService, IProductService productService, IProductMediaFileMappingService productMediaFileMappingService, IBrandService brandService, ICategoryService categoryService, IProductCategoryService productCategoryService, ISpecificationAttributeService specificationAttributeService, ISpecificationAttributeOptionService specificationAttributeOptionService, IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService)
+        private readonly IMapper _mapper;
+        public ImportJob(IImportProfileService importProfileService, IMediaFileService mediaFileService, ILogger<ImportJob> logger, ISettingService settingService, IProductService productService, IProductMediaFileMappingService productMediaFileMappingService, IBrandService brandService, ICategoryService categoryService, IProductCategoryService productCategoryService, ISpecificationAttributeService specificationAttributeService, ISpecificationAttributeOptionService specificationAttributeOptionService, IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService, IMapper mapper)
         {
             _importProfileService = importProfileService;
             _mediaFileService = mediaFileService;
@@ -63,6 +65,7 @@ namespace Entegro.Api.Jobs
             _productVariantAttributeService = productVariantAttributeService;
             _productAttributeService = productAttributeService;
             _productAttributeValueService = productAttributeValueService;
+            _mapper = mapper;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -399,6 +402,10 @@ namespace Entegro.Api.Jobs
             }).ToList();
 
 
+            var xmlProductCodes = filtered
+                .Select(x => x.Element("Product_code")?.Value)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
 
 
             foreach (var product in filtered)
@@ -496,7 +503,7 @@ namespace Entegro.Api.Jobs
                     Images = new List<string>();
 
 
-                code = dict.ContainsKey("Code") ? dict["Code"]?.ToString() : "";
+                code = dict.ContainsKey("Code") ? dict["Code"]?.ToString() + $"_xml_{profile.Id}" : "";
                 var existProduct = await _productService.ExistsByCodeAsync(code);
 
                 if (!existProduct)
@@ -608,14 +615,39 @@ namespace Entegro.Api.Jobs
                         }
                     }
 
+
+
+
                     #endregion
 
 
                 }
+
+
                 else
                 {
                     _logger.LogInformation($"{code} kodlu ürün zaten mevcut.");
                     continue;
+                }
+            }
+
+
+
+            //veritabanında olup xmlde olmayan ürünleri pasif yapma
+            var xmlMissingCodes = mapping.SelectedProducts.Where(selectedCode => !xmlProductCodes.Contains(selectedCode)).ToList();
+            foreach (var originalCode in xmlMissingCodes)
+            {
+                var productCode = $"{originalCode}_xml_{profile.Id}";
+                var existsInDb = await _productService.ExistsByCodeAsync(productCode);
+
+                if (existsInDb)
+                {
+                    var existingProduct = await _productService.GetProductByCodeAsync(productCode);
+                    var updateDto = _mapper.Map<UpdateProductDto>(existingProduct);
+                    updateDto.StockQuantity = 0;
+                    updateDto.Published = false;
+                    await _productService.UpdateAsync(updateDto);
+                    _logger.LogInformation($"{productCode} XML’de bulunmadığı için stok 0’a çekildi ve pasif duruma alındı.");
                 }
             }
         }
