@@ -1,11 +1,11 @@
 ﻿using ArasCargo;
-using Entegro.Application.DTOs.Shipment;
+using Entegro.Application.DTOs.Order;
 
 namespace Entegro.Application.Interfaces.Services.Cargo
 {
     public interface IArasCargoService
     {
-        Task SendCargo(ShipmentDto shipmentDto, bool isDoorPayment);
+        Task SendCargo(OrderDto order, bool isDoorPayment);
         Task<BarcodeResult?> GetBarcode(string integrationCode);
         Task<DispatchResultInfo> CancelDispatch(string integrationCode);
         Task GetCargo(string queryType, string integrationCode);

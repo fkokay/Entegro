@@ -23,4 +23,10 @@
         public decimal Price { get; set; }
         public Dictionary<string, string> Specs { get; set; }
     }
+
+    public class ProductVariantAttributeModel
+    {
+        public int ProductVariantAttributeId { get; set; }
+        public int ProductVariantAttributeValueId { get; set; }
+    }
 }

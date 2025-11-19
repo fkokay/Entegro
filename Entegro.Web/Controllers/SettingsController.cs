@@ -806,7 +806,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
             var apiUrl = await _integrationSystemParameterService.GetByKeyAsync("ApiUrl", model.IntegrationSystemId);
             if (apiUrl == null)
@@ -884,7 +885,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
             var customerId = await _integrationSystemParameterService.GetByKeyAsync("MusteriId", model.IntegrationSystemId);
             if (customerId == null)
@@ -982,7 +984,8 @@ namespace Entegro.Web.Controllers
                 Id = model.Id,
                 Description = model.Description,
                 IntegrationSystemTypeId = model.IntegrationSystemTypeId,
-                Name = model.Name
+                Name = model.Name,
+                Active = model.Active
             });
             var username = await _integrationSystemParameterService.GetByKeyAsync("Username", model.IntegrationSystemId);
             if (username == null)

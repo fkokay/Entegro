@@ -33,9 +33,9 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductService _productService;
-        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly INotificationService _notificationService;
         private readonly ILogger<TrendyolService> _logger;
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
         private readonly IProductVariantAttributeService _productVariantAttributeService;
         private readonly IProductAttributeService _productAttributeService;

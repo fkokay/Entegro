@@ -2,16 +2,23 @@
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.ImportProfile;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductAttribute;
+using Entegro.Application.DTOs.ProductAttributeValue;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Application.DTOs.ProductVariantAttribute;
+using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using Quartz;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json;
 using System.Xml.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Entegro.Api.Jobs
 {
@@ -27,7 +34,17 @@ namespace Entegro.Api.Jobs
         private readonly ICategoryService _categoryService;
         private readonly ILogger<ImportJob> _logger;
         private readonly IProductMediaFileMappingService _productMediaFileMappingService;
-        public ImportJob(IImportProfileService importProfileService, IMediaFileService mediaFileService, ILogger<ImportJob> logger, ISettingService settingService, IProductService productService, IProductMediaFileMappingService productMediaFileMappingService, IBrandService brandService, ICategoryService categoryService, IProductCategoryService productCategoryService)
+        private readonly ISpecificationAttributeService _specificationAttributeService;
+        private readonly ISpecificationAttributeOptionService _specificationAttributeOptionService;
+        private readonly IProductSpecificationAttributeMappingService _productSpecificationAttributeMappingService;
+        private readonly ConcurrentDictionary<string, int> _attributeCache = new();
+        private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
+        private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
+        private readonly IProductVariantAttributeService _productVariantAttributeService;
+        private readonly IProductAttributeService _productAttributeService;
+        private readonly IProductAttributeValueService _productAttributeValueService;
+        public ImportJob(IImportProfileService importProfileService, IMediaFileService mediaFileService, ILogger<ImportJob> logger, ISettingService settingService, IProductService productService, IProductMediaFileMappingService productMediaFileMappingService, IBrandService brandService, ICategoryService categoryService, IProductCategoryService productCategoryService, ISpecificationAttributeService specificationAttributeService, ISpecificationAttributeOptionService specificationAttributeOptionService, IProductSpecificationAttributeMappingService productSpecificationAttributeMappingService, IProductVariantAttributeCombinationService productVariantAttributeCombinationService, IProductVariantAttributeValueService productVariantAttributeValueService, IProductVariantAttributeService productVariantAttributeService, IProductAttributeService productAttributeService, IProductAttributeValueService productAttributeValueService)
         {
             _importProfileService = importProfileService;
             _mediaFileService = mediaFileService;
@@ -38,6 +55,14 @@ namespace Entegro.Api.Jobs
             _brandService = brandService;
             _categoryService = categoryService;
             _productCategoryService = productCategoryService;
+            _specificationAttributeService = specificationAttributeService;
+            _specificationAttributeOptionService = specificationAttributeOptionService;
+            _productSpecificationAttributeMappingService = productSpecificationAttributeMappingService;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
+            _productVariantAttributeValueService = productVariantAttributeValueService;
+            _productVariantAttributeService = productVariantAttributeService;
+            _productAttributeService = productAttributeService;
+            _productAttributeValueService = productAttributeValueService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -62,7 +87,7 @@ namespace Entegro.Api.Jobs
 
                 else if (profile.MediaFileType == "excel")
                 {
-                    // await ExcelJob(profile);
+                    //await ExcelJob(profile);
                 }
 
                 else
@@ -379,12 +404,11 @@ namespace Entegro.Api.Jobs
             foreach (var product in filtered)
             {
                 var dict = new Dictionary<string, object>();
-
+                string code = "";
                 foreach (var map in mapping.Mappings)
                 {
                     if (map.IsImage)
                     {
-
                         var imgList = map.XmlTags
                             .Select(tag => product.Element(tag)?.Value)
                             .Where(v => !string.IsNullOrWhiteSpace(v))
@@ -471,29 +495,32 @@ namespace Entegro.Api.Jobs
                 else
                     Images = new List<string>();
 
-                var productDto = new CreateProductDto
-                {
-                    Code = dict.ContainsKey("Code") ? dict["Code"]?.ToString() : "",
-                    Name = dict.ContainsKey("Name") ? dict["Name"]?.ToString() : "",
-                    Description = dict.ContainsKey("Description") ? dict["Description"]?.ToString() : "",
-                    Price = price,
-                    Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : "",
-                    CostPrice = 0,
-                    Unit = "Adet",
-                    Currency = "TL",
-                    BrandId = brandId > 0 ? brandId : null,
-                    VatRate = 0,
-                    StockQuantity = stock,
-                    Published = true,
-                    Deleted = false,
-                    CreatedOn = DateTime.UtcNow,
-                    UpdatedOn = DateTime.UtcNow
-                };
 
-                var existProduct = await _productService.ExistsByCodeAsync(productDto.Code);
+                code = dict.ContainsKey("Code") ? dict["Code"]?.ToString() : "";
+                var existProduct = await _productService.ExistsByCodeAsync(code);
 
                 if (!existProduct)
                 {
+
+                    var productDto = new CreateProductDto
+                    {
+                        Code = code,
+                        Name = dict.ContainsKey("Name") ? dict["Name"]?.ToString() : "",
+                        Description = dict.ContainsKey("Description") ? dict["Description"]?.ToString() : "",
+                        Price = price,
+                        Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : "",
+                        CostPrice = 0,
+                        Unit = "Adet",
+                        Currency = "TL",
+                        BrandId = brandId > 0 ? brandId : null,
+                        VatRate = 0,
+                        StockQuantity = stock,
+                        Published = true,
+                        Deleted = false,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
+                    };
+
                     var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
                     if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
                     {
@@ -519,7 +546,6 @@ namespace Entegro.Api.Jobs
                         CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
                         createProductMediaFile.MediaFileId = item;
                         createProductMediaFile.ProductId = createdProduct.Id;
-
                         await _productMediaFileMappingService.AddAsync(createProductMediaFile);
                     }
 
@@ -541,7 +567,6 @@ namespace Entegro.Api.Jobs
                         {
                             foreach (var variant in variantNodes)
                             {
-                                // varyant alanlarını oku
                                 string vCode = variant.Element("productCode")?.Value?.Trim() ?? "";
                                 string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
                                 string vPriceStr = variant.Element("price")?.Value ?? "";
@@ -550,83 +575,48 @@ namespace Entegro.Api.Jobs
                                 decimal vPrice = ParsePrice(vPriceStr);
                                 int vStock = ParseStock(vStockStr);
 
-                                // specs -> beden / renk vs
                                 var specs = variant.Elements("spec")
                                                    .ToDictionary(
                                                        x => x.Attribute("name")?.Value ?? "",
                                                        x => x.Value?.Trim() ?? ""
-                                                    );
+                                                   );
 
-                                // Ürün adı: Ana + specs
-                                string vName = productDto.Name;
-                                if (specs.Any())
-                                {
-                                    vName += " (" + string.Join(" - ", specs.Select(s => $"{s.Key}:{s.Value}")) + ")";
-                                }
-
-                                // Varyant dto
-                                var variantDto = new CreateProductDto
-                                {
-                                    Code = vCode,
-                                    Name = vName,
-                                    Description = productDto.Description,
-                                    Price = vPrice,
-                                    Barcode = vBarcode,
-                                    CostPrice = productDto.CostPrice,
-                                    Unit = "Adet",
-                                    Currency = "TL",
-                                    BrandId = productDto.BrandId,
-                                    VatRate = productDto.VatRate,
-                                    StockQuantity = vStock,
-                                    Published = true,
-                                    Deleted = false,
-                                    CreatedOn = DateTime.UtcNow,
-                                    UpdatedOn = DateTime.UtcNow
-                                };
-
-                                // exist kontrol
-                                //var existVariant = await _productService.ExistsByCodeAsync(variantDto.Code);
-                                //if (!existVariant)
-                                //{
-                                //    var createdVariant = await _productService.AddAsync(variantDto);
-
-                                //    // varyant resimleri ana ürün ile aynıdır
-                                //    List<int> vMediaFiles = await UploadImagesAsync(Images, httpClient);
-                                //    foreach (var item in vMediaFiles)
-                                //    {
-                                //        await _productMediaFileMappingService.AddAsync(
-                                //            new CreateProductMediaFileDto
-                                //            {
-                                //                MediaFileId = item,
-                                //                ProductId = createdVariant.Id
-                                //            });
-                                //    }
-
-                                //    // kategori bağla
-                                //    await _productCategoryService.AddAsync(new CreateProductCategoryDto
-                                //    {
-                                //        ProductId = createdVariant.Id,
-                                //        CategoryId = categoryId
-                                //    });
-                                //}
-                                //else
-                                //{
-                                //    _logger.LogInformation($"{variantDto.Code} kodlu varyant zaten mevcut.");
-                                //}
+                                await AddVariantCombinationAsync(
+                                    createdProduct.Id,
+                                    specs,
+                                    new ProductDto
+                                    {
+                                        Code = vCode,
+                                        Name = createdProduct.Name,
+                                        Description = productDto.Description,
+                                        Price = vPrice,
+                                        Barcode = vBarcode,
+                                        CostPrice = productDto.CostPrice,
+                                        Unit = "Adet",
+                                        Currency = "TL",
+                                        BrandId = productDto.BrandId,
+                                        VatRate = productDto.VatRate,
+                                        StockQuantity = vStock,
+                                        Published = true,
+                                        Deleted = false,
+                                        CreatedOn = DateTime.UtcNow,
+                                        UpdatedOn = DateTime.UtcNow
+                                    },
+                                    mediaFiles
+                                );
                             }
                         }
                     }
+
                     #endregion
 
 
                 }
                 else
                 {
-                    _logger.LogInformation($"{productDto.Code} kodlu ürün zaten mevcut.");
+                    _logger.LogInformation($"{code} kodlu ürün zaten mevcut.");
                     continue;
                 }
-
-
             }
         }
 
@@ -709,6 +699,122 @@ namespace Entegro.Api.Jobs
 
             return 0;
         }
+
+        private async Task<int> EnsureProductAttributeAsync(string name)
+        {
+            if (_attributeCache.TryGetValue(name, out int id)) return id;
+
+            var productAttribute = await _productAttributeService.GetByNameAsync(name);
+            if (productAttribute is null)
+            {
+                var created = await _productAttributeService.AddAsync(new CreateProductAttributeDto
+                {
+                    Name = name,
+                    Description = "",
+                    DisplayOrder = 0
+                });
+
+                _attributeCache.TryAdd(name, created.Id);
+                return created.Id;
+            }
+
+            _attributeCache.TryAdd(name, productAttribute.Id);
+            return productAttribute.Id;
+        }
+        private async Task<int> EnsureProductAttributeValueAsync(int attributeId, string value)
+        {
+            if (_attributeValueCache.TryGetValue((attributeId, value), out int id)) return id;
+
+            var created = await _productAttributeValueService.AddAsync(new CreateProductAttributeValueDto
+            {
+                Name = value,
+                DisplayOrder = 0,
+                ProductAttributeId = attributeId
+            });
+
+            _attributeValueCache.TryAdd((attributeId, value), created.Id);
+            return created.Id;
+        }
+        private async Task AddVariantCombinationAsync(int productId, Dictionary<string, string> specs, ProductDto product, List<int> mediaFiles)
+        {
+            if (specs == null || !specs.Any())
+                return;
+
+            List<ProductVariantAttributeModel> variantAttributes = new();
+            List<int> mediaFileMappingIds = new();
+
+            // Tüm özellikleri tek listeye ekliyoruz
+            foreach (var spec in specs)
+            {
+                string attributeName = spec.Key;
+                string attributeValue = spec.Value;
+
+                if (string.IsNullOrEmpty(attributeName) || string.IsNullOrEmpty(attributeValue))
+                    continue;
+
+                // Attribute ve Value ID'lerini garanti altına al
+                int attrId = await EnsureProductAttributeAsync(attributeName);
+                int attrValueId = await EnsureProductAttributeValueAsync(attrId, attributeValue);
+
+                // Varyant Attribute (üst grup)
+                var existingVariant = await _productVariantAttributeService.GetByAttibuteIdAsync(productId, attrId);
+                int variantId = existingVariant?.Id ??
+                    (await _productVariantAttributeService.AddAsync(new CreateProductVariantAttributeDto
+                    {
+                        ProductId = productId,
+                        ProductAttributeId = attrId,
+                        DisplayOrder = 0,
+                        AttributeControlTypeId = 0
+                    })).Id;
+
+                // Varyant Attribute Value
+                var existingVariantValue = await _productVariantAttributeValueService.GetByNameAsync(variantId, attributeValue);
+                int variantValueId = existingVariantValue?.Id ??
+                    (await _productVariantAttributeValueService.AddAsync(new CreateProductVariantAttributeValueDto
+                    {
+                        Name = attributeValue,
+                        ProductVariantAttributeId = variantId
+                    })).Id;
+
+                // JSON içine eklenecek
+                variantAttributes.Add(new ProductVariantAttributeModel
+                {
+                    ProductVariantAttributeId = variantId,
+                    ProductVariantAttributeValueId = variantValueId
+                });
+            }
+
+            // JSON serialize
+            string rawAttributeJson = JsonSerializer.Serialize(variantAttributes,
+                new JsonSerializerOptions { PropertyNamingPolicy = null, WriteIndented = false });
+
+            // Aynı Product + StokCode (Barcode) var mı?
+            bool exists = await _productVariantAttributeCombinationService.ExistsAsync(productId, product.Barcode);
+
+            if (exists)
+                return;
+
+            // Media dosyaları
+            foreach (var item in mediaFiles)
+            {
+                var created = await _productMediaFileMappingService.GetByPictureIdProductIdAsync(item, productId);
+                if (created != null)
+                    mediaFileMappingIds.Add(created.Id);
+            }
+
+            // Tek seferde kombinasyon ekleniyor
+            await _productVariantAttributeCombinationService.AddAsync(
+                new CreateProductVariantAttributeCombinationDto
+                {
+                    ProductId = productId,
+                    StokCode = product.Barcode,
+                    StockQuantity = product.StockQuantity,
+                    Price = product.Price,
+                    RawAttribute = rawAttributeJson,
+                    AssignedMediaFileIds = string.Join(",", mediaFileMappingIds)
+                });
+        }
+
 
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
         {
