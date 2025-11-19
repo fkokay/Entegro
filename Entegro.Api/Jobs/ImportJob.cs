@@ -90,7 +90,7 @@ namespace Entegro.Api.Jobs
 
                 else if (profile.MediaFileType == "excel")
                 {
-                    //await ExcelJob(profile);
+                    await ExcelJob(profile);
                 }
 
                 else
