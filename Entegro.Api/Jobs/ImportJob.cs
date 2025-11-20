@@ -90,7 +90,7 @@ namespace Entegro.Api.Jobs
 
                 else if (profile.MediaFileType == "excel")
                 {
-                    await ExcelJob(profile);
+                    //await ExcelJob(profile);
                 }
 
                 else
@@ -617,15 +617,16 @@ namespace Entegro.Api.Jobs
 
 
 
-
                     #endregion
 
-
+                    _logger.LogInformation($"{code} kodlu ürün başarıyla eklendi.");
+                    continue;
                 }
 
 
                 else
                 {
+                    #region update
 
                     var existingProduct = await _productService.GetProductByCodeAsync(code);
                     var updateDto = _mapper.Map<UpdateProductDto>(existingProduct);
@@ -637,7 +638,7 @@ namespace Entegro.Api.Jobs
                     updateDto.Price = price;
                     updateDto.StockQuantity = stock;
                     updateDto.BrandId = brandId > 0 ? brandId : updateDto.BrandId;
-                    updateDto.Published = true;                   // XML’de varsa aktif tut
+                    updateDto.Published = true;
                     updateDto.UpdatedOn = DateTime.UtcNow;
 
                     await _productService.UpdateAsync(updateDto);
@@ -692,7 +693,7 @@ namespace Entegro.Api.Jobs
                             if (variantNodes != null)
                             {
 
-                                await _productVariantAttributeCombinationService.DeleteAsync(existingProduct.Id);
+                                await _productVariantAttributeCombinationService.DeleteByProductIdAsync(existingProduct.Id);
 
                                 foreach (var variant in variantNodes)
                                 {
@@ -737,8 +738,8 @@ namespace Entegro.Api.Jobs
                             }
                         }
                     }
-
-                    _logger.LogInformation($"{code} kodlu ürün zaten mevcut.");
+                    #endregion
+                    _logger.LogInformation($"{code} kodlu ürün başarıyla güncellendi.");
                     continue;
                 }
             }
@@ -1033,7 +1034,6 @@ namespace Entegro.Api.Jobs
 
             return fileIds;
         }
-
 
     }
 }
