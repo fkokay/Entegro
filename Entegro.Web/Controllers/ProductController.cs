@@ -1241,6 +1241,7 @@ namespace Entegro.Web.Controllers
                     ProductVariantAttributeCombinationId = null,
                     Price = product.Price,
                     IntegrationCode = product.Code,
+                    CostPrice = product.CostPrice,
                     Active = true,
                 };
 

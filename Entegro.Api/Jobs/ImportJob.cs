@@ -437,6 +437,11 @@ namespace Entegro.Api.Jobs
                 {
                     price = ParsePrice(dict["Price"]?.ToString());
                 }
+                decimal costPrice = 0;
+                if (dict.ContainsKey("CostPrice"))
+                {
+                    costPrice = ParsePrice(dict["CostPrice"]?.ToString());
+                }
 
                 int brandId = 0;
                 if (dict.ContainsKey("Brand"))
@@ -516,7 +521,7 @@ namespace Entegro.Api.Jobs
                         Description = dict.ContainsKey("Description") ? dict["Description"]?.ToString() : "",
                         Price = price,
                         Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : "",
-                        CostPrice = 0,
+                        CostPrice = costPrice,
                         Unit = "Adet",
                         Currency = "TL",
                         BrandId = brandId > 0 ? brandId : null,
@@ -637,12 +642,13 @@ namespace Entegro.Api.Jobs
                     updateDto.Barcode = dict["Barcode"]?.ToString() ?? updateDto.Barcode;
                     updateDto.Price = price;
                     updateDto.StockQuantity = stock;
+                    updateDto.CostPrice = costPrice;
                     updateDto.BrandId = brandId > 0 ? brandId : updateDto.BrandId;
                     updateDto.Published = true;
                     updateDto.UpdatedOn = DateTime.UtcNow;
 
                     await _productService.UpdateAsync(updateDto);
-                    // RESİMLERİ GÜNCELLE
+
                     if (Images.Any())
                     {
 
@@ -664,7 +670,7 @@ namespace Entegro.Api.Jobs
                         };
                         var newFiles = await UploadImagesAsync(Images, httpClient);
 
-                        // mevcut resim eşleştirmelerini temizle (opsiyonel)
+
                         await _productMediaFileMappingService.DeleteByProductIdAsync(existingProduct.Id);
 
                         foreach (var fileId in newFiles)
@@ -953,8 +959,10 @@ namespace Entegro.Api.Jobs
                     ProductId = productId,
                     StokCode = product.Barcode,
                     StockQuantity = product.StockQuantity,
+                    Gtin = product.Barcode,
                     Price = product.Price,
                     RawAttribute = rawAttributeJson,
+                    CostPrice = product.CostPrice,
                     AssignedMediaFileIds = string.Join(",", mediaFileMappingIds)
                 });
         }
