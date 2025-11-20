@@ -108,5 +108,10 @@ namespace Entegro.Application.Services.Base
                 PageSize = productCategories.PageSize
             };
         }
+
+        public async Task DeleteByProductIdAsync(int productId)
+        {
+            await _productCategoryMappingRepository.DeleteByProductIdAsync(productId);
+        }
     }
 }

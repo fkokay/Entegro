@@ -26,6 +26,19 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteByProductIdAsync(int productId)
+        {
+            var images = await _context.ProductMediaFiles
+                              .Where(x => x.ProductId == productId)
+                              .ToListAsync();
+
+            if (images == null || images.Count == 0)
+                return;
+
+            _context.ProductMediaFiles.RemoveRange(images);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<ProductMediaFile>> GetAllAsync()
         {
             return await _context.ProductMediaFiles.ToListAsync();

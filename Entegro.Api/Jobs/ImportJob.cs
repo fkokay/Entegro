@@ -626,6 +626,118 @@ namespace Entegro.Api.Jobs
 
                 else
                 {
+
+                    var existingProduct = await _productService.GetProductByCodeAsync(code);
+                    var updateDto = _mapper.Map<UpdateProductDto>(existingProduct);
+
+                    // XML’den gelen değerlerle güncelle
+                    updateDto.Name = dict["Name"]?.ToString() ?? updateDto.Name;
+                    updateDto.Description = dict["Description"]?.ToString() ?? updateDto.Description;
+                    updateDto.Barcode = dict["Barcode"]?.ToString() ?? updateDto.Barcode;
+                    updateDto.Price = price;
+                    updateDto.StockQuantity = stock;
+                    updateDto.BrandId = brandId > 0 ? brandId : updateDto.BrandId;
+                    updateDto.Published = true;                   // XML’de varsa aktif tut
+                    updateDto.UpdatedOn = DateTime.UtcNow;
+
+                    await _productService.UpdateAsync(updateDto);
+                    // RESİMLERİ GÜNCELLE
+                    if (Images.Any())
+                    {
+
+                        var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                        if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                        {
+                            _logger.LogError("Sistem URL'si ayarlanmamış.");
+                            return;
+                        }
+
+                        if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                        {
+                            _logger.LogError("Geçersiz SystemUrl formatı.");
+                            return;
+                        }
+                        using var httpClient = new HttpClient
+                        {
+                            BaseAddress = baseUri
+                        };
+                        var newFiles = await UploadImagesAsync(Images, httpClient);
+
+                        // mevcut resim eşleştirmelerini temizle (opsiyonel)
+                        await _productMediaFileMappingService.DeleteByProductIdAsync(existingProduct.Id);
+
+                        foreach (var fileId in newFiles)
+                        {
+                            await _productMediaFileMappingService.AddAsync(new CreateProductMediaFileDto
+                            {
+                                ProductId = existingProduct.Id,
+                                MediaFileId = fileId
+                            });
+                        }
+
+                        if (categoryId > 0)
+                        {
+                            await _productCategoryService.DeleteByProductIdAsync(existingProduct.Id);
+
+                            await _productCategoryService.AddAsync(new CreateProductCategoryDto
+                            {
+                                ProductId = existingProduct.Id,
+                                CategoryId = categoryId
+                            });
+                        }
+                        if (mapping.IncludeVariants)
+                        {
+                            var variantNodes = product.Element("variants")?.Elements("variant");
+
+                            if (variantNodes != null)
+                            {
+
+                                await _productVariantAttributeCombinationService.DeleteAsync(existingProduct.Id);
+
+                                foreach (var variant in variantNodes)
+                                {
+                                    string vCode = variant.Element("productCode")?.Value?.Trim() ?? "";
+                                    string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
+                                    string vPriceStr = variant.Element("price")?.Value ?? "";
+                                    string vStockStr = variant.Element("quantity")?.Value ?? "";
+
+                                    decimal vPrice = ParsePrice(vPriceStr);
+                                    int vStock = ParseStock(vStockStr);
+
+                                    var specs = variant.Elements("spec")
+                                                       .ToDictionary(
+                                                            x => x.Attribute("name")?.Value ?? "",
+                                                            x => x.Value?.Trim() ?? ""
+                                                       );
+
+                                    await AddVariantCombinationAsync(
+                                         existingProduct.Id,
+                                         specs,
+                                         new ProductDto
+                                         {
+                                             Code = vCode,
+                                             Name = updateDto.Name,
+                                             Description = updateDto.Description,
+                                             Price = vPrice,
+                                             Barcode = vBarcode,
+                                             CostPrice = updateDto.CostPrice,
+                                             Unit = "Adet",
+                                             Currency = "TL",
+                                             BrandId = updateDto.BrandId,
+                                             VatRate = 0,
+                                             StockQuantity = vStock,
+                                             Published = true,
+                                             Deleted = false,
+                                             CreatedOn = existingProduct.CreatedOn,
+                                             UpdatedOn = DateTime.UtcNow
+                                         },
+                                         new List<int>() // resimler yukarıda zaten güncellendi
+                                    );
+                                }
+                            }
+                        }
+                    }
+
                     _logger.LogInformation($"{code} kodlu ürün zaten mevcut.");
                     continue;
                 }
@@ -731,7 +843,6 @@ namespace Entegro.Api.Jobs
 
             return 0;
         }
-
         private async Task<int> EnsureProductAttributeAsync(string name)
         {
             if (_attributeCache.TryGetValue(name, out int id)) return id;
@@ -846,8 +957,6 @@ namespace Entegro.Api.Jobs
                     AssignedMediaFileIds = string.Join(",", mediaFileMappingIds)
                 });
         }
-
-
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
         {
             List<int> fileIds = new();
@@ -924,7 +1033,6 @@ namespace Entegro.Api.Jobs
 
             return fileIds;
         }
-
 
 
     }

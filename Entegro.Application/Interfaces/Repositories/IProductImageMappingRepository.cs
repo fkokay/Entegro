@@ -11,6 +11,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task AddAsync(ProductMediaFile productImage);
         Task UpdateAsync(ProductMediaFile productImage);
         Task DeleteAsync(ProductMediaFile productImage);
+        Task DeleteByProductIdAsync(int productId)(ProductMediaFile productImage);
         Task<PagedResult<ProductMediaFile>> GetAllAsync(int pageNumber = 1, int pageSize = 7);
         Task<ProductMediaFile?> GetByPictureIdProductIdAsync(int pictureId, int productId);
         Task<ProductMediaFile?> GetByPictureIdSortAsync(int pictureId, int productId);

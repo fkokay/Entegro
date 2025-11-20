@@ -87,5 +87,10 @@ namespace Entegro.Application.Services.Base
 
             return await _productVariantAttributeCombinationRepository.ExistsAsync(productId, gtin);
         }
+
+        public async Task DeleteByProductIdAsync(int productId)
+        {
+            await _productVariantAttributeCombinationRepository.DeleteByProductIdAsync(productId);
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ProductCategoryDto> UpdateAsync(UpdateProductCategoryDto updateProductCategory);
         Task<List<ProductCategoryDto>> GetByProductWithCategoryAsync(int productId);
         Task DeleteAsync(int productCategoryId);
+        Task DeleteByProductIdAsync(int productId);
         Task<PagedResult<ProductCategoryDto>> GetPagedAsync(GridCommand gridCommand, int productId);
     }
 }

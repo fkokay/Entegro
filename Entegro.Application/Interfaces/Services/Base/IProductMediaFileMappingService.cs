@@ -11,6 +11,7 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ProductMediaFileDto> AddAsync(CreateProductMediaFileDto productImage);
         Task<ProductMediaFileDto> UpdateAsync(UpdateProductMediaFileDto productImage);
         Task DeleteAsync(int id);
+        Task DeleteByProductIdAsync(int productId);
         Task<PagedResult<ProductMediaFileDto>> GetPagedAsync(int pageNumber, int pageSize);
         Task<ProductMediaFileDto> GetByPictureIdProductIdAsync(int pictureId, int productId);
         Task<ProductMediaFileDto> GetByPictureIdSortAsync(int pictureId, int productId);

@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Repositories
     {
         Task<ProductCategory?> GetByIdAsync(int id);
         Task<List<ProductCategory>> GetAllAsync();
+        Task DeleteByProductIdAsync(int productId);
         Task AddAsync(ProductCategory productCategoryMapping);
         Task UpdateAsync(ProductCategory productCategoryMapping);
         Task DeleteAsync(ProductCategory productCategoryMapping);

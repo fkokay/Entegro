@@ -26,6 +26,19 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteByProductIdAsync(int productId)
+        {
+            var combinations = await _context.ProductVariantAttributeCombinations
+                                            .Where(x => x.ProductId == productId)
+                                            .ToListAsync();
+
+            if (combinations.Count == 0)
+                return;
+
+            _context.ProductVariantAttributeCombinations.RemoveRange(combinations);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<bool> ExistsAsync(int productId, string gtin)
         {
             return await _context.ProductVariantAttributeCombinations.AnyAsync(o => o.ProductId == productId && o.Gtin == gtin);

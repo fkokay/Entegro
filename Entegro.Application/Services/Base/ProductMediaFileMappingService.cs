@@ -96,5 +96,10 @@ namespace Entegro.Application.Services.Base
             var productImageMappingDtos = _mapper.Map<ProductMediaFileDto>(productImages);
             return productImageMappingDtos;
         }
+
+        public async Task DeleteByProductIdAsync(int productId)
+        {
+            await _productImageMappingRepository.DeleteByProductIdAsync(productId);
+        }
     }
 }

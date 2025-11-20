@@ -13,5 +13,6 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ProductVariantAttributeCombinationDto> AddAsync(CreateProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
         Task<ProductVariantAttributeCombinationDto> UpdateAsync(UpdateProductVariantAttributeCombinationDto productVariantAttributeCombinationDto);
         Task DeleteAsync(int productVariantAttributeCombinationId);
+        Task DeleteByProductIdAsync(int productId);
     }
 }

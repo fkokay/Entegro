@@ -33,6 +33,17 @@ namespace Entegro.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteByProductIdAsync(int productId)
+        {
+            var categories = await _context.ProductCategories
+                                           .Where(x => x.ProductId == productId)
+                                           .ToListAsync();
+            if (categories == null || categories.Count == 0)
+                return;
+            _context.ProductCategories.RemoveRange(categories);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<ProductCategory>> GetAllAsync()
         {
             return await _context.ProductCategories.Include(m => m.Product).Include(m => m.Category).AsNoTracking().ToListAsync();
