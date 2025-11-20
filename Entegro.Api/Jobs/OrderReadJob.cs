@@ -1043,10 +1043,13 @@ namespace Entegro.Api.Jobs
                         {
                             if (orderItem.Product != null)
                             {
+
                                 var product = await _productService.GetProductByCodeAsync(orderItem.Product.Code);
+
 
                                 if (product == null)
                                 {
+
                                     _logger.Error($"{orderItem.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
                                     continue;
                                 }

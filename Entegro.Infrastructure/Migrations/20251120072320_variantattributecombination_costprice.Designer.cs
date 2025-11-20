@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20251120072320_variantattributecombination_costprice")]
+    partial class variantattributecombination_costprice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -381,17 +384,8 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("ApplyAutoPrice")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("CommissionPercent")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Custom")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("ExtraCost")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("IntegrationCode")
                         .IsRequired()
@@ -406,9 +400,6 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<DateTime?>("LastSyncDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("Percent")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
@@ -418,9 +409,6 @@ namespace Entegro.Infrastructure.Migrations
 
                     b.Property<int?>("ProductVariantAttributeCombinationId")
                         .HasColumnType("int");
-
-                    b.Property<decimal?>("ShippingFee")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

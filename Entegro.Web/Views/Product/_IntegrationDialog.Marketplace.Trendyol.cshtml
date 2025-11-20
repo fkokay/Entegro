@@ -44,15 +44,50 @@
         <label class="form-label" for="IntegrationCode">Entegrasyon Kodu</label>
         <input type="text" asp-for="IntegrationCode" class="form-control" required />
     </div>
-    <div class="col-12 col-md-12">
-        <label class="form-label" for="price">Fiyat</label>
-        <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
-    </div>
+
     <div class="col-12 col-md-12">
         <div class="form-check form-switch mb-2 mt-2">
             <input class="form-check-input" type="checkbox" asp-for="Active" />
             <label class="form-check-label" for="Active">Aktif</label>
         </div>
+    </div>
+    <div class="col-12 col-md-12">
+        <div class="form-check form-switch mb-2 mt-2">
+            <input class="form-check-input"
+                   type="checkbox"
+                   asp-for="ApplyAutoPrice" />
+            <label class="form-check-label" asp-for="ApplyAutoPrice">
+                Otomatik Fiyat Güncellemesi Uygulansın Mı?
+            </label>
+        </div>
+    </div>
+
+    <div id="autoPriceFields">
+        <div class="col-6 col-md-12">
+            <label class="form-label" for="percent">Maliyet Fiyatı</label>
+            <input type="number" asp-for="CostPrice" class="form-control" step="0.01" min="0" readonly />
+        </div>
+        <div class="col-6 col-md-12">
+            <label class="form-label" for="percent">Yüzde Kâr Oranı (%)</label>
+            <input type="number" asp-for="Percent" class="form-control" step="0.01" min="0" />
+        </div>
+        <div class="col-6 col-md-12">
+            <label class="form-label" for="commissionpercent">Komisyon (%)</label>
+            <input type="number" asp-for="CommissionPercent" class="form-control" step="0.01" min="0" />
+        </div>
+        <div class="col-6 col-md-12">
+            <label class="form-label" for="shippingfee">Kargo</label>
+            <input type="number" asp-for="ShippingFee" class="form-control" step="0.01" min="0" />
+        </div>
+        <div class="col-6 col-md-12">
+            <label class="form-label" for="extracost">Ek Maliyet</label>
+            <input type="number" asp-for="ExtraCost" class="form-control" step="0.01" min="0" />
+        </div>
+    </div>
+
+    <div class="col-12 col-md-12">
+        <label class="form-label" for="price">Fiyat</label>
+        <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
     </div>
     <div class="col-12 col-md-12">
         <hr />
@@ -68,3 +103,72 @@
         }
     </div>
 </form>
+
+<script>
+    (function () {
+        var checkbox = document.getElementById("@Html.IdFor(m => m.ApplyAutoPrice)");
+        var fields = document.getElementById("autoPriceFields");
+
+        var originalPrice = "@Model.Price";
+
+        var priceInput = document.getElementById("@Html.IdFor(m => m.Price)");
+
+        var costInput = document.getElementById("@Html.IdFor(m => m.CostPrice)");
+        var percentInput = document.getElementById("@Html.IdFor(m => m.Percent)");
+        var commissionInput = document.getElementById("@Html.IdFor(m => m.CommissionPercent)");
+        var shippingInput = document.getElementById("@Html.IdFor(m => m.ShippingFee)");
+        var extraCostInput = document.getElementById("@Html.IdFor(m => m.ExtraCost)");
+
+        if (!checkbox || !fields) return;
+
+       
+        function calculatePrice() {
+            if (!checkbox.checked) return;
+
+            var cost = parseFloat(costInput.value) || 0;
+            var percent = parseFloat(percentInput.value) || 0;
+            var commissionPercent = parseFloat(commissionInput.value) || 0;
+            var shippingFee = parseFloat(shippingInput.value) || 0;
+            var extraCost = parseFloat(extraCostInput.value) || 0;
+
+            let result = cost * (1 + percent / 100);
+
+            result += extraCost;
+            result += shippingFee;
+
+            if (commissionPercent > 0) {
+                result = result / (1 - (commissionPercent / 100));
+            }
+
+            priceInput.value = result.toFixed(2);
+        }
+
+      
+        function toggleAutoPriceFields() {
+            if (checkbox.checked) {
+                fields.style.display = "";
+                calculatePrice();
+            } else {
+                fields.style.display = "none";
+
+                priceInput.value = originalPrice;
+
+
+                fields.querySelectorAll("input").forEach(function (x) {
+                    if (x.id !== "@Html.IdFor(m => m.CostPrice)") {
+                        x.value = "";
+                    }
+                });
+            }
+        }
+
+        toggleAutoPriceFields();
+        checkbox.addEventListener("change", toggleAutoPriceFields);
+
+        [percentInput, commissionInput, shippingInput, extraCostInput].forEach(function (inp) {
+            if (inp) inp.addEventListener("input", calculatePrice);
+        });
+
+    })();
+</script>
+

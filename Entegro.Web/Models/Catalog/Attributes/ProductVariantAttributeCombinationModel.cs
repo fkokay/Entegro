@@ -11,6 +11,7 @@ namespace Entegro.Web.Models.Catalog.Attributes
         public string? Gtin { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public decimal? Price { get; set; }
+        public decimal? CostPrice { get; set; }
         public int StockQuantity { get; set; }
         public int[] AssignedPictureIds { get; set; } = [];
 

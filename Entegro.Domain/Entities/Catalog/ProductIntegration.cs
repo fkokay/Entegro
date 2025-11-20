@@ -1,9 +1,7 @@
 ﻿using Entegro.Domain.Entities.Integration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Emit;
 namespace Entegro.Domain.Entities.Catalog
 {
     public class ProductIntegrationMap : IEntityTypeConfiguration<ProductIntegration>
@@ -19,7 +17,7 @@ namespace Entegro.Domain.Entities.Catalog
     {
         public int ProductId { get; set; }
         public virtual Product Product { get; set; }
-        public int ? ProductVariantAttributeCombinationId { get; set; }
+        public int? ProductVariantAttributeCombinationId { get; set; }
         public virtual ProductVariantAttributeCombination? ProductVariantAttributeCombination { get; set; }
         public decimal Price { get; set; }
         public int IntegrationSystemId { get; set; }
@@ -29,6 +27,12 @@ namespace Entegro.Domain.Entities.Catalog
         public DateTime? LastSyncDate { get; set; }
         public bool IsSync { get; set; }
         public bool Active { get; set; }
+
+        public decimal? Percent { get; set; }//yüzde kar oranı
+        public decimal? ShippingFee { get; set; }//kargo
+        public decimal? CommissionPercent { get; set; }//komisyon yüzdesi
+        public decimal? ExtraCost { get; set; }//ekstra maliyet
+        public bool ApplyAutoPrice { get; set; }//otomatik fiyat uygulansın mı
 
     }
 }

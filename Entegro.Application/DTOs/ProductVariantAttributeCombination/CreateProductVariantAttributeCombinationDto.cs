@@ -8,6 +8,7 @@
         public string? Gtin { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public decimal? Price { get; set; }
+        public decimal? CostPrice { get; set; }
         public int? StockQuantity { get; set; }
         public string RawAttribute { get; set; }
         public string? AssignedMediaFileIds { get; set; }

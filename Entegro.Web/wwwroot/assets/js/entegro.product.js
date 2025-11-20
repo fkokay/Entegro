@@ -457,6 +457,7 @@ Entegro.product = (function ($) {
             $row.find('[name$="[Gtin]"]').val(item.Gtin);
             $row.find('[name$="[Price]"]').val(item.Price);
             $row.find('[name$="[StockQuantity]"]').val(item.StockQuantity);
+            $row.find('[name$="[CostPrice]"]').val(item.CostPrice);
 
             $.each(item.ProductVariantAttributeSelections, function (j, attr) {
                 var $attrRow = $row.find('[data-repeater-list="ProductVariantAttributeSelections"]');

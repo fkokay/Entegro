@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20251120082758_productIntegration_Percent_ShippingFee_CommissionPercent_ExtraCost")]
+    partial class productIntegration_Percent_ShippingFee_CommissionPercent_ExtraCost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,9 +382,6 @@ namespace Entegro.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ApplyAutoPrice")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("CommissionPercent")

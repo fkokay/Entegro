@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Entegro.Domain.Entities.Catalog
@@ -18,6 +17,7 @@ namespace Entegro.Domain.Entities.Catalog
         public int ProductId { get; set; }
         public virtual Product Product { get; set; }
         public string? StokCode { get; set; }
+        public decimal CostPrice { get; set; }
         public string? Gtin { get; set; }
         public string? ManufacturerPartNumber { get; set; }
         public decimal? Price { get; set; }

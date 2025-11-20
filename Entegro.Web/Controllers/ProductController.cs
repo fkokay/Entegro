@@ -167,6 +167,7 @@ namespace Entegro.Web.Controllers
                 Price = m.Price,
                 StockQuantity = m.StockQuantity,
                 StokCode = m.StokCode,
+                CostPrice = m.CostPrice,
                 ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
             }).ToList();
 
@@ -252,13 +253,12 @@ namespace Entegro.Web.Controllers
                     ProductId = model.Id,
                     StokCode = m.StokCode,
                     AssignedPictureIds = m.AssignedPictureIds,
+                    CostPrice = m.CostPrice,
                 }).ToList();
 
                 await _productService.UpdateAsync(updateDto);
 
                 var productVariantAttributes = await _productVariantAttributeService.GetAllAsync(model.Id);
-
-
 
                 return Json(new { success = true });
             }
@@ -1254,6 +1254,7 @@ namespace Entegro.Web.Controllers
                     StockQuantity = m.StockQuantity,
                     StokCode = m.StokCode,
                     ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
+                    CostPrice = m.CostPrice,
                 }).ToList();
 
                 foreach (var item in productVariantAttributeCombinations)
@@ -1296,6 +1297,12 @@ namespace Entegro.Web.Controllers
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
                     MarketplaceLink = existingTrendyolProduct?.productUrl ?? "#",
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                    CostPrice = product.ProductVariantAttributeCombinations.FirstOrDefault(x => x.Gtin == product.Code).CostPrice.Value,
+                    ApplyAutoPrice = existingProductIntegration.ApplyAutoPrice,
+                    CommissionPercent = existingProductIntegration.CommissionPercent,
+                    ExtraCost = existingProductIntegration.ExtraCost,
+                    ShippingFee = existingProductIntegration.ShippingFee,
+                    Percent = existingProductIntegration.Percent
                 };
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
@@ -1312,6 +1319,7 @@ namespace Entegro.Web.Controllers
                     Price = m.Price,
                     StockQuantity = m.StockQuantity,
                     StokCode = m.StokCode,
+                    CostPrice = m.CostPrice,
                     ProductVariantAttributeSelections = JsonConvert.DeserializeObject<List<ProductVariantAttributeSelection>>(m.RawAttribute) ?? new List<ProductVariantAttributeSelection>(),
                 }).ToList();
 
@@ -1501,6 +1509,11 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    createProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    createProductIntegration.Percent = model.Percent;
+                    createProductIntegration.ShippingFee = model.ShippingFee;
+                    createProductIntegration.CommissionPercent = model.CommissionPercent;
+                    createProductIntegration.ExtraCost = model.ExtraCost;
                     await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
@@ -1516,6 +1529,11 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.LastSyncDate = null;
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    updateProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    updateProductIntegration.Percent = model.Percent;
+                    updateProductIntegration.ShippingFee = model.ShippingFee;
+                    updateProductIntegration.CommissionPercent = model.CommissionPercent;
+                    updateProductIntegration.ExtraCost = model.ExtraCost;
                     await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
@@ -2653,7 +2671,8 @@ namespace Entegro.Web.Controllers
                     ProductId = m.ProductId,
                     StockQuantity = m.StockQuantity,
                     StokCode = m.StokCode,
-                    AssignedPictureIds = m.AssignedPictureIds
+                    AssignedPictureIds = m.AssignedPictureIds,
+                    CostPrice = m.CostPrice
                 }).ToList();
                 model.ProductMediaFiles = product.ProductMediaFiles.Select(m => new ProductMediaFileModel()
                 {
