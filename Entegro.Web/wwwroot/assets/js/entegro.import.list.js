@@ -74,17 +74,13 @@ Entegro.import.list = (function ($) {
                             <a href="${editUrl}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
                                 <i class="icon-base ti ti-pencil icon-22px"></i>
                             </a>
+                            <button class="btn btn-text-danger rounded-pill waves-effect btn-icon delete-record"
+                                    data-id="${row.Id}" title="Sil">
+                                <i class="icon-base ti ti-trash text-danger icon-22px"></i>
+                            </button>
                             <button type="button" onclick="Entegro.import.list.runJob('ImportJob', ${row.TaskId})" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="İçe Aktar">
                                 <i class="icon-base ti ti-player-play icon-22px"></i>
                             </button>
-                            <button class="btn btn-text-secondary rounded-pill waves-effect btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="icon-base ti ti-dots-vertical icon-22px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end m-0">
-                                <a href="ImportAllProductsFromXml?profileId=${row.Id}" class="dropdown-item">Bütün Ürünleri Kaydet</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="javascript:void(0);" class="dropdown-item text-danger delete-record" data-id="${row.Id}">Sil</a>
-                            </div>
                         </div>
                      `;
                     }

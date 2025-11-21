@@ -1298,7 +1298,7 @@ namespace Entegro.Web.Controllers
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
                     MarketplaceLink = existingTrendyolProduct?.productUrl ?? "#",
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
-                    CostPrice = product.ProductVariantAttributeCombinations.FirstOrDefault(x => x.Gtin == product.Code).CostPrice.Value,
+                    CostPrice = product.ProductVariantAttributeCombinations.FirstOrDefault(x => x.Gtin == existingProductIntegration?.IntegrationCode).CostPrice.Value,
                     ApplyAutoPrice = existingProductIntegration.ApplyAutoPrice,
                     CommissionPercent = existingProductIntegration.CommissionPercent,
                     ExtraCost = existingProductIntegration.ExtraCost,

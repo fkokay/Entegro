@@ -1,5 +1,6 @@
 ﻿using ArasCargo;
-using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.Shipment;
+using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Cargo;
 
 
@@ -7,6 +8,13 @@ namespace Entegro.Application.Services.Cargo
 {
     public class ArasCargoService : IArasCargoService
     {
+        private readonly IOrderService _orderService;
+
+        public ArasCargoService(IOrderService orderService)
+        {
+            _orderService = orderService;
+        }
+
         private readonly string _username = "feyzan";
         private readonly string _password = "a5w89m7nrf";
         public async Task<DispatchResultInfo> CancelDispatch(string integrationCode)
@@ -94,12 +102,14 @@ namespace Entegro.Application.Services.Cargo
             }
         }
 
-        public async Task SendCargo(OrderDto orderDto, bool isDoorPayment)
+        public async Task SendCargo(ShipmentDto shipmentDto)
         {
-
+            //shipment içine isDoorPayment eklenmeli ve printData
+            //hazırlamış olduğu paket içindeki ürünlerin toplam fiyatı olacak --> paymentDoorPrice
             try
             {
                 var service = new ServiceSoapClient(ServiceSoapClient.EndpointConfiguration.ServiceSoap);
+                var orderDto = await _orderService.GetOrderByIdAsync(shipmentDto.OrderId);
                 Order order = new Order();
 
                 order.UserName = _username;
@@ -118,28 +128,38 @@ namespace Entegro.Application.Services.Cargo
                 order.SpecialField1 = "";
                 order.SpecialField2 = "";
                 order.SpecialField3 = "";
-                order.PieceCount = "";
-                order.IntegrationCode = "";
+
+                if (shipmentDto.IsPaymentDoor)
+                {
+                    order.IsCod = "1";
+                    order.CodAmount = "0"; //hazırlamış olduğu paket içindeki ürünlerin toplam fiyatı olacak
+                    order.CodCollectionType = "0";
+                    order.CodBillingType = "0";
+                }
+                else
+                {
+                    order.IsCod = "0";
+                }
+
+                order.PayorTypeCode = shipmentDto.PaymentType == false ? "1" : "2"; // 1: Gönderici, 2: Alıcı
                 order.Description = "";
-                order.CodAmount = "";
                 order.TaxNumber = order.TaxNumber;
                 order.TaxOffice = order.TaxOffice;
                 order.IsWorldWide = "0";
 
-                //order.CodBillingType = isDoorPayment ? "1" : "0";
-                //order.CodCollectionType = isDoorPayment ? "1" : "0";
-                //order.PieceCount = order.ToString();
-                //order.PieceDetails = new PieceDetail[packageQuantity];
-                //for (int i = 1; i <= packageQuantity; i++)
-                //{
-                //    order.PieceDetails[i - 1] = new PieceDetail();
-                //    order.PieceDetails[i - 1].VolumetricWeight = "1";
-                //    order.PieceDetails[i - 1].Weight = "";
-                //    order.PieceDetails[i - 1].BarcodeNumber = siparis.FATIRS_NO + (i < 10 ? "0" + i : i.ToString());
-                //    order.PieceDetails[i - 1].ProductNumber = "";
-                //    order.PieceDetails[i - 1].Description = content;
-                //}
 
+                int packageQuantity = shipmentDto.ShipmentItems.Count;
+                order.PieceCount = packageQuantity.ToString();
+                order.PieceDetails = new PieceDetail[packageQuantity];
+                for (int i = 1; i <= packageQuantity; i++)
+                {
+                    order.PieceDetails[i - 1] = new PieceDetail();
+                    order.PieceDetails[i - 1].VolumetricWeight = "1";
+                    order.PieceDetails[i - 1].Weight = "";
+                    order.PieceDetails[i - 1].BarcodeNumber = orderDto.OrderItems[i - 1].Product.Barcode.ToString();//ürün barkod
+                    order.PieceDetails[i - 1].ProductNumber = orderDto.OrderItems[i - 1].Product.Code.ToString();//ürün code
+                    order.PieceDetails[i - 1].Description = orderDto.OrderItems[i - 1].Product.Name.ToString();//ürün adı gidecek
+                }
 
 
                 var response = await service.SetOrderAsync(new[] { order }, _username, _password);
@@ -220,16 +240,16 @@ namespace Entegro.Application.Services.Cargo
         //        order.IsWorldWide = "0";
 
 
-        //        order.PieceCount = packageQuantity.ToString();
+        //        order.PieceCount = packageQuantity.ToString();//shipmentitem count
         //        order.PieceDetails = new PieceDetail[packageQuantity];
         //        for (int i = 1; i <= packageQuantity; i++)
         //        {
         //            order.PieceDetails[i - 1] = new PieceDetail();
         //            order.PieceDetails[i - 1].VolumetricWeight = "1";
         //            order.PieceDetails[i - 1].Weight = "";
-        //            order.PieceDetails[i - 1].BarcodeNumber = siparis.FATIRS_NO + (i < 10 ? "0" + i : i.ToString());
-        //            order.PieceDetails[i - 1].ProductNumber = "";
-        //            order.PieceDetails[i - 1].Description = content;
+        //            order.PieceDetails[i - 1].BarcodeNumber = siparis.FATIRS_NO + (i < 10 ? "0" + i : i.ToString());//ürün barkod
+        //            order.PieceDetails[i - 1].ProductNumber = "";//ürün code
+        //            order.PieceDetails[i - 1].Description = content;//ürün adı gidecek
         //        }
 
         //        var postdata = Serializer.Serialize(order);

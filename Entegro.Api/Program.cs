@@ -1,7 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Entegro;
-using Entegro.Api.Jobs;
 using Entegro.Api.Services;
 using Entegro.Application.Mappings;
 using Entegro.Engine;
@@ -45,7 +44,7 @@ var sinkOptions = new MSSqlServerSinkOptions
     BatchPeriod = TimeSpan.FromSeconds(5) // 5 saniyede bir batch gönder
 };
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Error()
     .WriteTo.Console()
     .WriteTo.MSSqlServer(
         connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),

@@ -4,6 +4,7 @@ using Entegro.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entegro.Infrastructure.Migrations
 {
     [DbContext(typeof(EntegroDbContext))]
-    partial class EntegroContextModelSnapshot : ModelSnapshot
+    [Migration("20251121131137_add-shipment-ShippingIntegration")]
+    partial class addshipmentShippingIntegration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1100,20 +1103,11 @@ namespace Entegro.Infrastructure.Migrations
                     b.Property<DateTime?>("DeliveryDateUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsPaymentDoor")
-                        .HasColumnType("bit");
-
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<string>("PackageNo")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PaymentType")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PrintData")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ShippedDateUtc")

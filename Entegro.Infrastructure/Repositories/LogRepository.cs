@@ -22,9 +22,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task DeleteAllAsync()
         {
-            var allLogs = await _context.Logs.ToListAsync();
-            _context.Logs.RemoveRange(allLogs);
-            await _context.SaveChangesAsync();
+            await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Log");
         }
 
         public async Task DeleteAsync(Log log)

@@ -6,6 +6,7 @@ using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Domain.Enums;
 using Entegro.Web.Models.Checkout.Orders;
 using Entegro.Web.Models.Common;
 using MapsterMapper;
@@ -96,23 +97,31 @@ namespace Entegro.Web.Controllers
         {
             var orderDetail = await _orderService.GetOrderByIdAsync(id);
             var model = _mapper.Map<OrderModel>(orderDetail);
+
+            var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null, true);
+            ViewBag.Cargos = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Cargo).Select(
+                m => new { m.Id, m.Name, Value = m.IntegrationSystemParameters.Select(x => x.Value).FirstOrDefault() }
+                ).ToList();
             return PartialView("_Packaging", model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PackagingSave(string carrier, List<OrderPackageModel> orderPackages)
+        public async Task<IActionResult> PackagingSave(string carrier, bool paymentType, bool isPaymentDoor, int? shippingIntegrationId, List<OrderPackageModel> orderPackages)
         {
 
             CreateShipmentDto createShipment = new CreateShipmentDto();
             createShipment.Carrier = carrier;
+            createShipment.ShippingIntegrationId = shippingIntegrationId;
             createShipment.TrackingNumber = "";
-            createShipment.PackageNo = new string(Guid.NewGuid().ToString("N").Where(char.IsDigit).Take(10).ToArray());
+            createShipment.PackageNo = "";
             createShipment.TrackingUrl = "";
             createShipment.TotalWeight = 0;
             createShipment.DeliveryDateUtc = null;
             createShipment.ShippedDateUtc = null;
             createShipment.OrderId = orderPackages[0].OrderId;
             createShipment.CreatedOn = DateTime.UtcNow;
+            createShipment.IsPaymentDoor = isPaymentDoor;
+            createShipment.PaymentType = paymentType;
             createShipment.ShipmentItems = orderPackages.Where(m => m.IsPackage).Select(m => new Application.DTOs.ShipmentItem.CreateShipmentItemDto()
             {
                 OrderItemId = m.OrderItemId,
@@ -121,6 +130,11 @@ namespace Entegro.Web.Controllers
 
             var result = await _shipmentService.AddAsync(createShipment);
 
+
+            var order = await _orderService.GetOrderByIdAsync(orderPackages[0].OrderId);
+            var mapped = _mapper.Map<UpdateOrderDto>(order);
+            mapped.OrderStatusId = (int)OrderStatus.Processing;
+            await _orderService.UpdateAsync(mapped);
             return Json(new { success = true });
         }
 

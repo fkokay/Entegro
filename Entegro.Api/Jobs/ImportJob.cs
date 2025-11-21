@@ -583,7 +583,9 @@ namespace Entegro.Api.Jobs
                                 string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
                                 string vPriceStr = variant.Element("price")?.Value ?? "";
                                 string vStockStr = variant.Element("quantity")?.Value ?? "";
+                                string vCostPriceStr = variant.Element("costPrice")?.Value ?? "";
 
+                                decimal vCostPrice = ParsePrice(vCostPriceStr);
                                 decimal vPrice = ParsePrice(vPriceStr);
                                 int vStock = ParseStock(vStockStr);
 
@@ -603,7 +605,7 @@ namespace Entegro.Api.Jobs
                                         Description = productDto.Description,
                                         Price = vPrice,
                                         Barcode = vBarcode,
-                                        CostPrice = productDto.CostPrice,
+                                        CostPrice = vCostPrice,
                                         Unit = "Adet",
                                         Currency = "TL",
                                         BrandId = productDto.BrandId,
@@ -707,7 +709,9 @@ namespace Entegro.Api.Jobs
                                     string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
                                     string vPriceStr = variant.Element("price")?.Value ?? "";
                                     string vStockStr = variant.Element("quantity")?.Value ?? "";
+                                    string vCostPriceStr = variant.Element("costPrice")?.Value ?? "";
 
+                                    decimal vCostPrice = ParsePrice(vCostPriceStr);
                                     decimal vPrice = ParsePrice(vPriceStr);
                                     int vStock = ParseStock(vStockStr);
 
@@ -727,7 +731,7 @@ namespace Entegro.Api.Jobs
                                              Description = updateDto.Description,
                                              Price = vPrice,
                                              Barcode = vBarcode,
-                                             CostPrice = updateDto.CostPrice,
+                                             CostPrice = vCostPrice,
                                              Unit = "Adet",
                                              Currency = "TL",
                                              BrandId = updateDto.BrandId,

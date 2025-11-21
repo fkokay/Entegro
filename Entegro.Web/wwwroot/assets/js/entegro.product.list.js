@@ -362,7 +362,8 @@ Entegro.product.list = (function ($) {
                         if (type === "sort" || type === "type") {
                             return data;
                         }
-                        return $.fn.dataTable.render.number('.', ',', 2).display(data) + ' ' + row.Currency;
+                        return $.fn.dataTable.render.number('.', ',', 2).display(data) + ' ' + (row.Currency ?? 'TL');
+
                     }
                 },
                 { data: 'StockQuantity' },
