@@ -1,7 +1,9 @@
 ﻿using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Application.Interfaces.Services.Cargo;
 using Entegro.Application.Services.Base;
+using Entegro.Application.Services.Cargo;
 using Entegro.Infrastructure.Messaging;
 using Entegro.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,6 +60,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<IReturnRequestService, ReturnRequestService>();
             services.AddScoped<ICrossSellProductService, CrossSellProductService>();
             services.AddScoped<IRelatedProductService, RelatedProductService>();
+            services.AddScoped<IArasCargoService, ArasCargoService>();
             services.AddHttpClient();
 
             return services;

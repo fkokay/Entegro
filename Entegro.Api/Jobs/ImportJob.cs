@@ -437,11 +437,6 @@ namespace Entegro.Api.Jobs
                 {
                     price = ParsePrice(dict["Price"]?.ToString());
                 }
-                decimal costPrice = 0;
-                if (dict.ContainsKey("CostPrice"))
-                {
-                    costPrice = ParsePrice(dict["CostPrice"]?.ToString());
-                }
 
                 int brandId = 0;
                 if (dict.ContainsKey("Brand"))
@@ -521,7 +516,7 @@ namespace Entegro.Api.Jobs
                         Description = dict.ContainsKey("Description") ? dict["Description"]?.ToString() : "",
                         Price = price,
                         Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : "",
-                        CostPrice = costPrice,
+                        CostPrice = price,
                         Unit = "Adet",
                         Currency = "TL",
                         BrandId = brandId > 0 ? brandId : null,
@@ -583,9 +578,7 @@ namespace Entegro.Api.Jobs
                                 string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
                                 string vPriceStr = variant.Element("price")?.Value ?? "";
                                 string vStockStr = variant.Element("quantity")?.Value ?? "";
-                                string vCostPriceStr = variant.Element("costPrice")?.Value ?? "";
 
-                                decimal vCostPrice = ParsePrice(vCostPriceStr);
                                 decimal vPrice = ParsePrice(vPriceStr);
                                 int vStock = ParseStock(vStockStr);
 
@@ -605,7 +598,7 @@ namespace Entegro.Api.Jobs
                                         Description = productDto.Description,
                                         Price = vPrice,
                                         Barcode = vBarcode,
-                                        CostPrice = vCostPrice,
+                                        CostPrice = vPrice,
                                         Unit = "Adet",
                                         Currency = "TL",
                                         BrandId = productDto.BrandId,
@@ -644,7 +637,7 @@ namespace Entegro.Api.Jobs
                     updateDto.Barcode = dict["Barcode"]?.ToString() ?? updateDto.Barcode;
                     updateDto.Price = price;
                     updateDto.StockQuantity = stock;
-                    updateDto.CostPrice = costPrice;
+                    updateDto.CostPrice = price;
                     updateDto.BrandId = brandId > 0 ? brandId : updateDto.BrandId;
                     updateDto.Published = true;
                     updateDto.UpdatedOn = DateTime.UtcNow;
@@ -709,9 +702,7 @@ namespace Entegro.Api.Jobs
                                     string vBarcode = variant.Element("barcode")?.Value?.Trim() ?? "";
                                     string vPriceStr = variant.Element("price")?.Value ?? "";
                                     string vStockStr = variant.Element("quantity")?.Value ?? "";
-                                    string vCostPriceStr = variant.Element("costPrice")?.Value ?? "";
 
-                                    decimal vCostPrice = ParsePrice(vCostPriceStr);
                                     decimal vPrice = ParsePrice(vPriceStr);
                                     int vStock = ParseStock(vStockStr);
 
@@ -731,7 +722,7 @@ namespace Entegro.Api.Jobs
                                              Description = updateDto.Description,
                                              Price = vPrice,
                                              Barcode = vBarcode,
-                                             CostPrice = vCostPrice,
+                                             CostPrice = vPrice,
                                              Unit = "Adet",
                                              Currency = "TL",
                                              BrandId = updateDto.BrandId,
