@@ -169,8 +169,17 @@
 @section Scripts {
     <script src="/assets/js/entegro.import.js" asp-append-version="true"></script>
 
+
     <script>
-        
+         $(document).on('change', '.select2, .select2-multi', function () {
+            $(this).next('.select2-container').css({
+                'border': '',
+                'border-radius': ''
+            });
+        });
+    </script>
+    <script>
+
         window._enteGroSavedMappings = @Html.Raw(JsonConvert.SerializeObject(ViewBag.SavedMappings ?? new List<object>()));
         window._enteGroIncludeVariants = @Html.Raw(JsonConvert.SerializeObject(ViewBag.IncludeVariants ?? false));
         window._enteGroSelectedProducts = new Set(@Html.Raw(JsonConvert.SerializeObject(ViewBag.SelectedProducts ?? new List<string>())));

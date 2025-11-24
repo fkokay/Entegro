@@ -109,6 +109,46 @@ Entegro.import = (function ($) {
                         });
                     }
                 });
+                // 🔹  kolon adları
+               
+                const requiredColumnNames = ["Ürün Kodu", "Ürün Adı", "Fiyat", "Stok Miktarı"];
+
+                let hasError = false;
+
+                $('#mappingForm tbody tr').each(function () {
+                    const displayName = $(this).find('.dbColumnInput').val();
+                    const select = $(this).find('.select2, .select2-multi');
+                    const xmlValue = select.val();
+
+                    // Select2 container (border buraya uygulanacak)
+                    const container = select.next('.select2-container');
+
+                    if (requiredColumnNames.includes(displayName)) {
+
+                        if (!xmlValue || xmlValue.length === 0) {
+                            // ❌ Boşsa kırmızı border
+                            container.css({
+                                'border': '2px solid red',
+                                'border-radius': '4px'
+                            });
+
+                            hasError = true;
+                        } else {
+                            // ✔ Doluysa border sıfırlansın
+                            container.css({
+                                'border': '',
+                                'border-radius': ''
+                            });
+                        }
+                    }
+                });
+
+                if (hasError) {
+                    return; // İşlemi durdur
+                }
+
+                // 🔹  kolon adları
+
 
                 if (mappings.length === 0) {
                     Swal.fire({

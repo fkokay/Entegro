@@ -257,10 +257,23 @@ namespace Entegro.Web.Controllers
                 var (xmlContent, profileId) = await DownloadAndSaveXmlAsync(model);
                 var structure = AnalyzeXml(xmlContent);
 
+
+
+                var variantTags = XDocument.Parse(xmlContent) // variant ve variants altındaki tüm tag'leri topla
+                                           .Descendants("variant")
+                                           .SelectMany(v => v.Descendants())
+                                           .Select(x => x.Name.LocalName)
+                                           .Distinct()
+                                           .ToList();
+
+                var excluded = new[] { "Product", "spec", "variant", "variants" };
+
                 structure.Tags = structure.Tags
-                    .Where(t => !string.Equals(t, structure.RootName, StringComparison.OrdinalIgnoreCase)
-                             && !new[] { "Product", "spec", "variant", "variants" }
-                                 .Contains(t, StringComparer.OrdinalIgnoreCase))
+                    .Where(t =>
+                        !string.Equals(t, structure.RootName, StringComparison.OrdinalIgnoreCase) &&
+                        !excluded.Contains(t, StringComparer.OrdinalIgnoreCase) &&
+                        !variantTags.Contains(t, StringComparer.OrdinalIgnoreCase)
+                    )
                     .ToList();
 
                 var xDoc = XDocument.Parse(xmlContent);
