@@ -62,8 +62,14 @@ namespace Entegro.Api.Jobs
         private async Task HandleArasKargoAsync(ShipmentDto shipment)
         {
             _logger.LogInformation($"Aras Kargo gönderisi hazırlanıyor. ShipmentId: {shipment.Id}");
-            await _arasCargoService.SendCargo(shipment);
-            _logger.LogInformation($"Aras Kargo gönderisi tamamlandı. ShipmentId: {shipment.Id}");
+            var result = await _arasCargoService.SendCargo(shipment);
+
+            if (result.Success)
+                _logger.LogInformation($"Aras Kargo gönderisi tamamlandı. PrintData: {result.PrintData} Takip Numarası:{result.TrackingNumber}");
+
+            else
+                _logger.LogError($"Aras Kargo gönderisi başarısız oldu. Hata Mesajı: {result.Message}");
+
         }
         private async Task HandleYurticiKargoAsync(ShipmentDto shipment)
         {

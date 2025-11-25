@@ -169,7 +169,7 @@ namespace Entegro.Application.Mappings
 
 
             // ---------------- Shipment ----------------
-            config.NewConfig<Shipment, ShipmentDto>().TwoWays();
+            config.NewConfig<Shipment, ShipmentDto>().Map(dest => dest.OrderNumber, src => src.Order.OrderNumber).TwoWays();
             config.NewConfig<Shipment, CreateShipmentDto>().TwoWays();
             config.NewConfig<Shipment, UpdateShipmentDto>().TwoWays();
 

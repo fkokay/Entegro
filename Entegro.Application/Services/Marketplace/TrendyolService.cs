@@ -127,6 +127,20 @@ namespace Entegro.Application.Services.Marketplace
                     {
                         var productVariantAttributeCombination = await _productVariantAttributeCombinationService.GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value);
                         stockQuantity = productVariantAttributeCombination.StockQuantity;
+
+                        if (productIntegration.ApplyAutoPrice && productVariantAttributeCombination.CostPrice.HasValue)
+                        {
+                            decimal calculatedPrice = CalculateAutoPrice(
+                                productVariantAttributeCombination.CostPrice.Value,
+                                productIntegration.Percent,
+                                productIntegration.CommissionPercent,
+                                productIntegration.ShippingFee,
+                                productIntegration.ExtraCost
+                            );
+
+                            productVariantAttributeCombination.Price = calculatedPrice;
+                            productIntegration.Price = calculatedPrice;
+                        }
                     }
                     else
                     {
@@ -148,8 +162,6 @@ namespace Entegro.Application.Services.Marketplace
                     };
 
                     await UpdatePriceAndStockAsync(apiContext, request);
-
-
                     await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Trendyol {product.Name} stok ve fiyat güncellendi");
 
                 }
@@ -863,5 +875,27 @@ namespace Entegro.Application.Services.Marketplace
             }
         }
 
+        public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)
+        {
+            decimal profitRate = profitPercent ?? 0;
+            decimal commissionRate = commissionPercent ?? 0;
+            decimal shippingCost = shippingFee ?? 0;
+            decimal additionalCost = extraCost ?? 0;
+
+            // Ana fiyat: maliyet + kar oranı
+            decimal finalPrice = costPrice * (1 + (profitRate / 100));
+
+            // Ek maliyetler
+            finalPrice += additionalCost;
+            finalPrice += shippingCost;
+
+            // Komisyon oranı varsa, komisyon sonrası net fiyat hesaplanır
+            if (commissionRate > 0)
+            {
+                finalPrice = finalPrice / (1 - (commissionRate / 100));
+            }
+
+            return Math.Round(finalPrice, 2);
+        }
     }
 }

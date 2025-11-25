@@ -3,6 +3,25 @@ Entegro.order = Entegro.order || {};
 
 
 Entegro.order.OrderList = (function ($) {
+
+    function showMessage(title, message, type = "info", redirectUrl = null, reload = null) {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: type, // success | error | warning | info | question
+            confirmButtonText: 'Tamam',
+            customClass: { confirmButton: 'btn btn-primary' },
+            buttonsStyling: false
+        }).then(() => {
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
+
+            if (reload) {
+                location.reload();
+            }
+        });
+    }
     function addFilterText(column, containerSelector, placeholder) {
         const container = document.querySelector(containerSelector);
         if (!container) {
@@ -805,7 +824,7 @@ Entegro.order.OrderList = (function ($) {
                 data: formData,
                 success: function (response) {
                     if (response.success) {
-                        showMessage("Başarılı!", 'Ürün başarıyla kaydedildi.', "success", "/Product/List");
+                        showMessage("Başarılı!", 'Sipariş başarıyla kaydedildi.', "success", "/Order/List");
                     } else {
                         showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
                     }

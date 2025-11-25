@@ -14,6 +14,7 @@ namespace Entegro.Application.Interfaces.Repositories
         Task<List<Shipment>> GetAllAsync();
         Task<PagedResult<Shipment>> GetAllAsync(int pageNumber, int pageSize);
         Task<PagedResult<Shipment>> GetPagedAsync(GridCommand gridCommand);
+        Task<PagedResult<Shipment>> GetShipmentsByIntegrationIdAsync(GridCommand gridCommand);
         Task AddAsync(Shipment shipment);
         Task UpdateAsync(Shipment shipment);
         Task UpdateByShippedDateAsync(int id);

@@ -179,6 +179,30 @@ namespace Entegro.Application.Services.Base
             };
         }
 
+
+        public async Task<PagedResult<ShipmentDto>> GetShipmentsByIntegrationIdAsync(GridCommand gridCommand)
+        {
+            var shipment = await _shipmentRepository.GetShipmentsByIntegrationIdAsync(gridCommand);
+
+            var items = await shipment.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ShipmentDto>(x);
+                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
+                model.ShippedDate = x.ShippedDateUtc.ToLocalTime();
+                model.DeliveryDate = x.DeliveryDateUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<ShipmentDto>
+            {
+                Items = items,
+                TotalCount = shipment.TotalCount,
+                PageNumber = shipment.PageNumber,
+                PageSize = shipment.PageSize
+            };
+        }
+
+
         public async Task<ShipmentDto> UpdateAsync(UpdateShipmentDto shipment)
         {
             if (shipment == null)

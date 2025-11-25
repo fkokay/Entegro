@@ -257,9 +257,7 @@ namespace Entegro.Web.Controllers
                 }).ToList();
 
                 await _productService.UpdateAsync(updateDto);
-
                 var productVariantAttributes = await _productVariantAttributeService.GetAllAsync(model.Id);
-
                 return Json(new { success = true });
             }
 

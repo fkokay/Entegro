@@ -1,4 +1,5 @@
 ﻿using ArasCargo;
+using Entegro.Application.DTOs.Cargo;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Cargo;
@@ -36,9 +37,10 @@ namespace Entegro.Application.Services.Cargo
                 ServiceSoapClient service = new ServiceSoapClient(ServiceSoapClient.EndpointConfiguration.ServiceSoap);
                 return await service.CancelDispatchAsync(_username, _password, integrationCode);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.Error("Kargo İptal Edilirken Hata: " + ex.Message);
+                return null;
             }
         }
 
@@ -141,10 +143,12 @@ namespace Entegro.Application.Services.Cargo
             }
         }
 
-        public async Task SendCargo(ShipmentDto shipmentDto)
+        public async Task<ArasSendCargoResultDto> SendCargo(ShipmentDto shipmentDto)
         {
             try
             {
+                var result = new ArasSendCargoResultDto();
+
                 var service = new ServiceSoapClient(ServiceSoapClient.EndpointConfiguration.ServiceSoap);
                 var orderDto = await _orderService.GetOrderByIdAsync(shipmentDto.OrderId);
 
@@ -184,13 +188,14 @@ namespace Entegro.Application.Services.Cargo
                     order.CodAmount = paymentDoorPrice.ToString(); //hazırlamış olduğu paket içindeki ürünlerin toplam fiyatı olacak
                     order.CodCollectionType = "0";
                     order.CodBillingType = "0";
+                    order.PayorTypeCode = "1";
                 }
                 else
                 {
                     order.IsCod = "0";
+                    order.PayorTypeCode = shipmentDto.PaymentType == false ? "1" : "2"; // 1: Gönderici, 2: Alıcı
                 }
 
-                order.PayorTypeCode = shipmentDto.PaymentType == false ? "1" : "2"; // 1: Gönderici, 2: Alıcı
                 order.Description = "";
                 order.TaxNumber = order.TaxNumber;
                 order.TaxOffice = order.TaxOffice;
@@ -212,51 +217,74 @@ namespace Entegro.Application.Services.Cargo
 
 
                 var response = await service.SetOrderAsync(new[] { order }, _username, _password);
-                if (response[0].ResultCode == "0")
-                {
-                    var retryPolicy = Policy.Handle<Exception>()
-                        .WaitAndRetryAsync(
-                        retryCount: 3,
-                        sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
-                        onRetry: (exception, timeSpan, retryCount, context) =>
-                        {
-                            _logger.LogInformation("{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
-                        });
 
-                    await retryPolicy.ExecuteAsync(async () =>
-                    {
-                        var barcodeResult = await GetBarcode(orderDto.OrderNumber, shipmentDto.ShippingIntegrationId.Value);
-
-                        if (barcodeResult == null)
-                        {
-                            _logger.Error("Aras Kargo servisi ile iletişim kurulamadı.");
-                        }
-
-                        if (barcodeResult.ResultCode == 0)
-                        {
-                            string printData = "";
-                            foreach (var item in barcodeResult.ZebraZpl)
-                            {
-                                printData += item;
-                            }
-                            shipmentDto.PrintData = printData;
-                        }
-                        else
-                        {
-                            _logger.Error(barcodeResult.Message);
-                        }
-                    });
-                }
                 if (response == null || response.Length == 0)
+                {
                     _logger.Error("ArasCargo gönderim cevabı boş döndü!");
+                    result.Success = false;
+                    result.Message = "ArasCargo gönderim cevabı boş döndü.";
+                    return result;
+                }
 
                 if (response[0].ResultCode != "0")
+                {
                     _logger.Error($"Aras hata: {response[0].ResultMessage}");
+                    result.Success = false;
+                    result.Message = response[0].ResultMessage;
+                    return result;
+                }
 
+
+
+                var retryPolicy = Policy.Handle<Exception>()
+                    .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
+                    onRetry: (exception, timeSpan, retryCount, context) =>
+                    {
+                        _logger.LogInformation("{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
+                    });
+
+                await retryPolicy.ExecuteAsync(async () =>
+                {
+                    var barcodeResult = await GetBarcode(orderDto.OrderNumber, shipmentDto.ShippingIntegrationId.Value);
+
+                    if (barcodeResult == null)
+                    {
+                        _logger.Error("Aras Kargo servisi ile iletişim kurulamadı.");
+                    }
+
+                    if (barcodeResult.ResultCode == 0)
+                    {
+                        string printData = "";
+                        foreach (var item in barcodeResult.ZebraZpl)
+                        {
+                            printData += item;
+                        }
+                        shipmentDto.PrintData = printData;
+
+                        result.PrintData = printData;
+                        result.TrackingNumber = orderDto.OrderNumber;
+                    }
+                    else
+                    {
+                        _logger.Error(barcodeResult.Message);
+                        result.Message = barcodeResult.Message;
+                    }
+                });
+
+                result.Success = true;
+                result.Message = "Kargo başarıyla gönderildi.";
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError("SendCargo sırasında hata oluştu: " + ex.Message, ex);
+                return new ArasSendCargoResultDto
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
             }
         }
     }
