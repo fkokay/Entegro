@@ -65,6 +65,7 @@ namespace Entegro.Application.Services.Base
             if (updateProduct == null)
                 throw new ArgumentNullException(nameof(updateProduct));
 
+            var variantCostPrice = 0;
             var existingProduct = await _productRepository.GetByAsync(m => m.Id == updateProduct.Id);
             var mainPictureId = existingProduct?.MainPictureId ?? null;
             if (existingProduct == null)
@@ -91,8 +92,23 @@ namespace Entegro.Application.Services.Base
             }
 
             var productIntegrations = await _productIntegrationService.GetProductIntegrationAllWithProductIdAsync(existingProduct.Id);
+
+
             foreach (var productIntegration in productIntegrations)
             {
+                //if (productIntegration.ApplyAutoPrice)
+                //{
+                //    var combination = await _productVariantAttributeCombinationRepository.GetByStockCodeOrGtinAsync(productIntegration.IntegrationCode);
+                //    var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(productIntegration);
+                //    mappedProductIntegration.Price = CalculateAutoPrice(
+                //        combination.CostPrice,
+                //        productIntegration.Percent,
+                //        productIntegration.CommissionPercent,
+                //        productIntegration.ShippingFee,
+                //        productIntegration.ExtraCost);
+                //    await _productIntegrationService.UpdateAsync(mappedProductIntegration);
+                //}
+
                 var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
                 _eventPublisher.Publish(recordUpdatedEvent);
             }
@@ -249,6 +265,29 @@ namespace Entegro.Application.Services.Base
                 return _mapper.Map<List<ProductDto>>(topSelling);
             var randomProducts = await _productRepository.GetRandomProductsAsync(topCount);
             return _mapper.Map<List<ProductDto>>(randomProducts);
+        }
+
+        public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)
+        {
+            decimal profitRate = profitPercent ?? 0;
+            decimal commissionRate = commissionPercent ?? 0;
+            decimal shippingCost = shippingFee ?? 0;
+            decimal additionalCost = extraCost ?? 0;
+
+            // Ana fiyat: maliyet + kar oranı
+            decimal finalPrice = costPrice * (1 + (profitRate / 100));
+
+            // Ek maliyetler
+            finalPrice += additionalCost;
+            finalPrice += shippingCost;
+
+            // Komisyon oranı varsa, komisyon sonrası net fiyat hesaplanır
+            if (commissionRate > 0)
+            {
+                finalPrice = finalPrice / (1 - (commissionRate / 100));
+            }
+
+            return Math.Round(finalPrice, 2);
         }
     }
 }

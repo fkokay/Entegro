@@ -7,6 +7,7 @@ namespace Entegro.Application.Interfaces.Services.Base
     {
         Task<bool> ExistsAsync(int productId, string gtin);
         Task<ProductVariantAttributeCombinationDto?> GetByIdAsync(int id);
+        Task<ProductVariantAttributeCombinationDto?> GetByStockCodeOrGtinAsync(string integrationCode);
         Task<List<ProductVariantAttributeCombinationDto>> GetByProductIdAsync(int productId);
         Task<List<ProductVariantAttributeCombinationDto>> GetAllAsync();
         Task<PagedResult<ProductVariantAttributeCombinationDto>> GetPagedAsync(int pageNumber = 1, int pageSize = 7);

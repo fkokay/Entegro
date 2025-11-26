@@ -118,7 +118,7 @@ namespace Entegro.Infrastructure.Repositories
           .Include(x => x.ProductCategories).ThenInclude(pc => pc.Category)
           .Include(x => x.ProductVariantAttributes).ThenInclude(pi => pi.ProductVariantAttributeValues)
           .Include(x => x.ProductVariantAttributeCombinations)
-          .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters)
+          .Include(x => x.ProductIntegrations).ThenInclude(pi => pi.IntegrationSystem).ThenInclude(isys => isys.IntegrationSystemParameters).AsSplitQuery()
           .AsNoTracking();
         }
 

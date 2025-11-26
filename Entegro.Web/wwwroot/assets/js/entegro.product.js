@@ -97,6 +97,7 @@ Entegro.product = (function ($) {
 
             formValidation.validate().then(function (status) {
                 if (status === 'Valid') {
+
                     if (typeof fullEditor !== "undefined" && fullEditor.root) {
                         document.getElementById('Description').value = fullEditor.root.innerHTML;
                     }
@@ -109,23 +110,38 @@ Entegro.product = (function ($) {
                         url: action,
                         type: 'POST',
                         data: formData,
+
+                        beforeSend: function () {
+                            window.showLoading("Lütfen bekleyiniz..");
+                        },
+
                         success: function (response) {
                             if (response.success) {
-                                showMessage("Başarılı!", 'Ürün başarıyla kaydedildi.', "success", "/Product/List");
+                                showMessage("Başarılı!", "Ürün başarıyla kaydedildi.", "success", "/Product/List");
                             } else {
-                                showMessage("Hata!", response.message || 'Bir hata oluştu.', "error");
+                                showMessage("Hata!", response.message || "Bir hata oluştu.", "error");
                             }
                         },
+
                         error: function (xhr) {
-                            showMessage("Hata!", xhr.responseText || 'İşlem sırasında bir hata oluştu.', "error");
+                            showMessage("Hata!", xhr.responseText || "İşlem sırasında bir hata oluştu.", "error");
+                        },
+
+                        
+                        complete: function () {
+                            if (window.hideLoading) {
+                                window.hideLoading();
+                            }
                         }
                     });
+
                 } else {
                     console.log("Form hatalı, submit iptal.");
                 }
             });
         });
     }
+
 
     function TabsInit() {
         const tabButtons = document.querySelectorAll('#product-tabs button[data-bs-toggle="tab"]');

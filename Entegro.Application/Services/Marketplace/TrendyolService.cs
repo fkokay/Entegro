@@ -17,6 +17,7 @@ using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Domain.Enums;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
@@ -42,6 +43,7 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IProductAttributeValueService _productAttributeValueService;
         private readonly ISettingService _settingService;
         private readonly IOrderItemService _orderItemService;
+        private readonly IMapper _mapper;
         private readonly IProductMediaFileMappingService _productMediaFileMappingService;
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
@@ -58,7 +60,8 @@ namespace Entegro.Application.Services.Marketplace
             IProductAttributeValueService productAttributeValueService,
             ISettingService settingService,
             IProductMediaFileMappingService productMediaFileMappingService,
-            IOrderItemService orderItemService)
+            IOrderItemService orderItemService,
+            IMapper mapper)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
@@ -73,6 +76,7 @@ namespace Entegro.Application.Services.Marketplace
             _settingService = settingService;
             _productMediaFileMappingService = productMediaFileMappingService;
             _orderItemService = orderItemService;
+            _mapper = mapper;
         }
 
 
@@ -768,8 +772,6 @@ namespace Entegro.Application.Services.Marketplace
                 return false;
             return true;
         }
-
-
         public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
         {
             List<int> fileIds = new();

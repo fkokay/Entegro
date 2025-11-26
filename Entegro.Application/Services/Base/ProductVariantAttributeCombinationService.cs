@@ -92,5 +92,18 @@ namespace Entegro.Application.Services.Base
         {
             await _productVariantAttributeCombinationRepository.DeleteByProductIdAsync(productId);
         }
+
+        public async Task<ProductVariantAttributeCombinationDto?> GetByStockCodeOrGtinAsync(string integrationCode)
+        {
+
+            var productVariantAttributeCombination = await _productVariantAttributeCombinationRepository.GetByStockCodeOrGtinAsync(integrationCode);
+            if (productVariantAttributeCombination == null)
+            {
+                throw new KeyNotFoundException($"productVariantAttributeCombination with integrationCode {integrationCode} not found.");
+            }
+
+            var productVariantAttributeCombinationDto = _mapper.Map<ProductVariantAttributeCombinationDto>(productVariantAttributeCombination);
+            return productVariantAttributeCombinationDto;
+        }
     }
 }

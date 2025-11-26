@@ -252,7 +252,9 @@ Entegro.product.list = (function ($) {
 
     function initList() {
         var salesData = []; 
-
+        if ($.fn.DataTable.isDataTable('#ProductTable')) {
+            return;
+        }
         
         $.ajax({
             url: '/Product/GetStoreProductSales',
@@ -269,6 +271,7 @@ Entegro.product.list = (function ($) {
 
         $(document).off('submit.integration')
             .on('submit.integration', '#integrationDialog', function (e) {
+
                 e.preventDefault();
 
                 const $form = $(this);
@@ -284,24 +287,38 @@ Entegro.product.list = (function ($) {
                     type: 'POST',
                     data: $form.serialize(),
                     success: function (response) {
+
                         if (response.success) {
                             $('#addIntegration').modal('hide');
-                            window.location.reload();
-                        } else {
+
+                            $('#ProductTable').DataTable().ajax.reload(null, false);
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Başarılı!',
+                                text: 'İşlem başarıyla tamamlandı.',
+                                confirmButtonText: 'Tamam',
+                                showConfirmButton: true,
+                                backdrop: true,
+                                heightAuto: false,
+                                timer: 2000,   
+                                timerProgressBar: true
+                            });
+
+                        }
+                        else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Hata',
-                                text: response.message || 'Bilinmeyen bir hata oluştu.',
-                                confirmButtonText: 'Tamam'
+                                text: response.message || 'Hata oluştu'
                             });
                         }
                     },
-                    error: function (xhr) {
-                        console.error(xhr.responseText);
+                    error: function () {
                         Swal.fire({
                             icon: 'error',
                             title: 'Sunucu Hatası',
-                            text: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.'
+                            text: 'Sunucuda bir hata oluştu'
                         });
                     },
                     complete: function () {
@@ -310,6 +327,7 @@ Entegro.product.list = (function ($) {
                     }
                 });
             });
+
         var table = $('#ProductTable').DataTable({
             language: {
                 paginate: {
@@ -397,7 +415,7 @@ Entegro.product.list = (function ($) {
 
                         return `
                      <div class="d-inline-block text-nowrap">
-                       <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill btn-icon">
+                       <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill btn-icon" target="_blank">
                          <i class="icon-base ti ti-pencil icon-22px"></i>
                        </a>
                        <button class="btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"

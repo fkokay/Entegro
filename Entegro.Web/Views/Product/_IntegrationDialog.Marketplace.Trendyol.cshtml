@@ -108,11 +108,8 @@
     (function () {
         var checkbox = document.getElementById("@Html.IdFor(m => m.ApplyAutoPrice)");
         var fields = document.getElementById("autoPriceFields");
-
         var originalPrice = "@Model.Price";
-
         var priceInput = document.getElementById("@Html.IdFor(m => m.Price)");
-
         var costInput = document.getElementById("@Html.IdFor(m => m.CostPrice)");
         var percentInput = document.getElementById("@Html.IdFor(m => m.Percent)");
         var commissionInput = document.getElementById("@Html.IdFor(m => m.CommissionPercent)");
@@ -121,7 +118,6 @@
 
         if (!checkbox || !fields) return;
 
-       
         function calculatePrice() {
             if (!checkbox.checked) return;
 

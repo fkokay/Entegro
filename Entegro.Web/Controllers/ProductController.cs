@@ -59,6 +59,7 @@ namespace Entegro.Web.Controllers
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
         private readonly ICategoryService _categoryService;
+        private readonly IProductCategoryService _productCategoryService;
         private readonly ITrendyolService _trenyolService;
         private readonly IN11Service _n11Service;
         private readonly IPazaramaService _pazaramaService;
@@ -100,7 +101,8 @@ namespace Entegro.Web.Controllers
             IProductAttributeValueService productAttributeValueService,
             ISpecificationAttributeService specificationAttributeService,
             ISpecificationAttributeOptionService specificationAttributeOptionService,
-            IOrderService orderService)
+            IOrderService orderService,
+            IProductCategoryService productCategoryService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -129,6 +131,7 @@ namespace Entegro.Web.Controllers
             _specificationAttributeService = specificationAttributeService;
             _specificationAttributeOptionService = specificationAttributeOptionService;
             _orderService = orderService;
+            _productCategoryService = productCategoryService;
         }
 
         #region Product list / create / edit / delete

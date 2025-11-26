@@ -79,6 +79,15 @@ namespace Entegro.Infrastructure.Repositories
             return await _context.ProductVariantAttributeCombinations.Where(o => o.ProductId == productId).ToListAsync();
         }
 
+        public async Task<ProductVariantAttributeCombination?> GetByStockCodeOrGtinAsync(string integrationCode)
+        {
+            return await _context.ProductVariantAttributeCombinations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o =>
+                    o.StokCode == integrationCode ||
+                    o.Gtin == integrationCode);
+        }
+
         public async Task UpdateAsync(ProductVariantAttributeCombination productVariantAttributeCombination)
         {
             _context.ProductVariantAttributeCombinations.Update(productVariantAttributeCombination);
