@@ -1,5 +1,6 @@
 ﻿using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
@@ -96,18 +97,18 @@ namespace Entegro.Application.Services.Base
 
             foreach (var productIntegration in productIntegrations)
             {
-                //if (productIntegration.ApplyAutoPrice)
-                //{
-                //    var combination = await _productVariantAttributeCombinationRepository.GetByStockCodeOrGtinAsync(productIntegration.IntegrationCode);
-                //    var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(productIntegration);
-                //    mappedProductIntegration.Price = CalculateAutoPrice(
-                //        combination.CostPrice,
-                //        productIntegration.Percent,
-                //        productIntegration.CommissionPercent,
-                //        productIntegration.ShippingFee,
-                //        productIntegration.ExtraCost);
-                //    await _productIntegrationService.UpdateAsync(mappedProductIntegration);
-                //}
+                if (productIntegration.ApplyAutoPrice)
+                {
+                    var combination = await _productVariantAttributeCombinationRepository.GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value);
+                    var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(productIntegration);
+                    mappedProductIntegration.Price = CalculateAutoPrice(
+                        combination.CostPrice,
+                        productIntegration.Percent,
+                        productIntegration.CommissionPercent,
+                        productIntegration.ShippingFee,
+                        productIntegration.ExtraCost);
+                    await _productIntegrationService.UpdateAsync(mappedProductIntegration);
+                }
 
                 var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
                 _eventPublisher.Publish(recordUpdatedEvent);
