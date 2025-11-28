@@ -1347,8 +1347,10 @@ namespace Entegro.Web.Controllers
         private async Task<IActionResult> ProductIntegrationSmartstoreDialog(ProductIntegrationDialogModel model, ProductDto? product, IntegrationSystemDto? integrationSystem)
         {
             var commerceType = "Smartstore";
+            var productVariantAttributeCombinationId = product.ProductIntegrations.Where(x => x.IntegrationCode == product.Code).Select(x => x.ProductVariantAttributeCombinationId).FirstOrDefault();
             if (model.ProductIntegrationId == 0)
             {
+
                 var createModel = new SmartstoreProductIntegrationModel
                 {
                     Id = 0,
@@ -1361,6 +1363,8 @@ namespace Entegro.Web.Controllers
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
                     Price = product.Price,
                     IntegrationCode = product.Code,
+                    CostPrice = productVariantAttributeCombinationId != null ? product.ProductVariantAttributeCombinations.Where(x => x.Id == productVariantAttributeCombinationId).Select(x => x.CostPrice).FirstOrDefault().Value : product.CostPrice,
+                    ProductVariantAttributeCombinationId = productVariantAttributeCombinationId,
                     Active = true,
                 };
 
@@ -1382,7 +1386,14 @@ namespace Entegro.Web.Controllers
                     ProductName = product.Name,
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
-                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url
+                    ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId == null ? null : existingProductIntegration.ProductVariantAttributeCombinationId,
+                    ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
+                    ApplyAutoPrice = existingProductIntegration.ApplyAutoPrice,
+                    ExtraCost = existingProductIntegration.ExtraCost,
+                    Percent = existingProductIntegration.Percent,
+                    ShippingFee = existingProductIntegration.ShippingFee,
+                    CommissionPercent = existingProductIntegration.CommissionPercent,
+                    CostPrice = productVariantAttributeCombinationId != null ? product.ProductVariantAttributeCombinations.Where(x => x.Id == productVariantAttributeCombinationId).Select(x => x.CostPrice).FirstOrDefault().Value : product.CostPrice,
                 };
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
@@ -1431,6 +1442,12 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    createProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    createProductIntegration.Percent = model.Percent;
+                    createProductIntegration.ShippingFee = model.ShippingFee;
+                    createProductIntegration.ExtraCost = model.ExtraCost;
+                    createProductIntegration.CommissionPercent = model.CommissionPercent;
+                    createProductIntegration.ProductVariantAttributeCombinationId = model.ProductVariantAttributeCombinationId;
                     await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
@@ -1445,7 +1462,12 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.LastSyncDate = null;
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-
+                    updateProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    updateProductIntegration.Percent = model.Percent;
+                    updateProductIntegration.ShippingFee = model.ShippingFee;
+                    updateProductIntegration.ExtraCost = model.ExtraCost;
+                    updateProductIntegration.CommissionPercent = model.CommissionPercent;
+                    updateProductIntegration.ProductVariantAttributeCombinationId = model.ProductVariantAttributeCombinationId;
                     await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 

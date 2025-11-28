@@ -1,20 +1,13 @@
 ﻿using Entegro.Application.DTOs.Commerce;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.IntegrationSystem;
-using Entegro.Application.DTOs.Product;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Commerce;
-using Entegro.Domain.Entities;
 using Entegro.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services.Commerce.Smartstore
 {
@@ -73,7 +66,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                         CustomData = customData
                     };
 
-                    await _smartstoreClient.UpsertProductAsync(context,request);
+                    await _smartstoreClient.UpsertProductAsync(context, request);
 
 
                     await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
@@ -81,7 +74,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             }
         }
 
-        public async Task DeleteProductAsync(SmartstoreApiContext context,string sku)
+        public async Task DeleteProductAsync(SmartstoreApiContext context, string sku)
         {
             await _smartstoreClient.DeleteProductAsync(context, sku);
         }

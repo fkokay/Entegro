@@ -66,13 +66,13 @@ namespace Entegro.Application.Services.Base
             if (updateProduct == null)
                 throw new ArgumentNullException(nameof(updateProduct));
 
-            var variantCostPrice = 0;
             var existingProduct = await _productRepository.GetByAsync(m => m.Id == updateProduct.Id);
             var mainPictureId = existingProduct?.MainPictureId ?? null;
             if (existingProduct == null)
                 throw new KeyNotFoundException($"ID {updateProduct.Id} ile Product bulunamadı.");
 
 
+            var productCostPrice = existingProduct.CostPrice;
             _mapper.Map(updateProduct, existingProduct);
             existingProduct.MainPictureId = mainPictureId;
             await _productRepository.UpdateAsync(existingProduct);
@@ -99,15 +99,30 @@ namespace Entegro.Application.Services.Base
             {
                 if (productIntegration.ApplyAutoPrice)
                 {
-                    var combination = await _productVariantAttributeCombinationRepository.GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value);
-                    var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(productIntegration);
-                    mappedProductIntegration.Price = CalculateAutoPrice(
-                        combination.CostPrice,
+
+                    if (productIntegration.ProductVariantAttributeCombinationId != null && productIntegration.ProductVariantAttributeCombinationId.HasValue)
+                    {
+                        var combination = await _productVariantAttributeCombinationRepository.GetByIdAsync(productIntegration.ProductVariantAttributeCombinationId.Value);
+                        var mappedProductIntegration = _mapper.Map<UpdateProductIntegrationDto>(productIntegration);
+                        mappedProductIntegration.Price = CalculateAutoPrice(
+                            combination.CostPrice,
+                            productIntegration.Percent,
+                            productIntegration.CommissionPercent,
+                            productIntegration.ShippingFee,
+                            productIntegration.ExtraCost);
+                        await _productIntegrationService.UpdateAsync(mappedProductIntegration);
+                    }
+
+
+                    var integration = await _productIntegrationService.GetByIdAsync(productIntegration.Id);
+                    var mappedProductIntegration2 = _mapper.Map<UpdateProductIntegrationDto>(integration);
+                    mappedProductIntegration2.Price = CalculateAutoPrice(
+                        productCostPrice,
                         productIntegration.Percent,
                         productIntegration.CommissionPercent,
                         productIntegration.ShippingFee,
                         productIntegration.ExtraCost);
-                    await _productIntegrationService.UpdateAsync(mappedProductIntegration);
+                    await _productIntegrationService.UpdateAsync(mappedProductIntegration2);
                 }
 
                 var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
