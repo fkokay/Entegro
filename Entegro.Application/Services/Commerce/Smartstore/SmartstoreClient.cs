@@ -149,7 +149,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PutAsync($"products({product.Id})", content);
+            var response = await httpClient.PatchAsync($"products({product.Id})", content);
             var result = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
         }
@@ -858,7 +858,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             return created?.Id ?? 0;
         }
         #endregion
-
         #region Product Variant Attribute Combination
         public async Task<ProductVariantAttributeCombinationDto?> GetProductVariantAttributeCombination(SmartstoreApiContext context, int productId, int hashCode)
         {

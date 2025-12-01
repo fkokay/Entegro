@@ -105,7 +105,7 @@ namespace Entegro.Api.Jobs
                 switch (item.IntegrationSystemType)
                 {
                     case Domain.Enums.IntegrationSystemType.Commerce:
-                        await CommerceOrderSync(item);
+                        //await CommerceOrderSync(item);
                         break;
                     case Domain.Enums.IntegrationSystemType.Marketplace:
                         await MarketplaceOrderSync(item);
@@ -1046,10 +1046,8 @@ namespace Entegro.Api.Jobs
 
                                 var product = await _productService.GetProductByCodeAsync(orderItem.Product.Code);
 
-
                                 if (product == null)
                                 {
-
                                     _logger.Error($"{orderItem.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
                                     continue;
                                 }

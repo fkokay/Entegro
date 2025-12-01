@@ -575,7 +575,7 @@ namespace Entegro.Application.Services.Marketplace
                 ProductId = productId,
                 ProductAttributeId = attrId,
                 DisplayOrder = 0,
-                AttributeControlTypeId = 0
+                AttributeControlTypeId = (int)FormControlType.ColorOrImageBox
             })).Id;
 
             var existingVariantValue = await _productVariantAttributeValueService.GetByNameAsync(variantId, attributeValue);

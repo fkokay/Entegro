@@ -9,6 +9,7 @@ using Entegro.Application.Interfaces.Services.Base;
 using Entegro.ComponentModel;
 using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
+using Product = Entegro.Domain.Entities.Catalog.Product;
 
 namespace Entegro.Application.Services.Base
 {
@@ -112,17 +113,18 @@ namespace Entegro.Application.Services.Base
                             productIntegration.ExtraCost);
                         await _productIntegrationService.UpdateAsync(mappedProductIntegration);
                     }
-
-
-                    var integration = await _productIntegrationService.GetByIdAsync(productIntegration.Id);
-                    var mappedProductIntegration2 = _mapper.Map<UpdateProductIntegrationDto>(integration);
-                    mappedProductIntegration2.Price = CalculateAutoPrice(
-                        productCostPrice,
-                        productIntegration.Percent,
-                        productIntegration.CommissionPercent,
-                        productIntegration.ShippingFee,
-                        productIntegration.ExtraCost);
-                    await _productIntegrationService.UpdateAsync(mappedProductIntegration2);
+                    else
+                    {
+                        var integration = await _productIntegrationService.GetByIdAsync(productIntegration.Id);
+                        var mappedProductIntegration2 = _mapper.Map<UpdateProductIntegrationDto>(integration);
+                        mappedProductIntegration2.Price = CalculateAutoPrice(
+                            productCostPrice,
+                            productIntegration.Percent,
+                            productIntegration.CommissionPercent,
+                            productIntegration.ShippingFee,
+                            productIntegration.ExtraCost);
+                        await _productIntegrationService.UpdateAsync(mappedProductIntegration2);
+                    }
                 }
 
                 var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
