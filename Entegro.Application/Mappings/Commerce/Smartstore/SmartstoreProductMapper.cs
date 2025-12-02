@@ -185,7 +185,96 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 return null;
             }
         }
+        public static SmartstoreUpdateProductDto? UpdateToDto(ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
+        {
+            try
+            {
+                if (product == null)
+                {
+                    return null;
+                }
 
+                SmartstoreManufacturerMapper.ConfigureLogger(_logger);
+
+                SmartstoreUpdateProductDto smartstoreProduct = new SmartstoreUpdateProductDto();
+                smartstoreProduct.Id = product.Id;
+                smartstoreProduct.ProductTypeId = 5; // Varsayılan olarak basit ürün tipi
+                smartstoreProduct.ParentGroupedProductId = 0;
+                smartstoreProduct.Visibility = "Full";
+                smartstoreProduct.Condition = "New";
+                smartstoreProduct.Name = product.Name;
+                smartstoreProduct.ShortDescription = "";
+                smartstoreProduct.AdminComment = "";
+                smartstoreProduct.ProductTemplateId = 1;
+                smartstoreProduct.ShowOnHomePage = customData == null ? false : customData.ShowOnHomePage;
+                smartstoreProduct.HomePageDisplayOrder = customData == null ? 0 : customData.HomePageDisplayOrder;
+                smartstoreProduct.AllowCustomerReviews = true;
+                smartstoreProduct.Sku = product.Code;
+                smartstoreProduct.FullDescription = product.Description;
+                smartstoreProduct.Price = product.Price;
+                smartstoreProduct.MetaKeywords = product.MetaKeywords;
+                smartstoreProduct.MetaDescription = product.MetaDescription;
+                smartstoreProduct.MetaTitle = product.MetaTitle;
+                smartstoreProduct.StockQuantity = product.StockQuantity;
+                smartstoreProduct.ApprovedRatingSum = 0;
+                smartstoreProduct.NotApprovedRatingSum = 0;
+                smartstoreProduct.ApprovedTotalReviews = 0;
+                smartstoreProduct.NotApprovedTotalReviews = 0;
+                smartstoreProduct.ManufacturerPartNumber = "";
+                smartstoreProduct.Gtin = product.Gtin;
+                smartstoreProduct.GiftCardTypeId = 0;
+                smartstoreProduct.UnlimitedDownloads = true;
+                smartstoreProduct.MaxNumberOfDownloads = 10;
+                smartstoreProduct.DownloadActivationTypeId = 1;
+                smartstoreProduct.RecurringCycleLength = 100;
+                smartstoreProduct.RecurringCyclePeriodId = 0;
+                smartstoreProduct.RecurringTotalCycles = 10;
+                smartstoreProduct.IsShippingEnabled = true;
+                smartstoreProduct.AdditionalShippingCharge = 0;
+                smartstoreProduct.TaxCategoryId = 1;
+                smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
+                smartstoreProduct.StockQuantity = product.StockQuantity;
+                smartstoreProduct.DisplayStockAvailability = customData == null ? false : customData.DisplayStockAvailability;
+                smartstoreProduct.DisplayStockQuantity = customData == null ? false : customData.DisplayStockQuantity;
+                smartstoreProduct.MinStockQuantity = customData == null ? 0 : customData.MinStockQuantity;
+                smartstoreProduct.LowStockActivityId = customData == null ? 0 : customData.LowStockActivityId;
+                smartstoreProduct.NotifyAdminForQuantityBelow = 0;
+                smartstoreProduct.BackorderModeId = 0;
+                smartstoreProduct.OrderMinimumQuantity = 1;
+                smartstoreProduct.OrderMaximumQuantity = int.MaxValue;
+                smartstoreProduct.QuantityStep = 1;
+                smartstoreProduct.QuantityControlType = "Spinner";
+                smartstoreProduct.Price = product.Price;
+                smartstoreProduct.ComparePrice = 0;
+                smartstoreProduct.SpecialPrice = customData == null ? 0 : customData.SpecialPrice;
+                smartstoreProduct.SpecialPriceStartDateTimeUtc = customData == null ? null : customData.SpecialPriceStartDateTime ?? customData.SpecialPriceStartDateTime.ToUniversalTime();
+                smartstoreProduct.SpecialPriceEndDateTimeUtc = customData == null ? null : customData.SpecialPriceEndDateTime ?? customData.SpecialPriceEndDateTime.ToUniversalTime();
+                smartstoreProduct.MinimumCustomerEnteredPrice = 0;
+                smartstoreProduct.MaximumCustomerEnteredPrice = 1000;
+                smartstoreProduct.AttributeCombinationRequired = true;
+                smartstoreProduct.AttributeChoiceBehaviour = "GrayOutUnavailable";
+                smartstoreProduct.Weight = product.Weight;
+                smartstoreProduct.Length = product.Length;
+                smartstoreProduct.Width = product.Width;
+                smartstoreProduct.Height = product.Height;
+                smartstoreProduct.DisplayOrder = 0;
+                smartstoreProduct.Published = product.Published;
+                smartstoreProduct.SystemName = "";
+                smartstoreProduct.CreatedOnUtc = DateTimeOffset.UtcNow;
+                smartstoreProduct.UpdatedOnUtc = DateTimeOffset.UtcNow;
+                smartstoreProduct.CustomsTariffNumber = "";
+                smartstoreProduct.CountryOfOriginId = 77;
+
+
+
+                return smartstoreProduct;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Product mapping sırasında hata oluştu. ProductId: {ProductId}", product.Id);
+                return null;
+            }
+        }
         public static IEnumerable<ProductDto> ToDtoList(IEnumerable<SmartstoreProductDto> products)
         {
             if (products == null)

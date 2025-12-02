@@ -142,7 +142,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         public async Task UpdateProductAsync(SmartstoreApiContext context, ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
         {
             var httpClient = CreateHttpClient(context);
-            var payload = SmartstoreProductMapper.ToDto(product, customData);
+            var payload = SmartstoreProductMapper.UpdateToDto(product, customData);
             if (payload == null)
                 throw new Exception("SmartstoreProductMapper returned null");
 
@@ -325,7 +325,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     : await CreateProductAttributeAsync(context, productVariantAttribute.ProductAttribute);
 
                 // ProductVariantAttribute kontrol / ekle
-                var existingVariantAttr = await ProductVariantAttributeExistsAsync(context, productId, productVariantAttribute.Id);
+                var existingVariantAttr = await ProductVariantAttributeExistsAsync(context, productId, productAttributeId);
                 productVariantAttribute.Id = existingVariantAttr?.Id ?? await CreateProductVariantAttributeAsync(context, new ProductVariantAttributeDto
                 {
                     ProductId = productId,
@@ -382,6 +382,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 if (existingCombination != null)
                 {
                     combination.Id = existingCombination.Id;
+                    combination.Price = CalculateAutoPrice(2000, 10, 10, 10, 10);
                     await UpdateProductVariantAttributeCombination(context, combination);
                 }
                 else
@@ -419,7 +420,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PutAsync($"manufacturers({id})", content);
+            var response = await httpClient.PatchAsync($"manufacturers({id})", content);
             response.EnsureSuccessStatusCode();
         }
         public async Task DeleteBrandAsync(SmartstoreApiContext context, int brandId)
@@ -492,7 +493,8 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PatchAsync("productmanufacturers", content);
+            var response = await httpClient.PatchAsync($"productmanufacturers({productBrand.Id})", content);
+            var json2 = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
         }
         #endregion
@@ -731,7 +733,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await httpClient.PatchAsync("productmediafiles", content);
+            var response = await httpClient.PatchAsync($"productmediafiles({productMediaFile.Id})", content);
             response.EnsureSuccessStatusCode();
         }
         public async Task DeleteProductMediaFileAsync(SmartstoreApiContext context, int id)
@@ -839,6 +841,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await httpClient.PostAsync("productvariantattributes", content);
+            var a = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
             var created = await response.Content.ReadFromJsonAsync<SmartstoreProductVariantAttributeDto>();
@@ -946,6 +949,29 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             }
 
             return combiner.CombinedHash;
+        }
+
+        public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)
+        {
+            decimal profitRate = profitPercent ?? 0;
+            decimal commissionRate = commissionPercent ?? 0;
+            decimal shippingCost = shippingFee ?? 0;
+            decimal additionalCost = extraCost ?? 0;
+
+            // Ana fiyat: maliyet + kar oranı
+            decimal finalPrice = costPrice * (1 + (profitRate / 100));
+
+            // Ek maliyetler
+            finalPrice += additionalCost;
+            finalPrice += shippingCost;
+
+            // Komisyon oranı varsa, komisyon sonrası net fiyat hesaplanır
+            if (commissionRate > 0)
+            {
+                finalPrice = finalPrice / (1 - (commissionRate / 100));
+            }
+
+            return Math.Round(finalPrice, 2);
         }
         #endregion
     }

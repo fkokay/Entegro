@@ -1,13 +1,6 @@
 ﻿using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.ProductVariantAttribute;
-using Entegro.Application.DTOs.ProductVariantAttributeValue;
-using Entegro.Domain.Entities;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Mappings.Commerce.Smartstore
 {
@@ -28,6 +21,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 }
 
                 ProductVariantAttributeDto productVariantAttribute = new ProductVariantAttributeDto();
+                productVariantAttribute.Id = smartstoreProductVariantAttribute.Id;
                 productVariantAttribute.ProductAttributeId = smartstoreProductVariantAttribute.ProductAttributeId;
                 productVariantAttribute.ProductAttribute = SmartstoreProductAttributeMapper.ToDto(smartstoreProductVariantAttribute.ProductAttribute);
                 productVariantAttribute.AttributeControlTypeId = smartstoreProductVariantAttribute.AttributeControlTypeId;
