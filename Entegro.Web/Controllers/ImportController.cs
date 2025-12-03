@@ -5,6 +5,7 @@ using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductIntegration;
 using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Domain.Enums;
 using Entegro.Web.Models.Import;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -31,8 +32,8 @@ namespace Entegro.Web.Controllers
         private readonly IMapper _mapper;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IProductMediaFileMappingService _productMediaFileMappingService;
-
-        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService, IMapper mapper, IProductIntegrationService productIntegrationService, IProductMediaFileMappingService productMediaFileMappingService)
+        private readonly IIntegrationSystemService _integrationSystemService;
+        public ImportController(IMediaFileService mediaFileService, IWebHostEnvironment webHostEnvironment, IImportProfileService importProfileService, HttpClient client, IProductService productService, ICategoryService categoryService, IBrandService brandService, ISettingService settingService, IMapper mapper, IProductIntegrationService productIntegrationService, IProductMediaFileMappingService productMediaFileMappingService, IIntegrationSystemService integrationSystemService)
         {
             _mediaFileService = mediaFileService;
             _webHostEnvironment = webHostEnvironment;
@@ -45,6 +46,7 @@ namespace Entegro.Web.Controllers
             _mapper = mapper;
             _productIntegrationService = productIntegrationService;
             _productMediaFileMappingService = productMediaFileMappingService;
+            _integrationSystemService = integrationSystemService;
         }
 
         [HttpPost]
@@ -229,22 +231,111 @@ namespace Entegro.Web.Controllers
 
         public async Task<IActionResult> Xml(int profileId = 0)
         {
+            var allSystems = await _integrationSystemService.GetAllAsync(null, true);
 
-            var importProfile = new XmlImportProfileModel();
-            if (profileId == 0)
+            XmlImportProfileModel model = new XmlImportProfileModel();
+
+
+            if (profileId != 0)
             {
-                return View(new XmlImportProfileModel());
+                var dto = await _importProfileService.GetByIdAsync(profileId);
+                if (dto != null)
+                {
+                    model = _mapper.Map<XmlImportProfileModel>(dto);
+                    // Eğer PlatformStoreMapping varsa deserialize et
+                    if (!string.IsNullOrEmpty(dto.PlatformStoreMapping))
+                    {
+                        try
+                        {
+                            var store = JsonConvert.DeserializeObject<PlatformStoreRoot>(dto.PlatformStoreMapping);
+
+                            if (store != null)
+                            {
+                                model.ECommerces = store.PlatformStore
+                                    .Where(x => x.type == "ECommerce")
+                                    .Select(x => new IntegrationProfileLine
+                                    {
+                                        Id = x.id,
+                                        Name = x.name,
+                                        Value = x.value,
+                                        ProfitRate = x.pricing?.profitRate ?? 0,
+                                        Commission = x.pricing?.commission ?? 0,
+                                        CargoPrice = x.pricing?.cargoPrice ?? 0,
+                                        ExtraCost = x.pricing?.extraCost ?? 0,
+                                        ApplyAutoPrice = x.pricing?.applyAutoPrice ?? true
+                                    }).ToList();
+
+                                model.Marketplaces = store.PlatformStore
+                                    .Where(x => x.type == "Marketplace")
+                                    .Select(x => new IntegrationProfileLine
+                                    {
+                                        Id = x.id,
+                                        Name = x.name,
+                                        Value = x.value,
+                                        ProfitRate = x.pricing?.profitRate ?? 0,
+                                        Commission = x.pricing?.commission ?? 0,
+                                        CargoPrice = x.pricing?.cargoPrice ?? 0,
+                                        ExtraCost = x.pricing?.extraCost ?? 0,
+                                        ApplyAutoPrice = x.pricing?.applyAutoPrice ?? true
+                                    }).ToList();
+                            }
+                        }
+                        catch
+                        {
+                            // hata olursa boş geç
+                        }
+                    }
+                }
             }
 
-            var profileDto = await _importProfileService.GetByIdAsync(profileId);
-            if (profileDto != null)
-            {
-                importProfile = _mapper.Map<XmlImportProfileModel>(profileDto);
+            var existingE = model.ECommerces?.ToDictionary(x => x.Id)
+                            ?? new Dictionary<int, IntegrationProfileLine>();
 
-            }
-            return View(importProfile);
+            model.ECommerces = allSystems
+                .Where(x => x.IntegrationSystemType == IntegrationSystemType.Commerce)
+                .Select(x =>
+                {
+                    existingE.TryGetValue(x.Id, out var exists);
+
+                    return new IntegrationProfileLine
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Value = x.IntegrationSystemParameters.Select(p => p.Value).FirstOrDefault(),
+
+                        ProfitRate = exists?.ProfitRate ?? 0,
+                        Commission = exists?.Commission ?? 0,
+                        CargoPrice = exists?.CargoPrice ?? 0,
+                        ExtraCost = exists?.ExtraCost ?? 0
+                    };
+                })
+                .ToList();
+
+            var existingM = model.Marketplaces?.ToDictionary(x => x.Id)
+                    ?? new Dictionary<int, IntegrationProfileLine>();
+
+            model.Marketplaces = allSystems
+                .Where(x => x.IntegrationSystemType == IntegrationSystemType.Marketplace)
+                .Select(x =>
+                {
+                    existingM.TryGetValue(x.Id, out var exists);
+
+                    return new IntegrationProfileLine
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Value = x.IntegrationSystemParameters.Select(p => p.Value).FirstOrDefault(),
+
+                        ProfitRate = exists?.ProfitRate ?? 0,
+                        Commission = exists?.Commission ?? 0,
+                        CargoPrice = exists?.CargoPrice ?? 0,
+                        ExtraCost = exists?.ExtraCost ?? 0
+                    };
+                })
+                .ToList();
+
+            return View(model);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Analyze(XmlImportProfileModel model)
@@ -256,8 +347,6 @@ namespace Entegro.Web.Controllers
             {
                 var (xmlContent, profileId) = await DownloadAndSaveXmlAsync(model);
                 var structure = AnalyzeXml(xmlContent);
-
-
 
                 var variantTags = XDocument.Parse(xmlContent) // variant ve variants altındaki tüm tag'leri topla
                                            .Descendants("variant")
@@ -439,12 +528,15 @@ namespace Entegro.Web.Controllers
 
         private async Task<(string XmlContent, int ProfileId)> DownloadAndSaveXmlAsync(XmlImportProfileModel model)
         {
+            var mappingJson = BuildPlatformStoreJson(model);
+
             if (model.Id > 0)
             {
                 var importProfile = await _importProfileService.GetByIdAsync(model.Id);
                 if (importProfile != null)
                 {
                     var map = _mapper.Map<UpdateImportProfileDto>(importProfile);
+                    map.PlatformStoreMapping = mappingJson;
                     var updated = await _importProfileService.UpdateAsync(map);
                     return (await DownloadXmlAsync(model.MediaFileUrl), updated.Id);
                 }
@@ -455,11 +547,43 @@ namespace Entegro.Web.Controllers
                 ProfileName = model.ProfileName,
                 MediaFileType = "xml",
                 Enable = false,
+                PlatformStoreMapping = mappingJson,
             };
 
             var dto = _mapper.Map<CreateImportProfileDto>(createModel);
             var profile = await _importProfileService.AddAsync(dto);
             return (await DownloadXmlAsync(model.MediaFileUrl), profile.Id);
+        }
+        private string BuildPlatformStoreJson(XmlImportProfileModel model)
+        {
+            var platformStore = new List<object>();
+
+            void AddItems(List<IntegrationProfileLine> list, string type)
+            {
+                foreach (var item in list)
+                {
+                    platformStore.Add(new
+                    {
+                        id = item.Id,
+                        type = type,
+                        name = item.Name,
+                        value = item.Value,
+                        pricing = new
+                        {
+                            profitRate = item.ProfitRate,
+                            commission = item.Commission,
+                            cargoPrice = item.CargoPrice,
+                            extraCost = item.ExtraCost,
+                            applyAutoPrice = item.ApplyAutoPrice
+                        }
+                    });
+                }
+            }
+
+            AddItems(model.ECommerces, "ECommerce");
+            AddItems(model.Marketplaces, "Marketplace");
+
+            return JsonConvert.SerializeObject(new { PlatformStore = platformStore }, Formatting.Indented);
         }
 
         private static async Task<string> DownloadXmlAsync(string url)

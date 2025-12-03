@@ -7,7 +7,7 @@
         public string? MediaFileType { get; set; }
         public string? MediaFileUrl { get; set; }
         public int? MediaFileId { get; set; }
-
+        public string? PlatformStoreMapping { get; set; }
         public bool? ApplyPriceAdjustment { get; set; }
         public decimal? PriceAdjustmentAmount { get; set; }
         public decimal? OptionalExtraAmount { get; set; }

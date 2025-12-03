@@ -654,96 +654,127 @@ Entegro.product.list = (function ($) {
 
                 if (row.data().ProductIntegrations?.length) {
                     row.data().ProductIntegrations.forEach(pi => {
+
                         let typeValue = "";
                         switch (pi.IntegrationSystem.IntegrationSystemType) {
-                            //Commerce
                             case 2:
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters
-                                    ?.find(x => x.Key === "CommerceType")?.Value;
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key === "CommerceType")?.Value;
                                 break;
-                            //Marketplace
                             case 3:
-                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters
-                                    ?.find(x => x.Key === "MarketplaceType")?.Value;
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key === "MarketplaceType")?.Value;
                                 break;
                         }
 
                         let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
 
-
                         let variantName = "";
                         if (pi.IntegrationSystem.IntegrationSystemType === 3 && pi.ProductVariantAttributeCombinationId) {
-                            let comb = row.data().ProductVariantAttributeCombinations
-                                ?.find(c => c.Id === pi.ProductVariantAttributeCombinationId);
-
+                            let comb = row.data().ProductVariantAttributeCombinations?.find(c => c.Id === pi.ProductVariantAttributeCombinationId);
                             if (comb) {
                                 try {
                                     let attrs = JSON.parse(comb.RawAttribute);
                                     let attr = attrs[0];
                                     row.data().ProductVariantAttributes.forEach(pa => {
-                                        let val = pa.ProductVariantAttributeValues
-                                            ?.find(v => v.Id === attr.ProductVariantAttributeValueId);
-                                        if (val) {
-                                            variantName = val.Name;
-                                        }
+                                        let val = pa.ProductVariantAttributeValues?.find(v => v.Id === attr.ProductVariantAttributeValueId);
+                                        if (val) variantName = val.Name;
                                     });
-                                } catch (e) {
-                                    console.error("RawAttribute parse error", e);
-                                }
+                                } catch (e) { console.error("RawAttribute parse error", e); }
                             }
                         }
 
-                        
+                       
                         let quantityHtml = "";
-                        if (salesData && pi.IntegrationCode) {
-                            let match = salesData.find(x => x.IntegrationSku === pi.IntegrationCode);
-                            if (match) {
-                                quantityHtml = `
-                            <span class="fw-bold text-black">
-                                ${match.TotalQuantity}
-                            </span>`;
+                             if (pi.IntegrationSystem.IntegrationSystemType === 3 && salesData && pi.IntegrationCode) {
+                                 let match = salesData.find(x => x.IntegrationSku === pi.IntegrationCode);
+                                 if (match) {
+                                     quantityHtml = `
+                                 <span class="fw-bold text-black">${match.TotalQuantity}</span>
+                             `;
                             }
                         }
 
 
+                        // ==========================================================
+                        //  TYPE 2 İÇİN FARKLI HTML
+                        // ==========================================================
+                        if (pi.IntegrationSystem.IntegrationSystemType === 2) {
+
+                            let variantCount = row.data().ProductVariantAttributeCombinations
+                                ? row.data().ProductVariantAttributeCombinations.length
+                                : 0;
+
+                            integrationHtml += `
+                                <div class="col-2 mb-2">
+                                    <div class="d-flex align-items-center product-integration">
+                                        <div class="product-integration-image">
+                                            <div class="me-5 position-relative">
+                                                <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                            </div>
+                                        </div>
+                                        <div class="product-integration-info">
+                                            <div class="d-flex flex-column">
+                                                <span class="integration-name"
+                                                    data-product-id="${row.data().Id}"
+                                                    data-product-integration-id="${pi.Id}"
+                                                    data-integration-system-id="${pi.IntegrationSystem.Id}">
+                                                    ${pi.IntegrationSystem.Name}
+                                                </span>
+                                            </div>
+                                            ${
+                                               variantCount > 0
+                                                   ? `<span class="price">Varyant Sayısı : ${variantCount}</span>`
+                                                   : `<span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>`
+                                               }
+                                        </div>
+                                        <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
+                                            Satışta 
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+
+                            return;
+                        }
+
+
+                        // ==========================================================
+                        //  TYPE 3 (özellikle TYPE 3 quantityHtml içerir)
+                        // ==========================================================
                         integrationHtml += `
-                    <div class="col-2 mb-2">
-                        <div class="d-flex align-items-center product-integration">
-                            <div class="product-integration-image">
-                                <div class="me-5 position-relative">
-                                    <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
-                                    ${quantityHtml
-                                ? `<span style="background: #fff; font-size: 12px;
-                                                width: 20px; height: 20px; border-radius: 50%;
-                                                text-align: center; line-height: 24px;
-                                                display: block; left: -10px; top: -10px;
-                                                position: absolute; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-                                                ${quantityHtml}
-                                           </span>`
-                                : ""
-                            }
-                                </div>
-                            </div>
-                            <div class="product-integration-info">
-                                <div class="d-flex flex-column">
-                                    <span class="integration-name"
-                                        data-product-id="${row.data().Id}"
-                                        data-product-integration-id="${pi.Id}"
-                                        data-integration-system-id="${pi.IntegrationSystem.Id}">
-                                        ${pi.IntegrationSystem.Name}
+                            <div class="col-2 mb-2">
+                                <div class="d-flex align-items-center product-integration">
+                                    <div class="product-integration-image">
+                                        <div class="me-5 position-relative">
+                                            <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
+                                            ${pi.IntegrationSystem.IntegrationSystemType === 3 && quantityHtml
+                                                    ? `<span style="background:#fff;font-size:12px;width:20px;height:20px;border-radius:50%;text-align:center;line-height:24px;display:block;left:-10px;top:-10px;position:absolute;box-shadow:0 2px 6px rgba(0,0,0,0.2);">${quantityHtml}</span>`
+                                                    : ""
+                                                }
+                                        </div>
+                                    </div>
+                                    <div class="product-integration-info">
+                                        <div class="d-flex flex-column">
+                                            <span class="integration-name"
+                                                data-product-id="${row.data().Id}"
+                                                data-product-integration-id="${pi.Id}"
+                                                data-integration-system-id="${pi.IntegrationSystem.Id}">
+                                                ${pi.IntegrationSystem.Name}
+                                            </span>
+                                            ${variantName ? `<b class="text-muted">${variantName}</b>` : ""}
+                                        </div>
+                                        <span class="price">
+                                            ${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
+                                        </span>
+                                    </div>
+                                    <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
+                                        Satışta 
                                     </span>
-                                    ${variantName ? `<b class="text-muted">${variantName}</b>` : ""}
                                 </div>
-                                <span class="price">
-                                    ${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL
-                                </span>
                             </div>
-                            <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
-                                Satışta 
-                            </span>
-                        </div>
-                    </div>`;
+                        `;
+
                     });
+
                 }
 
                

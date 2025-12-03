@@ -6,6 +6,7 @@
         public string ProfileName { get; set; } = null!;
         public string? MediaFileType { get; set; }
         public bool Enable { get; set; } = true;
+        public string? PlatformStoreMapping { get; set; }
         public CreateXmlProductImportProfileModel CreateXmlProduct { get; set; } = new();
     }
 }

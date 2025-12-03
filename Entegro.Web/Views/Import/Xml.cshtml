@@ -46,6 +46,150 @@
                 </div>
             </div>
         </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">E-Ticaret Mağazaları</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mağaza Adı</th>
+                            <th>Platform</th>
+                            <th>Yüzde Kâr (%)</th>
+                            <th>Komisyon (%)</th>
+                            <th>Kargo Ücreti</th>
+                            <th>Ek Maliyet</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < Model.ECommerces.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="hidden" asp-for="ECommerces[i].Id" />
+                                    <input type="hidden" asp-for="ECommerces[i].ApplyAutoPrice" />
+                                    <span class="form-control-plaintext">@Model.ECommerces[i].Id</span>
+                                </td>
+
+                                <td>
+                                    <input asp-for="ECommerces[i].Name"
+                                           class="form-control"
+                                           readonly />
+                                </td>
+
+                                <td>
+                                    <input asp-for="ECommerces[i].Value"
+                                           class="form-control"
+                                           readonly />
+                                </td>
+
+                                <td>
+                                    <input asp-for="ECommerces[i].ProfitRate"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="ECommerces[i].Commission"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="ECommerces[i].CargoPrice"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="ECommerces[i].ExtraCost"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+
+                </table>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Pazaryeri Mağazaları</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mağaza Adı</th>
+                            <th>Platform</th>
+                            <th>Yüzde Kâr (%)</th>
+                            <th>Komisyon (%)</th>
+                            <th>Kargo Ücreti</th>
+                            <th>Ek Maliyet</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < Model.Marketplaces.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="hidden" asp-for="Marketplaces[i].Id" />
+                                    <input type="hidden" asp-for="Marketplaces[i].ApplyAutoPrice" />
+                                    <span class="form-control-plaintext">
+                                        @Model.Marketplaces[i].Id
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <input asp-for="Marketplaces[i].Name"
+                                           class="form-control"
+                                           readonly />
+                                </td>
+
+                                <td>
+                                    <input asp-for="Marketplaces[i].Value"
+                                           class="form-control"
+                                           readonly />
+                                </td>
+
+                                <td>
+                                    <input asp-for="Marketplaces[i].ProfitRate"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="Marketplaces[i].Commission"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="Marketplaces[i].CargoPrice"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+
+                                <td>
+                                    <input asp-for="Marketplaces[i].ExtraCost"
+                                           type="number" step="0.01"
+                                           class="form-control" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
     </form>
 </div>
 

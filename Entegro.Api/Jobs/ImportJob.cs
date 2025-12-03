@@ -10,6 +10,7 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Domain.Enums;
 using MapsterMapper;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -909,7 +910,7 @@ namespace Entegro.Api.Jobs
                         ProductId = productId,
                         ProductAttributeId = attrId,
                         DisplayOrder = 0,
-                        AttributeControlTypeId = 0
+                        AttributeControlTypeId = (int)FormControlType.ColorOrImageBox
                     })).Id;
 
                 // Varyant Attribute Value

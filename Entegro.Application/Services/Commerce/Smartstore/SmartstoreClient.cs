@@ -29,17 +29,18 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         private readonly ISettingService _settingService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<SmartstoreClient> _logger;
-
+        private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
         };
 
-        public SmartstoreClient(ISettingService settingService, IHttpClientFactory httpClientFactory, ILogger<SmartstoreClient> logger)
+        public SmartstoreClient(ISettingService settingService, IHttpClientFactory httpClientFactory, ILogger<SmartstoreClient> logger, IProductVariantAttributeCombinationService productVariantAttributeCombinationService)
         {
             _settingService = settingService;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _productVariantAttributeCombinationService = productVariantAttributeCombinationService;
         }
 
         private HttpClient CreateHttpClient(SmartstoreApiContext context)
@@ -378,11 +379,24 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 combination.HashCode = GetHashCode(rawAttribute);
 
                 var existingCombination = await GetProductVariantAttributeCombination(context, productId, combination.HashCode);
+                foreach (var integration in product.ProductIntegrations)
+                {
+                    if (integration.ApplyAutoPrice && combination.CostPrice.HasValue)
+                    {
+                        decimal calculatedPrice = CalculateAutoPrice(
+                            combination.CostPrice.Value,
+                            integration.Percent,
+                            integration.CommissionPercent,
+                            integration.ShippingFee,
+                            integration.ExtraCost
+                        );
 
+                        combination.Price = calculatedPrice;
+                    }
+                }
                 if (existingCombination != null)
                 {
                     combination.Id = existingCombination.Id;
-                    combination.Price = CalculateAutoPrice(2000, 10, 10, 10, 10);
                     await UpdateProductVariantAttributeCombination(context, combination);
                 }
                 else
@@ -861,6 +875,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             return created?.Id ?? 0;
         }
         #endregion
+
         #region Product Variant Attribute Combination
         public async Task<ProductVariantAttributeCombinationDto?> GetProductVariantAttributeCombination(SmartstoreApiContext context, int productId, int hashCode)
         {
