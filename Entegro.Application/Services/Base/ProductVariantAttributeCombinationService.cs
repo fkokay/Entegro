@@ -78,14 +78,23 @@ namespace Entegro.Application.Services.Base
 
         public async Task<bool> ExistsAsync(int productId, string gtin)
         {
-            if (productId <= 0)
-                throw new ArgumentOutOfRangeException(nameof(productId), "Ürün ID sıfırdan büyük olmalıdır.");
 
+            try
+            {
+                if (productId <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(productId), "Ürün ID sıfırdan büyük olmalıdır.");
 
-            if (string.IsNullOrWhiteSpace(gtin))
-                throw new ArgumentException("Barkod (GTIN) boş veya geçersiz olamaz.", nameof(gtin));
+                if (string.IsNullOrWhiteSpace(gtin))
+                {
+                    throw new ArgumentException("Barkod (GTIN) boş veya geçersiz olamaz.", nameof(gtin));
+                }
 
-            return await _productVariantAttributeCombinationRepository.ExistsAsync(productId, gtin);
+                return await _productVariantAttributeCombinationRepository.ExistsAsync(productId, gtin);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         public async Task DeleteByProductIdAsync(int productId)

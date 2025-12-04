@@ -138,7 +138,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.Price = product.Price;
                 smartstoreProduct.ComparePrice = 0;
                 smartstoreProduct.ComparePriceLabelId = null;
-                smartstoreProduct.SpecialPrice = customData == null ? 0 : customData.SpecialPrice;
+                smartstoreProduct.SpecialPrice = customData == null ? null : customData.SpecialPrice;
                 smartstoreProduct.SpecialPriceStartDateTimeUtc = customData == null ? null : customData.SpecialPriceStartDateTime ?? customData.SpecialPriceStartDateTime.ToUniversalTime();
                 smartstoreProduct.SpecialPriceEndDateTimeUtc = customData == null ? null : customData.SpecialPriceEndDateTime ?? customData.SpecialPriceEndDateTime.ToUniversalTime();
                 smartstoreProduct.CustomerEntersPrice = false;
@@ -246,7 +246,7 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.QuantityControlType = "Spinner";
                 smartstoreProduct.Price = product.Price;
                 smartstoreProduct.ComparePrice = 0;
-                smartstoreProduct.SpecialPrice = customData == null ? 0 : customData.SpecialPrice;
+                smartstoreProduct.SpecialPrice = customData == null ? null : customData.SpecialPrice;
                 smartstoreProduct.SpecialPriceStartDateTimeUtc = customData == null ? null : customData.SpecialPriceStartDateTime ?? customData.SpecialPriceStartDateTime.ToUniversalTime();
                 smartstoreProduct.SpecialPriceEndDateTimeUtc = customData == null ? null : customData.SpecialPriceEndDateTime ?? customData.SpecialPriceEndDateTime.ToUniversalTime();
                 smartstoreProduct.MinimumCustomerEnteredPrice = 0;
