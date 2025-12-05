@@ -536,6 +536,7 @@ namespace Entegro.Web.Controllers
                 if (importProfile != null)
                 {
                     var map = _mapper.Map<UpdateImportProfileDto>(importProfile);
+                    map.MediaFileUrl = model.MediaFileUrl;
                     map.PlatformStoreMapping = mappingJson;
                     var updated = await _importProfileService.UpdateAsync(map);
                     return (await DownloadXmlAsync(model.MediaFileUrl), updated.Id);

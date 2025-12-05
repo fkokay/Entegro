@@ -516,7 +516,7 @@ namespace Entegro.Api.Jobs
                         Name = dict.ContainsKey("Name") ? dict["Name"]?.ToString() : "",
                         Description = dict.ContainsKey("Description") ? dict["Description"]?.ToString() : "",
                         Price = price,
-                        Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : "",
+                        Barcode = dict.ContainsKey("Barcode") ? dict["Barcode"]?.ToString() : code,
                         CostPrice = price,
                         Unit = "Adet",
                         Currency = "TL",
