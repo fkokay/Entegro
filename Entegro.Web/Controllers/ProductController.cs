@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Common;
+﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.CrossSellProduct;
 using Entegro.Application.DTOs.IntegrationSystem;
 using Entegro.Application.DTOs.Marketplace.Hepsiburada;
@@ -72,6 +73,7 @@ namespace Entegro.Web.Controllers
         private readonly ISettingService _settingService;
         private readonly HttpClient _client;
         private readonly IMapper _mapper;
+        private readonly IImportProfileService _importProfileService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly ISpecificationAttributeOptionService _specificationAttributeOptionService;
         public ProductController(
@@ -102,7 +104,8 @@ namespace Entegro.Web.Controllers
             ISpecificationAttributeService specificationAttributeService,
             ISpecificationAttributeOptionService specificationAttributeOptionService,
             IOrderService orderService,
-            IProductCategoryService productCategoryService)
+            IProductCategoryService productCategoryService,
+            IImportProfileService importProfileService)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -132,6 +135,7 @@ namespace Entegro.Web.Controllers
             _specificationAttributeOptionService = specificationAttributeOptionService;
             _orderService = orderService;
             _productCategoryService = productCategoryService;
+            _importProfileService = importProfileService;
         }
 
         #region Product list / create / edit / delete
@@ -1367,7 +1371,7 @@ namespace Entegro.Web.Controllers
                     ProductVariantAttributeCombinationId = productVariantAttributeCombinationId,
                     Active = true,
                 };
-
+                await ApplyXmlProfilePricingAsync(product.Code, integrationSystem.Id, createModel);
                 return PartialView($"_IntegrationDialog.Commerce.{commerceType}", createModel);
             }
             else
@@ -2865,6 +2869,35 @@ namespace Entegro.Web.Controllers
             return fileIds;
         }
 
+        private async Task ApplyXmlProfilePricingAsync(string productCode, int integrationSystemId, SmartstoreProductIntegrationModel model)
+        {
+            const string marker = "_xml_";
+
+            int xmlMarkerIndex = productCode.IndexOf(marker, StringComparison.Ordinal);
+            if (xmlMarkerIndex == -1)
+                return;
+
+            int start = xmlMarkerIndex + marker.Length;
+            string profileStr = productCode.Substring(start);
+
+            if (!int.TryParse(profileStr, out int profileId))
+                return;
+
+            var importProfile = await _importProfileService.GetByIdAsync(profileId);
+            if (importProfile == null || string.IsNullOrEmpty(importProfile.PlatformStoreMapping))
+                return;
+
+            var store = JsonConvert.DeserializeObject<PlatformStoreRootDto>(importProfile.PlatformStoreMapping);
+            var storeMapping = store.PlatformStore.FirstOrDefault(s => s.id == integrationSystemId);
+            if (storeMapping == null)
+                return;
+
+            model.CommissionPercent = storeMapping.pricing.commission;
+            model.ExtraCost = storeMapping.pricing.extraCost;
+            model.ShippingFee = storeMapping.pricing.cargoPrice;
+            model.Percent = storeMapping.pricing.profitRate;
+            model.ApplyAutoPrice = storeMapping.pricing.applyAutoPrice;
+        }
 
         [HttpPost]
         public async Task<IActionResult> GetStoreProductSales()
