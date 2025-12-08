@@ -134,9 +134,9 @@ namespace Entegro.Api.Jobs
                 case "CicekSepeti":
                     await CicekSepetiOrderSync(item);
                     break;
-                //case "Pazarama":
-                //    await PazaramaOrderSync(item);
-                //    break;
+                case "Pazarama":
+                    await PazaramaOrderSync(item);
+                    break;
                 //case "Idefix":
                 //    await IdefixOrderSync(item);
                 //    break;

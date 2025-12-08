@@ -252,7 +252,7 @@ namespace Entegro.Application.Services.Marketplace
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task<IEnumerable<PazaramaOrderDto>> GetOrdersAsync(PazaramaApiContext context)
+        public async Task<IEnumerable<OrderData>> GetOrdersAsync(PazaramaApiContext context)
         {
             var token = await GetToken(context);
 
@@ -271,10 +271,14 @@ namespace Entegro.Application.Services.Marketplace
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var jsonData = JsonSerializer.Deserialize<PazaramaResponse<List<PazaramaOrderDto>>>(json, new JsonSerializerOptions
+            var jsonData = JsonSerializer.Deserialize<PazaramaResponse<List<OrderData>>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
+            //var jsonData = JsonSerializer.Deserialize<PazaramaResponse<List<PazaramaOrderDto>>>(json, new JsonSerializerOptions
+            //{
+            //    PropertyNameCaseInsensitive = true
+            //});
 
             if (jsonData == null)
             {
