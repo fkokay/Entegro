@@ -1,12 +1,16 @@
 ﻿using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
+using Entegro.Domain.Enums;
 
 namespace Entegro.Application.DTOs.Product
 {
     public class UpdateProductDto
     {
         public int Id { get; set; }
+        public ProductSourceType SourceType { get; set; }
+        public int? SourceIntegrationSystemId { get; set; }
+        public int? SourceImportProfileId { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }

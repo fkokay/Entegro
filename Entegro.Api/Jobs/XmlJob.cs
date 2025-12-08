@@ -160,6 +160,8 @@ namespace Entegro.Api.Jobs
                         createProductDto.Barcode = GetValue(rootElement, mappings, "Barcode", "");
                         createProductDto.Published = false;
                         createProductDto.Deleted = false;
+                        createProductDto.SourceImportProfileId = profile.Id;
+                        createProductDto.SourceType = Domain.Enums.ProductSourceType.Xml;
 
                         int productId = 0;
                         if (await _productService.ExistsByCodeAsync(createProductDto.Code))

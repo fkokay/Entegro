@@ -1,5 +1,6 @@
 ﻿using Entegro.Domain.Entities.Content;
 using Entegro.Domain.Entities.Integration;
+using Entegro.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -56,7 +57,9 @@ namespace Entegro.Domain.Entities.Catalog
     [Index(nameof(Published), Name = "IX_Product_Published")]
     public class Product : BaseEntity, ISoftDeletable, IAuditable, ITransient
     {
-
+        public ProductSourceType SourceType { get; set; } = ProductSourceType.None;
+        public int? SourceIntegrationSystemId { get; set; }
+        public int? SourceImportProfileId { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string? ShortDescription { get; set; }

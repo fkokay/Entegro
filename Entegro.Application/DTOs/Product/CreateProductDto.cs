@@ -2,11 +2,15 @@
 using Entegro.Application.DTOs.MediaFile;
 using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.ProductMediaFile;
+using Entegro.Domain.Enums;
 
 namespace Entegro.Application.DTOs.Product
 {
     public class CreateProductDto
     {
+        public ProductSourceType SourceType { get; set; }
+        public int? SourceIntegrationSystemId { get; set; }
+        public int? SourceImportProfileId { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }

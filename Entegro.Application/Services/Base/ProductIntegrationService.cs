@@ -102,12 +102,16 @@ namespace Entegro.Application.Services.Base
             return _mapper.Map<PagedResult<ProductIntegrationDto>>(await _productIntegrationRepository.GetAllAsync(pageNumber, pageSize));
         }
 
-        public async Task<ProductIntegrationDto> UpdateAsync(UpdateProductIntegrationDto updateProductIntegration)
+        public async Task<ProductIntegrationDto> UpdateAsync(UpdateProductIntegrationDto updateProductIntegration, bool isEvent = true)
         {
-            await _productIntegrationRepository.UpdateAsync(_mapper.Map<ProductIntegration>(updateProductIntegration));
+            var map = _mapper.Map<ProductIntegration>(updateProductIntegration);
+            await _productIntegrationRepository.UpdateAsync(map);
 
-            var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(updateProductIntegration.Id);
-            _eventPublisher.Publish(recordUpdatedEvent);
+            if (isEvent)
+            {
+                var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(updateProductIntegration.Id);
+                _eventPublisher.Publish(recordUpdatedEvent);
+            }
 
             return _mapper.Map<ProductIntegrationDto>(updateProductIntegration);
         }

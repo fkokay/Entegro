@@ -12,7 +12,7 @@ namespace Entegro.Domain.Entities.Import
         }
     }
 
-    [Table("ImportProfiles")]
+    [Table("ImportProfile")]
     public class ImportProfile : BaseEntity
     {
         public string ProfileName { get; set; } = null!;

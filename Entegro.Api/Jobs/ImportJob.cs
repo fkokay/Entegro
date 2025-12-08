@@ -224,7 +224,9 @@ namespace Entegro.Api.Jobs
                         Published = true,
                         Deleted = false,
                         CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
+                        UpdatedOn = DateTime.UtcNow,
+                        SourceImportProfileId = profile.Id,
+                        SourceType = Domain.Enums.ProductSourceType.Excel,
                     };
 
                     try
@@ -526,7 +528,9 @@ namespace Entegro.Api.Jobs
                         Published = true,
                         Deleted = false,
                         CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
+                        UpdatedOn = DateTime.UtcNow,
+                        SourceImportProfileId = profile.Id,
+                        SourceType = Domain.Enums.ProductSourceType.Xml,
                     };
 
                     var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
@@ -608,7 +612,9 @@ namespace Entegro.Api.Jobs
                                         Published = true,
                                         Deleted = false,
                                         CreatedOn = DateTime.UtcNow,
-                                        UpdatedOn = DateTime.UtcNow
+                                        UpdatedOn = DateTime.UtcNow,
+                                        SourceImportProfileId = profile.Id,
+                                        SourceType = Domain.Enums.ProductSourceType.Xml,
                                     },
                                     mediaFiles
                                 );
