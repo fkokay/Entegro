@@ -447,12 +447,6 @@ namespace Entegro.Api.Jobs
                 TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 
-
-                var trendyolShipmentPackages2 = trendyolShipmentPackages.Where(x => x.OrderNumber == "10619124388").FirstOrDefault();
-                var orders2 = TrendyolShipmentPackageMapper.ToDto(trendyolShipmentPackages2);
-
-
-
                 foreach (var order in orders)
                 {
                     try

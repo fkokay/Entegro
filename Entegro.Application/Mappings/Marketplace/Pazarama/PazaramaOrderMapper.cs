@@ -32,15 +32,15 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             order.Deleted = false;
             order.IsTransient = true;
             order.OrderDiscount = Convert.ToDecimal(pazaramaOrder.DiscountAmount);//ekledim
-            order.OrderSubTotal = 0;//ekledim
-            order.InvoiceLink = "";//ekledim
-            var i = pazaramaOrder.OrderStatus;
-            order.OrderStatus = 0;
-            order.PaymentStatus = pazaramaOrder.PaymentType == 1 ? PaymentStatus.Paid : PaymentStatus.Pending;
+            order.OrderSubTotal = 0;
+            order.InvoiceLink = "";
+            order.OrderStatus = PazaramaStatusMapper.MapOrderStatus(pazaramaOrder.OrderStatus);
+            order.PaymentStatus = order.PaymentStatus = new[] { 1, 2, 3 }.Contains(pazaramaOrder.PaymentType)
+            ? PaymentStatus.Paid
+            : PaymentStatus.Pending;
             order.ShippingMethod = "";
-
-
             order.DueDateUtc = DateTime.UtcNow;
+
             order.Customer = new DTOs.Customer.CustomerDto()
             {
                 Address = pazaramaOrder.ShipmentAddress.AddressDetail,
@@ -58,7 +58,7 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             order.BillingAddress = new DTOs.Address.AddressDto()
             {
                 Address1 = pazaramaOrder.BillingAddress.AddressDetail,
-                Address2 = pazaramaOrder.BillingAddress.AddressDetail,
+                Address2 = pazaramaOrder.BillingAddress.DisplayAddressText,
                 AddressType = "Fatura Adresi",
                 City = pazaramaOrder.BillingAddress.CityName,
                 Company = pazaramaOrder.BillingAddress.AddressDetail,
@@ -79,7 +79,7 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             order.ShippingAddress = new DTOs.Address.AddressDto()
             {
                 Address1 = pazaramaOrder.ShipmentAddress.AddressDetail,
-                Address2 = pazaramaOrder.ShipmentAddress.AddressDetail,
+                Address2 = pazaramaOrder.ShipmentAddress.DisplayAddressText,
                 AddressType = "Teslimat Adresi",
                 City = pazaramaOrder.ShipmentAddress.CityName,
                 Company = "",
@@ -97,6 +97,7 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
                 Title = "",
                 ZipPostalCode = "",
             };
+            //order.OrderItems = PazaramaOrderLineMapper.ToDtoList(pazaramaOrder.Items).ToList();
             order.OrderItems = new List<DTOs.OrderItem.OrderItemDto>();
 
             ShipmentDto shipmentDto = new ShipmentDto();
