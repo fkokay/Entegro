@@ -559,6 +559,55 @@ namespace Entegro.Application.Services.Marketplace
 
             return allProducts;
         }
+
+        public async Task<IEnumerable<Content>> GetReturnsAsync(TrendyolApiContext context)
+        {
+            using var client = CreateHttpClient(context);
+            var allReturns = new List<Content>();
+            bool moreData = true;
+            int page = 0;
+            int pageSize = 10;
+
+            var startDate = DateTime.UtcNow.AddMonths(-6);
+            var endDate = DateTime.UtcNow;
+
+            long startTimestamp = new DateTimeOffset(startDate).ToUnixTimeMilliseconds();
+            long endTimestamp = new DateTimeOffset(endDate).ToUnixTimeMilliseconds();
+
+            while (moreData)
+            {
+                var url =
+                    $"order/sellers/{context.SupplierId}/claims" +
+                    $"?startDate={startTimestamp}&endDate={endTimestamp}" +
+                    $"&page={page}&size={pageSize}";
+
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                var data = JsonSerializer.Deserialize<TrendyolResponse<Content>>(json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                if (data?.content == null || data.content.Count == 0)
+                    break;
+
+                allReturns.AddRange(data.content);
+
+                page++;
+
+                if (page >= data.totalPages)
+                    moreData = false;
+            }
+
+            return allReturns;
+        }
+
+
+
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, ProductDto? product, TrendyolProductDto trendyolProduct, int integrationSystemId)
         {
             List<ProductVariantAttributeDto> variantAttributes = new List<ProductVariantAttributeDto>();

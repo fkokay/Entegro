@@ -194,6 +194,8 @@ namespace Entegro.Api.Jobs
                 {
                     try
                     {
+                        order.IntegrationSystemId = item.Id;
+
                         #region Exists Order
                         if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
                         {
@@ -243,27 +245,47 @@ namespace Entegro.Api.Jobs
                         {
                             if (orderItem.Product != null)
                             {
-                                var product = await _productService.GetProductByCodeAsync(orderItem.Product.Code);
 
-                                if (product == null)
+                                //var product = await _productService.GetProductByCodeAsync(orderItem.Product.Code);
+                                var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.Product.Code);
+                                if (productIntegration != null)
                                 {
-                                    _logger.Error($"{orderItem.Product.Code} kodlu ürün {order.OrderNumber} ' +nolu siparişte bulunamadı");
-                                    continue;
+                                    orderItem.Product = null;
+                                    orderItem.ProductId = productIntegration.ProductId;
                                 }
-
-                                orderItem.Product = null;
-                                orderItem.ProductId = product.Id;
+                                else
+                                {
+                                    orderItem.Product = null;
+                                    orderItem.ProductId = null;
+                                }
                             }
                         }
                         #endregion
 
                         #region Order
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
-                        await _orderService.AddAsync(createOrder);
+                        var createdOrder = await _orderService.AddAsync(createOrder);
 
                         _logger.LogInformation("'{OrderNo}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                         #endregion
+                        #region Shipment
+                        foreach (var shipment in order.Shipments)
+                        {
+                            shipment.OrderId = createdOrder.Id;
 
+                            foreach (var orderItem in createdOrder.OrderItems)
+                            {
+                                ShipmentItemDto createShipmentItem = new ShipmentItemDto();
+                                createShipmentItem.OrderItemId = orderItem.Id;
+                                createShipmentItem.Quantity = orderItem.Quantity;
+
+                                shipment.ShipmentItems.Add(createShipmentItem);
+                            }
+
+                            var createShipment = _mapper.Map<CreateShipmentDto>(shipment);
+                            var createdShipment = await _shipmentService.AddAsync(createShipment);
+                        }
+                        #endregion
 
                     }
                     catch (Exception ex)
@@ -443,6 +465,8 @@ namespace Entegro.Api.Jobs
                     _logger.Warn("Trendyol'dan hiç sipariş alınamadı.");
                     return;
                 }
+
+                var returnReq = await _trendyol.GetReturnsAsync(context);
 
                 TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);

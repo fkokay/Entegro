@@ -32,13 +32,14 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             order.Deleted = false;
             order.IsTransient = true;
             order.OrderDiscount = Convert.ToDecimal(pazaramaOrder.DiscountAmount);//ekledim
-            order.OrderSubTotal = 0;
+            order.OrderSubTotal = Convert.ToDecimal(pazaramaOrder.OrderAmount);
             order.InvoiceLink = "";
             order.OrderStatus = PazaramaStatusMapper.MapOrderStatus(pazaramaOrder.OrderStatus);
             order.PaymentStatus = order.PaymentStatus = new[] { 1, 2, 3 }.Contains(pazaramaOrder.PaymentType)
             ? PaymentStatus.Paid
             : PaymentStatus.Pending;
-            order.ShippingMethod = "";
+            order.ShippingMethod = pazaramaOrder.Items.Select(x => x.Cargo.CompanyName).FirstOrDefault();
+            order.ShippingStatus = ShippingStatus.NotYetShipped;
             order.DueDateUtc = DateTime.UtcNow;
 
             order.Customer = new DTOs.Customer.CustomerDto()
@@ -97,13 +98,14 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
                 Title = "",
                 ZipPostalCode = "",
             };
-            //order.OrderItems = PazaramaOrderLineMapper.ToDtoList(pazaramaOrder.Items).ToList();
-            order.OrderItems = new List<DTOs.OrderItem.OrderItemDto>();
+            order.OrderItems = PazaramaOrderLineMapper.ToDtoList(pazaramaOrder.Items).ToList();
+
 
             ShipmentDto shipmentDto = new ShipmentDto();
+
             shipmentDto.OrderId = 0;
             shipmentDto.Carrier = pazaramaOrder.Items.Select(x => x.Cargo.CompanyName).FirstOrDefault();
-            shipmentDto.PackageNo = pazaramaOrder.Items.Select(x => x.Cargo.CompanyId).FirstOrDefault();
+            shipmentDto.PackageNo = "Pazarama";
             shipmentDto.TrackingNumber = pazaramaOrder.Items.Select(x => x.Cargo.TrackingNumber).FirstOrDefault();
             shipmentDto.TrackingUrl = pazaramaOrder.Items.Select(x => x.Cargo.TrackingUrl).FirstOrDefault();
             shipmentDto.TotalWeight = 0;
