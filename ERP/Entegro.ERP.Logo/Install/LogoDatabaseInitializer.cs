@@ -24,6 +24,169 @@ namespace Entegro.ERP.Logo.Install
             await InitializeProductStocks();
             await InitializeCustomers();
             await InitializeCustomerBalances();
+            await InitializeOrders();
+            await InitializeOrderItems();
+            await InitializeCustomerInvoiceAddress();
+            await InitializeCustomerShippingAddress();
+        }
+
+        private async Task InitializeCustomerShippingAddress()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_CUSTOMER_SHIPPING_ADDRESS', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_CUSTOMER_SHIPPING_ADDRESS AS
+                  SELECT 
+                SHIPINFO.LOGICALREF,
+                '' AS [Salutation],
+                'Fatura Adresi' AS [Title],
+                1 AS [AddressType],
+                SHIPINFO.SNAME AS [FirstName],
+                SHIPINFO.SSURNAME AS [LastName],
+                SHIPINFO.EMAILADDR AS [Email],
+                SHIPINFO.TITLE AS [Company],
+                SHIPINFO.ADDR1 AS [Address1],
+                SHIPINFO.ADDR2 AS [Address2],
+                SHIPINFO.POSTCODE AS [ZipPostalCode],
+                SHIPINFO.TELNRS1+SHIPINFO.TELCODES1 AS [PhoneNumber],
+                SHIPINFO.FAXNR+SHIPINFO.FAXCODE AS [FaxNumber],
+                SHIPINFO.TAXOFFICE AS [TaxOffice],
+                SHIPINFO.TAXNR AS [TaxOfficeNumber],
+                SHIPINFO.CITY AS[City],
+                SHIPINFO.COUNTRY AS [Country],
+                SHIPINFO.DISTRICT AS [District],
+                SHIPINFO.TOWN AS [Town]
+
+                FROM LG_001_SHIPINFO SHIPINFO
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task InitializeCustomerInvoiceAddress()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_CUSTOMER_INVOCE_ADDRESS', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_CUSTOMER_INVOCE_ADDRESS AS
+                SELECT 
+                CLCARD.CODE AS [CustomerCode],  
+                '' AS [Salutation],
+                'Fatura Adresi' AS [Title],
+                1 AS [AddressType],
+                CLCARD.NAME AS [FirstName],
+                CLCARD.SURNAME AS [LastName],
+                CLCARD.EMAILADDR AS [Email],
+                CLCARD.DEFINITION_ AS [Company],
+                CLCARD.ADDR1 AS [Address1],
+                CLCARD.ADDR2 AS [Address2],
+                CLCARD.POSTCODE AS [ZipPostalCode],
+                CLCARD.TELNRS1+CLCARD.TELCODES1 AS [PhoneNumber],
+                CLCARD.FAXNR+CLCARD.FAXCODE AS [FaxNumber],
+                CLCARD.TAXOFFICE AS [TaxOffice],
+                CLCARD.TAXNR AS [TaxOfficeNumber],
+                CLCARD.CITY AS[City],
+                CLCARD.COUNTRY AS [Country],
+                CLCARD.DISTRICT AS [District],
+                CLCARD.TOWN AS [Town]
+
+                FROM LG_001_CLCARD CLCARD WHERE CLCARD.CARDTYPE <> 22
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task InitializeOrderItems()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_ORDER_ITEMS', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_ORDER_ITEMS AS
+                SELECT 
+                ORFICHE.FICHENO AS OrderNumber,
+                ITEMS.CODE AS ProductCode,
+                ITEMS.NAME AS ProductName,
+                MARK.DESCR AS BrandName,
+                ORFLINE.AMOUNT AS Quantity,
+                ORFLINE.PRICE AS UnitPrice,
+                ORFLINE.TOTAL AS Price,
+                ORFLINE.VAT AS VatRate,
+                ORFLINE.DISTDISC AS DiscountAmount
+                FROM LG_001_01_ORFLINE ORFLINE
+                INNER JOIN LG_001_01_ORFICHE ORFICHE ON ORFICHE.LOGICALREF = ORFLINE.LOGICALREF
+                INNER JOIN LG_001_ITEMS ITEMS ON ORFLINE.STOCKREF = ITEMS.LOGICALREF 
+                LEFT OUTER JOIN LG_001_MARK MARK ON ITEMS.MARKREF = MARK.LOGICALREF
+                WHERE ORFLINE.TRCODE=1
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        private async Task InitializeOrders()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var checkViewCmd = new SqlCommand("SELECT OBJECT_ID('ENTEGRO_ORDERS', 'V')", connection);
+
+            var result = await checkViewCmd.ExecuteScalarAsync();
+
+            if (result == DBNull.Value || result == null)
+            {
+                var createViewSql = @"
+                CREATE VIEW ENTEGRO_ORDERS AS
+                SELECT 
+                ORFICHE.FICHENO AS OrderNumber,
+                ORFICHE.GUID AS OrderGuid,
+                ORFICHE.DATE_ AS OrderDate,
+                CLCARD.CODE AS CustomerCode,
+                CLCARD.DEFINITION_ AS CustomerName,
+                ORFICHE.GROSSTOTAL AS OrderSubTotal,
+                0 AS OrderShipping,
+                0 AS PaymentFee,
+                ORFICHE.TOTALVAT AS OrderTax,
+                ORFICHE.TOTALDISCOUNTS AS OrderDiscount,
+                ORFICHE.NETTOTAL AS OrderTotal,
+                0 AS RefundedAmount,
+                ORFICHE.FICHENO AS IntegrationOrderNumber,
+                SHPAGENT.TITLE AS ShippingMethod,
+                ORFICHE.SHIPINFOREF AS ShippingAddressId
+                FROM LG_001_01_ORFICHE ORFICHE
+                INNER JOIN LG_001_CLCARD CLCARD ON ORFICHE.CLIENTREF = CLCARD.LOGICALREF
+                LEFT JOIN L_SHPAGENT SHPAGENT ON ORFICHE.SHPAGNCOD = SHPAGENT.CODE
+                WHERE ORFICHE.TRCODE=1;
+                ";
+
+                using var createCmd = new SqlCommand(createViewSql, connection);
+                await createCmd.ExecuteNonQueryAsync();
+            }
         }
 
         private async Task InitializeProductStocks()
@@ -42,9 +205,9 @@ namespace Entegro.ERP.Logo.Install
                 SELECT 
                 ITEM.CODE AS ProductCode,
                 ITEM.NAME AS ProductName,
-                (SELECT ISNULL((SUM (GNSTITOT.ONHAND)-SUM (GNSTITOT.RESERVED)),0) AS STOCKAMOUNT FROM LV_200_01_GNTOTST GNSTITOT WITH(NOLOCK) WHERE (GNSTITOT.STOCKREF = ITEM.LOGICALREF) AND (GNSTITOT.INVENNO = -1)) AS Stock
+                (SELECT ISNULL((SUM (GNSTITOT.ONHAND)-SUM (GNSTITOT.RESERVED)),0) AS STOCKAMOUNT FROM LV_001_01_GNTOTST GNSTITOT WITH(NOLOCK) WHERE (GNSTITOT.STOCKREF = ITEM.LOGICALREF) AND (GNSTITOT.INVENNO = -1)) AS Stock
                 FROM 
-                LG_200_ITEMS AS ITEM
+                LG_001_ITEMS AS ITEM
                 WHERE (ITEM.ACTIVE=0) AND (ITEM.CARDTYPE NOT IN(4,20,21));
                 ";
 
@@ -71,7 +234,7 @@ namespace Entegro.ERP.Logo.Install
                 ITEM.NAME AS ProductName,	
                 0 AS Price
                 FROM 
-                LG_200_ITEMS AS ITEM
+                LG_001_ITEMS AS ITEM
                 WHERE (ITEM.ACTIVE=0) AND (ITEM.CARDTYPE NOT IN(4,20,21));
                 ";
 
@@ -96,10 +259,10 @@ namespace Entegro.ERP.Logo.Install
                 SELECT
 	            CODE AS CustomerCode,
 	            DEFINITION_ AS CustomerName,
-	            ISNULL((SELECT SUM(GNTOTCL.DEBIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Debit,
-                ISNULL((SELECT SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Credit,
-                ISNULL((SELECT SUM(GNTOTCL.DEBIT)-SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Balance
-                FROM LG_200_CLCARD AS CLCARD WHERE ACTIVE=0 AND CARDTYPE <>  22;
+	            ISNULL((SELECT SUM(GNTOTCL.DEBIT) FROM LV_001_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Debit,
+                ISNULL((SELECT SUM(GNTOTCL.CREDIT) FROM LV_001_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Credit,
+                ISNULL((SELECT SUM(GNTOTCL.DEBIT)-SUM(GNTOTCL.CREDIT) FROM LV_001_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Balance
+                FROM LG_001_CLCARD AS CLCARD WHERE ACTIVE=0 AND CARDTYPE <>  22;
                 ";
 
                 using var createCmd = new SqlCommand(createViewSql, connection);
@@ -123,10 +286,10 @@ namespace Entegro.ERP.Logo.Install
                 SELECT
 	            CODE AS Code,
 	            DEFINITION_ AS Name,
-	            ISNULL((SELECT SUM(GNTOTCL.DEBIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Debit,
-                ISNULL((SELECT SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Credit,
-                ISNULL((SELECT SUM(GNTOTCL.DEBIT)-SUM(GNTOTCL.CREDIT) FROM LV_200_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Balance
-                FROM LG_200_CLCARD AS CLCARD WHERE ACTIVE=0 AND CARDTYPE <>  22;
+	            ISNULL((SELECT SUM(GNTOTCL.DEBIT) FROM LV_001_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Debit,
+                ISNULL((SELECT SUM(GNTOTCL.CREDIT) FROM LV_001_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Credit,
+                ISNULL((SELECT SUM(GNTOTCL.DEBIT)-SUM(GNTOTCL.CREDIT) FROM LV_001_01_GNTOTCL AS GNTOTCL WITH(NOLOCK) WHERE CLCARD.LOGICALREF=GNTOTCL.CARDREF AND GNTOTCL.TOTTYP=1),0.00) AS Balance
+                FROM LG_001_CLCARD AS CLCARD WHERE ACTIVE=0 AND CARDTYPE <>  22;
                 ";
 
                 using var createCmd = new SqlCommand(createViewSql, connection);
@@ -163,7 +326,7 @@ namespace Entegro.ERP.Logo.Install
                     '' AS Category2, 
                     '' AS Category3, 
                     '' AS Category4
-                FROM dbo.LG_200_ITEMS
+                FROM dbo.LG_001_ITEMS
                 WHERE (CARDTYPE = 1) AND (ACTIVE = 0) 
                 AND (NAME IS NOT NULL) AND (CODE IS NOT NULL) 
                 AND (LEN(NAME) > 0) AND (LEN(CODE) > 0);
