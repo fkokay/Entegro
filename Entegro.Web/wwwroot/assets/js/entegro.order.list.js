@@ -295,7 +295,7 @@ Entegro.order.OrderList = (function ($) {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/9.png";
                         }else if (row.ShipmentCarrier === "MNG Kargo Marketplace") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/10.png";
-                        } else if (row.ShipmentCarrier === "DHL eCommerce Marketplace" || row.ShipmentCarrier ==="DHL eCommerce") {
+                        } else if (row.ShipmentCarrier === "DHL eCommerce Marketplace" || row.ShipmentCarrier === "DHL eCommerce" || row.ShipmentCarrier === "DHL  Inc.") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/40.png";
                         } else if (row.ShipmentCarrier === "Kolay Gelsin Marketplace") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/38.png";

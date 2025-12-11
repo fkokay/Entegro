@@ -19,8 +19,6 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
                 return null;
             }
 
-
-
             OrderItemDto orderItem = new OrderItemDto();
             orderItem.Quantity = trendyolOrderLine.Quantity;
             orderItem.DiscountAmount = trendyolOrderLine.Discount;

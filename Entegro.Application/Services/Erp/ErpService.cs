@@ -1,14 +1,7 @@
 ﻿using Entegro.Application.DTOs.Erp;
-using Entegro.Application.DTOs.Marketplace.CicekSepeti;
-using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.Interfaces.Services.Erp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Entegro.Application.Services.Erp
 {
@@ -31,7 +24,7 @@ namespace Entegro.Application.Services.Erp
             return client;
         }
 
-        public async Task<List<ErpProductDto>> GetProductsAsync(ErpApiContext context,int pageSize = 50)
+        public async Task<List<ErpProductDto>> GetProductsAsync(ErpApiContext context, int pageSize = 50)
         {
             using var client = CreateHttpClient(context);
 
@@ -67,6 +60,44 @@ namespace Entegro.Application.Services.Erp
             }
 
             return allProducts;
+        }
+
+        public async Task<IEnumerable<ErpOrderDto>> GetOrdersAsync(ErpApiContext context, int pageSize = 50)
+        {
+            using var client = CreateHttpClient(context);
+
+            var allOrder = new List<ErpOrderDto>();
+            bool moreData = true;
+            int page = 1;
+
+            while (moreData)
+            {
+                var url = $"api/{context.ErpType}/orders?pageSize={pageSize}&page={page}";
+                var response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var data = JsonSerializer.Deserialize<ErpResponse<ErpOrderDto>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (data?.Content == null || !data.Content.Any())
+                {
+                    break;
+                }
+
+                allOrder.AddRange(data.Content);
+
+                page += 1;
+
+                if (page >= data.TotalPages)
+                {
+                    moreData = false;
+                }
+            }
+
+            return allOrder;
         }
     }
 }

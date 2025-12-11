@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entegro.Application.DTOs.Erp
+﻿namespace Entegro.Application.DTOs.Erp
 {
     public class ErpApiContext
     {
@@ -12,5 +6,6 @@ namespace Entegro.Application.DTOs.Erp
         public string ApiUser { get; set; }
         public string ApiPassword { get; set; }
         public string ErpType { get; set; }
+        public int IntegrationSystemId { get; set; }
     }
 }

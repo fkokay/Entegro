@@ -15,6 +15,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
         Task<IEnumerable<TrendyolProductDto>> GetProductsByProductMainIdAsync(TrendyolApiContext context, string productMainId);
         Task ChangeCargoProviderAsync(TrendyolApiContext context, TrendyolChangeCargoProviderRequest request);
         Task<IEnumerable<Content>> GetReturnsAsync(TrendyolApiContext context);
-        Task CancelCargoAsync(TrendyolApiContext context, TrendyolCancelCargoRequest request)
+        Task CancelCargoAsync(TrendyolApiContext context, TrendyolCancelCargoRequest request);
     }
 }

@@ -1,8 +1,11 @@
 ﻿
+using Entegro.Application.DTOs.Address;
 using Entegro.Application.DTOs.Brand;
 using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.Erp;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.Product;
 using Entegro.Application.DTOs.ProductAttribute;
 using Entegro.Application.DTOs.ProductAttributeValue;
@@ -26,7 +29,9 @@ namespace Entegro.Api.Jobs
     {
         private readonly IErpService _erpService;
         private readonly IProductService _productService;
+        private readonly IProductIntegrationService _productIntegrationService;
         private readonly IOrderService _orderService;
+        private readonly IAddressService _addressService;
         private readonly ICustomerService _customerService;
         private readonly IBrandService _brandService;
         private readonly ICategoryService _categoryService;
@@ -36,6 +41,7 @@ namespace Entegro.Api.Jobs
         private readonly IProductVariantAttributeValueService _productVariantAttributeValueService;
         private readonly IProductVariantAttributeCombinationService _productVariantAttributeCombinationService;
         private readonly IIntegrationSystemService _integrationSystemService;
+        private readonly IShipmentService _shipmentService;
         private readonly IMapper _mapper;
         private readonly ILogger<ErpJob> _logger;
 
@@ -56,7 +62,10 @@ namespace Entegro.Api.Jobs
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IIntegrationSystemService integrationSystemService,
             IMapper mapper,
-            ILogger<ErpJob> logger)
+            ILogger<ErpJob> logger,
+            IProductIntegrationService productIntegrationService,
+            IAddressService addressService,
+            IShipmentService shipmentService)
         {
             _erpService = erpService ?? throw new ArgumentNullException(nameof(erpService));
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
@@ -72,11 +81,14 @@ namespace Entegro.Api.Jobs
             _integrationSystemService = integrationSystemService;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _productIntegrationService = productIntegrationService;
+            _addressService = addressService;
+            _shipmentService = shipmentService;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var erpIntegrations = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP,true);
+            var erpIntegrations = await _integrationSystemService.GetAllAsync((int)IntegrationSystemType.ERP, true);
 
             foreach (var erpIntegration in erpIntegrations)
             {
@@ -85,8 +97,10 @@ namespace Entegro.Api.Jobs
                 apiContext.BaseUrl = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ApiUrl").Select(m => m.Value).FirstOrDefault() ?? "";
                 apiContext.ApiUser = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ApiUser").Select(m => m.Value).FirstOrDefault() ?? "";
                 apiContext.ApiPassword = erpIntegration.IntegrationSystemParameters.Where(m => m.Key == "ApiPassword").Select(m => m.Value).FirstOrDefault() ?? "";
+                apiContext.IntegrationSystemId = erpIntegration.Id;
 
                 await ProductSync(apiContext);
+                await OrderReadSync(apiContext);
             }
 
         }
@@ -103,6 +117,7 @@ namespace Entegro.Api.Jobs
             try
             {
                 erpProducts = (await _erpService.GetProductsAsync(apiContext, 500)).ToList();
+
             }
             catch (Exception ex)
             {
@@ -204,6 +219,148 @@ namespace Entegro.Api.Jobs
 
             _logger.LogInformation("{erpType} ürün senkronizasyonu tamamlandı. Zaman: {Time}", apiContext.ErpType, DateTime.UtcNow);
         }
+        private async Task OrderReadSync(ErpApiContext apiContext)
+        {
+            IEnumerable<ErpOrderDto> erpOrderList;
+
+            try
+            {
+                erpOrderList = await _erpService.GetOrdersAsync(apiContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Logo'dan siparişler alınırken bir hata oluştu.");
+                return;
+            }
+
+            if (erpOrderList == null || !erpOrderList.Any())
+            {
+                _logger.LogWarning("Logo'dan hiç sipariş alınamadı.");
+                return;
+            }
+
+            ErpOrderMapper.ConfigureLogger(_logger);
+            var orders = ErpOrderMapper.ToDtoList(erpOrderList).ToList();
+
+
+            var retryPolicy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(2 * attempt),
+                    onRetry: (exception, timeSpan, retryCount, context) =>
+                    {
+                        _logger.LogWarning(exception, "{RetryCount}. deneme başarısız oldu, {WaitTime} saniye bekleniyor.", retryCount, timeSpan.TotalSeconds);
+                    });
+
+
+            foreach (var order in orders)
+            {
+
+
+                try
+                {
+                    order.IntegrationSystemId = apiContext.IntegrationSystemId;
+
+                    if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
+                    {
+                        _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
+                        continue;
+                    }
+
+                    #region Exists Order
+                    if (await _orderService.ExistsByOrderNoAsync(order.OrderNumber))
+                    {
+                        _logger.LogInformation("'{OrderNumber}' nolu sipariş zaten kayıtlı", order.OrderNumber);
+                        continue;
+                    }
+                    #endregion
+
+                    #region Customer
+                    var customer = await _customerService.GetCustomerByEmailAsync(order.Customer.Email);
+                    if (customer == null)
+                    {
+                        var createCustomer = _mapper.Map<CreateCustomerDto>(order.Customer);
+                        customer = await CreateCustomer(createCustomer);
+                        order.CustomerId = customer.Id;
+                        order.Customer = null;
+                    }
+                    else
+                    {
+                        order.CustomerId = customer.Id;
+                        order.Customer = null;
+                    }
+                    #endregion
+
+                    #region Address
+                    if (order.ShippingAddress != null)
+                    {
+                        var createShippingAddress = _mapper.Map<CreateAddressDto>(order.ShippingAddress);
+                        var address = await CreateAddress(createShippingAddress);
+                        order.ShippingAddressId = address.Id;
+                        order.ShippingAddress = null;
+                    }
+
+                    if (order.BillingAddress != null)
+                    {
+                        var createShippingAddress = _mapper.Map<CreateAddressDto>(order.BillingAddress);
+                        var address = await CreateAddress(createShippingAddress);
+                        order.BillingAddressId = address.Id;
+                        order.BillingAddress = null;
+                    }
+                    #endregion
+
+                    #region OrderItems
+                    foreach (var orderItem in order.OrderItems)
+                    {
+                        if (orderItem.Product != null)
+                        {
+                            var productIntegration = await _productIntegrationService.GetByIntegrationCodeAsync(orderItem.Product.Code);
+                            if (productIntegration != null)
+                            {
+                                orderItem.Product = null;
+                                orderItem.ProductId = productIntegration.ProductId;
+                            }
+                            else
+                            {
+                                orderItem.Product = null;
+                                orderItem.ProductId = null;
+                            }
+                        }
+                    }
+                    #endregion
+                    await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        var createOrder = _mapper.Map<CreateOrderDto>(order);
+                        var createdOrder = await _orderService.AddAsync(createOrder);
+
+                        //foreach (var shipment in order.Shipments)
+                        //{
+                        //    shipment.OrderId = createdOrder.Id;
+
+                        //    foreach (var orderItem in createdOrder.OrderItems)
+                        //    {
+                        //        ShipmentItemDto createShipmentItem = new ShipmentItemDto();
+                        //        createShipmentItem.OrderItemId = orderItem.Id;
+                        //        createShipmentItem.Quantity = orderItem.Quantity;
+
+                        //        shipment.ShipmentItems.Add(createShipmentItem);
+                        //    }
+
+                        //    var createShipment = _mapper.Map<CreateShipmentDto>(shipment);
+                        //    var createdShipment = await _shipmentService.AddAsync(createShipment);
+                        //}
+
+                        _logger.LogInformation("'{OrderNumber}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "'{OrderNumber}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNumber);
+                }
+            }
+            _logger.LogInformation("Logo sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+        }
 
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeSelection> variantAttributes)
         {
@@ -302,6 +459,21 @@ namespace Entegro.Api.Jobs
             }
 
             return createCategoryModel.Id;
+        }
+
+
+        private async Task<CustomerDto> CreateCustomer(CreateCustomerDto createCustomer)
+        {
+            createCustomer.CustomerType = 1;
+            var customer = await _customerService.AddAsync(createCustomer);
+
+            return customer;
+        }
+
+        private async Task<AddressDto> CreateAddress(CreateAddressDto createAddress)
+        {
+            var address = await _addressService.AddAsync(createAddress);
+            return address;
         }
     }
 
