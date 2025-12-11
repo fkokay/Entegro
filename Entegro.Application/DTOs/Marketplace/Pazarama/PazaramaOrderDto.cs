@@ -82,6 +82,7 @@
         public bool PlusOrder { get; set; }
         public int ChannelCode { get; set; }
         public string ChannelCodeName { get; set; }
+        public int Quantity { get; set; }
     }
     public class Price
     {

@@ -20,7 +20,7 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             }
 
             OrderItemDto orderItem = new OrderItemDto();
-            orderItem.Quantity = 0;
+            orderItem.Quantity = pazaramaOrder.Quantity;
             orderItem.DiscountAmount = Convert.ToDecimal(pazaramaOrder.DiscountAmount.Value);
             orderItem.Price = Convert.ToDecimal(pazaramaOrder.TotalPrice.Value);
             orderItem.UnitPrice = Convert.ToDecimal(pazaramaOrder.SalePrice.Value);
@@ -28,7 +28,7 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             orderItem.Product.Code = pazaramaOrder.Product.ProductId == null ? pazaramaOrder.Product.Barcode : pazaramaOrder.Product.ProductId;
             orderItem.TaxRate = Convert.ToDecimal(pazaramaOrder.TaxAmount.Value);
             orderItem.Sku = pazaramaOrder.Product.ProductId == null ? pazaramaOrder.Product.Barcode : pazaramaOrder.Product.ProductId;
-            orderItem.IntegrationSku = pazaramaOrder.Product.StockCode == null ? pazaramaOrder.Product.Barcode : pazaramaOrder.Product.StockCode;
+            orderItem.IntegrationSku = pazaramaOrder.Product.ProductId == null ? pazaramaOrder.Product.Barcode : pazaramaOrder.Product.ProductId;
             orderItem.IntegrationProductName = pazaramaOrder.Product.Name;
             orderItem.ProductCost = 0;
             orderItem.ItemWeight = 0;

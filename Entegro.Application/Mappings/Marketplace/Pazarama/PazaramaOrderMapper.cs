@@ -40,7 +40,7 @@ namespace Entegro.Application.Mappings.Marketplace.Pazarama
             : PaymentStatus.Pending;
             order.ShippingMethod = pazaramaOrder.Items.Select(x => x.Cargo.CompanyName).FirstOrDefault();
             order.ShippingStatus = ShippingStatus.NotYetShipped;
-            order.DueDateUtc = DateTime.UtcNow;
+            order.DueDateUtc = null;
 
             order.Customer = new DTOs.Customer.CustomerDto()
             {

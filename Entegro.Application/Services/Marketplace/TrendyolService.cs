@@ -903,11 +903,38 @@ namespace Entegro.Application.Services.Marketplace
         {
             using var client = CreateHttpClient(context);
 
-            var url = $"shipment-packages/{request.ShipmentPackageNumber}/cargo-provider";
+            var url = $"order/sellers/{context.SupplierId}/shipment-packages/{request.ShipmentPackageNumber}/cargo-providers";
 
             var body = new
             {
-                cargoProviderCode = request.CargoProviderCode
+                cargoProvider = request.CargoProviderCode
+            };
+
+
+            var json = JsonSerializer.Serialize(body, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PutAsync(url, content);
+            var result = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Kargo firması değiştirme başarısız oldu. Kod: {response.StatusCode}, Yanıt: {result}");
+            }
+        }
+        public async Task CancelCargoAsync(TrendyolApiContext context, TrendyolCancelCargoRequest request)
+        {
+            using var client = CreateHttpClient(context);
+            var url = $"order-management/sellers/{context.SupplierId}/shipment-packages/{request.ShipmentPackageNumber}/reject";
+
+            var body = new
+            {
+                reason = request.Reason
             };
 
             var json = JsonSerializer.Serialize(body, new JsonSerializerOptions
@@ -917,15 +944,15 @@ namespace Entegro.Application.Services.Marketplace
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await client.PostAsync(url, content);
-
             var result = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"Kargo firması değiştirme başarısız oldu. Kod: {response.StatusCode}, Yanıt: {result}");
+                throw new Exception(
+                    $"Kargo iptali başarısız oldu. Kod: {response.StatusCode}, Yanıt: {result}"
+                );
             }
         }
-
         public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)
         {
             decimal profitRate = profitPercent ?? 0;
