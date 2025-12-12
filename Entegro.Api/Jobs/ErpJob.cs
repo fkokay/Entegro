@@ -152,10 +152,10 @@ namespace Entegro.Api.Jobs
 
                 try
                 {
+                    if (await _productService.ExistsByCodeAsync(product.Code)) return;
+
                     await retryPolicy.ExecuteAsync(async () =>
                     {
-                        if (await _productService.ExistsByCodeAsync(product.Code)) return;
-
                         if ((product.BrandId == null || product.BrandId == 0) && product.Brand != null)
                         {
                             if (await _brandService.ExistsByNameAsync(product.Brand.Name))
@@ -229,13 +229,13 @@ namespace Entegro.Api.Jobs
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Logo'dan siparişler alınırken bir hata oluştu.");
+                _logger.LogError(ex, "ERP'den siparişler alınırken bir hata oluştu.");
                 return;
             }
 
             if (erpOrderList == null || !erpOrderList.Any())
             {
-                _logger.LogWarning("Logo'dan hiç sipariş alınamadı.");
+                _logger.LogWarning("ERP'den hiç sipariş alınamadı.");
                 return;
             }
 
@@ -256,8 +256,6 @@ namespace Entegro.Api.Jobs
 
             foreach (var order in orders)
             {
-
-
                 try
                 {
                     order.IntegrationSystemId = apiContext.IntegrationSystemId;
@@ -333,24 +331,6 @@ namespace Entegro.Api.Jobs
                     {
                         var createOrder = _mapper.Map<CreateOrderDto>(order);
                         var createdOrder = await _orderService.AddAsync(createOrder);
-
-                        //foreach (var shipment in order.Shipments)
-                        //{
-                        //    shipment.OrderId = createdOrder.Id;
-
-                        //    foreach (var orderItem in createdOrder.OrderItems)
-                        //    {
-                        //        ShipmentItemDto createShipmentItem = new ShipmentItemDto();
-                        //        createShipmentItem.OrderItemId = orderItem.Id;
-                        //        createShipmentItem.Quantity = orderItem.Quantity;
-
-                        //        shipment.ShipmentItems.Add(createShipmentItem);
-                        //    }
-
-                        //    var createShipment = _mapper.Map<CreateShipmentDto>(shipment);
-                        //    var createdShipment = await _shipmentService.AddAsync(createShipment);
-                        //}
-
                         _logger.LogInformation("'{OrderNumber}' nolu sipariş başarıyla kaydedildi.", order.OrderNumber);
                     });
                 }
@@ -359,7 +339,7 @@ namespace Entegro.Api.Jobs
                     _logger.LogError(ex, "'{OrderNumber}' nolu sipariş için tüm denemeler başarısız oldu.", order.OrderNumber);
                 }
             }
-            _logger.LogInformation("Logo sipariş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+            _logger.LogInformation("ERP separiş senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
         }
 
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, List<ProductVariantAttributeSelection> variantAttributes)

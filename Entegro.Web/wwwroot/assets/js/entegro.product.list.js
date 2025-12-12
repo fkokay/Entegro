@@ -28,6 +28,7 @@ Entegro.product.list = (function ($) {
             case "Idefix": return "/assets/img/brandicons/idefix.png";
             case "CicekSepeti": return "/assets/img/brandicons/ciceksepeti.jpeg";
             case "Hepsiburada": return "/assets/img/brandicons/hepsiburada.png";
+            case "Logo": return "/assets/img/brandicons/logo.png";
             default: return "/assets/img/icons/brands/default.png";
         }
     }
@@ -139,10 +140,10 @@ Entegro.product.list = (function ($) {
             confirmButtonText: 'Evet, uygula!',
             cancelButtonText: 'İptal',
             preConfirm: () => {
-                
+
                 Swal.close();
 
-              
+
                 window.showLoading("Lütfen bekleyiniz..");
 
                 return fetch('/Product/CreateOrUpdateIntegrationAll', {
@@ -166,7 +167,7 @@ Entegro.product.list = (function ($) {
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
-            
+
             window.hideLoading();
 
             if (result.isConfirmed && result.value?.success) {
@@ -175,7 +176,7 @@ Entegro.product.list = (function ($) {
                     result.value.message,
                     'success'
                 ).then(() => {
-                   
+
                     window.location.reload();
                 });
             } else if (result.value && !result.value.success) {
@@ -243,7 +244,7 @@ Entegro.product.list = (function ($) {
                     alert('Form yüklenemedi.');
                 },
                 complete: function () {
-                    
+
                     window.hideLoading();
                 }
             });
@@ -251,11 +252,11 @@ Entegro.product.list = (function ($) {
     }
 
     function initList() {
-        var salesData = []; 
+        var salesData = [];
         if ($.fn.DataTable.isDataTable('#ProductTable')) {
             return;
         }
-        
+
         $.ajax({
             url: '/Product/GetStoreProductSales',
             type: 'POST',
@@ -301,7 +302,7 @@ Entegro.product.list = (function ($) {
                                 showConfirmButton: true,
                                 backdrop: true,
                                 heightAuto: false,
-                                timer: 2000,   
+                                timer: 2000,
                                 timerProgressBar: true
                             });
 
@@ -530,20 +531,20 @@ Entegro.product.list = (function ($) {
                             {
                                 extend: "collection",
                                 className: "btn btn-success dropdown-toggle",
-                                                             text: `<span class="d-flex align-items-center gap-2">
+                                text: `<span class="d-flex align-items-center gap-2">
                                   <i class="icon-base ti ti-cloud-download icon-xs"></i>
                                   <span>E-Ticaretten Ürün Kayıt</span>
                                 </span>`,
-                                                             buttons: window.commerces.map(commerce => {
-                                                                 const logoSrc = Entegro.product.list.getIntegrationLogo(commerce.Value);
-                                                                 return {
-                                                                     className: "dropdown-item d-flex align-items-center gap-2",
-                                                                     text: `
+                                buttons: window.commerces.map(commerce => {
+                                    const logoSrc = Entegro.product.list.getIntegrationLogo(commerce.Value);
+                                    return {
+                                        className: "dropdown-item d-flex align-items-center gap-2",
+                                        text: `
                                      <img src="${logoSrc}" alt="${commerce.Name}" style="width: 20px; height: 20px; object-fit: contain;">
                                      <span>${commerce.Name}</span>
                                    `,
                                         action: () => {
-                                            
+
                                             $.get(`/Product/CreateProductECommerceDialog?IntegrationSystemId=${commerce.Id}`, function (html) {
                                                 $("#CreateIfNotExistProductCommerceModal .modal-content").html(html);
                                                 const modal = new bootstrap.Modal(document.getElementById('CreateIfNotExistProductCommerceModal'));
@@ -657,12 +658,16 @@ Entegro.product.list = (function ($) {
 
                         let typeValue = "";
                         switch (pi.IntegrationSystem.IntegrationSystemType) {
+                            case 1:
+                                typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key === "ErpType")?.Value;
+                                break;
                             case 2:
                                 typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key === "CommerceType")?.Value;
                                 break;
                             case 3:
                                 typeValue = pi.IntegrationSystem.IntegrationSystemParameters?.find(x => x.Key === "MarketplaceType")?.Value;
                                 break;
+
                         }
 
                         let logoSrc = Entegro.product.list.getIntegrationLogo(typeValue);
@@ -682,12 +687,12 @@ Entegro.product.list = (function ($) {
                             }
                         }
 
-                       
+
                         let quantityHtml = "";
-                             if (pi.IntegrationSystem.IntegrationSystemType === 3 && salesData && pi.IntegrationCode) {
-                                 let match = salesData.find(x => x.IntegrationSku === pi.IntegrationCode);
-                                 if (match) {
-                                     quantityHtml = `
+                        if (pi.IntegrationSystem.IntegrationSystemType === 3 && salesData && pi.IntegrationCode) {
+                            let match = salesData.find(x => x.IntegrationSku === pi.IntegrationCode);
+                            if (match) {
+                                quantityHtml = `
                                  <span class="fw-bold text-black">${match.TotalQuantity}</span>
                              `;
                             }
@@ -720,11 +725,10 @@ Entegro.product.list = (function ($) {
                                                     ${pi.IntegrationSystem.Name}
                                                 </span>
                                             </div>
-                                            ${
-                                               variantCount > 0
-                                                   ? `<span class="price">Varyant Sayısı : ${variantCount}</span>`
-                                                   : `<span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>`
-                                               }
+                                            ${variantCount > 0
+                                    ? `<span class="price">Varyant Sayısı : ${variantCount}</span>`
+                                    : `<span class="price">${pi.Price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} TL</span>`
+                                }
                                         </div>
                                         <span class="w-px-30 h-px-30 d-flex justify-content-end align-items-center me-4 product-status">
                                             Satışta 
@@ -747,9 +751,9 @@ Entegro.product.list = (function ($) {
                                         <div class="me-5 position-relative">
                                             <img src="${logoSrc}" title="${pi.IntegrationSystem.Name}" class="rounded">
                                             ${pi.IntegrationSystem.IntegrationSystemType === 3 && quantityHtml
-                                                    ? `<span style="background:#fff;font-size:12px;width:20px;height:20px;border-radius:50%;text-align:center;line-height:24px;display:block;left:-10px;top:-10px;position:absolute;box-shadow:0 2px 6px rgba(0,0,0,0.2);">${quantityHtml}</span>`
-                                                    : ""
-                                                }
+                                ? `<span style="background:#fff;font-size:12px;width:20px;height:20px;border-radius:50%;text-align:center;line-height:24px;display:block;left:-10px;top:-10px;position:absolute;box-shadow:0 2px 6px rgba(0,0,0,0.2);">${quantityHtml}</span>`
+                                : ""
+                            }
                                         </div>
                                     </div>
                                     <div class="product-integration-info">
@@ -777,7 +781,7 @@ Entegro.product.list = (function ($) {
 
                 }
 
-               
+
                 if (!row.child.isShown()) {
                     row.child('<div class="row">' + integrationHtml + '</div>').show();
                 }
@@ -931,7 +935,7 @@ Entegro.product.list = (function ($) {
         });
     }
 
-   
+
 
 
 

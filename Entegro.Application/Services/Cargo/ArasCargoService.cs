@@ -1,4 +1,7 @@
 ﻿using ArasCargo;
+using ArasCargoCustomerService;
+using Entegro.Application.ArasCargoSerializer;
+using Entegro.Application.DTOs.ArasQueryResult;
 using Entegro.Application.DTOs.Cargo;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.Interfaces.Services.Base;
@@ -285,6 +288,40 @@ namespace Entegro.Application.Services.Cargo
                     Success = false,
                     Message = ex.Message
                 };
+            }
+        }
+
+        public async Task<QueryResult> Query(string queryType, string integrationCode)
+        {
+            string xml = "";
+            try
+            {
+                string loginInfo = @$"<LoginInfo>
+           <UserName>{_username}</UserName>
+           <Password>{_password}</Password>
+           <CustomerCode>1327138011239</CustomerCode>
+           </LoginInfo>";
+
+                string queryInfo = @$"<QueryInfo>
+           <QueryType>{queryType}</QueryType>
+           <IntegrationCode>{integrationCode}</IntegrationCode>
+           </QueryInfo>";
+
+                ArasCargoIntegrationServiceClient client = new ArasCargoIntegrationServiceClient();
+                var result = await client.GetQueryXMLAsync(loginInfo, queryInfo);
+                if (result == null || result.GetQueryXMLResult == null)
+                {
+                    throw new Exception("Aras Kargo servisi ile iletişim kurulamadı.");
+                }
+
+                xml = result.GetQueryXMLResult;
+
+                QueryResult queryResult = Serializer.Deserialize<QueryResult>(xml);
+                return queryResult;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("xml = " + xml + " message=" + ex.Message);
             }
         }
     }

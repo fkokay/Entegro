@@ -98,6 +98,17 @@ namespace Entegro.Web.Controllers
             var orderDetail = await _orderService.GetOrderByIdAsync(id);
             var model = _mapper.Map<OrderModel>(orderDetail);
 
+            bool hasUnmatchedProduct = model.OrderItems.Any(x => x.Product == null);
+
+            if (hasUnmatchedProduct)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Siparişte eşleştirilmemiş ürünler var. Lütfen önce ürün eşleştirmesi yapınız."
+                });
+            }
+
             var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null, true);
             ViewBag.Cargos = allIntegrationSystems.Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Cargo).Select(
                 m => new { m.Id, m.Name, Value = m.IntegrationSystemParameters.Select(x => x.Value).FirstOrDefault() }
@@ -109,8 +120,25 @@ namespace Entegro.Web.Controllers
         public async Task<IActionResult> PackagingSave(string carrier, bool paymentType, bool isPaymentDoor, int? shippingIntegrationId, List<OrderPackageModel> orderPackages)
         {
 
+            var order = await _orderService.GetOrderByIdAsync(orderPackages[0].OrderId);
+
+            string cargoName = null;
+            if (shippingIntegrationId.HasValue)
+            {
+                var allIntegrationSystems = await _integrationSystemService.GetAllAsync(null, true);
+
+                cargoName = allIntegrationSystems
+                    .Where(m => m.IntegrationSystemType == Domain.Enums.IntegrationSystemType.Cargo
+                             && m.Id == shippingIntegrationId.Value)
+                    .Select(m => m.Name)
+                    .FirstOrDefault();
+            }
+
+
             CreateShipmentDto createShipment = new CreateShipmentDto();
-            createShipment.Carrier = carrier;
+            createShipment.Carrier = !string.IsNullOrWhiteSpace(cargoName)
+                ? cargoName
+                : carrier;
             createShipment.ShippingIntegrationId = shippingIntegrationId;
             createShipment.TrackingNumber = "";
             createShipment.PackageNo = "";
@@ -131,9 +159,10 @@ namespace Entegro.Web.Controllers
             var result = await _shipmentService.AddAsync(createShipment);
 
 
-            var order = await _orderService.GetOrderByIdAsync(orderPackages[0].OrderId);
+
             var mapped = _mapper.Map<UpdateOrderDto>(order);
             mapped.OrderStatusId = (int)OrderStatus.Processing;
+            order.ShippingMethod = !string.IsNullOrWhiteSpace(cargoName) ? cargoName : carrier;
             await _orderService.UpdateAsync(mapped);
             return Json(new { success = true });
         }

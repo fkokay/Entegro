@@ -36,9 +36,9 @@ namespace Entegro.Application.Mappings.Erp
             order.InvoiceLink = "";//ekledim
 
             order.OrderStatus = OrderStatus.Pending;
+            order.ShippingStatus = ShippingStatus.ShippingNotRequired;
             order.PaymentStatus = PaymentStatus.Paid;
             order.ShippingMethod = erpOrder.ShippingMethod;
-            order.ShippingStatus = ShippingStatus.Delivered;
 
             order.OrderItems = ErpOrderItemMapper.ToDtoList(erpOrder.OrderItems).ToList();
             order.DueDateUtc = DateTime.MinValue;

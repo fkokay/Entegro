@@ -111,6 +111,8 @@ Entegro.order.OrderList = (function ($) {
                             type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "CommerceType").Value;
                         } else if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "Pazaryeri Entegrasyonu") {
                             type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "MarketplaceType").Value;
+                        } else if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "ERP Entegrasyonu") {
+                            type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "ErpType").Value;
                         }
 
                         return `<div>
@@ -258,7 +260,11 @@ Entegro.order.OrderList = (function ($) {
                                         <div><b>${row.OrderItems[i].ProductName}</b></div>
                                         <div>Barkod      : ${row.OrderItems[i].IntegrationSku ?? ""}</div>
                                         <div>Birim Fiyat : ${row.OrderItems[i].UnitPrice} TL</div>
-                                        <div><b class="text-mute">${row.OrderItems[i].AttributeDescription}<b></div>
+                                        <div>
+                                            <b class="text-muted">
+                                                ${row.OrderItems[i].AttributeDescription ? row.OrderItems[i].AttributeDescription : 'Açıklama yok'}
+                                            </b>
+                                        </div>
                                     </div>
                                 </div>
                                 `;
@@ -276,16 +282,16 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     responsivePriority: 3,
                     render: function (data, type, row) {
-                        if (!row.ShippingTrackingNumber) {
-                            return ``;
-                        }
+                        //if (!row.ShippingTrackingNumber) {
+                        //    return ``;
+                        //}
 
                         let logoUrl = "";
 
                         // Kargo firması kontrolü
                         if (row.ShipmentCarrier === "Trendyol Express Marketplace") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/17.png";
-                        } else if (row.ShipmentCarrier === "Aras Kargo Marketplace") {
+                        } else if (row.ShipmentCarrier === "Aras Kargo Marketplace" || row.ShipmentCarrier === "Aras Kargo") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/7.png";
                         } else if (row.ShipmentCarrier === "Yurtiçi Kargo Marketplace") {
                             logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/4.png";
@@ -304,10 +310,15 @@ Entegro.order.OrderList = (function ($) {
                         }
 
                         return `
-                          <div>
-                              <div><img src="${logoUrl}" width="100px" style="margin:0px auto;display:block;"/></div>
-                              <div class="text-center">${row.ShippingTrackingNumber}</div>
-                          </div>`;
+                        <div>
+                            <div>
+                                <img src="${logoUrl}" width="100px" style="margin:0px auto;display:block;"/>
+                            </div>
+                            <div class="text-center">
+                                ${row.ShippingTrackingNumber ? row.ShippingTrackingNumber : 'Takip numarası yok'}
+                            </div>
+                        </div>`;
+
                     }
                 },
 
@@ -395,8 +406,12 @@ Entegro.order.OrderList = (function ($) {
                     searchable: false,
                     orderable: false,
                     render: function (data, type, row) {
-                        if (orderStatus == 1) {
-                            return `<div><button class="btn btn-warning" onclick="Entegro.order.OrderList.OrderPackage(${row.Id})">Paketle</button></div>`;
+                        if (orderStatus === 1) {
+                            return `
+                                <button class="btn btn-warning"
+                                        onclick="Entegro.order.OrderList.OrderPackage(${row.Id})">
+                                    Paketle
+                                </button>`;
                         } else if (orderStatus == 2) {
                             return `
                              <div>
@@ -562,23 +577,92 @@ Entegro.order.OrderList = (function ($) {
         }
     };
 
-    const OrderPackage = function OrderPackage(id) {
+    const OrderPackage = function (id) {
         $.ajax({
             url: '/Order/Packaging?id=' + id,
             type: 'POST',
-            dataType: 'html',
-            success: function (html) {
-                $('#OrderPackageModal .modal-body').html(html);
+            success: function (response) {
+
+                // 🔴 Eşleştirilmemiş ürün varsa
+                if (response && response.success === false) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Ürün Eşleştirme Gerekli',
+                        text: response.message,
+                        confirmButtonText: 'Tamam',
+                        customClass: {
+                            confirmButton: 'btn btn-warning'
+                        },
+                        buttonsStyling: false
+                    });
+                    return;
+                }
+
+                $('#OrderPackageModal .modal-body').html(response);
                 OrderPackageInit();
                 $('#OrderPackageModal').modal('show');
             },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert('Form yüklenemedi.');
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: 'Paketleme formu yüklenemedi.',
+                    confirmButtonText: 'Tamam',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false
+                });
             }
         });
-    }
+    };
 
+
+    function OrderPackageInit() {
+
+        $(".btn-minus").off().on("click", function () {
+            var span = $(this).siblings("span");
+            var input = $(this).siblings("input");
+            var max = parseInt(span.data("max-quantity"));
+            var qty = parseInt(span.text());
+
+            if (qty > 1) qty--;
+            span.text(qty);
+            input.val(qty);
+        });
+
+        $(".btn-plus").off().on("click", function () {
+            var span = $(this).siblings("span");
+            var input = $(this).siblings("input");
+            var max = parseInt(span.data("max-quantity"));
+            var qty = parseInt(span.text());
+
+            if (qty < max) qty++;
+            span.text(qty);
+            input.val(qty);
+        });
+
+        $(".orderpackage-save").off().on("click", function () {
+            const action = $('#PackagingForm').attr("action");
+            const formData = $('#PackagingForm').serialize();
+
+            $.ajax({
+                url: action,
+                type: 'POST',
+                data: formData,
+                success: function (res) {
+                    if (res.success) {
+                        showMessage("Başarılı", "Sipariş paketlendi.", "success", null, true);
+                    } else {
+                        showMessage("Hata", res.message, "error");
+                    }
+                },
+                error: function () {
+                    showMessage("Hata", "Kayıt sırasında hata oluştu.", "error");
+                }
+            });
+        });
+    }
     const ProductIntegration = function ProductIntegration(integrationSystemId, productIntegrationName, productIntegrationSku) {
         $("#IntegrationSystemId").val(integrationSystemId);
         $("#ProductIntegrationName").val(productIntegrationName);
@@ -1104,6 +1188,7 @@ Entegro.order.OrderList = (function ($) {
             case "Idefix": return "/assets/img/logo/idefix.png";
             case "CicekSepeti": return "/assets/img/logo/ciceksepeti.png";
             case "Hepsiburada": return "/assets/img/logo/hepsiburada.png";
+            case "Logo": return "/assets/img/logo/logo.webp";
             default: return "/assets/img/icons/logo/default.png";
         }
     }

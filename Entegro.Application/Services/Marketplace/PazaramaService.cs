@@ -275,10 +275,7 @@ namespace Entegro.Application.Services.Marketplace
             {
                 PropertyNameCaseInsensitive = true
             });
-            //var jsonData = JsonSerializer.Deserialize<PazaramaResponse<List<PazaramaOrderDto>>>(json, new JsonSerializerOptions
-            //{
-            //    PropertyNameCaseInsensitive = true
-            //});
+
 
             if (jsonData == null)
             {
