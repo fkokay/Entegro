@@ -466,8 +466,6 @@ namespace Entegro.Api.Jobs
                     return;
                 }
 
-                var returnReq = await _trendyol.GetReturnsAsync(context);
-
                 TrendyolShipmentPackageMapper.ConfigureLogger(_logger);
                 var orders = TrendyolShipmentPackageMapper.ToDtoList(trendyolShipmentPackages);
 

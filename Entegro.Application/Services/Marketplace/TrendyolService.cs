@@ -559,7 +559,6 @@ namespace Entegro.Application.Services.Marketplace
 
             return allProducts;
         }
-
         public async Task<IEnumerable<Content>> GetReturnsAsync(TrendyolApiContext context)
         {
             using var client = CreateHttpClient(context);
@@ -605,9 +604,6 @@ namespace Entegro.Application.Services.Marketplace
 
             return allReturns;
         }
-
-
-
         private async Task AddVariantAttributeAsync(int productId, string attributeName, string attributeValue, ProductDto? product, TrendyolProductDto trendyolProduct, int integrationSystemId)
         {
             List<ProductVariantAttributeDto> variantAttributes = new List<ProductVariantAttributeDto>();

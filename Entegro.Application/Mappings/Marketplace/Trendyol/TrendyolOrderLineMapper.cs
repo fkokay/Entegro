@@ -52,4 +52,5 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
             }
         }
     }
+
 }

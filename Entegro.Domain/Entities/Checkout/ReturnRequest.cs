@@ -1,44 +1,37 @@
-﻿using Entegro.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using Entegro.Domain.Entities.Integration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entegro.Domain.Entities.Checkout
 {
-    [Table("ReturnRequest")]
-    public class ReturnRequest :BaseEntity, IAuditable
+
+    public class ReturnRequestMap : IEntityTypeConfiguration<ReturnRequest>
     {
-        public int OrderItemId { get; set; }
-        public int CustomerId { get; set; }
-        public virtual Customer Customer { get; set; }  
-        public int Quantity { get; set; }
-        [Required, StringLength(4000)]
-        public string ReasonForReturn { get; set; }
-        [Required, StringLength(4000)]
-        public string RequestedAction { get; set; }
-        public DateTime? RequestedActionUpdatedOnUtc { get; set; }
-        public string CustomerComments { get; set; }
-        public string StaffNotes { get; set; }
-        [StringLength(4000)]
-        public string AdminComment { get; set; }
-        public int ReturnRequestStatusId { get; set; }
-        [NotMapped]
-        public ReturnRequestStatus ReturnRequestStatus
+        public void Configure(EntityTypeBuilder<ReturnRequest> builder)
         {
-            get => (ReturnRequestStatus)ReturnRequestStatusId;
-            set => ReturnRequestStatusId = (int)value;
+
         }
+    }
 
-        public bool? RefundToWallet { get; set; }
-
-        /// <inheritdoc/>
+    [Table("ReturnRequest")]
+    public class ReturnRequest : BaseEntity, IAuditable
+    {
+        public int? IntegrationSystemId { get; set; }
+        public virtual IntegrationSystem? IntegrationSystem { get; set; }
+        public string? OrderNumber { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime ClaimDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
+        public string CustomerFirstName { get; set; }
+        public string CustomerLastName { get; set; }
+        public string? CargoTrackingNumber { get; set; }
+        public string? CargoProviderName { get; set; }
+        public string? CargoTrackingLink { get; set; }
+        public long OrderShipmentPackageId { get; set; }
+        public long OrderOutboundPackageId { get; set; }
         public DateTime CreatedOnUtc { get; set; }
-
-        /// <inheritdoc/>
         public DateTime UpdatedOnUtc { get; set; }
+        public virtual ICollection<ReturnRequestItem> Items { get; set; } = new HashSet<ReturnRequestItem>();
     }
 }

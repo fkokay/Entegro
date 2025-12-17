@@ -37,47 +37,48 @@ namespace Entegro.Domain.Enums
     public enum ReturnRequestStatus
     {
         /// <summary>
-        /// Beklemede
+        /// Talep oluşturuldu, işlem bekliyor
         /// </summary>
         [Display(Name = "Beklemede")]
-        Pending = 0,
+        Created = 0,
 
         /// <summary>
-        /// Alındı
+        /// Talep kabul edildi
         /// </summary>
-        [Display(Name = "Alındı")]
-        Received = 10,
+        [Display(Name = "Kabul Edildi")]
+        Accepted = 10,
 
         /// <summary>
-        /// İade Yetkilendirildi
+        /// Talep reddedildi
         /// </summary>
-        [Display(Name = "İade Yetkilendirildi")]
-        ReturnAuthorized = 20,
+        [Display(Name = "Reddedildi")]
+        Rejected = 20,
 
         /// <summary>
-        /// Ürün(ler) Onarıldı
+        /// İade / işlem onaylandı
         /// </summary>
-        [Display(Name = "Ürün(ler) Onarıldı")]
-        ItemsRepaired = 30,
+        [Display(Name = "Onaylandı")]
+        Approved = 30,
 
         /// <summary>
-        /// Ürün(ler) İade Edildi
+        /// İade süreci tamamlandı
         /// </summary>
-        [Display(Name = "Ürün(ler) İade Edildi")]
-        ItemsRefunded = 40,
+        [Display(Name = "Tamamlandı")]
+        Completed = 40,
 
         /// <summary>
-        /// Talep Reddedildi
-        /// </summary>
-        [Display(Name = "Talep Reddedildi")]
-        RequestRejected = 50,
-
-        /// <summary>
-        /// İptal Edildi
+        /// Talep iptal edildi
         /// </summary>
         [Display(Name = "İptal Edildi")]
-        Cancelled = 60
+        Canceled = 50,
+
+        /// <summary>
+        /// Bilinmeyen / eşleşmeyen durum
+        /// </summary>
+        [Display(Name = "Bilinmiyor")]
+        Unknown = 60
     }
+
     public enum ReasonForReturnType
     {
         /// <summary>

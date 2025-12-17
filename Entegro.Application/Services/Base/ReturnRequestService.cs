@@ -2,6 +2,7 @@
 using Entegro.Application.DTOs.ReturnRequest;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
+using Entegro.Domain.Entities.Checkout;
 using MapsterMapper;
 
 namespace Entegro.Application.Services.Base
@@ -16,9 +17,10 @@ namespace Entegro.Application.Services.Base
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public Task AddAsync(CreateReturnRequestDto returnRequest)
+        public async Task AddAsync(CreateReturnRequestDto returnRequest)
         {
-            throw new NotImplementedException();
+            var request = _mapper.Map<ReturnRequest>(returnRequest);
+            await _returnRequestRepository.AddAsync(request);
         }
 
         public async Task DeleteAsync(int id)
@@ -123,9 +125,9 @@ namespace Entegro.Application.Services.Base
             var items = await returnRequests.Items.SelectAwait(async x =>
             {
                 var model = _mapper.Map<ReturnRequestDto>(x);
-                model.CreatedOn = x.CreatedOnUtc.ToLocalTime();
-                model.UpdatedOn = x.UpdatedOnUtc.ToLocalTime();
-                model.RequestedActionUpdatedOn = x.RequestedActionUpdatedOnUtc.ToLocalTime();
+                model.CreatedOnUtc = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOnUtc = x.UpdatedOnUtc.ToLocalTime();
+                //model.RequestedActionUpdatedOn = x.RequestedActionUpdatedOnUtc.ToLocalTime();
                 return model;
             }).AsyncToList();
 

@@ -58,13 +58,13 @@
         {
             return trendyolStatus switch
             {
-                "ReturnRequested" => ReturnRequestStatus.Pending,
-                "Returned" => ReturnRequestStatus.Received,
-                "ReturnApproved" => ReturnRequestStatus.ReturnAuthorized,
-                "Refunded" => ReturnRequestStatus.ItemsRefunded,
-                "ReturnRejected" => ReturnRequestStatus.RequestRejected,
-                "Cancelled" => ReturnRequestStatus.Cancelled,
-                _ => ReturnRequestStatus.Pending
+                "Created" => ReturnRequestStatus.Created,
+                "Accepted" => ReturnRequestStatus.Accepted,
+                "Rejected" => ReturnRequestStatus.Rejected,
+                "Approved" => ReturnRequestStatus.Approved,
+                "Completed" => ReturnRequestStatus.Completed,
+                "Canceled" => ReturnRequestStatus.Canceled,
+                _ => ReturnRequestStatus.Unknown
             };
         }
     }

@@ -116,6 +116,7 @@ namespace Entegro.Infrastructure.Data
         public DbSet<ShipmentItem> ShipmentItems { get; set; }
         public DbSet<ProductSpecificationAttribute> ProductSpecificationAttributes { get; set; }
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
+        public DbSet<ReturnRequestItem> ReturnRequestItems { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ImportProfile> ImportProfiles { get; set; }
         public DbSet<Setting> Settings { get; set; }

@@ -30,6 +30,7 @@ using Entegro.Application.DTOs.ProductSpecificationAttribute;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ReturnRequest;
+using Entegro.Application.DTOs.ReturnRequestItem;
 using Entegro.Application.DTOs.Setting;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
@@ -215,10 +216,13 @@ namespace Entegro.Application.Mappings
 
             // ---------------- TaskExecutionInfoMapping ----------------
             config.NewConfig<TaskExecutionInfo, TaskExecutionInfoDto>().TwoWays();
-            // ---------------- ReturnRequest ----------------
+            // ---------------- ReturnRequest & ReturnRequestItem ----------------
             config.NewConfig<ReturnRequest, ReturnRequestDto>().TwoWays();
             config.NewConfig<ReturnRequest, CreateReturnRequestDto>().TwoWays();
             config.NewConfig<ReturnRequest, UpdateReturnRequestDto>().TwoWays();
+            config.NewConfig<ReturnRequestItem, CreateReturnRequestItemDto>().TwoWays();
+            config.NewConfig<ReturnRequestItem, ReturnRequestItemDto>().TwoWays();
+            //config.NewConfig<ReturnRequestItem, UpdateReturnRequestItemDto>().TwoWays();
         }
     }
 }

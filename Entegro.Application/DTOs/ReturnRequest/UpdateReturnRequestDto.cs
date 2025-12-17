@@ -1,24 +1,27 @@
-﻿using Entegro.Application.DTOs.Customer;
+﻿using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.ReturnRequestItem;
 
 namespace Entegro.Application.DTOs.ReturnRequest
 {
     public class UpdateReturnRequestDto
     {
         public int Id { get; set; }
-        public int OrderItemId { get; set; }
-        public int CustomerId { get; set; }
-        public CustomerDto Customer { get; set; }
-        public int Quantity { get; set; }
-        public string ReasonForReturn { get; set; }
-        public string RequestedAction { get; set; }
-        public DateTime? RequestedActionUpdatedOn { get; set; }
-        public string CustomerComments { get; set; }
-        public string StaffNotes { get; set; }
-        public string AdminComment { get; set; }
-        public int ReturnRequestStatusId { get; set; }
-        public bool? RefundToWallet { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public int? IntegrationSystemId { get; set; }
+        public virtual IntegrationSystemDto? IntegrationSystem { get; set; }
+        public string OrderNumber { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime ClaimDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
+        public string CustomerFirstName { get; set; }
+        public string CustomerLastName { get; set; }
+        public string CargoTrackingNumber { get; set; }
+        public string CargoProviderName { get; set; }
+        public string CargoTrackingLink { get; set; }
+        public long OrderShipmentPackageId { get; set; }
+        public long OrderOutboundPackageId { get; set; }
+        public DateTime CreatedOnUtc { get; set; }
+        public DateTime UpdatedOnUtc { get; set; }
+        public virtual ICollection<CreateReturnRequestItemDto> Items { get; set; } = new List<CreateReturnRequestItemDto>();
 
     }
 }

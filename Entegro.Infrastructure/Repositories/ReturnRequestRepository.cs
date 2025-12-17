@@ -16,9 +16,10 @@ namespace Entegro.Infrastructure.Repositories
             _context = context;
         }
 
-        public Task AddAsync(ReturnRequest returnRequest)
+        public async Task AddAsync(ReturnRequest returnRequest)
         {
-            throw new NotImplementedException();
+            await _context.ReturnRequests.AddAsync(returnRequest);
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(ReturnRequest returnRequest)
@@ -39,7 +40,7 @@ namespace Entegro.Infrastructure.Repositories
 
         public async Task<bool> ExistsByCustomerNameAsync(string customerName)
         {
-            return await _context.ReturnRequests.AsNoTracking().AnyAsync(rr => rr.Customer.Name == customerName);
+            return await _context.ReturnRequests.Include(x => x.Items).AsNoTracking().AnyAsync(rr => rr.CustomerFirstName == customerName);
         }
 
         public async Task<bool> ExistsByIdAsync(int id)
@@ -51,37 +52,42 @@ namespace Entegro.Infrastructure.Repositories
         {
             return await _context.ReturnRequests
                 .AsNoTracking()
-                .AnyAsync(rr => rr.Customer.Orders.Any(o => o.OrderNumber == orderNumber));
+                .AnyAsync(o => o.OrderNumber == orderNumber);
         }
 
         public async Task<bool> ExistsByReturnRequestStatusAsync(int requestStatus)
         {
-            return await _context.ReturnRequests.AsNoTracking().AnyAsync(o => o.ReturnRequestStatusId == requestStatus);
+            return await _context.ReturnRequests.AsNoTracking().AnyAsync(rr => rr.Items.Any(i => i.ReturnRequestStatusId == requestStatus));
         }
 
         public async Task<ReturnRequest?> GetByCustomerNameAsync(string name)
         {
-            return await _context.ReturnRequests.Include(rr => rr.Customer).ThenInclude(c => c.Orders).ThenInclude(oi => oi.OrderItems).AsNoTracking().FirstOrDefaultAsync(rr => rr.Customer.Name == name);
+            return await _context.ReturnRequests.Include(rr => rr.Items).FirstOrDefaultAsync(rr => rr.CustomerFirstName == name);
         }
 
         public async Task<ReturnRequest?> GetByIdAsync(int id)
         {
-            return await _context.ReturnRequests.Include(rr => rr.Customer).ThenInclude(c => c.Orders).ThenInclude(oi => oi.OrderItems).AsNoTracking().FirstOrDefaultAsync(rr => rr.Id == id);
+            return await _context.ReturnRequests.Include(rr => rr.Items).AsNoTracking().FirstOrDefaultAsync(rr => rr.Id == id);
         }
 
         public async Task<ReturnRequest?> GetByOrderNumberAsync(string orderNumber)
         {
-            return await _context.ReturnRequests.Include(rr => rr.Customer).ThenInclude(c => c.Orders).ThenInclude(oi => oi.OrderItems).AsNoTracking().FirstOrDefaultAsync(rr => rr.Customer.Orders.Any(o => o.OrderNumber == orderNumber));
+            return await _context.ReturnRequests.Include(rr => rr.Items
+            ).AsNoTracking().FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
         }
 
         public async Task<ReturnRequest?> GetByReturnRequestStatusAsync(int requestStatus)
         {
-            return await _context.ReturnRequests.Include(rr => rr.Customer).ThenInclude(c => c.Orders).ThenInclude(oi => oi.OrderItems).AsNoTracking().FirstOrDefaultAsync(rr => rr.ReturnRequestStatusId == requestStatus);
+            return await _context.ReturnRequests.Where(rr => rr.Items.Any(i => i.ReturnRequestStatusId == requestStatus))
+            .Include(rr => rr.Items
+                .Where(i => i.ReturnRequestStatusId == requestStatus))
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
         }
 
         public async Task<Application.DTOs.Common.PagedResult<ReturnRequest>> GetPagedAsync(GridCommand gridCommand)
         {
-            var query = _context.ReturnRequests.Include(rr => rr.Customer).ThenInclude(c => c.Orders).ThenInclude(oi => oi.OrderItems).OrderBy(b => b.Id).AsNoTracking();
+            var query = _context.ReturnRequests.Include(rr => rr.Items).OrderBy(b => b.Id).AsNoTracking();
 
 
             if (gridCommand.Columns != null)
@@ -124,7 +130,7 @@ namespace Entegro.Infrastructure.Repositories
                 if (!string.IsNullOrEmpty(gridCommand.Search.Value))
                 {
                     query = query.Where(b =>
-                    b.Customer.Name.Contains(gridCommand.Search.Value)).AsQueryable();
+                    b.CustomerFirstName.Contains(gridCommand.Search.Value)).AsQueryable();
                 }
             }
 
