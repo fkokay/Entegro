@@ -74,18 +74,11 @@ Entegro.returnrequest.list = (function ($) {
             column.search(val, false, true).draw();
         });
     }
-    function initList() {
-        const statusDisplayMap = {
-            0: "Beklemede",
-            10: "Alındı",
-            20: "İade Onaylandı",
-            30: "Ürün(ler) Tamir Edildi",
-            40: "Ürün(ler) İade Edildi",
-            50: "Talep Reddedildi",
-            60: "İptal Edildi"
-        };
 
+
+    const initTable = function (returnRequestStatusId) {
         const table = $('#ReturnRequestTable').DataTable({
+            destroy: true,
             language: {
                 paginate: {
                     next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
@@ -96,39 +89,41 @@ Entegro.returnrequest.list = (function ($) {
                 url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/tr.json',
             },
             serverSide: true,
-            order: [[9, 'asc']], // Tarihe göre sıralama
+            order: [[3, 'asc']],
             ajax: {
-                url: '/ReturnRequest/ReturnRequestList',
+                url: '/ReturnRequest/ReturnRequestList?returnRequestStatusId=' + returnRequestStatusId,
                 type: 'POST',
                 contentType: 'application/json',
                 data: function (d) {
-                    return JSON.stringify(d);
-                },
+
+                    const filters = {
+                        customerName: $("#filterCustomerName").val() || "",
+                        orderNo: $("#filterOrderNo").val() || "",
+                        returnCode: $("#filterReturnCode").val() || "",
+                        barcode: $("#filterBarcode").val() || "",
+                        filterClaimReasonCode: $("#filterClaimReasonCode").val() || "",
+                        startDate: $("#filterStartDate").val() || null,
+                        endDate: $("#filterEndDate").val() || null
+                    };
+
+
+                    return JSON.stringify({
+                        grid: d,        // GridCommand
+                        filters: filters // OrderListFilter
+                    });
+                }
             },
             columns: [
-                { data: 'Id', orderable: false },
-                { data: 'Id', visible: false },
-                { data: 'Id' }, // Id
-                { data: 'ProductName' },
-                { data: 'Quantity' },
-                { data: 'Customer.Name' },
-                { data: 'OrderItemId' },
-                { data: 'ReturnRequestStatusId', visible: false },
-                {
-                    data: 'ReturnRequestStatus',
-                    render: function (data) {
-                        return statusDisplayMap[data] || "Bilinmeyen";
-                    }
-                },
-                {
-                    name: 'CreatedOn',
-                    data: 'CreatedOnUtc',
-                    render: function (data, type) {
-                        if (type === "sort" || type === "type") return data;
-                        return moment(data).format("DD.MM.yyyy HH:mm");
-                    }
-                },
-                { data: 'Id' }
+                { data: 'Id', orderable: false }, // checkbox
+                { data: 'Id', visible: false }, // hidden ID
+                { data: 'IntegrationSystemId' },
+                { data: 'Id' },
+                { data: 'Customer.Name', width: '200px' },
+                { data: 'Id' },
+                { data: 'Id' },
+                { data: 'Id' },
+                { data: 'PaymentStatus' },
+                { data: 'Id', width: '150px', } // İşlemler
             ],
             columnDefs: [
                 {
@@ -142,27 +137,233 @@ Entegro.returnrequest.list = (function ($) {
                     render: () => '<input type="checkbox" class="dt-checkboxes form-check-input">'
                 },
                 {
-                    targets: 7, // ReturnRequestStatusId'nin indexi
-                    visible: false,
-                    searchable: false
+                    targets: 2,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        var type = "";
+                        if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "E-Ticareti Entegrasyonu") {
+                            type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "CommerceType").Value;
+                        } else if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "Pazaryeri Entegrasyonu") {
+                            type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "MarketplaceType").Value;
+                        } else if (row.IntegrationSystem.IntegrationSystemTypeLabelHint == "ERP Entegrasyonu") {
+                            type = row.IntegrationSystem.IntegrationSystemParameters.find(x => x.Key === "ErpType").Value;
+                        }
+
+                        return `<div>
+                                <div><img src="${getIntegrationLogo(type)}" style="max-width:115px;"/></div>
+                                <div class="text-center">Mağaza Adı</div>
+                                <div class="text-center fw-bold">${row.IntegrationSystem.Name}</div>
+                            </div>`;
+                    }
                 },
+                {
+                    targets: 3,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+
+                        const orderDate = moment.utc(row.OrderDate);
+                        const returnDate = moment.utc(row.ClaimDate);
+                        const now = moment.utc();
+
+                        let html = `
+                           <div>
+                               <div><i class="menu-icon tf-icons ti ti-package"></i><b>#${row.OrderNumber}</b></div>
+                               <div>Sipariş Tarihi : <b>${orderDate.format("DD.MM.YYYY HH:mm")}</b></div>
+                               <div class="mb-3">İade Talep Tarihi No : <b>${returnDate.format("DD.MM.YYYY HH:mm")} </b></div>
+        `               ;
+
+                        html += `</div>`;
+                        return html;
+                    }
+                },
+
+                {
+                    targets: 4,
+                    orderable: false,
+                    searchable: true,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div><i class="menu-icon tf-icons ti ti-star"></i><b>${row.CustomerFirstName + " " + row.CustomerLastName}</b></div>
+                        </div>`;
+                    }
+                },
+
+                {
+                    targets: 5,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        var items = "";
+                        for (var i = 0; i < row.Items.length; i++) {
+                            if (row.Items[i].ProductId == null) {
+                                console.log(row.Items);
+                                items +=
+                                    `<div  class="order-item-no-integration">
+                                       <div class="p-5 d-flex align-items-start gap-3">
+                                              <div class="me-5 position-relative">
+                                                 <img src="${row.Items[i].ProductImageUrl}" width="60"/>
+                                                 <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">1</span>
+                                             </div>
+                                          <div>
+                                            <div class="order-item-no-integration-title">
+                                              Eşleştirilmemiş Ürün, Eşleştirme Yapmak İçin Tıklayın.
+                                            </div>
+                                            <div class="order-item-no-integration-info">
+                                              ${row.Items[i].ProductName}
+                                            </div>
+                                            <div class="order-item-no-integration-info">
+                                              ${row.Items[i].MerchantSku}
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                    </div>`;
+                            } else {
+                                items +=
+                                    `<div class="d-flex mb-5 mt-5">
+                                    <div class="me-5 position-relative">
+                                        <img src="${row.Items[i].ProductMainPicture}" width="60"/>
+                                        <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">${row.OrderItems[i].Quantity}</span>
+                                    </div>
+                                    <div>
+                                        <div><b>${row.Items[i].ProductName}</b></div>
+                                        <div>Barkod      : ${row.Items[i].IntegrationSku ?? ""}</div>
+                                        <div>Birim Fiyat : ${row.Items[i].UnitPrice} TL</div>
+                                        <div>
+                                            <b class="text-muted">
+                                                ${row.Items[i].AttributeDescription ? row.Items[i].AttributeDescription : 'Açıklama yok'}
+                                            </b>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            }
+                        }
+                        return `
+                        <div>
+                            ${items}
+                        </div>`;
+                    }
+                },
+
+                {
+                    targets: 6,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+
+                        let logoUrl = "";
+
+                        // Kargo firması kontrolü
+                        if (row.CargoProviderName === "Trendyol Express Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/17.png";
+                        } else if (row.CargoProviderName === "Aras Kargo Marketplace" || row.CargoProviderName === "Aras Kargo") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/7.png";
+                        } else if (row.CargoProviderName === "Yurtiçi Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/4.png";
+                        } else if (row.CargoProviderName === "Horoz Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/6.png";
+                        } else if (row.CargoProviderName === "Sürat Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/9.png";
+                        } else if (row.CargoProviderName === "MNG Kargo Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/10.png";
+                        } else if (row.CargoProviderName === "DHL eCommerce Marketplace" || row.CargoProviderName === "DHL eCommerce" || row.CargoProviderName === "DHL  Inc.") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/40.png";
+                        } else if (row.CargoProviderName === "Kolay Gelsin Marketplace") {
+                            logoUrl = "https://cdn.dsmcdn.com/seller-center/oms/nexus/cargo-provider/38.png";
+                        } else {
+                            logoUrl = "";
+                        }
+
+                        const hasTrackingNumber =
+                            row.CargoTrackingNumber &&
+                            row.CargoTrackingNumber !== "0" &&
+                            row.CargoTrackingNumber !== 0;
+
+                        const trackingButton = row.CargoTrackingLink
+                            ? `<div class="text-center mt-2">
+                                   <a href="${row.CargoTrackingLink}" target="_blank" class="btn btn-sm btn-outline-warning">
+                                        Kargo Takibi
+                                    </a>
+                                </div>`
+                            : "";
+                        return `
+                        <div>
+                            <div>
+                                <img src="${logoUrl}" width="100px" style="margin:0px auto;display:block;"/>
+                            </div>
+                            <div class="text-center">
+                                ${hasTrackingNumber
+                                ? row.CargoTrackingNumber
+                                : 'Kargo bilgisi henüz oluşturulmamış veya takip numarası bulunmamaktadır.'}
+                            </div>
+                             ${trackingButton}
+                        </div>`;
+
+                    }
+                },
+                {
+                    targets: 7,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        return `
+                        <div>
+                            <div>Tutar  :${row.SubTotal} TL</div>
+                            <div>İndirim:${row.OrderDiscount} TL</div>
+                            <div>Faturalanacak Tutar</div>
+                            <div class="mb-4"><b>${row.OrderTotal} TL</b></div>
+                        </div>`;
+                    }
+                },
+                {
+                    targets: 8,
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 3,
+                    render: function (data, type, row) {
+                        let claimHtml = "";
+
+                        if (row.Items && row.Items.length > 0) {
+                            row.Items.forEach(item => {
+                                if (item.CustomerClaimReasonName || item.CustomerNote) {
+                                    claimHtml += `
+                                    <div class="mb-2" style="width:125px;">
+                                        <div><b>${item.CustomerClaimReasonName ?? "-"}</b></div>
+                                        <div>Müşteri Notu :</div>
+                                        <div><b>${item.CustomerNote ?? "-"}</b></div>
+                                    </div>
+                                `;
+                                }
+                            });
+                        }
+
+                        return `
+                        <div>
+                            ${claimHtml || '<div class="text-muted">İade / talep bilgisi yok</div>'}
+                        </div>
+                            `;
+                    }
+                },
+
                 {
                     targets: -1,
                     title: 'İşlemler',
                     searchable: false,
                     orderable: false,
-                    render: (data, type, row) => `
-                    <div class="d-inline-block text-nowrap">
-                        <a href="#" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Detaylar">
-                            <i class="icon-base ti ti-eye icon-22px"></i>
-                        </a>
-                        <a href="Edit?id=${row.Id}" class="btn btn-text-secondary rounded-pill waves-effect btn-icon" title="Düzenle">
-                            <i class="icon-base ti ti-pencil icon-22px"></i>
-                        </a>
-                         <button class="btn btn-text-danger rounded-pill waves-effect btn-icon btn-delete" data-id="${row.Id}" title="Sil">
-                            <i class="icon-base ti ti-trash icon-22px"></i>
-                        </button>
-                    </div>`
+                    render: function (data, type, row) {
+                       
+                        return ``;
+                    }
                 }
             ],
             select: {
@@ -174,21 +375,65 @@ Entegro.returnrequest.list = (function ($) {
                 topStart: {
                     rowClass: "card-header d-flex border-top rounded-0 flex-wrap py-0 flex-column flex-md-row align-items-start",
                     features: [{
-                        search: {
-                            className: "me-5 ms-n4 pe-5 mb-n6 mb-md-0",
-                            placeholder: "Ara..",
-                            text: "_INPUT_"
-                        }
+                        pageLength: {
+                            menu: [10, 25, 50, 100],
+                            text: "_MENU_"
+                        },
                     }]
                 },
                 topEnd: {
                     rowClass: "row m-3 my-0 justify-content-between",
                     features: [{
-                        pageLength: {
-                            menu: [10, 25, 50, 100],
-                            text: "_MENU_"
-                        },
-                        buttons: []
+                        buttons: [
+                            {
+                                extend: "collection",
+                                className: "btn btn-label-secondary dropdown-toggle me-4",
+                                text: `<span class="d-flex align-items-center gap-1">
+                                            <i class="icon-base ti ti-upload icon-xs"></i>
+                                            <span class="d-none d-sm-inline-block">Dışarı Aktar</span>
+                                        </span>`,
+                                buttons: [
+                                    {
+                                        extend: "print",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-printer me-1"></i> Yazdır`,
+                                        exportOptions: { columns: [2, 3, 4, 5] }
+                                    },
+                                    {
+                                        extend: "csv",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-file me-1"></i> Csv`,
+                                        exportOptions: { columns: [2, 3, 4, 5] }
+                                    },
+                                    {
+                                        extend: "excel",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-upload me-1"></i> Excel`,
+                                        exportOptions: { columns: [2, 3, 4, 5] }
+                                    },
+                                    {
+                                        extend: "pdf",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-file-text me-1"></i> Pdf`,
+                                        exportOptions: { columns: [2, 3, 4, 5] }
+                                    },
+                                    {
+                                        extend: "copy",
+                                        className: "dropdown-item",
+                                        text: `<i class="icon-base ti tabler-copy me-1"></i> Kopyala`,
+                                        exportOptions: { columns: [2, 3, 4, 5] }
+                                    }
+                                ]
+                            },
+                            {
+                                text: `<i class="icon-base ti ti-plus me-0 me-sm-1 icon-16px"></i>
+                                       <span class="d-none d-sm-inline-block">Yeni İade</span>`,
+                                className: "add-new btn btn-primary",
+                                action: function () {
+                                    window.location.href = "#";
+                                }
+                            }
+                        ]
                     }]
                 },
                 bottomStart: {
@@ -197,24 +442,8 @@ Entegro.returnrequest.list = (function ($) {
                 },
                 bottomEnd: "paging"
             },
-            initComplete: function () {
-                this.api().columns().every(function () {
-                    if (this.dataSrc() === "ReturnRequestStatusId") {
-                        Entegro.returnrequest.list.addFilterDropdown(this, ".returnRequestStatusFilter", "Durum", [
-                            { title: "Beklemede", id: 0 },
-                            { title: "Alındı", id: 10 },
-                            { title: "İade Onaylandı", id: 20 },
-                            { title: "Ürün(ler) Tamir Edildi", id: 30 },
-                            { title: "Ürün(ler) İade Edildi", id: 40 },
-                            { title: "Talep Reddedildi", id: 50 },
-                            { title: "İptal Edildi", id: 60 }
-                        ]);
-                    }
-                });
-            }
         });
 
-        // Görsel sınıf düzeltmeleri
         setTimeout(() => {
             const adjustments = [
                 { selector: ".dt-buttons .btn", classToRemove: "btn-secondary" },
@@ -234,7 +463,33 @@ Entegro.returnrequest.list = (function ($) {
                 });
             });
         }, 100);
-    }
+
+
+        checkAndInit();
+    };
+
+    const initTab = function (defaultReturnRequestStatus) {
+
+        $(".returnrequest-actions .btn").click(function () {
+            var returnRequestStatusId = $(this).data("returnrequest-status");
+            $(".returnrequest-actions .btn").removeClass("active");
+            $(this).addClass("active");
+
+
+            initTable(returnRequestStatusId);
+        });
+
+
+        if (defaultReturnRequestStatus !== undefined && defaultReturnRequestStatus !== null) {
+            var $defaultBtn = $('.returnrequest-actions .btn[data-returnrequest-status="' + defaultReturnRequestStatus + '"]');
+            if ($defaultBtn.length > 0) {
+                $(".returnrequest-actions .btn").removeClass("active");
+                $defaultBtn.addClass("active");
+
+                initTable(defaultReturnRequestStatus);
+            }
+        }
+    };
     function deleteReturnRequest() {
         $(document).on('click', '.btn-delete', function (e) {
             e.preventDefault();
@@ -251,7 +506,7 @@ Entegro.returnrequest.list = (function ($) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/ReturnRequest/Delete`, 
+                        url: `/ReturnRequest/Delete`,
                         type: 'POST',
                         data: { id: id },
                         success: function (response) {
@@ -277,13 +532,32 @@ Entegro.returnrequest.list = (function ($) {
 
     }
 
+    function checkAndInit() {
+        const activeReturnRequestStatus = parseInt($('.returnrequest-actions .btn.active').data('returnrequest-status')) || 0;
+        if (activeReturnRequestStatus > 0) {
+        }
+    }
+
 
     return {
         addFilterText: addFilterText,
         addFilterDropdown: addFilterDropdown,
-        init: initList,
+        initTable: initTable,
+        initTab: initTab,
         deleteReturnRequest: deleteReturnRequest,
-       
-    };
 
+    };
+    function getIntegrationLogo(value) {
+        switch (value) {
+            case "Smartstore": return "/assets/img/logo/smartstore.png";
+            case "Trendyol": return "/assets/img/logo/trendyol.png";
+            case "N11": return "/assets/img/logo/n11.png";
+            case "Pazarama": return "/assets/img/logo/pazarama.png";
+            case "Idefix": return "/assets/img/logo/idefix.png";
+            case "CicekSepeti": return "/assets/img/logo/ciceksepeti.png";
+            case "Hepsiburada": return "/assets/img/logo/hepsiburada.png";
+            case "Logo": return "/assets/img/logo/logo.webp";
+            default: return "/assets/img/icons/logo/default.png";
+        }
+    }
 })(jQuery);

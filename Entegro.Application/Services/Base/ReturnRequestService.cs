@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.ReturnRequest;
 using Entegro.Application.Interfaces.Repositories;
 using Entegro.Application.Interfaces.Services.Base;
@@ -138,6 +139,33 @@ namespace Entegro.Application.Services.Base
                 PageNumber = returnRequests.PageNumber,
                 PageSize = returnRequests.PageSize
             };
+        }
+
+        public async Task<PagedResult<ReturnRequestListDto>> GetPagedAsync(GridCommand gridCommand, ReturnRequestListFilterDto filters, int returnrequestStatusId)
+        {
+            var returnRequests = await _returnRequestRepository.GetPagedAsync(gridCommand, filters, returnrequestStatusId);
+
+            var items = await returnRequests.Items.SelectAwait(async x =>
+            {
+                var model = _mapper.Map<ReturnRequestListDto>(x);
+                model.CreatedOnUtc = x.CreatedOnUtc.ToLocalTime();
+                model.UpdatedOnUtc = x.UpdatedOnUtc.ToLocalTime();
+                return model;
+            }).AsyncToList();
+
+            return new PagedResult<ReturnRequestListDto>
+            {
+                Items = returnRequests.Items,
+                TotalCount = returnRequests.TotalCount,
+                PageNumber = returnRequests.PageNumber,
+                PageSize = returnRequests.PageSize
+            };
+        }
+
+        public async Task<ReturnListPageDto> GetReturnRequestPageAsync()
+        {
+            var returnRequestPage = await _returnRequestRepository.GetReturnRequestPageAsync();
+            return returnRequestPage;
         }
 
         public async Task<ReturnRequestDto> UpdateAsync(UpdateReturnRequestDto returnRequest)

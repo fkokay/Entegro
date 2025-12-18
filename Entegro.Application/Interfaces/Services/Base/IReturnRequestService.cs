@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Common;
+using Entegro.Application.DTOs.Order;
 using Entegro.Application.DTOs.ReturnRequest;
 
 namespace Entegro.Application.Interfaces.Services.Base
@@ -14,8 +15,10 @@ namespace Entegro.Application.Interfaces.Services.Base
         Task<ReturnRequestDto?> GetByCustomerNameAsync(string name);
         Task<ReturnRequestDto?> GetByReturnRequestDtoStatusAsync(int requestStatus);
         Task<PagedResult<ReturnRequestDto>> GetPagedAsync(GridCommand gridCommand);
+        Task<PagedResult<ReturnRequestListDto>> GetPagedAsync(GridCommand gridCommand, ReturnRequestListFilterDto filters, int returnrequestStatusId);
         Task AddAsync(CreateReturnRequestDto returnReturnRequest);
         Task<ReturnRequestDto> UpdateAsync(UpdateReturnRequestDto returnReturnRequest);
+        Task<ReturnListPageDto> GetReturnRequestPageAsync();
         Task DeleteAsync(int id);
     }
 }

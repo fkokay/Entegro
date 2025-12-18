@@ -42,7 +42,10 @@ namespace Entegro.Application.Mappings.Marketplace.Trendyol
                 CustomerNote = claim.customerNote,
                 Resolved = claim.resolved,
                 AcceptedBySeller = claim.acceptedBySeller,
-
+                Product = new DTOs.Product.ProductDto
+                {
+                    Code = item.orderLine.barcode
+                },
                 ReturnRequestStatus = TrendyolStatusMapper.MapReturnStatus(claim.claimItemStatus?.name)
             };
         }

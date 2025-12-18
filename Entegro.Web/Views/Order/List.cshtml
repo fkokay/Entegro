@@ -178,8 +178,6 @@
 
 
 <!-- Kargo Firması Değiştir Butonu -->
-
-
 <div class="modal fade" id="changeCargoModal" tabindex="-1" aria-labelledby="changeCargoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
@@ -286,7 +284,6 @@
 
             $("#filterStartDate").on("change", function () {
                 const startDate = $(this).val();
-
                 if (startDate) {
 
                     $("#filterEndDate").attr("min", startDate);

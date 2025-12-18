@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entegro.Application.DTOs.ReturnRequestItem
 {
-    public class ReturnRequestItemDto
+    public class ReturnRequestItemListDto
     {
         public int Id { get; set; }
         public int ReturnRequestId { get; set; }

@@ -24,6 +24,7 @@ namespace Entegro.Application.DTOs.ReturnRequestItem
         public int VatRate { get; set; }
         public int SalesCampaignId { get; set; }
         public string ProductCategory { get; set; }
+        public string? ProductImageUrl { get; set; }
 
         // Müşteri Beyan
         public string CustomerClaimReasonName { get; set; }

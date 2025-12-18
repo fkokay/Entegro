@@ -1,4 +1,5 @@
-﻿@{
+﻿@model ReturnListModel
+@{
     ViewData["Title"] = "İade Talepleri";
 }
 
@@ -6,7 +7,86 @@
     <div class="d-flex flex-column justify-content-center">
         <h4 class="mb-3">@ViewData["Title"]</h4>
     </div>
+
     <div class="card">
+        <div class="returnrequest-actions border-bottom p-4 d-flex">
+            <button class="btn active" data-returnrequest-status="1">Tüm İadeler <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="2">Talep Oluşturulan <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.CreatedQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="3">Kargoya Verilen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="4">Aksiyon Bekleyen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.WaitingInActionQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="5">Onaylanan <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="6">Reddedilen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.RejectedQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="7">Analiz <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.InAnalysisQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="7">İhtilaflı <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.UnresolvedQuantity</span></button>
+            <div class="split"></div>
+            <button class="btn" data-returnrequest-status="7">Askıda İadeler <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.UnresolvedQuantity</span></button>
+        </div>
+        <div class="p-5">
+            <div class="row">
+                <div class="col-2 mb-2">
+                    <label for="filterCustomerName" class="form-label">Müşteri Adı</label>
+                    <input type="text" class="form-control" id="filterCustomerName" placeholder="Müşteri Adı" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterOrderNo" class="form-label">Sipariş No</label>
+                    <input type="text" class="form-control" id="filterOrderNo" placeholder="Sipariş No" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterReturnCode" class="form-label">iade Kodu</label>
+                    <input type="text" class="form-control" id="filterReturnCode" placeholder="İade Kodu" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterClaimReasonCode" class="form-label">iade Sebebi</label>
+                    <input type="text" class="form-control" id="filterClaimReasonCode" placeholder="İade Kodu" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterBarcode" class="form-label">Barkod</label>
+                    <input type="text" class="form-control" id="filterBarcode" placeholder="Barkod" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterStartDate" class="form-label">İade Başlangıç Tarihi</label>
+                    <input type="date" class="form-control" id="filterStartDate" placeholder="Başlangıç Tarihi" />
+                </div>
+                <div class="col-2 mb-2">
+                    <label for="filterEndDate" class="form-label">İade Bitiş Tarihi</label>
+                    <input type="date" class="form-control" id="filterEndDate" placeholder="Bitiş Tarihi" />
+                </div>
+                <div class="col-2 mb-2 d-flex gap-2 align-items-end">
+                    <button id="btnFilter" class="btn btn-primary w-100">Filtrele</button>
+                    <button id="btnClear" class="btn btn-secondary w-100">Temizle</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card-datatable table-responsive border-top">
+            <table id="ReturnRequestTable" class="dt-fixedheader table table-bordered dataTable dtr-column">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Id</th>
+                        <th>Sipariş Kaynağı</th>
+                        <th>Sipariş Bilgileri</th>
+                        <th>Alıcı</th>
+                        <th>Bilgiler</th>
+                        <th>Kargo</th>
+                        <th>Fatura</th>
+                        <th>İade Sebebi</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    @* <div class="card">
         <div class="card-header border-bottom">
             <h5 class="card-title mb-0">Filtreler</h5>
             <div class="row pt-4 gap-6 gap-md-0 g-md-6">
@@ -20,27 +100,70 @@
                     <tr>
                         <th></th>
                         <th></th>
-                        <th>Id</th>
-                        <th>Ürün</th>
-                        <th>Miktar</th>
-                        <th>Müşteri</th>
-                        <th>Sipariş</th>
-                        <th>İade Talebinin Durumu</th>
-                        <th>Oluşturulma Tarihi</th>
+                        <th>Sipariş Kaynağı</th>
+                        <th>Sipariş Bilgileri</th>
+                        <th>Alıcı</th>
+                        <th>Bilgiler</th>
+                        <th>Kargo</th>
+                        <th>Fatura</th>
+                        <th>İade Sebebi</th>
                         <th></th>
                     </tr>
                 </thead>
             </table>
         </div>
-    </div>
+    </div> *@
 </div>
 
 @section Scripts {
     <script src="/assets/js/entegro.returnrequest.list.js" asp-append-version="true"></script>
     <script>
         $(function() {
-             Entegro.returnrequest.list.init();
+            var returnRequestStatusId = @((ViewBag.ReturnRequestStatusId ?? 1));
+             Entegro.returnrequest.list.initTab(returnRequestStatusId);
              Entegro.returnrequest.list.deleteReturnRequest();
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("#filterStartDate").on("change", function () {
+                const startDate = $(this).val();
+                if (startDate) {
+                    $("#filterEndDate").attr("min", startDate);
+                    const endDate = $("#filterEndDate").val();
+                    if (endDate && endDate < startDate) {
+                        $("#filterEndDate").val("");
+                    }
+                } else {
+
+                    $("#filterEndDate").removeAttr("min");
+                }
+            });
+
+            // Filtrele butonu
+            $(document).off("click", "#btnFilter").on("click", "#btnFilter", function () {
+                const table = $('#ReturnRequestTable').DataTable();
+                table.ajax.reload();
+            });
+
+            // Temizle butonu
+            $(document).off("click", "#btnClear").on("click", "#btnClear", function () {
+                // Tüm filtre inputlarını temizle
+                $("#filterCustomerName").val("");
+                $("#filterOrderNo").val("");
+                $("#filterReturnCode").val("");
+                $("#filterBarcode").val("");
+                $("#filterClaimReasonCode").val("");
+                $("#filterStartDate").val("");
+                $("#filterEndDate").val("");
+                $("#filterEndDate").removeAttr("min"); // min değerini sıfırla
+
+                const table = $('#ReturnRequestTable').DataTable();
+                table.ajax.reload();
+            });
         });
     </script>
 }

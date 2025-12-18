@@ -58,12 +58,30 @@
         {
             return trendyolStatus switch
             {
+                // İlk oluşan iade
                 "Created" => ReturnRequestStatus.Created,
-                "Accepted" => ReturnRequestStatus.Accepted,
+
+                // Ürün satıcıya ulaştı / aksiyon bekleniyor
+                "WaitingInAction" => ReturnRequestStatus.WaitingInAction,
+
+                // Fraud kontrol süreci
+                "WaitingFraudCheck" => ReturnRequestStatus.WaitingFraudCheck,
+
+                // İhtilaflı durum
+                "Unresolved" => ReturnRequestStatus.Unresolved,
+
+                // Satıcı reddetti
                 "Rejected" => ReturnRequestStatus.Rejected,
-                "Approved" => ReturnRequestStatus.Approved,
-                "Completed" => ReturnRequestStatus.Completed,
-                "Canceled" => ReturnRequestStatus.Canceled,
+
+                // Satıcı kabul etti
+                "Accepted" => ReturnRequestStatus.Accepted,
+
+                // Müşteri / sistem iptal etti
+                "Cancelled" => ReturnRequestStatus.Cancelled,
+
+                // Analiz süreci
+                "InAnalysis" => ReturnRequestStatus.InAnalysis,
+
                 _ => ReturnRequestStatus.Unknown
             };
         }

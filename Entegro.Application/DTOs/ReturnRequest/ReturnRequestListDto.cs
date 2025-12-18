@@ -3,7 +3,7 @@ using Entegro.Application.DTOs.ReturnRequestItem;
 
 namespace Entegro.Application.DTOs.ReturnRequest
 {
-    public class ReturnRequestDto
+    public class ReturnRequestListDto
     {
         public int Id { get; set; }
         public int? IntegrationSystemId { get; set; }
@@ -21,7 +21,7 @@ namespace Entegro.Application.DTOs.ReturnRequest
         public long OrderOutboundPackageId { get; set; }
         public DateTime CreatedOnUtc { get; set; }
         public DateTime UpdatedOnUtc { get; set; }
-        public virtual ICollection<ReturnRequestItemDto> Items { get; set; } = new List<ReturnRequestItemDto>();
+        public virtual ICollection<ReturnRequestItemListDto> Items { get; set; } = new List<ReturnRequestItemListDto>();
+        public decimal SubTotal { get; set; }
     }
-
 }

@@ -23,9 +23,12 @@ namespace Entegro.Web.Controllers
             return View();
         }
 
-        public IActionResult List()
+        public async Task<IActionResult> List(int returnRequestStatusId = 1)
         {
-            return View();
+            ViewBag.ReturnRequestStatusId = returnRequestStatusId;
+            var returnRequestPage = await _returnRequestService.GetReturnRequestPageAsync();
+            var model = _mapper.Map<ReturnListModel>(returnRequestPage);
+            return View(model);
         }
 
         [HttpGet]
@@ -69,19 +72,33 @@ namespace Entegro.Web.Controllers
             }
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> ReturnRequestList([FromBody] GridCommand gridCommand)
+        //{
+        //    var result = await _returnRequestService.GetPagedAsync(gridCommand);
+
+        //    return Json(new
+        //    {
+        //        draw = gridCommand.Draw,
+        //        recordsTotal = result.TotalCount,
+        //        recordsFiltered = result.TotalCount,
+        //        data = result.Items
+        //    });
+
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> ReturnRequestList([FromBody] GridCommand gridCommand)
+        public async Task<IActionResult> ReturnRequestList([FromBody] ReturnRequestListRequest request, int returnRequestStatusId)
         {
-            var result = await _returnRequestService.GetPagedAsync(gridCommand);
+            var result = await _returnRequestService.GetPagedAsync(request.Grid, request.Filters, returnRequestStatusId);
 
             return Json(new
             {
-                draw = gridCommand.Draw,
+                draw = request.Grid.Draw,
                 recordsTotal = result.TotalCount,
                 recordsFiltered = result.TotalCount,
                 data = result.Items
             });
-
         }
     }
 }

@@ -37,46 +37,66 @@ namespace Entegro.Domain.Enums
     public enum ReturnRequestStatus
     {
         /// <summary>
-        /// Talep oluşturuldu, işlem bekliyor
+        /// Müşteri iade talebi oluşturdu
+        /// Trendyol: Created
         /// </summary>
         [Display(Name = "Beklemede")]
         Created = 0,
 
         /// <summary>
-        /// Talep kabul edildi
+        /// Ürün satıcıya ulaştı, aksiyon bekleniyor
+        /// Trendyol: WaitingInAction
+        /// </summary>
+        [Display(Name = "Aksiyon Bekleniyor")]
+        WaitingInAction = 5,
+
+        /// <summary>
+        /// İade onaylandı, fraud kontrolünde
+        /// Trendyol: WaitingFraudCheck
+        /// </summary>
+        [Display(Name = "Fraud Kontrolünde")]
+        WaitingFraudCheck = 8,
+
+        /// <summary>
+        /// Analiz sürecinde
+        /// Trendyol: InAnalysis
+        /// </summary>
+        [Display(Name = "Analizde")]
+        InAnalysis = 9,
+
+        /// <summary>
+        /// İhtilaflı iade
+        /// Trendyol: Unresolved
+        /// </summary>
+        [Display(Name = "İhtilaflı")]
+        Unresolved = 12,
+
+        /// <summary>
+        /// Satıcı tarafından kabul edildi
+        /// Trendyol: Accepted
         /// </summary>
         [Display(Name = "Kabul Edildi")]
-        Accepted = 10,
+        Accepted = 20,
 
         /// <summary>
-        /// Talep reddedildi
+        /// Satıcı tarafından reddedildi
+        /// Trendyol: Rejected
         /// </summary>
         [Display(Name = "Reddedildi")]
-        Rejected = 20,
+        Rejected = 30,
 
         /// <summary>
-        /// İade / işlem onaylandı
-        /// </summary>
-        [Display(Name = "Onaylandı")]
-        Approved = 30,
-
-        /// <summary>
-        /// İade süreci tamamlandı
-        /// </summary>
-        [Display(Name = "Tamamlandı")]
-        Completed = 40,
-
-        /// <summary>
-        /// Talep iptal edildi
+        /// İade iptal edildi
+        /// Trendyol: Cancelled
         /// </summary>
         [Display(Name = "İptal Edildi")]
-        Canceled = 50,
+        Cancelled = 40,
 
         /// <summary>
-        /// Bilinmeyen / eşleşmeyen durum
+        /// Tanımsız / beklenmeyen durum
         /// </summary>
         [Display(Name = "Bilinmiyor")]
-        Unknown = 60
+        Unknown = 99
     }
 
     public enum ReasonForReturnType
