@@ -2676,7 +2676,6 @@ namespace Entegro.Web.Controllers
         {
             if (product != null)
             {
-
                 model.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new ProductVariantAttributeModel()
                 {
                     AttributeControlTypeId = m.AttributeControlTypeId,

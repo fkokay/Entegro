@@ -640,7 +640,9 @@ namespace Entegro.Api.Jobs
 
                     // XML’den gelen değerlerle güncelle
                     updateDto.Name = dict["Name"]?.ToString() ?? updateDto.Name;
-                    updateDto.Description = dict["Description"]?.ToString() ?? updateDto.Description;
+                    updateDto.Description = dict.ContainsKey("Description")
+                    ? dict["Description"]?.ToString() ?? string.Empty
+                    : string.Empty;
                     updateDto.Barcode = dict["Barcode"]?.ToString() ?? updateDto.Barcode;
                     updateDto.Price = price;
                     updateDto.StockQuantity = stock;
