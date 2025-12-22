@@ -50,6 +50,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<ITaskDescriptorRepository, TaskDescriptorRepository>();
             services.AddScoped<IReturnRequestRepository, ReturnRequestRepository>();
+            services.AddScoped<IReturnRequestItemRepository, ReturnRequestItemRepository>();
             services.AddScoped<ICrossSellProductRepository, CrossSellProductRepository>();
             services.AddScoped<IRelatedProductRepository, RelatedProductRepository>();
             return services;

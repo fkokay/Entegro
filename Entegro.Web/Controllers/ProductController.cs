@@ -16,11 +16,14 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.DTOs.RelatedProduct;
+using Entegro.Application.DTOs.ReturnRequestItem;
 using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Entegro.Application.Services.Base;
+using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
@@ -39,6 +42,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using System.Net;
 using System.Text.Json;
 using ProductVariantAttributeDto = Entegro.Application.DTOs.ProductVariantAttribute.ProductVariantAttributeDto;
@@ -71,6 +75,7 @@ namespace Entegro.Web.Controllers
         private readonly IOrderItemService _orderItemService;
         private readonly IOrderService _orderService;
         private readonly ISettingService _settingService;
+        private readonly IReturnRequestItemService _returnRequestItemService;
         private readonly HttpClient _client;
         private readonly IMapper _mapper;
         private readonly IImportProfileService _importProfileService;
@@ -103,6 +108,7 @@ namespace Entegro.Web.Controllers
             IProductAttributeValueService productAttributeValueService,
             ISpecificationAttributeService specificationAttributeService,
             ISpecificationAttributeOptionService specificationAttributeOptionService,
+            IReturnRequestItemService returnRequestItemService,
             IOrderService orderService,
             IProductCategoryService productCategoryService,
             IImportProfileService importProfileService)
@@ -129,6 +135,7 @@ namespace Entegro.Web.Controllers
             _relatedProductService = relatedProductService;
             _orderItemService = orderItemService;
             _settingService = settingService;
+            _returnRequestItemService = returnRequestItemService;
             _client = client;
             _productAttributeValueService = productAttributeValueService;
             _specificationAttributeService = specificationAttributeService;
@@ -2100,7 +2107,7 @@ namespace Entegro.Web.Controllers
 
                             await _orderItemService.UpdateAsync(updateOrderItem);
                         }
-
+                       
                         return Json(new
                         {
                             success = true,

@@ -328,73 +328,64 @@ namespace Entegro.Infrastructure.Repositories
             }
 
             var totalCount = await query.CountAsync();
-            var returnRequest = await query.SelectMany(r => r.Items.DefaultIfEmpty(),
-                (request, item) => new { request, item })
-                .Select(x => new ReturnRequestListDto
-                {
-                    Id = x.request.Id,
-                    IntegrationSystemId = x.request.IntegrationSystemId,
-                    IntegrationSystem = x.request.IntegrationSystem != null
-                        ? new IntegrationSystemDto
-                        {
-                            Id = x.request.IntegrationSystem.Id,
-                            Name = x.request.IntegrationSystem.Name,
-                            Description = x.request.IntegrationSystem.Description,
-                            IntegrationSystemType = x.request.IntegrationSystem.IntegrationSystemType,
-                            IntegrationSystemTypeId = x.request.IntegrationSystem.IntegrationSystemTypeId,
-                            IntegrationSystemParameters = x.request.IntegrationSystem.IntegrationSystemParameters
-                                .Select(p => new IntegrationSystemParameterDto
-                                {
-                                    Id = p.Id,
-                                    IntegrationSystemId = p.IntegrationSystemId,
-                                    Key = p.Key,
-                                    Value = p.Value
-                                }).ToList()
-                        }
-                        : null,
-                    OrderNumber = x.request.OrderNumber,
-                    OrderDate = x.request.OrderDate,
-                    ClaimDate = x.request.ClaimDate,
-                    CustomerFirstName = x.request.CustomerFirstName,
-                    CustomerLastName = x.request.CustomerLastName,
-                    CargoTrackingNumber = x.request.CargoTrackingNumber,
-                    CargoProviderName = x.request.CargoProviderName,
-                    CargoTrackingLink = x.request.CargoTrackingLink,
-                    SubTotal = x.request.Items.Sum(i => i.Price),
-                    Items = (x.item != null
-                          ? x.request.Items.Select(i => new ReturnRequestItemListDto
-                          {
-                              Id = i.Id,
-                              ReturnRequestId = i.ReturnRequestId,
-                              AcceptedBySeller = i.AcceptedBySeller,
-                              AutoApproveDate = i.AutoApproveDate,
-                              Barcode = i.Barcode,
-                              CustomerClaimReasonCode = i.CustomerClaimReasonCode,
-                              CustomerClaimReasonName = i.CustomerClaimReasonName,
-                              CustomerNote = i.CustomerNote,
-                              Note = i.Note,
-                              MerchantSku = i.MerchantSku,
-                              PlatformClaimReasonCode = i.PlatformClaimReasonCode,
-                              PlatformClaimReasonName = i.PlatformClaimReasonName,
-                              Price = i.Price,
-                              PlatformName = i.PlatformName,
-                              ProductCategory = i.ProductCategory,
-                              ReturnRequestStatusId = i.ReturnRequestStatusId,
-                              ReturnRequestStatus = i.ReturnRequestStatus,
-                              ProductColor = i.ProductColor,
-                              ProductId = i.ProductId,
-                              ProductImageUrl = i.ProductImageUrl,
-                              ProductName = i.ProductName,
-                              ProductSize = i.ProductSize,
-                              Resolved = i.Resolved,
-                              VatRate = i.VatRate,
-                              SalesCampaignId = i.SalesCampaignId,
-                              VatBaseAmount = i.VatBaseAmount,
-                          }).ToList() : new List<ReturnRequestItemListDto>()),
-                })
-                .Skip(gridCommand.Start)
-                .Take(gridCommand.Length)
-                .ToListAsync();
+            var returnRequest = await query
+    .Select(r => new ReturnRequestListDto
+    {
+        Id = r.Id,
+        IntegrationSystemId = r.IntegrationSystemId,
+        IntegrationSystem = r.IntegrationSystem != null
+            ? new IntegrationSystemDto
+            {
+                Id = r.IntegrationSystem.Id,
+                Name = r.IntegrationSystem.Name,
+                Description = r.IntegrationSystem.Description,
+                IntegrationSystemType = r.IntegrationSystem.IntegrationSystemType,
+                IntegrationSystemTypeId = r.IntegrationSystem.IntegrationSystemTypeId,
+                IntegrationSystemParameters = r.IntegrationSystem.IntegrationSystemParameters
+                    .Select(p => new IntegrationSystemParameterDto
+                    {
+                        Id = p.Id,
+                        IntegrationSystemId = p.IntegrationSystemId,
+                        Key = p.Key,
+                        Value = p.Value
+                    }).ToList()
+            }
+            : null,
+
+        OrderNumber = r.OrderNumber,
+        OrderDate = r.OrderDate,
+        ClaimDate = r.ClaimDate,
+        CustomerFirstName = r.CustomerFirstName,
+        CustomerLastName = r.CustomerLastName,
+
+        CargoTrackingNumber = r.CargoTrackingNumber,
+        CargoProviderName = r.CargoProviderName,
+        CargoTrackingLink = r.CargoTrackingLink,
+
+        SubTotal = r.Items.Sum(i => i.Price),
+
+        Items = r.Items.Select(i => new ReturnRequestItemListDto
+        {
+            Id = i.Id,
+            ReturnRequestId = i.ReturnRequestId,
+            Barcode = i.Barcode,
+            CustomerClaimReasonCode = i.CustomerClaimReasonCode,
+            CustomerClaimReasonName = i.CustomerClaimReasonName,
+            CustomerNote = i.CustomerNote,
+            MerchantSku = i.MerchantSku,
+            Price = i.Price,
+            ProductId = i.ProductId,
+            ProductImageUrl = i.ProductImageUrl,
+            ProductName = i.ProductName,
+            ProductSize = i.ProductSize,
+            ReturnRequestStatusId = i.ReturnRequestStatusId,
+            ReturnRequestStatus = i.ReturnRequestStatus
+        }).ToList()
+    })
+    .Skip(gridCommand.Start)
+    .Take(gridCommand.Length)
+    .ToListAsync();
+
 
             return new Application.DTOs.Common.PagedResult<ReturnRequestListDto>
             {

@@ -15,6 +15,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Mappings.Commerce.Smartstore;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Globalization;
@@ -138,6 +139,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         }
         public async Task<int?> CreateProductAsync(SmartstoreApiContext context, ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
         {
+
             await CreateProductHandleXmlProfilePricingAsync(product);
             var httpClient = CreateHttpClient(context);
             var payload = SmartstoreProductMapper.ToDto(product, customData);
@@ -579,6 +581,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
             var created = await response.Content.ReadFromJsonAsync<SmartstoreCategoryDto>();
             return created?.Id ?? 0;
+
         }
         public async Task UpdateCategoryAsync(SmartstoreApiContext context, CategoryDto category, int id)
         {
@@ -602,19 +605,25 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         }
         public async Task<CategoryDto?> CategoryExistsAsync(SmartstoreApiContext context, string categoryName)
         {
+
+            
             try
             {
-                var httpClient = CreateHttpClient(context);
-                var url = $"categories?$filter=Name eq '{Uri.EscapeDataString(categoryName)}'";
-                var response = await httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
 
-                var json = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreCategoryDto>>(json, _jsonOptions);
+                 
+                    var httpClient = CreateHttpClient(context);
+                    var url = $"categories?$filter=Name eq '{Uri.EscapeDataString(categoryName)}'";
+                    var response = await httpClient.GetAsync(url);
+                    //response.EnsureSuccessStatusCode();
 
-                return data?.Value?.FirstOrDefault() is SmartstoreCategoryDto dto
-                    ? SmartstoreCategoryMapper.ToDto(dto)
-                    : null;
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreCategoryDto>>(json, _jsonOptions);
+
+                    return data?.Value?.FirstOrDefault() is SmartstoreCategoryDto dto
+                        ? SmartstoreCategoryMapper.ToDto(dto)
+                        : null;
+               
+               
             }
             catch (Exception ex)
             {

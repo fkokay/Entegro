@@ -165,9 +165,11 @@ Entegro.returnrequest.list = (function ($) {
                     responsivePriority: 3,
                     render: function (data, type, row) {
 
-                        const orderDate = moment.utc(row.OrderDate);
-                        const returnDate = moment.utc(row.ClaimDate);
-                        const now = moment.utc();
+                       
+
+                        const orderDate = moment.utc(row.OrderDate).local();
+                        const returnDate = moment.utc(row.ClaimDate).local();
+                       
 
                         let html = `
                            <div>
@@ -205,7 +207,7 @@ Entegro.returnrequest.list = (function ($) {
                             if (row.Items[i].ProductId == null) {
                                 console.log(row.Items);
                                 items +=
-                                    `<div  class="order-item-no-integration">
+                                    `<div onclick="Entegro.returnrequest.list.ProductIntegration(${row.IntegrationSystemId}, '${row.Items[i].ProductName.replace(/'/g, "\\'")}', '${row.Items[i].Barcode}')" class="order-item-no-integration">
                                        <div class="p-5 d-flex align-items-start gap-3">
                                               <div class="me-5 position-relative">
                                                  <img src="${row.Items[i].ProductImageUrl}" width="60"/>
@@ -219,7 +221,7 @@ Entegro.returnrequest.list = (function ($) {
                                               ${row.Items[i].ProductName}
                                             </div>
                                             <div class="order-item-no-integration-info">
-                                              ${row.Items[i].MerchantSku}
+                                              ${row.Items[i].Barcode}
                                             </div>
                                           </div>
                                         </div>
@@ -229,16 +231,15 @@ Entegro.returnrequest.list = (function ($) {
                                 items +=
                                     `<div class="d-flex mb-5 mt-5">
                                     <div class="me-5 position-relative">
-                                        <img src="${row.Items[i].ProductMainPicture}" width="60"/>
-                                        <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">${row.OrderItems[i].Quantity}</span>
+                                        <img src="${row.Items[i].ProductImageUrl}" width="60"/>
+                                        <span style="background: #ff6060;color: #fff;font-size: 15px;width: 30px;height: 30px;border-radius: 30px;text-align: center;line-height: 30px;display: block;right: -15px;top: -15px;position: absolute;">1</span>
                                     </div>
                                     <div>
                                         <div><b>${row.Items[i].ProductName}</b></div>
-                                        <div>Barkod      : ${row.Items[i].IntegrationSku ?? ""}</div>
-                                        <div>Birim Fiyat : ${row.Items[i].UnitPrice} TL</div>
+                                        <div>Barkod      : ${row.Items[i].Barcode ?? ""}</div>
+                                        <div>Birim Fiyat : ${row.Items[i].Price} TL</div>
                                         <div>
                                             <b class="text-muted">
-                                                ${row.Items[i].AttributeDescription ? row.Items[i].AttributeDescription : 'Açıklama yok'}
                                             </b>
                                         </div>
                                     </div>
@@ -535,17 +536,268 @@ Entegro.returnrequest.list = (function ($) {
     function checkAndInit() {
         const activeReturnRequestStatus = parseInt($('.returnrequest-actions .btn.active').data('returnrequest-status')) || 0;
         if (activeReturnRequestStatus > 0) {
+            initCustomScriptForOrderStatus2();
         }
     }
+    const ProductIntegration = function ProductIntegration(integrationSystemId, productIntegrationName, productIntegrationSku) {
+        $("#IntegrationSystemId").val(integrationSystemId);
+        $("#ProductIntegrationName").val(productIntegrationName);
+        $("#ProductIntegrationSku").val(productIntegrationSku);
+        $("#IntegrationCode").val(productIntegrationSku);
+        $("#ProductId").select2({
+            language: {
+                noResults: function () {
+                    return $(`
+                        <div style="padding: 6px; text-align: center;">
+                            <button type="button" id="createIfNotExistBtn" class="btn btn-outline-danger btn-sm">
+                                Aradığınız Ürün Yok Kaydet Ve Eşleştir
+                            </button>
+                        </div>
+                    `);
+                }
+            },
+            placeholder: 'Ürün seçiniz',
+            allowClear: true,
+            dropdownParent: $('#ProudctIntegrationModal'),
+            width: '100%',
+            ajax: {
+                url: "/Product/AllProduct",
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '', page: params.page || 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination?.more === true
+                        }
+                    };
+                },
+                cache: true
+            },
+            templateResult: function (state) {
+                if (!state.id) {
+                    return state.text;
+                }
 
+                var $state = $('<span>' + state.text + '</span><br><span>' + state.code + '</span>');
+                return $state;
+            }
+        });
+        $("#ProductId").change(function () {
+            var productId = $(this).val();
+            const select = document.getElementById("ProductVariantAttributeCombinationId");
 
+            if (productId == undefined) {
+                select.innerHTML = "";
+                $("#ProductVariantAttributeCombination").hide();
+            } else {
+                window.showLoading("Lütfen bekleyiniz varyantlar kontrol ediliyor..");
+                $.ajax({
+                    url: '/Product/GetProductVariantAttributeCombination?productId=' + productId,
+                    type: 'POST',
+                    success: function (response) {
+                        if (response.length > 0) {
+
+                            select.innerHTML = "";
+
+                            response.forEach(item => {
+                                const option = document.createElement("option");
+                                option.value = item.Id;            // backend'den gelen Id
+                                option.text = item.Name;           // backend'den gelen isim
+                                select.appendChild(option);
+                            });
+
+                            $("#ProductVariantAttributeCombinationId").select2({
+                                placeholder: 'Varyant seçiniz',
+                                allowClear: false,
+                                dropdownParent: $('#ProudctIntegrationModal'),
+                                width: '100%'
+                            });
+
+                            $("#ProductVariantAttributeCombination").show();
+                        } else {
+                            $("#ProductVariantAttributeCombination").hide();
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sunucu Hatası!',
+                            text: 'İstek gönderilirken bir hata oluştu.',
+                            confirmButtonText: 'Tamam',
+                            customClass: {
+                                confirmButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    },
+                    complete: function () {
+                        window.hideLoading();
+                    }
+                });
+            }
+        });
+        $('#ProudctIntegrationModal').modal('show');
+
+        $("#CreateProductIntegrationForm").submit(function (e) {
+            e.preventDefault();
+            const $form = $(this);
+            const serializedData = $form.serialize();
+
+            if ($form.find("#ProductId").val() == undefined) {
+                Swal.fire({
+                    title: 'Hata!',
+                    text: 'Ürün seçiniz',
+                    icon: 'error',
+                    confirmButtonText: 'Tamam',
+                    customClass: {
+                        confirmButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false
+                });
+                return;
+            }
+
+            const $submitBtn = $form.find('button[type="submit"]');
+            $submitBtn.prop('disabled', true);
+            window.showLoading("Lütfen bekleyiniz..");
+
+            $.ajax({
+                url: "/ReturnRequest/CreateProductIntegration",
+                type: 'POST',
+                data: serializedData,
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Başarılı!',
+                            text: 'İşlem başarıyla tamamlandı.',
+                            icon: 'success',
+                            confirmButtonText: 'Tamam',
+                            customClass: {
+                                confirmButton: 'btn btn-success'
+                            },
+                            buttonsStyling: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: response.message || 'Bir hata oluştu.',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam',
+                            customClass: {
+                                confirmButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: xhr.responseText || 'İşlem sırasında bir hata oluştu.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam',
+                        customClass: {
+                            confirmButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: false
+                    });
+                },
+                complete: function () {
+                    $("#ProductVariantAttributeCombinationId").html("");
+                    $("#ProductVariantAttributeCombination").hide();
+                    $submitBtn.prop('disabled', false);
+
+                    window.hideLoading();
+                }
+            });
+        });
+    }
+    function initCustomScriptForOrderStatus2() {
+
+        $(document).off("click", "#createIfNotExistBtn").on("click", "#createIfNotExistBtn", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const integrationSystemId = parseInt(document.getElementById("IntegrationSystemId")?.value || 0);
+            const productIntegrationSku = document.getElementById("ProductIntegrationSku")?.value || "";
+
+            if (!integrationSystemId || !productIntegrationSku) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Eksik Bilgi',
+                    text: 'Lütfen tüm alanları doldurun.'
+                });
+                return;
+            }
+
+            window.showLoading("Lütfen bekleyiniz..");
+
+            fetch('/Product/CreateIfNotExistProductTrendyol', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    integrationSystemId: integrationSystemId,
+                    productIntegrationSku: productIntegrationSku
+                })
+            })
+                .then(response => {
+                    console.log("Fetch cevabı geldi:", response);
+                    return response.json();
+                })
+                .then(result => {
+                    window.hideLoading();
+                    console.log("Fetch result:", result);
+
+                    if (result.success === false) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'İşlem Başarısız',
+                            text: result.message || "Bir hata oluştu. Lütfen tekrar deneyin.",
+                            footer: result.errorCode ? `Hata Kodu: ${result.errorCode}` : null
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: result.message || "İşlem başarıyla tamamlandı."
+                    }).then(() => {
+                        const modalEl = document.getElementById('ProudctIntegrationModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    window.hideLoading();
+                    console.error("Fetch hatası:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sunucu Hatası',
+                        text: "Sunucuya bağlanırken bir sorun oluştu. Lütfen internet bağlantınızı kontrol edin."
+                    });
+                });
+        });
+    }
     return {
         addFilterText: addFilterText,
         addFilterDropdown: addFilterDropdown,
         initTable: initTable,
         initTab: initTab,
         deleteReturnRequest: deleteReturnRequest,
-
+        ProductIntegration: ProductIntegration
     };
     function getIntegrationLogo(value) {
         switch (value) {
