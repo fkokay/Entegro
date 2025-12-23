@@ -92,15 +92,46 @@ namespace Entegro.Infrastructure.Repositories
         }
         public async Task<ReturnListPageDto> GetReturnRequestPageAsync()
         {
-            ReturnListPageDto returnListPage = new ReturnListPageDto();
-            returnListPage.CreatedQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.Created).CountAsync();
-            returnListPage.WaitingInActionQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.WaitingInAction).CountAsync();
-            returnListPage.WaitingFraudCheckQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.WaitingFraudCheck).CountAsync();
-            returnListPage.UnresolvedQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.Unresolved).CountAsync();
-            returnListPage.RejectedQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.Rejected).CountAsync();
-            returnListPage.AcceptedQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.Accepted).CountAsync();
-            returnListPage.CancelledQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.Cancelled).CountAsync();
-            returnListPage.InAnalysisQuantity = await _context.ReturnRequestItems.Where(rr => rr.ReturnRequestStatusId == (int)ReturnRequestStatus.InAnalysis).CountAsync();
+            var grouped = await _context.ReturnRequestItems
+                .GroupBy(x => new { x.ReturnRequestId, x.ReturnRequestStatusId })
+                .Select(g => new
+                {
+                    g.Key.ReturnRequestStatusId,
+                    Count = g.Select(x => x.ReturnRequestId).Distinct().Count()
+                })
+                .ToListAsync();
+
+            ReturnListPageDto returnListPage = new ReturnListPageDto
+            {
+                AllQuantity = grouped.Sum(x => x.Count),
+                CreatedQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.Created)
+                    .Sum(x => x.Count),
+                WaitingInActionQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.WaitingInAction)
+                    .Sum(x => x.Count),
+                WaitingFraudCheckQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.WaitingFraudCheck)
+                    .Sum(x => x.Count),
+                UnresolvedQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.Unresolved)
+                    .Sum(x => x.Count),
+                RejectedQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.Rejected)
+                    .Sum(x => x.Count),
+                AcceptedQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.Accepted)
+                    .Sum(x => x.Count),
+                CancelledQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.Cancelled)
+                    .Sum(x => x.Count),
+                InAnalysisQuantity = grouped
+                    .Where(x => x.ReturnRequestStatusId == (int)ReturnRequestStatus.InAnalysis)
+                    .Sum(x => x.Count)
+            };
+
+
+
             return returnListPage;
         }
         public async Task<Application.DTOs.Common.PagedResult<ReturnRequest>> GetPagedAsync(GridCommand gridCommand)
@@ -304,87 +335,87 @@ namespace Entegro.Infrastructure.Repositories
                 case 1: // hepsini getir
                     query = query;
                     break;
-                case 5: // Aksiyon Bekleniyor
+                case 2: // Aksiyon Bekleniyor
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.WaitingInAction));
                     break;
-                case 8: // İade onaylandı, fraud kontrolünde
+                case 3: // İade onaylandı, fraud kontrolünde
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.WaitingFraudCheck));
                     break;
-                case 9: // Analizde
+                case 4: // Analizde
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.InAnalysis));
                     break;
-                case 12: // İhtilaflı
+                case 5: // İhtilaflı
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.Unresolved));
                     break;
-                case 20: // Satıcı tarafından kabul edildi
+                case 6: // Satıcı tarafından kabul edildi
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.Accepted));
                     break;
-                case 30: // Satıcı tarafından reddedildi
+                case 7: // Satıcı tarafından reddedildi
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.Rejected));
                     break;
-                case 40: // İade iptal edildi
+                case 8: // İade iptal edildi
                     query = query.Where(r => r.Items.Any(i => i.ReturnRequestStatusId == (int)ReturnRequestStatus.Cancelled));
                     break;
             }
 
             var totalCount = await query.CountAsync();
             var returnRequest = await query
-    .Select(r => new ReturnRequestListDto
-    {
-        Id = r.Id,
-        IntegrationSystemId = r.IntegrationSystemId,
-        IntegrationSystem = r.IntegrationSystem != null
-            ? new IntegrationSystemDto
-            {
-                Id = r.IntegrationSystem.Id,
-                Name = r.IntegrationSystem.Name,
-                Description = r.IntegrationSystem.Description,
-                IntegrationSystemType = r.IntegrationSystem.IntegrationSystemType,
-                IntegrationSystemTypeId = r.IntegrationSystem.IntegrationSystemTypeId,
-                IntegrationSystemParameters = r.IntegrationSystem.IntegrationSystemParameters
-                    .Select(p => new IntegrationSystemParameterDto
-                    {
-                        Id = p.Id,
-                        IntegrationSystemId = p.IntegrationSystemId,
-                        Key = p.Key,
-                        Value = p.Value
-                    }).ToList()
-            }
-            : null,
-
-        OrderNumber = r.OrderNumber,
-        OrderDate = r.OrderDate,
-        ClaimDate = r.ClaimDate,
-        CustomerFirstName = r.CustomerFirstName,
-        CustomerLastName = r.CustomerLastName,
-
-        CargoTrackingNumber = r.CargoTrackingNumber,
-        CargoProviderName = r.CargoProviderName,
-        CargoTrackingLink = r.CargoTrackingLink,
-
-        SubTotal = r.Items.Sum(i => i.Price),
-
-        Items = r.Items.Select(i => new ReturnRequestItemListDto
+        .Select(r => new ReturnRequestListDto
         {
-            Id = i.Id,
-            ReturnRequestId = i.ReturnRequestId,
-            Barcode = i.Barcode,
-            CustomerClaimReasonCode = i.CustomerClaimReasonCode,
-            CustomerClaimReasonName = i.CustomerClaimReasonName,
-            CustomerNote = i.CustomerNote,
-            MerchantSku = i.MerchantSku,
-            Price = i.Price,
-            ProductId = i.ProductId,
-            ProductImageUrl = i.ProductImageUrl,
-            ProductName = i.ProductName,
-            ProductSize = i.ProductSize,
-            ReturnRequestStatusId = i.ReturnRequestStatusId,
-            ReturnRequestStatus = i.ReturnRequestStatus
-        }).ToList()
-    })
-    .Skip(gridCommand.Start)
-    .Take(gridCommand.Length)
-    .ToListAsync();
+            Id = r.Id,
+            IntegrationSystemId = r.IntegrationSystemId,
+            IntegrationSystem = r.IntegrationSystem != null
+                ? new IntegrationSystemDto
+                {
+                    Id = r.IntegrationSystem.Id,
+                    Name = r.IntegrationSystem.Name,
+                    Description = r.IntegrationSystem.Description,
+                    IntegrationSystemType = r.IntegrationSystem.IntegrationSystemType,
+                    IntegrationSystemTypeId = r.IntegrationSystem.IntegrationSystemTypeId,
+                    IntegrationSystemParameters = r.IntegrationSystem.IntegrationSystemParameters
+                        .Select(p => new IntegrationSystemParameterDto
+                        {
+                            Id = p.Id,
+                            IntegrationSystemId = p.IntegrationSystemId,
+                            Key = p.Key,
+                            Value = p.Value
+                        }).ToList()
+                }
+                : null,
+
+            OrderNumber = r.OrderNumber,
+            OrderDate = r.OrderDate,
+            ClaimDate = r.ClaimDate,
+            CustomerFirstName = r.CustomerFirstName,
+            CustomerLastName = r.CustomerLastName,
+
+            CargoTrackingNumber = r.CargoTrackingNumber,
+            CargoProviderName = r.CargoProviderName,
+            CargoTrackingLink = r.CargoTrackingLink,
+
+            SubTotal = r.Items.Sum(i => i.Price),
+
+            Items = r.Items.Select(i => new ReturnRequestItemListDto
+            {
+                Id = i.Id,
+                ReturnRequestId = i.ReturnRequestId,
+                Barcode = i.Barcode,
+                CustomerClaimReasonCode = i.CustomerClaimReasonCode,
+                CustomerClaimReasonName = i.CustomerClaimReasonName,
+                CustomerNote = i.CustomerNote,
+                MerchantSku = i.MerchantSku,
+                Price = i.Price,
+                ProductId = i.ProductId,
+                ProductImageUrl = i.ProductImageUrl,
+                ProductName = i.ProductName,
+                ProductSize = i.ProductSize,
+                ReturnRequestStatusId = i.ReturnRequestStatusId,
+                ReturnRequestStatus = i.ReturnRequestStatus
+            }).ToList()
+        })
+        .Skip(gridCommand.Start)
+        .Take(gridCommand.Length)
+        .ToListAsync();
 
 
             return new Application.DTOs.Common.PagedResult<ReturnRequestListDto>

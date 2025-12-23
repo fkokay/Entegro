@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.CrossSellProduct;
 using Entegro.Application.DTOs.IntegrationSystem;
@@ -21,6 +22,7 @@ using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Application.Services.Base;
 using Entegro.Domain.Entities.Catalog;
@@ -40,6 +42,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
@@ -2040,7 +2043,63 @@ namespace Entegro.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateIfNotExistProductTrendyol([FromBody] TrendyolProductRequest model)
+        public async Task<IActionResult> DispatchProductIntegration([FromBody] DispatchProductIntegrationRequest request)
+        {
+            var integrationSystem =
+                await _integrationSystemService.GetByIdAsync(request.IntegrationSystemId);
+
+            if (integrationSystem == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Entegrasyon sistemi bulunamadı.",
+                    errorCode = "IntegrationSystemNotFound"
+                });
+            }
+
+            if (integrationSystem.IntegrationSystemType == IntegrationSystemType.Marketplace)
+            {
+                var marketplaceType = integrationSystem.IntegrationSystemParameters
+                    .FirstOrDefault(p => p.Key == "MarketplaceType")?.Value;
+
+                if (marketplaceType == "Trendyol")
+                {
+                    return await ImportAndMatchProductFromTrendyolAsync(
+                        new ImportAndMatchProductFromTrendyol
+                        {
+                            IntegrationSystemId = request.IntegrationSystemId,
+                            ProductIntegrationSku = request.ProductIntegrationSku
+                        });
+                }
+                if (marketplaceType == "Pazarama")
+                {
+                    return await ImportAndMatchProductFromPazaramaAsync(
+                        new ImportAndMatchProductFromPazarama
+                        {
+                            IntegrationSystemId = request.IntegrationSystemId,
+                            ProductIntegrationSku = request.ProductIntegrationSku
+                        });
+                }
+                return Json(new
+                {
+                    success = false,
+                    message = "Marketplace desteklenmiyor.",
+                    errorCode = "MarketplaceNotSupported"
+                });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Entegrasyon tipi desteklenmiyor.",
+                errorCode = "IntegrationTypeNotSupported"
+            });
+        }
+
+
+
+        public async Task<IActionResult> ImportAndMatchProductFromTrendyolAsync([FromBody] ImportAndMatchProductFromTrendyol model)
         {
             try
             {
@@ -2107,7 +2166,7 @@ namespace Entegro.Web.Controllers
 
                             await _orderItemService.UpdateAsync(updateOrderItem);
                         }
-                       
+
                         return Json(new
                         {
                             success = true,
@@ -2313,8 +2372,94 @@ namespace Entegro.Web.Controllers
                 });
             }
         }
+        public async Task<IActionResult> ImportAndMatchProductFromPazaramaAsync([FromBody] ImportAndMatchProductFromPazarama model)
+        {
+            try
+            {
+                var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
+
+                if (integrationSystem == null)
+                {
+                    return Json(new { success = false, message = "Entegrasyon sistemi bulunamadı.", errorCode = "IntegrationSystemNotFound" });
+                }
+
+                PazaramaApiContext context = new PazaramaApiContext
+                {
+                    ClientId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientId")?.Value,
+                    ClientSecret = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientSecret")?.Value,
+                };
+
+                var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, model.ProductIntegrationSku);
+                if (existingPazaramaProduct == null)
+                {
+                    return Json(new { success = false, message = "Pazaramama'da bu barkoda sahip ürün bulunamadı.", errorCode = "ProductNotFoundOnTrendyol" });
+                }
+
+                PazaramaProductMapper.ConfigureBrandService(_brandService);
+                var productsDtos = PazaramaProductMapper.ToDto(existingPazaramaProduct);
+
+                int categoryId = 0;
+                var createProduct = _mapper.Map<CreateProductDto>(productsDtos);
+                var productDto = await _productService.AddAsync(createProduct);
+
+                var category = await _categoryService.ExistsByNameAsync(existingPazaramaProduct.CategoryName);
+                if (!category)
+                {
+                    var createdCategory = await _categoryService.AddAsync(new CreateCategoryDto
+                    {
+                        Name = existingPazaramaProduct.CategoryName,
+                        DisplayOrder = 0,
+                        Published = true
+                    });
+                    categoryId = createdCategory.Id;
+                }
+                else
+                {
+                    var existCategory = await _categoryService.GetCategoryByNameAsync(existingPazaramaProduct.CategoryName);
+                    categoryId = existCategory.Id;
+                }
+                var productCategoryDto = new CreateProductCategoryDto
+                {
+                    ProductId = productDto.Id,
+                    CategoryId = categoryId
+                };
+
+                await _productCategoryService.AddAsync(productCategoryDto);
 
 
+                var createProductIntegration = new CreateProductIntegrationDto();
+                createProductIntegration.IntegrationCode = model.ProductIntegrationSku;
+                createProductIntegration.Price = productDto.Price;
+                createProductIntegration.ProductId = productDto.Id;
+                createProductIntegration.ProductVariantAttributeCombinationId = null;
+                createProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
+                createProductIntegration.Active = true;
+                createProductIntegration.LastSyncDate = null;
+                createProductIntegration.IsSync = false;
+                await _productIntegrationService.AddAsync(createProductIntegration);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Ürün başarıyla kaydedildi ve Pazarama ile eşleştirildi.",
+                    data = new
+                    {
+                        productId = 0,
+                        integrationCode = existingPazaramaProduct.StockCode
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new
+                {
+                    success = false,
+                    message = "İşlem sırasında bir hata oluştu: " + ex.Message,
+                    errorCode = "ServerError"
+                });
+            }
+        }
         #endregion
 
         #region ProductVariantAttributeCombination

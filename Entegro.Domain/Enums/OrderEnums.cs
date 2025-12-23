@@ -43,54 +43,59 @@ namespace Entegro.Domain.Enums
         [Display(Name = "Beklemede")]
         Created = 0,
 
+
+        ////1 hepsini getir
+
+
+
         /// <summary>
         /// Ürün satıcıya ulaştı, aksiyon bekleniyor
         /// Trendyol: WaitingInAction
         /// </summary>
         [Display(Name = "Aksiyon Bekleniyor")]
-        WaitingInAction = 5,
+        WaitingInAction = 2,
 
         /// <summary>
         /// İade onaylandı, fraud kontrolünde
         /// Trendyol: WaitingFraudCheck
         /// </summary>
         [Display(Name = "Fraud Kontrolünde")]
-        WaitingFraudCheck = 8,
+        WaitingFraudCheck = 3,
 
         /// <summary>
         /// Analiz sürecinde
         /// Trendyol: InAnalysis
         /// </summary>
         [Display(Name = "Analizde")]
-        InAnalysis = 9,
+        InAnalysis = 4,
 
         /// <summary>
         /// İhtilaflı iade
         /// Trendyol: Unresolved
         /// </summary>
         [Display(Name = "İhtilaflı")]
-        Unresolved = 12,
+        Unresolved = 5,
 
         /// <summary>
         /// Satıcı tarafından kabul edildi
         /// Trendyol: Accepted
         /// </summary>
         [Display(Name = "Kabul Edildi")]
-        Accepted = 20,
+        Accepted = 6,
 
         /// <summary>
         /// Satıcı tarafından reddedildi
         /// Trendyol: Rejected
         /// </summary>
         [Display(Name = "Reddedildi")]
-        Rejected = 30,
+        Rejected = 7,
 
         /// <summary>
         /// İade iptal edildi
         /// Trendyol: Cancelled
         /// </summary>
         [Display(Name = "İptal Edildi")]
-        Cancelled = 40,
+        Cancelled = 8,
 
         /// <summary>
         /// Tanımsız / beklenmeyen durum

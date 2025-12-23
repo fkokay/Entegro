@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Address;
+using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Customer;
 using Entegro.Application.DTOs.IntegrationSystem;
@@ -9,6 +10,8 @@ using Entegro.Application.DTOs.Marketplace.N11;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.Order;
+using Entegro.Application.DTOs.Product;
+using Entegro.Application.DTOs.ProductCategory;
 using Entegro.Application.DTOs.Shipment;
 using Entegro.Application.DTOs.ShipmentItem;
 using Entegro.Application.Interfaces.Services.Base;
@@ -20,6 +23,8 @@ using Entegro.Application.Mappings.Marketplace.Hepsiburada;
 using Entegro.Application.Mappings.Marketplace.N11;
 using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Entegro.Application.Services.Base;
+using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
 using Quartz;
 
@@ -31,8 +36,10 @@ namespace Entegro.Api.Jobs
         private readonly IPazaramaService _pazarama;
         private readonly IHepsiburadaService _hepsiburada;
         private readonly ITrendyolService _trendyol;
+        private readonly ICategoryService _categoryService;
         private readonly ICicekSepetiService _cicekSepeti;
-
+        private readonly IBrandService _brandService;
+        private readonly IProductCategoryService _productCategoryService;
         private readonly ISmartstoreService _smartstore;
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
@@ -65,12 +72,16 @@ namespace Entegro.Api.Jobs
             IShipmentService shipmentService,
             IShipmentItemService shipmentItemService,
             INotificationService notificationService,
+
             IMapper mapper,
             ILogger<OrderReadJob> logger,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IProductVariantAttributeService productVariantAttributeService,
             IProductVariantAttributeValueService productVariantAttributeValueService,
-            IOrderItemService orderItemService)
+            IOrderItemService orderItemService,
+            IBrandService brandService,
+            ICategoryService categoryService,
+            IProductCategoryService productCategoryService)
         {
             _n11 = n11;
             _pazarama = pazarama;
@@ -93,6 +104,9 @@ namespace Entegro.Api.Jobs
             _productVariantAttributeService = productVariantAttributeService;
             _productVariantAttributeValueService = productVariantAttributeValueService;
             _orderItemService = orderItemService;
+            _brandService = brandService;
+            _categoryService = categoryService;
+            _productCategoryService = productCategoryService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -186,6 +200,56 @@ namespace Entegro.Api.Jobs
                     _logger.Warn("Pazarama'dan hiç sipariş alınamadı.");
                     return;
                 }
+
+                //var pazaramaProducts = await _pazarama.GetProductsAsync(context);
+                //PazaramaProductMapper.ConfigureBrandService(_brandService);
+                //var products1 = PazaramaProductMapper.ToDtoList(pazaramaProducts);
+
+
+                //foreach (var product in products1)
+                //{
+                //    int categoryId = 0;
+                //    var createProduct = _mapper.Map<CreateProductDto>(product);
+                //    var productDto = await _productService.AddAsync(createProduct);
+
+                //    foreach (var productCategory in pazaramaProducts)
+                //    {
+                //        var category = await _categoryService.ExistsByNameAsync(productCategory.CategoryName);
+                //        if (!category)
+                //        {
+                //            var createdCategory = await _categoryService.AddAsync(new CreateCategoryDto
+                //            {
+                //                Name = productCategory.CategoryName,
+                //                DisplayOrder = 0,
+                //                Published = true
+                //            });
+                //            categoryId = createdCategory.Id;
+                //        }
+                //        else
+                //        {
+                //            var existCategory = await _categoryService.GetCategoryByNameAsync(productCategory.CategoryName);
+                //            categoryId = existCategory.Id;
+                //        }
+
+
+                //        var productCategoryDto = new CreateProductCategoryDto
+                //        {
+                //            ProductId = productDto.Id,
+                //            CategoryId = categoryId
+                //        };
+
+                //        await _productCategoryService.AddAsync(productCategoryDto);
+                //    }
+                //}
+
+
+              
+
+                
+                
+
+
+                
 
                 PazaramaOrderMapper.ConfigureLogger(_logger);
                 var orders = PazaramaOrderMapper.ToDtoList(pazaramaOrders);
