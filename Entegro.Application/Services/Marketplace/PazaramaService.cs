@@ -96,6 +96,17 @@ namespace Entegro.Application.Services.Marketplace
                         stockQuantity = product.StockQuantity;
                     }
 
+                    if (productIntegration.ApplyAutoPrice)
+                    {
+                        decimal calculatedPrice = CalculateAutoPrice(
+                            product.CostPrice,
+                            productIntegration.Percent,
+                            productIntegration.CommissionPercent,
+                            productIntegration.ShippingFee,
+                            productIntegration.ExtraCost
+                        );
+                        productIntegration.Price = calculatedPrice;
+                    }
                     var priceRequest = new PazaramaPriceUpdateRequest
                     {
                         Items = new List<PazaramaPriceUpdateDto>()
@@ -104,7 +115,7 @@ namespace Entegro.Application.Services.Marketplace
                             {
                                 Code = product.Code,
                                 ListPrice = product.Price,
-                                SalePrice = product.Price
+                                SalePrice = product.SalePrice
                             }
                         }
                     };
@@ -283,6 +294,29 @@ namespace Entegro.Application.Services.Marketplace
             }
 
             return jsonData.Data.ToList();
+        }
+
+        public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)
+        {
+            decimal profitRate = profitPercent ?? 0;
+            decimal commissionRate = commissionPercent ?? 0;
+            decimal shippingCost = shippingFee ?? 0;
+            decimal additionalCost = extraCost ?? 0;
+
+            // Ana fiyat: maliyet + kar oranı
+            decimal finalPrice = costPrice * (1 + (profitRate / 100));
+
+            // Ek maliyetler
+            finalPrice += additionalCost;
+            finalPrice += shippingCost;
+
+            // Komisyon oranı varsa, komisyon sonrası net fiyat hesaplanır
+            if (commissionRate > 0)
+            {
+                finalPrice = finalPrice / (1 - (commissionRate / 100));
+            }
+
+            return Math.Round(finalPrice, 2);
         }
     }
 }

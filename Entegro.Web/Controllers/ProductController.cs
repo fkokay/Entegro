@@ -17,15 +17,12 @@ using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.DTOs.RelatedProduct;
-using Entegro.Application.DTOs.ReturnRequestItem;
 using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
-using Entegro.Application.Services.Base;
-using Entegro.Domain.Entities.Catalog;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
 using Entegro.Web.Models.Catalog.Attributes;
@@ -42,10 +39,8 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
 using System.Net;
 using System.Text.Json;
 using ProductVariantAttributeDto = Entegro.Application.DTOs.ProductVariantAttribute.ProductVariantAttributeDto;
@@ -876,6 +871,7 @@ namespace Entegro.Web.Controllers
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, existingProductIntegration.IntegrationCode);
+                var pazaramaOrders = await _pazaramaService.GetOrdersAsync(context);
 
                 var createModel = new PazaramaProductIntegrationModel
                 {
@@ -890,8 +886,14 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
-                    MarketplaceLink = "#",
+                    MarketplaceLink = "https://www.pazarama.com/" + pazaramaOrders.SelectMany(o => o.Items).Where(i => i.Product.Code == existingProductIntegration?.IntegrationCode).Select(i => i.Product.Url).FirstOrDefault(),
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                    CostPrice = product.CostPrice,
+                    ApplyAutoPrice = existingProductIntegration.ApplyAutoPrice,
+                    CommissionPercent = existingProductIntegration.CommissionPercent,
+                    ExtraCost = existingProductIntegration.ExtraCost,
+                    ShippingFee = existingProductIntegration.ShippingFee,
+                    Percent = existingProductIntegration.Percent
                 };
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
@@ -1910,6 +1912,11 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    createProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    createProductIntegration.Percent = model.Percent;
+                    createProductIntegration.ShippingFee = model.ShippingFee;
+                    createProductIntegration.CommissionPercent = model.CommissionPercent;
+                    createProductIntegration.ExtraCost = model.ExtraCost;
                     await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
@@ -1925,7 +1932,11 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.LastSyncDate = null;
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-
+                    updateProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    updateProductIntegration.Percent = model.Percent;
+                    updateProductIntegration.ShippingFee = model.ShippingFee;
+                    updateProductIntegration.CommissionPercent = model.CommissionPercent;
+                    updateProductIntegration.ExtraCost = model.ExtraCost;
                     await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
@@ -2096,9 +2107,6 @@ namespace Entegro.Web.Controllers
                 errorCode = "IntegrationTypeNotSupported"
             });
         }
-
-
-
         public async Task<IActionResult> ImportAndMatchProductFromTrendyolAsync([FromBody] ImportAndMatchProductFromTrendyol model)
         {
             try
@@ -2342,9 +2350,6 @@ namespace Entegro.Web.Controllers
                 }
                 #endregion
 
-
-
-
                 #region variant create
                 if (isSlicer)
                     await _trenyolService.GetProductVariantAsync(context, mappedProduct.Barcode, model.IntegrationSystemId);
@@ -2427,6 +2432,8 @@ namespace Entegro.Web.Controllers
                 await _productCategoryService.AddAsync(productCategoryDto);
 
 
+
+                //integration kaydı oluştur
                 var createProductIntegration = new CreateProductIntegrationDto();
                 createProductIntegration.IntegrationCode = model.ProductIntegrationSku;
                 createProductIntegration.Price = productDto.Price;
@@ -2437,6 +2444,68 @@ namespace Entegro.Web.Controllers
                 createProductIntegration.LastSyncDate = null;
                 createProductIntegration.IsSync = false;
                 await _productIntegrationService.AddAsync(createProductIntegration);
+
+
+                //order item güncelle
+                var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(createProductIntegration.IntegrationCode);
+                foreach (var orderItem in orderItems)
+                {
+                    UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                    updateOrderItem.Id = orderItem.Id;
+                    updateOrderItem.Sku = productDto.Code;
+                    updateOrderItem.ProductId = productDto.Id;
+                    updateOrderItem.ProductCost = orderItem.ProductCost;
+                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                    updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                    updateOrderItem.Quantity = orderItem.Quantity;
+                    updateOrderItem.Price = orderItem.Price;
+                    updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                    updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                    updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                    updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                    updateOrderItem.OrderId = orderItem.OrderId;
+                    updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                    updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
+                    await _orderItemService.UpdateAsync(updateOrderItem);
+                }
+
+
+                #region product image upload
+                var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                {
+                    Console.WriteLine("Sistem URL'si ayarlanmamış.");
+                }
+                if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                {
+                    Console.WriteLine("hata");
+                }
+
+                using var httpClient = new HttpClient
+                {
+                    BaseAddress = baseUri
+                };
+
+                try
+                {
+                    var images = orderItems.Select(image => image.IntegrationProductImageUrl).ToList();
+                    List<int> mediaFiles = await UploadImagesAsync(images, httpClient);
+                    foreach (var item in mediaFiles)
+                    {
+                        CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                        createProductMediaFile.MediaFileId = item;
+                        createProductMediaFile.ProductId = productDto.Id;
+
+                        await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                #endregion
+
 
                 return Json(new
                 {

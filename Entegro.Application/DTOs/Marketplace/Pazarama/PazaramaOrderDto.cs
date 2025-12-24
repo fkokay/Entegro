@@ -114,6 +114,7 @@
         public int VatRate { get; set; }
         public string SellerAddressId { get; set; }
         public string Code { get; set; }
+        public string? Url { get; set; }
     }
 
 }
