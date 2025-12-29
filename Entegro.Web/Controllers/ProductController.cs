@@ -79,6 +79,7 @@ namespace Entegro.Web.Controllers
         private readonly IImportProfileService _importProfileService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly ISpecificationAttributeOptionService _specificationAttributeOptionService;
+        private readonly ISchedulingRunner _schedulingRunner;
         public ProductController(
             IProductService productService,
             IProductCategoryService productCategoryMappingService,
@@ -109,7 +110,8 @@ namespace Entegro.Web.Controllers
             IReturnRequestItemService returnRequestItemService,
             IOrderService orderService,
             IProductCategoryService productCategoryService,
-            IImportProfileService importProfileService)
+            IImportProfileService importProfileService,
+            ISchedulingRunner schedulingRunner)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -141,6 +143,7 @@ namespace Entegro.Web.Controllers
             _orderService = orderService;
             _productCategoryService = productCategoryService;
             _importProfileService = importProfileService;
+            _schedulingRunner = schedulingRunner;
         }
 
         #region Product list / create / edit / delete
@@ -640,25 +643,13 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateIntegrationAll(int integrationSystemId)
         {
-            var allProduct = await _productService.GetProductsAsync();
-            foreach (var product in allProduct)
+            await _schedulingRunner.RunAsync("ECommerceSyncJob", 12,integrationSystemId);
+            return Json(new
             {
-                var productIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.Id, integrationSystemId);
-                if (productIntegration == null)
-                {
-                    await _productIntegrationService.AddAsync(new CreateProductIntegrationDto
-                    {
-                        IntegrationCode = product.Code,
-                        Price = product.Price,
-                        ProductId = product.Id,
-                        IntegrationSystemId = integrationSystemId,
-                        Active = true,
-                        LastSyncDate = null
-                    });
-                }
+                success = true,
+                message = "Ürünlerin mağazaya aktarım işlemi başlatıldı. İşlem tamamlandığında tarafınıza bildirim gönderilecektir."
+            });
 
-            }
-            return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
         }
 
         [HttpGet]

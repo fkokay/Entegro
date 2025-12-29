@@ -62,6 +62,7 @@ namespace Entegro.Infrastructure.Extensions
             services.AddScoped<ICrossSellProductService, CrossSellProductService>();
             services.AddScoped<IRelatedProductService, RelatedProductService>();
             services.AddScoped<IArasCargoService, ArasCargoService>();
+            services.AddScoped<ISchedulingRunner, SchedulingRunner>();
             services.AddHttpClient();
 
             return services;
