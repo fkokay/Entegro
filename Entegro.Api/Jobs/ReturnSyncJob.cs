@@ -1,9 +1,11 @@
 ﻿using Entegro.Application.DTOs.IntegrationSystem;
+using Entegro.Application.DTOs.Marketplace.Pazarama;
 using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.DTOs.ReturnRequest;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Entegro.Domain.Entities.Catalog;
 using MapsterMapper;
 using Quartz;
 
@@ -14,11 +16,12 @@ namespace Entegro.Api.Jobs
     {
         private readonly ILogger<ReturnSyncJob> _logger;
         private readonly ITrendyolService _trendyolService;
+        private readonly IPazaramaService _pazaramaService;
         private readonly IIntegrationSystemService _integrationSystemService;
         private readonly IReturnRequestService _returnRequestService;
         private readonly IProductIntegrationService _productIntegrationService;
         private readonly IMapper _mapper;
-        public ReturnSyncJob(ILogger<ReturnSyncJob> logger, ITrendyolService trendyolService, IIntegrationSystemService integrationSystemService, IReturnRequestService returnRequestService, IMapper mapper, IProductIntegrationService productIntegrationService)
+        public ReturnSyncJob(ILogger<ReturnSyncJob> logger, ITrendyolService trendyolService, IIntegrationSystemService integrationSystemService, IReturnRequestService returnRequestService, IMapper mapper, IProductIntegrationService productIntegrationService, IPazaramaService pazaramaService)
         {
             _logger = logger;
             _trendyolService = trendyolService;
@@ -26,6 +29,7 @@ namespace Entegro.Api.Jobs
             _returnRequestService = returnRequestService;
             _mapper = mapper;
             _productIntegrationService = productIntegrationService;
+            _pazaramaService = pazaramaService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -55,8 +59,11 @@ namespace Entegro.Api.Jobs
             switch (marketPlaceType)
             {
 
-                case "Trendyol":
-                    await TrendyolReturnSync(item);
+                //case "Trendyol":
+                //    await TrendyolReturnSync(item);
+                //    break;
+                case "Pazarama":
+                    await PazaramaReturnSync(item);
                     break;
                 default:
                     _logger.LogError("{0} pazaryerine ait iade çekme işlemi bulunamadı", marketPlaceType);
@@ -172,5 +179,40 @@ namespace Entegro.Api.Jobs
 
             return context;
         }
+
+        private async Task PazaramaReturnSync(IntegrationSystemDto item)
+        {
+            try
+            {
+                _logger.LogInformation("Pazarama iade senkronizasyonu başlatıldı. Zaman: {Time}", DateTime.UtcNow);
+                PazaramaApiContext context = GetPazaramaApiContext(item);
+                var pazaramaReturnRequests = await _pazaramaService.GetReturnsAsync(context);
+                _logger.LogInformation("Trendyol iade senkronizasyonu tamamlandı. Zaman: {Time}", DateTime.UtcNow);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
+        }
+
+        private PazaramaApiContext GetPazaramaApiContext(IntegrationSystemDto item)
+        {
+
+            PazaramaApiContext context = new PazaramaApiContext();
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Pazarama ClientSecret Ayarlanmamış");
+            }
+
+            if (!item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Any() || string.IsNullOrEmpty(item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Select(m => m.Value).FirstOrDefault()))
+            {
+                _logger.Error("Trendyol ClientId Ayarlanmamış");
+            }
+            context.ClientSecret = item.IntegrationSystemParameters.Where(m => m.Key == "ClientSecret").Select(m => m.Value).FirstOrDefault() ?? "";
+            context.ClientId = item.IntegrationSystemParameters.Where(m => m.Key == "ClientId").Select(m => m.Value).FirstOrDefault() ?? "";
+            return context;
+        }
+
     }
 }

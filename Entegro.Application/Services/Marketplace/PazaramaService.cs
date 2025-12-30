@@ -3,6 +3,7 @@ using Entegro.Application.DTOs.Category;
 using Entegro.Application.DTOs.CategoryAttribute;
 using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Marketplace.Pazarama;
+using Entegro.Application.DTOs.Marketplace.Trendyol;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Services.Base;
@@ -294,6 +295,19 @@ namespace Entegro.Application.Services.Marketplace
             }
 
             return jsonData.Data.ToList();
+        }
+
+        public async Task<IEnumerable<Content>> GetReturnsAsync(PazaramaApiContext context)
+        {
+            var token = await GetToken(context);
+
+            using var client = CreateHttpClientWithToken(context, token.AccessToken);
+            var url = $"order/getRefund";
+            var response = await client.PostAsync(url, null);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            return null;
         }
 
         public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)
