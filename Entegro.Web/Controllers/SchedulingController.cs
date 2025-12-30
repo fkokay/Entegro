@@ -71,7 +71,7 @@ namespace Entegro.Web.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> RunAsync(string type, int taskId)
+        public async Task<IActionResult> RunAsync(string type, int taskId,int? parameter)
         {
 
             if (string.IsNullOrWhiteSpace(type))
@@ -86,7 +86,7 @@ namespace Entegro.Web.Controllers
             _client.BaseAddress = new Uri(setting.Value);
 
             // Type parametresini query string ile gönderiyoruz
-            var response = await _client.PostAsync($"api/job/run?type={type}&taskId={taskId}", null);
+            var response = await _client.PostAsync($"api/job/run?type={type}&taskId={taskId}&parameter={parameter}", null);
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();

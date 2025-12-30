@@ -18,7 +18,7 @@ namespace Entegro.Application.Services.Marketplace
 
         public Task HandleAsync(ProductIntegrationRecordUpdatedEvent @event)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

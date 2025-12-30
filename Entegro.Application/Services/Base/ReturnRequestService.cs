@@ -150,12 +150,14 @@ namespace Entegro.Application.Services.Base
                 var model = _mapper.Map<ReturnRequestListDto>(x);
                 model.CreatedOnUtc = x.CreatedOnUtc.ToLocalTime();
                 model.UpdatedOnUtc = x.UpdatedOnUtc.ToLocalTime();
+                model.ClaimDate = x.ClaimDate.ToLocalTime();
+                model.OrderDate = x.OrderDate.ToLocalTime();
                 return model;
             }).AsyncToList();
 
             return new PagedResult<ReturnRequestListDto>
             {
-                Items = returnRequests.Items,
+                Items = items,
                 TotalCount = returnRequests.TotalCount,
                 PageNumber = returnRequests.PageNumber,
                 PageSize = returnRequests.PageSize

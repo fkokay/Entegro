@@ -1,4 +1,5 @@
-﻿using Entegro.Application.DTOs.Commerce.Smartstore;
+﻿using Entegro.Application.DTOs.Category;
+using Entegro.Application.DTOs.Commerce.Smartstore;
 using Entegro.Application.DTOs.Common;
 using Entegro.Application.DTOs.CrossSellProduct;
 using Entegro.Application.DTOs.IntegrationSystem;
@@ -20,6 +21,7 @@ using Entegro.Application.DTOs.SpecificationAttribute;
 using Entegro.Application.DTOs.SpecificationAttributeOption;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
+using Entegro.Application.Mappings.Marketplace.Pazarama;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
 using Entegro.Domain.Enums;
 using Entegro.Web.Helpers;
@@ -71,11 +73,13 @@ namespace Entegro.Web.Controllers
         private readonly IOrderItemService _orderItemService;
         private readonly IOrderService _orderService;
         private readonly ISettingService _settingService;
+        private readonly IReturnRequestItemService _returnRequestItemService;
         private readonly HttpClient _client;
         private readonly IMapper _mapper;
         private readonly IImportProfileService _importProfileService;
         private readonly ISpecificationAttributeService _specificationAttributeService;
         private readonly ISpecificationAttributeOptionService _specificationAttributeOptionService;
+        private readonly ISchedulingRunner _schedulingRunner;
         public ProductController(
             IProductService productService,
             IProductCategoryService productCategoryMappingService,
@@ -103,9 +107,11 @@ namespace Entegro.Web.Controllers
             IProductAttributeValueService productAttributeValueService,
             ISpecificationAttributeService specificationAttributeService,
             ISpecificationAttributeOptionService specificationAttributeOptionService,
+            IReturnRequestItemService returnRequestItemService,
             IOrderService orderService,
             IProductCategoryService productCategoryService,
-            IImportProfileService importProfileService)
+            IImportProfileService importProfileService,
+            ISchedulingRunner schedulingRunner)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _productCategoryMappingService = productCategoryMappingService ?? throw new ArgumentNullException(nameof(productCategoryMappingService));
@@ -129,6 +135,7 @@ namespace Entegro.Web.Controllers
             _relatedProductService = relatedProductService;
             _orderItemService = orderItemService;
             _settingService = settingService;
+            _returnRequestItemService = returnRequestItemService;
             _client = client;
             _productAttributeValueService = productAttributeValueService;
             _specificationAttributeService = specificationAttributeService;
@@ -136,6 +143,7 @@ namespace Entegro.Web.Controllers
             _orderService = orderService;
             _productCategoryService = productCategoryService;
             _importProfileService = importProfileService;
+            _schedulingRunner = schedulingRunner;
         }
 
         #region Product list / create / edit / delete
@@ -635,25 +643,13 @@ namespace Entegro.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateIntegrationAll(int integrationSystemId)
         {
-            var allProduct = await _productService.GetProductsAsync();
-            foreach (var product in allProduct)
+            await _schedulingRunner.RunAsync("ECommerceSyncJob", 12,integrationSystemId);
+            return Json(new
             {
-                var productIntegration = await _productIntegrationService.GetByProductAndIntegrationSystemAsync(product.Id, integrationSystemId);
-                if (productIntegration == null)
-                {
-                    await _productIntegrationService.AddAsync(new CreateProductIntegrationDto
-                    {
-                        IntegrationCode = product.Code,
-                        Price = product.Price,
-                        ProductId = product.Id,
-                        IntegrationSystemId = integrationSystemId,
-                        Active = true,
-                        LastSyncDate = null
-                    });
-                }
+                success = true,
+                message = "Ürünlerin mağazaya aktarım işlemi başlatıldı. İşlem tamamlandığında tarafınıza bildirim gönderilecektir."
+            });
 
-            }
-            return Json(new { success = true, message = "Ürünlere entegrasyon Uygulandı." });
         }
 
         [HttpGet]
@@ -866,6 +862,7 @@ namespace Entegro.Web.Controllers
 
                 var existingProductIntegration = await _productIntegrationService.GetByIdAsync(model.ProductIntegrationId);
                 var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, existingProductIntegration.IntegrationCode);
+                var pazaramaOrders = await _pazaramaService.GetOrdersAsync(context);
 
                 var createModel = new PazaramaProductIntegrationModel
                 {
@@ -880,8 +877,14 @@ namespace Entegro.Web.Controllers
                     ProductCode = product.Code,
                     Active = existingProductIntegration.Active,
                     ProductMainPicture = product.ProductMediaFiles.FirstOrDefault(x => x.MediaFileId == product.MainPictureId)?.MediaFile?.Url,
-                    MarketplaceLink = "#",
+                    MarketplaceLink = "https://www.pazarama.com/" + pazaramaOrders.SelectMany(o => o.Items).Where(i => i.Product.Code == existingProductIntegration?.IntegrationCode).Select(i => i.Product.Url).FirstOrDefault(),
                     ProductVariantAttributeCombinationId = existingProductIntegration.ProductVariantAttributeCombinationId,
+                    CostPrice = product.CostPrice,
+                    ApplyAutoPrice = existingProductIntegration.ApplyAutoPrice,
+                    CommissionPercent = existingProductIntegration.CommissionPercent,
+                    ExtraCost = existingProductIntegration.ExtraCost,
+                    ShippingFee = existingProductIntegration.ShippingFee,
+                    Percent = existingProductIntegration.Percent
                 };
 
                 if (!string.IsNullOrEmpty(existingProductIntegration.Custom))
@@ -1900,6 +1903,11 @@ namespace Entegro.Web.Controllers
                     createProductIntegration.LastSyncDate = null;
                     createProductIntegration.IsSync = false;
                     createProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
+                    createProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    createProductIntegration.Percent = model.Percent;
+                    createProductIntegration.ShippingFee = model.ShippingFee;
+                    createProductIntegration.CommissionPercent = model.CommissionPercent;
+                    createProductIntegration.ExtraCost = model.ExtraCost;
                     await _productIntegrationService.AddAsync(createProductIntegration);
                 }
                 else
@@ -1915,7 +1923,11 @@ namespace Entegro.Web.Controllers
                     updateProductIntegration.LastSyncDate = null;
                     updateProductIntegration.IsSync = false;
                     updateProductIntegration.Custom = JsonConvert.SerializeObject(model.Custom);
-
+                    updateProductIntegration.ApplyAutoPrice = model.ApplyAutoPrice;
+                    updateProductIntegration.Percent = model.Percent;
+                    updateProductIntegration.ShippingFee = model.ShippingFee;
+                    updateProductIntegration.CommissionPercent = model.CommissionPercent;
+                    updateProductIntegration.ExtraCost = model.ExtraCost;
                     await _productIntegrationService.UpdateAsync(updateProductIntegration);
                 }
 
@@ -2033,7 +2045,60 @@ namespace Entegro.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateIfNotExistProductTrendyol([FromBody] TrendyolProductRequest model)
+        public async Task<IActionResult> DispatchProductIntegration([FromBody] DispatchProductIntegrationRequest request)
+        {
+            var integrationSystem =
+                await _integrationSystemService.GetByIdAsync(request.IntegrationSystemId);
+
+            if (integrationSystem == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Entegrasyon sistemi bulunamadı.",
+                    errorCode = "IntegrationSystemNotFound"
+                });
+            }
+
+            if (integrationSystem.IntegrationSystemType == IntegrationSystemType.Marketplace)
+            {
+                var marketplaceType = integrationSystem.IntegrationSystemParameters
+                    .FirstOrDefault(p => p.Key == "MarketplaceType")?.Value;
+
+                if (marketplaceType == "Trendyol")
+                {
+                    return await ImportAndMatchProductFromTrendyolAsync(
+                        new ImportAndMatchProductFromTrendyol
+                        {
+                            IntegrationSystemId = request.IntegrationSystemId,
+                            ProductIntegrationSku = request.ProductIntegrationSku
+                        });
+                }
+                if (marketplaceType == "Pazarama")
+                {
+                    return await ImportAndMatchProductFromPazaramaAsync(
+                        new ImportAndMatchProductFromPazarama
+                        {
+                            IntegrationSystemId = request.IntegrationSystemId,
+                            ProductIntegrationSku = request.ProductIntegrationSku
+                        });
+                }
+                return Json(new
+                {
+                    success = false,
+                    message = "Marketplace desteklenmiyor.",
+                    errorCode = "MarketplaceNotSupported"
+                });
+            }
+
+            return Json(new
+            {
+                success = false,
+                message = "Entegrasyon tipi desteklenmiyor.",
+                errorCode = "IntegrationTypeNotSupported"
+            });
+        }
+        public async Task<IActionResult> ImportAndMatchProductFromTrendyolAsync([FromBody] ImportAndMatchProductFromTrendyol model)
         {
             try
             {
@@ -2276,9 +2341,6 @@ namespace Entegro.Web.Controllers
                 }
                 #endregion
 
-
-
-
                 #region variant create
                 if (isSlicer)
                     await _trenyolService.GetProductVariantAsync(context, mappedProduct.Barcode, model.IntegrationSystemId);
@@ -2306,8 +2368,158 @@ namespace Entegro.Web.Controllers
                 });
             }
         }
+        public async Task<IActionResult> ImportAndMatchProductFromPazaramaAsync([FromBody] ImportAndMatchProductFromPazarama model)
+        {
+            try
+            {
+                var integrationSystem = await _integrationSystemService.GetByIdAsync(model.IntegrationSystemId);
+
+                if (integrationSystem == null)
+                {
+                    return Json(new { success = false, message = "Entegrasyon sistemi bulunamadı.", errorCode = "IntegrationSystemNotFound" });
+                }
+
+                PazaramaApiContext context = new PazaramaApiContext
+                {
+                    ClientId = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientId")?.Value,
+                    ClientSecret = integrationSystem.IntegrationSystemParameters.FirstOrDefault(m => m.Key == "ClientSecret")?.Value,
+                };
+
+                var existingPazaramaProduct = await _pazaramaService.GetProductWithStockCodeAsync(context, model.ProductIntegrationSku);
+                if (existingPazaramaProduct == null)
+                {
+                    return Json(new { success = false, message = "Pazaramama'da bu barkoda sahip ürün bulunamadı.", errorCode = "ProductNotFoundOnTrendyol" });
+                }
+
+                PazaramaProductMapper.ConfigureBrandService(_brandService);
+                var productsDtos = PazaramaProductMapper.ToDto(existingPazaramaProduct);
+
+                int categoryId = 0;
+                var createProduct = _mapper.Map<CreateProductDto>(productsDtos);
+                var productDto = await _productService.AddAsync(createProduct);
+
+                var category = await _categoryService.ExistsByNameAsync(existingPazaramaProduct.CategoryName);
+                if (!category)
+                {
+                    var createdCategory = await _categoryService.AddAsync(new CreateCategoryDto
+                    {
+                        Name = existingPazaramaProduct.CategoryName,
+                        DisplayOrder = 0,
+                        Published = true
+                    });
+                    categoryId = createdCategory.Id;
+                }
+                else
+                {
+                    var existCategory = await _categoryService.GetCategoryByNameAsync(existingPazaramaProduct.CategoryName);
+                    categoryId = existCategory.Id;
+                }
+                var productCategoryDto = new CreateProductCategoryDto
+                {
+                    ProductId = productDto.Id,
+                    CategoryId = categoryId
+                };
+
+                await _productCategoryService.AddAsync(productCategoryDto);
 
 
+
+                //integration kaydı oluştur
+                var createProductIntegration = new CreateProductIntegrationDto();
+                createProductIntegration.IntegrationCode = model.ProductIntegrationSku;
+                createProductIntegration.Price = productDto.Price;
+                createProductIntegration.ProductId = productDto.Id;
+                createProductIntegration.ProductVariantAttributeCombinationId = null;
+                createProductIntegration.IntegrationSystemId = model.IntegrationSystemId;
+                createProductIntegration.Active = true;
+                createProductIntegration.LastSyncDate = null;
+                createProductIntegration.IsSync = false;
+                await _productIntegrationService.AddAsync(createProductIntegration);
+
+
+                //order item güncelle
+                var orderItems = await _orderItemService.GetAllWithIntegrationSkuAsync(createProductIntegration.IntegrationCode);
+                foreach (var orderItem in orderItems)
+                {
+                    UpdateOrderItemDto updateOrderItem = new UpdateOrderItemDto();
+                    updateOrderItem.Id = orderItem.Id;
+                    updateOrderItem.Sku = productDto.Code;
+                    updateOrderItem.ProductId = productDto.Id;
+                    updateOrderItem.ProductCost = orderItem.ProductCost;
+                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                    updateOrderItem.DiscountAmount = orderItem.DiscountAmount;
+                    updateOrderItem.Quantity = orderItem.Quantity;
+                    updateOrderItem.Price = orderItem.Price;
+                    updateOrderItem.UnitPrice = orderItem.UnitPrice;
+                    updateOrderItem.IntegrationSku = orderItem.IntegrationSku;
+                    updateOrderItem.IntegrationProductName = orderItem.IntegrationProductName;
+                    updateOrderItem.ItemWeight = orderItem.ItemWeight;
+                    updateOrderItem.OrderId = orderItem.OrderId;
+                    updateOrderItem.IntegrationProductImageUrl = orderItem.IntegrationProductImageUrl;
+                    updateOrderItem.AttributesXml = orderItem.AttributesXml;
+                    updateOrderItem.AttributesDescription = orderItem.AttributesDescription;
+                    await _orderItemService.UpdateAsync(updateOrderItem);
+                }
+
+
+                #region product image upload
+                var systemUrl = await _settingService.GetByKeyAsync("SystemUrl");
+                if (systemUrl == null || string.IsNullOrWhiteSpace(systemUrl.Value))
+                {
+                    Console.WriteLine("Sistem URL'si ayarlanmamış.");
+                }
+                if (!Uri.TryCreate(systemUrl.Value, UriKind.Absolute, out var baseUri))
+                {
+                    Console.WriteLine("hata");
+                }
+
+                using var httpClient = new HttpClient
+                {
+                    BaseAddress = baseUri
+                };
+
+                try
+                {
+                    var images = orderItems.Select(image => image.IntegrationProductImageUrl).ToList();
+                    List<int> mediaFiles = await UploadImagesAsync(images, httpClient);
+                    foreach (var item in mediaFiles)
+                    {
+                        CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
+                        createProductMediaFile.MediaFileId = item;
+                        createProductMediaFile.ProductId = productDto.Id;
+
+                        await _productMediaFileMappingService.AddAsync(createProductMediaFile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                #endregion
+
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Ürün başarıyla kaydedildi ve Pazarama ile eşleştirildi.",
+                    data = new
+                    {
+                        productId = 0,
+                        integrationCode = existingPazaramaProduct.StockCode
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new
+                {
+                    success = false,
+                    message = "İşlem sırasında bir hata oluştu: " + ex.Message,
+                    errorCode = "ServerError"
+                });
+            }
+        }
         #endregion
 
         #region ProductVariantAttributeCombination
@@ -2676,7 +2888,6 @@ namespace Entegro.Web.Controllers
         {
             if (product != null)
             {
-
                 model.ProductVariantAttributes = product.ProductVariantAttributes.Select(m => new ProductVariantAttributeModel()
                 {
                     AttributeControlTypeId = m.AttributeControlTypeId,

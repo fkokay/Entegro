@@ -8,6 +8,6 @@ namespace Entegro.Application.Interfaces.Event
 {
     public interface IEventPublisher
     {
-        void Publish<TEvent>(TEvent @event);
+        Task Publish<TEvent>(TEvent @event);
     }
 }

@@ -234,7 +234,7 @@ Entegro.product = (function ($) {
             ['clean']
         ];
 
-        fullEditor = new Quill("#full-editor", {
+        const fullEditor = new Quill("#full-editor", {
             bounds: "#full-editor",
             placeholder: 'Açıklama Giriniz...',
             modules: { formula: true, toolbar: fullToolbar },
@@ -242,10 +242,12 @@ Entegro.product = (function ($) {
         });
 
         const description = document.querySelector("#Description");
+
         if (description && description.value) {
-            fullEditor.root.innerHTML = description.value;
+            fullEditor.clipboard.dangerouslyPasteHTML(description.value);
         }
     }
+
     function ProductCategoryCreatePopup(productId) {
         var popup = $('#ProductCategoryPopup');
         var popupContent = $("#ProductCategoryPopupContent");

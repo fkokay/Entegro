@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Quartz;
 using Quartz.Impl.Matchers;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace Entegro.Api.Controllers
@@ -23,7 +24,7 @@ namespace Entegro.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Run(string type,int taskId)
+        public async Task<IActionResult> Run(string type, int taskId, int? parameter)
         {
             try
             {
@@ -52,6 +53,12 @@ namespace Entegro.Api.Controllers
 
                 var job = JobBuilder.Create(jobType).WithIdentity(jobKey)
                     .UsingJobData("RunId", runId.ToString()).Build();
+
+
+                if (parameter.HasValue)
+                    job.JobDataMap["Parameter"] = parameter.Value;
+
+
                 var trigger = TriggerBuilder.Create()
                                   .WithIdentity($"{taskId}-trigger", "AdHocTriggers")
                                   .StartNow()
@@ -59,7 +66,7 @@ namespace Entegro.Api.Controllers
 
                 await scheduler.ScheduleJob(job, trigger);
 
-                return Ok(new { Success = true, Job = jobType.Name, RunId = runId, TriggerTime = DateTime.Now });
+                return Ok(new { Success = true, Job = jobType.Name, RunId = runId, TriggerTime = DateTime.Now, Parameter = parameter.HasValue ? parameter : null });
             }
             catch (Exception ex)
             {

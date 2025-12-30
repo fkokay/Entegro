@@ -17,21 +17,18 @@ namespace Entegro.Infrastructure.Messaging
             _scopeFactory = scopeFactory;
         }
 
-        public void Publish<TEvent>(TEvent @event)
+        public async Task Publish<TEvent>(TEvent @event)
         {
-            _ = Task.Run(async () =>
+            using (var scope = _scopeFactory.CreateScope())
             {
-                using (var scope = _scopeFactory.CreateScope())
-                {
-                    var serviceProvider = scope.ServiceProvider;
-                    var handlers = serviceProvider.GetServices<IEventHandler<TEvent>>();
+                var serviceProvider = scope.ServiceProvider;
+                var handlers = serviceProvider.GetServices<IEventHandler<TEvent>>();
 
-                    foreach (var handler in handlers)
-                    {
-                        await handler.HandleAsync(@event);
-                    }
+                foreach (var handler in handlers)
+                {
+                    await handler.HandleAsync(@event);
                 }
-            });
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Entegro.Application.Services.Base
 
 
             var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(productIntegration.Id);
-            _eventPublisher.Publish(recordUpdatedEvent);
+            await _eventPublisher.Publish(recordUpdatedEvent);
             return _mapper.Map<ProductIntegrationDto>(productIntegration);
         }
 
@@ -110,7 +110,7 @@ namespace Entegro.Application.Services.Base
             if (isEvent)
             {
                 var recordUpdatedEvent = new ProductIntegrationRecordUpdatedEvent(updateProductIntegration.Id);
-                _eventPublisher.Publish(recordUpdatedEvent);
+                await _eventPublisher.Publish(recordUpdatedEvent);
             }
 
             return _mapper.Map<ProductIntegrationDto>(updateProductIntegration);

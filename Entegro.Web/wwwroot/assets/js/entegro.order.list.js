@@ -924,7 +924,6 @@ Entegro.order.OrderList = (function ($) {
         $(document).off("click", "#createIfNotExistBtn").on("click", "#createIfNotExistBtn", function (e) {
             e.preventDefault();
             e.stopPropagation();
-
             const integrationSystemId = parseInt(document.getElementById("IntegrationSystemId")?.value || 0);
             const productIntegrationSku = document.getElementById("ProductIntegrationSku")?.value || "";
 
@@ -939,7 +938,7 @@ Entegro.order.OrderList = (function ($) {
 
             window.showLoading("Lütfen bekleyiniz..");
 
-            fetch('/Product/CreateIfNotExistProductTrendyol', {
+            fetch('/Product/DispatchProductIntegration', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

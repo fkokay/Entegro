@@ -2,6 +2,7 @@
 {
     public class ReturnListModel
     {
+        public int AllQuantity { get; set; }
         public int CreatedQuantity { get; set; }
         public int WaitingInActionQuantity { get; set; }
         public int WaitingFraudCheckQuantity { get; set; }

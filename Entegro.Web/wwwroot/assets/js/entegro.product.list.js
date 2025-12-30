@@ -174,7 +174,7 @@ Entegro.product.list = (function ($) {
                 Swal.fire(
                     'Başarılı!',
                     result.value.message,
-                    'success'
+                    'info'
                 ).then(() => {
 
                     window.location.reload();

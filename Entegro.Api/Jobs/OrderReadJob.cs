@@ -31,8 +31,10 @@ namespace Entegro.Api.Jobs
         private readonly IPazaramaService _pazarama;
         private readonly IHepsiburadaService _hepsiburada;
         private readonly ITrendyolService _trendyol;
+        private readonly ICategoryService _categoryService;
         private readonly ICicekSepetiService _cicekSepeti;
-
+        private readonly IBrandService _brandService;
+        private readonly IProductCategoryService _productCategoryService;
         private readonly ISmartstoreService _smartstore;
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
@@ -65,12 +67,16 @@ namespace Entegro.Api.Jobs
             IShipmentService shipmentService,
             IShipmentItemService shipmentItemService,
             INotificationService notificationService,
+
             IMapper mapper,
             ILogger<OrderReadJob> logger,
             IProductVariantAttributeCombinationService productVariantAttributeCombinationService,
             IProductVariantAttributeService productVariantAttributeService,
             IProductVariantAttributeValueService productVariantAttributeValueService,
-            IOrderItemService orderItemService)
+            IOrderItemService orderItemService,
+            IBrandService brandService,
+            ICategoryService categoryService,
+            IProductCategoryService productCategoryService)
         {
             _n11 = n11;
             _pazarama = pazarama;
@@ -93,6 +99,9 @@ namespace Entegro.Api.Jobs
             _productVariantAttributeService = productVariantAttributeService;
             _productVariantAttributeValueService = productVariantAttributeValueService;
             _orderItemService = orderItemService;
+            _brandService = brandService;
+            _categoryService = categoryService;
+            _productCategoryService = productCategoryService;
         }
 
         public async Task Execute(IJobExecutionContext context)

@@ -1,4 +1,5 @@
 ﻿using Entegro.Application.DTOs.Marketplace.Pazarama;
+using Entegro.Application.DTOs.Marketplace.Trendyol;
 
 namespace Entegro.Application.Interfaces.Services.Marketplace
 {
@@ -10,5 +11,6 @@ namespace Entegro.Application.Interfaces.Services.Marketplace
         Task UpdatePriceAsync(PazaramaApiContext context, PazaramaPriceUpdateRequest pazaramaPriceUpdateRequest);
         Task UpdateStockAsync(PazaramaApiContext context, PazaramaStockUpdateRequest pazaramaStockUpdateRequest);
         Task<IEnumerable<OrderData>> GetOrdersAsync(PazaramaApiContext context);
+        Task<IEnumerable<Content>> GetReturnsAsync(PazaramaApiContext context);
     }
 }

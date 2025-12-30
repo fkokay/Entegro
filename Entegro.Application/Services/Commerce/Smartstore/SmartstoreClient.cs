@@ -15,6 +15,7 @@ using Entegro.Application.DTOs.ProductVariantAttributeValue;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Mappings.Commerce.Smartstore;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Globalization;
@@ -99,11 +100,13 @@ namespace Entegro.Application.Services.Commerce.Smartstore
             {
                 request.Product.Id = existingProduct.Id;
                 productId = existingProduct.Id;
+                await UpdateProductHandleXmlProfilePricingAsync(request.Product);
                 await UpdateProductAsync(context, request.Product, request.CustomData as SmartstoreProductIntegrationCustomDto);
             }
             else
             {
                 request.Product.Id = 0;
+                await CreateProductHandleXmlProfilePricingAsync(request.Product);
                 productId = await CreateProductAsync(context, request.Product, request.CustomData as SmartstoreProductIntegrationCustomDto) ?? 0;
             }
 
@@ -138,7 +141,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         }
         public async Task<int?> CreateProductAsync(SmartstoreApiContext context, ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
         {
-            await HandleXmlProfilePricingAsync(product);
             var httpClient = CreateHttpClient(context);
             var payload = SmartstoreProductMapper.ToDto(product, customData);
             var json = JsonSerializer.Serialize(payload, _jsonOptions);
@@ -151,7 +153,6 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         }
         public async Task UpdateProductAsync(SmartstoreApiContext context, ProductDto product, SmartstoreProductIntegrationCustomDto? customData)
         {
-            await HandleXmlProfilePricingAsync(product);
             var httpClient = CreateHttpClient(context);
             var payload = SmartstoreProductMapper.UpdateToDto(product, customData);
             if (payload == null)
@@ -413,7 +414,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 {
                     foreach (var integration in product.ProductIntegrations)
                     {
-                        if (product.SourceIntegrationSystemId.HasValue & product.SourceType == Domain.Enums.ProductSourceType.Xml)
+                        if (product.SourceImportProfileId.HasValue & product.SourceType == Domain.Enums.ProductSourceType.Xml)
                         {
                             var importProfile = await _importProfileService.GetByIdAsync(product.SourceImportProfileId.Value);
 
@@ -579,6 +580,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
             var created = await response.Content.ReadFromJsonAsync<SmartstoreCategoryDto>();
             return created?.Id ?? 0;
+
         }
         public async Task UpdateCategoryAsync(SmartstoreApiContext context, CategoryDto category, int id)
         {
@@ -602,12 +604,16 @@ namespace Entegro.Application.Services.Commerce.Smartstore
         }
         public async Task<CategoryDto?> CategoryExistsAsync(SmartstoreApiContext context, string categoryName)
         {
+
+
             try
             {
+
+
                 var httpClient = CreateHttpClient(context);
                 var url = $"categories?$filter=Name eq '{Uri.EscapeDataString(categoryName)}'";
                 var response = await httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
+                //response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
                 var data = JsonSerializer.Deserialize<ODataListResponse<SmartstoreCategoryDto>>(json, _jsonOptions);
@@ -615,6 +621,8 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                 return data?.Value?.FirstOrDefault() is SmartstoreCategoryDto dto
                     ? SmartstoreCategoryMapper.ToDto(dto)
                     : null;
+
+
             }
             catch (Exception ex)
             {
@@ -1018,62 +1026,83 @@ namespace Entegro.Application.Services.Commerce.Smartstore
 
             return combiner.CombinedHash;
         }
-        private async Task HandleXmlProfilePricingAsync(ProductDto product)
+        private async Task CreateProductHandleXmlProfilePricingAsync(ProductDto product)
         {
-            if (!product.ProductVariantAttributeCombinations.Any())
+            if (product.SourceImportProfileId.HasValue & product.SourceType == Domain.Enums.ProductSourceType.Xml)
             {
-                if (product.SourceIntegrationSystemId.HasValue & product.SourceType == Domain.Enums.ProductSourceType.Xml)
+                foreach (var integration in product.ProductIntegrations)
                 {
-                    foreach (var integration in product.ProductIntegrations)
+                    var importProfile = await _importProfileService.GetByIdAsync(product.SourceImportProfileId.Value);
+
+                    if (!string.IsNullOrEmpty(importProfile.PlatformStoreMapping))
                     {
-                        var importProfile = await _importProfileService.GetByIdAsync(product.SourceImportProfileId.Value);
+                        var store = JsonConvert.DeserializeObject<PlatformStoreRootDto>(importProfile.PlatformStoreMapping);
 
-                        if (!string.IsNullOrEmpty(importProfile.PlatformStoreMapping))
+                        var storeMapping = store.PlatformStore.FirstOrDefault(s => s.id == integration.IntegrationSystemId);
+                        if (storeMapping != null)
                         {
-                            var store = JsonConvert.DeserializeObject<PlatformStoreRootDto>(importProfile.PlatformStoreMapping);
+                            decimal calculatedPrice = CalculateAutoPrice(
+                                product.CostPrice,
+                                storeMapping.pricing.profitRate,
+                                storeMapping.pricing.commission,
+                                storeMapping.pricing.cargoPrice,
+                                storeMapping.pricing.extraCost
+                            );
 
-                            var storeMapping = store.PlatformStore.FirstOrDefault(s => s.id == integration.IntegrationSystemId);
-                            if (storeMapping != null)
-                            {
-                                decimal calculatedPrice = CalculateAutoPrice(
-                                    product.CostPrice,
-                                    storeMapping.pricing.profitRate,
-                                    storeMapping.pricing.commission,
-                                    storeMapping.pricing.cargoPrice,
-                                    storeMapping.pricing.extraCost
-                                );
-
-                                var mapped = _mapper.Map<ProductIntegrationDto, UpdateProductIntegrationDto>(integration);
-                                mapped.CommissionPercent = storeMapping.pricing.commission;
-                                mapped.ExtraCost = storeMapping.pricing.extraCost;
-                                mapped.ShippingFee = storeMapping.pricing.cargoPrice;
-                                mapped.Percent = storeMapping.pricing.profitRate;
-                                mapped.ApplyAutoPrice = storeMapping.pricing.applyAutoPrice;
-                                mapped.Price = calculatedPrice;
-                                await _productintegrationService.UpdateAsync(mapped, false);
-                                product.Price = calculatedPrice;
-                            }
+                            var mapped = _mapper.Map<ProductIntegrationDto, UpdateProductIntegrationDto>(integration);
+                            mapped.CommissionPercent = storeMapping.pricing.commission;
+                            mapped.ExtraCost = storeMapping.pricing.extraCost;
+                            mapped.ShippingFee = storeMapping.pricing.cargoPrice;
+                            mapped.Percent = storeMapping.pricing.profitRate;
+                            mapped.ApplyAutoPrice = storeMapping.pricing.applyAutoPrice;
+                            mapped.Price = calculatedPrice;
+                            await _productintegrationService.UpdateAsync(mapped, false);
+                            product.Price = calculatedPrice;
                         }
-
-
-                        else
-                        {
-                            if (integration.ApplyAutoPrice)
-                            {
-                                decimal calculatedPrice = CalculateAutoPrice(
-                                    product.CostPrice,
-                                    integration.Percent,
-                                    integration.CommissionPercent,
-                                    integration.ShippingFee,
-                                    integration.ExtraCost
-                                );
-
-                                product.Price = calculatedPrice;
-                            }
-                        }
-
                     }
+
+
+                    else
+                    {
+                        if (integration.ApplyAutoPrice)
+                        {
+                            decimal calculatedPrice = CalculateAutoPrice(
+                                product.CostPrice,
+                                integration.Percent,
+                                integration.CommissionPercent,
+                                integration.ShippingFee,
+                                integration.ExtraCost
+                            );
+
+                            product.Price = calculatedPrice;
+                        }
+                    }
+
                 }
+            }
+        }
+        private async Task UpdateProductHandleXmlProfilePricingAsync(ProductDto product)
+        {
+            foreach (var integration in product.ProductIntegrations)
+            {
+
+                decimal calculatedPrice = CalculateAutoPrice(
+                          product.CostPrice,
+                          integration.Percent,
+                          integration.CommissionPercent,
+                          integration.ShippingFee,
+                          integration.ExtraCost
+                      );
+
+                var mapped = _mapper.Map<ProductIntegrationDto, UpdateProductIntegrationDto>(integration);
+                mapped.CommissionPercent = integration.CommissionPercent;
+                mapped.ExtraCost = integration.ExtraCost;
+                mapped.ShippingFee = integration.ShippingFee;
+                mapped.Percent = integration.Percent;
+                mapped.ApplyAutoPrice = integration.ApplyAutoPrice;
+                mapped.Price = calculatedPrice;
+                await _productintegrationService.UpdateAsync(mapped, false);
+                product.Price = calculatedPrice;
             }
         }
         public decimal CalculateAutoPrice(decimal costPrice, decimal? profitPercent, decimal? commissionPercent, decimal? shippingFee, decimal? extraCost)

@@ -10,23 +10,21 @@
 
     <div class="card">
         <div class="returnrequest-actions border-bottom p-4 d-flex">
-            <button class="btn active" data-returnrequest-status="1">Tüm İadeler <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
+            <button class="btn active" data-returnrequest-status="1">Tüm İadeler <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AllQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-returnrequest-status="2">Talep Oluşturulan <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.CreatedQuantity</span></button>
+            <button class="btn" data-returnrequest-status="0">Talep Oluşturulan <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.CreatedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-returnrequest-status="3">Kargoya Verilen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
+            <button class="btn" data-returnrequest-status="2">Kargoya Verilen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">0</span></button>
             <div class="split"></div>
             <button class="btn" data-returnrequest-status="4">Aksiyon Bekleyen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.WaitingInActionQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-returnrequest-status="5">Onaylanan <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
+            <button class="btn" data-returnrequest-status="6">Onaylanan <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.AcceptedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-returnrequest-status="6">Reddedilen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.RejectedQuantity</span></button>
+            <button class="btn" data-returnrequest-status="7">Reddedilen <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.RejectedQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-returnrequest-status="7">Analiz <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.InAnalysisQuantity</span></button>
+            <button class="btn" data-returnrequest-status="4">Analiz <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.InAnalysisQuantity</span></button>
             <div class="split"></div>
-            <button class="btn" data-returnrequest-status="7">İhtilaflı <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.UnresolvedQuantity</span></button>
-            <div class="split"></div>
-            <button class="btn" data-returnrequest-status="7">Askıda İadeler <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.UnresolvedQuantity</span></button>
+            <button class="btn" data-returnrequest-status="5">İhtilaflı <span class="badge badge-center rounded-pill badge-outline-secondary ms-4">@Model.UnresolvedQuantity</span></button>
         </div>
         <div class="p-5">
             <div class="row">
@@ -85,36 +83,47 @@
             </table>
         </div>
     </div>
-
-    @* <div class="card">
-        <div class="card-header border-bottom">
-            <h5 class="card-title mb-0">Filtreler</h5>
-            <div class="row pt-4 gap-6 gap-md-0 g-md-6">
-                <div class="col-md-2 returnRequestStatusFilter"></div>
-            </div>
-        </div>
-
-        <div class="card-datatable">
-            <table id="ReturnRequestTable" class="table">
-                <thead class="border-top">
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th>Sipariş Kaynağı</th>
-                        <th>Sipariş Bilgileri</th>
-                        <th>Alıcı</th>
-                        <th>Bilgiler</th>
-                        <th>Kargo</th>
-                        <th>Fatura</th>
-                        <th>İade Sebebi</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div> *@
 </div>
-
+<div class="modal fade" id="ProudctIntegrationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-simple modal-edit-user modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <form asp-action="/Order/CreateProductIntegration" method="post" id="CreateProductIntegrationForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ProudctIntegrationModalLabel">Ürün Eşleştirme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-5">
+                        <input type="hidden" id="IntegrationSystemId" name="IntegrationSystemId" />
+                        <input type="hidden" id="OrderItemId" name="OrderItemId" />
+                        <input type="hidden" id="IntegrationCode" name="IntegrationCode" />
+                        <!-- Kategori Seçimi -->
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductIntegrationName">Trendyol Ürün Adı</label>
+                            <input type="text" id="ProductIntegrationName" name="ProductIntegrationName" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductIntegrationSku">Trendyol Ürün Kodu</label>
+                            <input type="text" id="ProductIntegrationSku" name="ProductIntegrationSku" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label text-sm-start" for="ProductId">Ürün</label>
+                            <select id="ProductId" name="ProductId" class="select2 form-select"></select>
+                        </div>
+                        <div id="ProductVariantAttributeCombination" class="col-md-12" style="display:none;">
+                            <label class="form-label text-sm-start" for="ProductVariantAttributeCombinationId">Varyant</label>
+                            <select id="ProductVariantAttributeCombinationId" name="ProductVariantAttributeCombinationId" class="select2 form-select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Kapat">Vazgeç</button>
+                    <button type="submit" class="btn btn-warning">Eşleştir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script src="/assets/js/entegro.returnrequest.list.js" asp-append-version="true"></script>
     <script>

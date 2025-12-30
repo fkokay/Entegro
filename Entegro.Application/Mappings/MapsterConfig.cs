@@ -222,7 +222,7 @@ namespace Entegro.Application.Mappings
             config.NewConfig<ReturnRequest, UpdateReturnRequestDto>().TwoWays();
             config.NewConfig<ReturnRequestItem, CreateReturnRequestItemDto>().TwoWays();
             config.NewConfig<ReturnRequestItem, ReturnRequestItemDto>().TwoWays();
-            //config.NewConfig<ReturnRequestItem, UpdateReturnRequestItemDto>().TwoWays();
+            config.NewConfig<ReturnRequestItem, UpdateReturnRequestItemDto>().TwoWays();
         }
     }
 }

@@ -11,11 +11,13 @@ using Entegro.Application.DTOs.ProductMediaFile;
 using Entegro.Application.DTOs.ProductVariantAttribute;
 using Entegro.Application.DTOs.ProductVariantAttributeCombination;
 using Entegro.Application.DTOs.ProductVariantAttributeValue;
+using Entegro.Application.DTOs.ReturnRequestItem;
 using Entegro.Application.Events;
 using Entegro.Application.Interfaces.Event;
 using Entegro.Application.Interfaces.Services.Base;
 using Entegro.Application.Interfaces.Services.Marketplace;
 using Entegro.Application.Mappings.Marketplace.Trendyol;
+using Entegro.Application.Services.Base;
 using Entegro.Domain.Enums;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
@@ -45,6 +47,7 @@ namespace Entegro.Application.Services.Marketplace
         private readonly IOrderItemService _orderItemService;
         private readonly IMapper _mapper;
         private readonly IProductMediaFileMappingService _productMediaFileMappingService;
+        private readonly IReturnRequestItemService _returnRequestItemService;
         private readonly ConcurrentDictionary<string, int> _attributeCache = new();
         private readonly ConcurrentDictionary<(int attributeId, string value), int> _attributeValueCache = new();
         public TrendyolService(
@@ -61,7 +64,8 @@ namespace Entegro.Application.Services.Marketplace
             ISettingService settingService,
             IProductMediaFileMappingService productMediaFileMappingService,
             IOrderItemService orderItemService,
-            IMapper mapper)
+            IMapper mapper,
+            IReturnRequestItemService returnRequestItemService)
         {
             _httpClientFactory = httpClientFactory;
             _productIntegrationService = productIntegrationService;
@@ -77,6 +81,7 @@ namespace Entegro.Application.Services.Marketplace
             _productMediaFileMappingService = productMediaFileMappingService;
             _orderItemService = orderItemService;
             _mapper = mapper;
+            _returnRequestItemService = returnRequestItemService;
         }
 
 
@@ -762,6 +767,42 @@ namespace Entegro.Application.Services.Marketplace
                         ? attributeDescription.TrimEnd(' ', '|')
                         : orderItem.AttributesDescription;
                         await _orderItemService.UpdateAsync(updateOrderItem);
+
+                    }
+
+                    var returnRequestItems = await _returnRequestItemService.GetAllWithIntegrationSkuAsync(product.Barcode);
+                    foreach (var returnRequest in returnRequestItems)
+                    {
+                        var returnRequestItem = await _returnRequestItemService.GetByIdAsync(returnRequest.Id);
+                        UpdateReturnRequestItemDto updateReturnRequestItem = new UpdateReturnRequestItemDto();
+
+                        updateReturnRequestItem.Id = returnRequestItem.Id;
+                        updateReturnRequestItem.ReturnRequestId = returnRequestItem.ReturnRequestId;
+                        updateReturnRequestItem.ProductId = productId;
+                        updateReturnRequestItem.ProductName = product.Name;
+                        updateReturnRequestItem.Barcode = product.Barcode;
+                        updateReturnRequestItem.MerchantSku = returnRequestItem.MerchantSku;
+                        updateReturnRequestItem.ProductColor = returnRequestItem.ProductColor;
+                        updateReturnRequestItem.ProductSize = returnRequestItem.ProductSize;
+                        updateReturnRequestItem.Price = returnRequestItem.Price;
+                        updateReturnRequestItem.VatBaseAmount = returnRequestItem.VatBaseAmount;
+                        updateReturnRequestItem.VatRate = returnRequestItem.VatRate;
+                        updateReturnRequestItem.SalesCampaignId = returnRequestItem.SalesCampaignId;
+                        updateReturnRequestItem.ProductCategory = returnRequestItem.ProductCategory;
+                        updateReturnRequestItem.ProductImageUrl = returnRequestItem.ProductImageUrl;
+                        updateReturnRequestItem.CustomerClaimReasonName = returnRequestItem.CustomerClaimReasonName;
+                        updateReturnRequestItem.CustomerClaimReasonCode = returnRequestItem.CustomerClaimReasonCode;
+                        updateReturnRequestItem.PlatformClaimReasonName = returnRequestItem.PlatformClaimReasonName;
+                        updateReturnRequestItem.PlatformClaimReasonCode = returnRequestItem.PlatformClaimReasonCode;
+                        updateReturnRequestItem.PlatformName = returnRequestItem.PlatformName;
+                        updateReturnRequestItem.AutoApproveDate = returnRequestItem.AutoApproveDate;
+                        updateReturnRequestItem.Note = returnRequestItem.Note;
+                        updateReturnRequestItem.CustomerNote = returnRequestItem.CustomerNote;
+                        updateReturnRequestItem.Resolved = returnRequestItem.Resolved;
+                        updateReturnRequestItem.AcceptedBySeller = returnRequestItem.AcceptedBySeller;
+                        updateReturnRequestItem.ReturnRequestStatusId = returnRequestItem.ReturnRequestStatusId;
+
+                        await _returnRequestItemService.UpdateAsync(updateReturnRequestItem);
                     }
                 }
             }

@@ -64,15 +64,28 @@ namespace Entegro.Application.DTOs.Marketplace.Pazarama
         public PazaramaProductSaleLimitDetailDto ProductSaleLimitDetail { get; set; }
 
         [JsonProperty("attributes")]
-        public object Attributes { get; set; }
+        public List<PazaramaAttributeDto> Attributes { get; set; }
 
         [JsonProperty("images")]
-        public object Images { get; set; }
+        public List<PazaramaImageDto> Images { get; set; }
 
         [JsonProperty("deliveryTypes")]
         public object DeliveryTypes { get; set; }
 
         [JsonProperty("productStatus")]
         public int ProductStatus { get; set; }
+    }
+
+    public class PazaramaAttributeDto
+    {
+        [JsonProperty("attributeName")]
+        public string AttributeName { get; set; }
+        [JsonProperty("attributeValue")]
+        public string AttributeValue { get; set; }
+    }
+    public class PazaramaImageDto
+    {
+        [JsonProperty("imageUrl")]
+        public string ImageUrl { get; set; }
     }
 }
