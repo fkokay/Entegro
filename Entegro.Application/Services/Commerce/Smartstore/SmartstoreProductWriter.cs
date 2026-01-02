@@ -67,7 +67,7 @@ namespace Entegro.Application.Services.Commerce.Smartstore
                     };
 
                     await _smartstoreClient.UpsertProductAsync(context, request);
-                    await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
+                    //await _notificationService.SendNotification(NotificationType.Info, "Bildirim", $"Smartstore {product.Name} stok ve fiyat güncellendi");
                 }
             }
         }

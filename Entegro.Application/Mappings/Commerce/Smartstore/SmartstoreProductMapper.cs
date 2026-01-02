@@ -116,10 +116,10 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.IsTaxExempt = false;
                 smartstoreProduct.IsEsd = false;
                 smartstoreProduct.TaxCategoryId = 1;
-                smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
+                smartstoreProduct.ManageInventoryMethodId = customData == null ? 2 : customData.ManageInventoryMethod;//Envanter yöntemini yönet -- 2
                 smartstoreProduct.StockQuantity = product.StockQuantity;
-                smartstoreProduct.DisplayStockAvailability = customData == null ? false : customData.DisplayStockAvailability;
-                smartstoreProduct.DisplayStockQuantity = customData == null ? false : customData.DisplayStockQuantity;
+                smartstoreProduct.DisplayStockAvailability = customData == null ? true : customData.DisplayStockAvailability;//stockdurumunu göster -- 1
+                smartstoreProduct.DisplayStockQuantity = customData == null ? true : customData.DisplayStockQuantity;//stock miktarını göster -- 1
                 smartstoreProduct.MinStockQuantity = customData == null ? 0 : customData.MinStockQuantity;
                 smartstoreProduct.LowStockActivityId = customData == null ? 0 : customData.LowStockActivityId;
                 smartstoreProduct.NotifyAdminForQuantityBelow = 0;
@@ -232,10 +232,10 @@ namespace Entegro.Application.Mappings.Commerce.Smartstore
                 smartstoreProduct.IsShippingEnabled = true;
                 smartstoreProduct.AdditionalShippingCharge = 0;
                 smartstoreProduct.TaxCategoryId = 1;
-                smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;
+                smartstoreProduct.ManageInventoryMethodId = customData == null ? 0 : customData.ManageInventoryMethod;//Envanter yöntemini yönet
                 smartstoreProduct.StockQuantity = product.StockQuantity;
-                smartstoreProduct.DisplayStockAvailability = customData == null ? false : customData.DisplayStockAvailability;
-                smartstoreProduct.DisplayStockQuantity = customData == null ? false : customData.DisplayStockQuantity;
+                smartstoreProduct.DisplayStockAvailability = customData == null ? true : customData.DisplayStockAvailability;//stockdurumunu göster -- 1
+                smartstoreProduct.DisplayStockQuantity = customData == null ? true : customData.DisplayStockQuantity;//stock miktarını göster -- 1
                 smartstoreProduct.MinStockQuantity = customData == null ? 0 : customData.MinStockQuantity;
                 smartstoreProduct.LowStockActivityId = customData == null ? 0 : customData.LowStockActivityId;
                 smartstoreProduct.NotifyAdminForQuantityBelow = 0;
