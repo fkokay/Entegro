@@ -29,7 +29,6 @@ namespace Entegro.Application.Services.Base
             var url = $"/Scheduling/Run?type={type}&taskId={taskId}&parameter={parameter}";
             var response = await _httpClient.PostAsync(url, null);
             response.EnsureSuccessStatusCode();
-            var x=await response.Content.ReadAsStringAsync();
             return await response.Content.ReadAsStringAsync();
         }
     }

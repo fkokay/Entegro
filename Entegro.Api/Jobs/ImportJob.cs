@@ -86,12 +86,12 @@ namespace Entegro.Api.Jobs
             {
                 if (profile.MediaFileType == "xml")
                 {
-                    await XmlJob(profile);
+                   // await XmlJob(profile);
                 }
 
                 else if (profile.MediaFileType == "excel")
                 {
-                    //await ExcelJob(profile);
+                    await ExcelJob(profile);
                 }
 
                 else
