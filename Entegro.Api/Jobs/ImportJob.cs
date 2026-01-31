@@ -86,12 +86,12 @@ namespace Entegro.Api.Jobs
             {
                 if (profile.MediaFileType == "xml")
                 {
-                   // await XmlJob(profile);
+                    await XmlJob(profile);
                 }
 
                 else if (profile.MediaFileType == "excel")
                 {
-                    await ExcelJob(profile);
+                   // await ExcelJob(profile);
                 }
 
                 else
@@ -353,7 +353,7 @@ namespace Entegro.Api.Jobs
                         {
                             var createdProduct = await _productService.AddAsync(productDto);
 
-                            List<int> mediaFiles = await UploadImagesAsync(Images, httpClient);
+                            List<int> mediaFiles = await UploadImagesAsync(Images, httpClient, "excel");
                             foreach (var item in mediaFiles)
                             {
                                 CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
@@ -552,7 +552,7 @@ namespace Entegro.Api.Jobs
                     };
                     var createdProduct = await _productService.AddAsync(productDto);
 
-                    List<int> mediaFiles = await UploadImagesAsync(Images, httpClient);
+                    List<int> mediaFiles = await UploadImagesAsync(Images, httpClient,"xml");
                     foreach (var item in mediaFiles)
                     {
                         CreateProductMediaFileDto createProductMediaFile = new CreateProductMediaFileDto();
@@ -672,7 +672,7 @@ namespace Entegro.Api.Jobs
                         {
                             BaseAddress = baseUri
                         };
-                        var newFiles = await UploadImagesAsync(Images, httpClient);
+                        var newFiles = await UploadImagesAsync(Images, httpClient,"xml");
 
 
                         await _productMediaFileMappingService.DeleteByProductIdAsync(existingProduct.Id);
@@ -970,7 +970,7 @@ namespace Entegro.Api.Jobs
                     AssignedMediaFileIds = string.Join(",", mediaFileMappingIds)
                 });
         }
-        public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient)
+        public async Task<List<int>> UploadImagesAsync(List<string> imageUrls, HttpClient httpClient,string? sourceName)
         {
             List<int> fileIds = new();
 
@@ -992,7 +992,7 @@ namespace Entegro.Api.Jobs
 
                         var nameWithoutExtension = Path.GetFileNameWithoutExtension(imageName);
                         var extension = Path.GetExtension(imageName);
-                        var uniqueSuffix = $"excel_{Guid.NewGuid():N}";
+                        var uniqueSuffix = $"{sourceName}_{Guid.NewGuid():N}";
                         imageName = $"{nameWithoutExtension}_{uniqueSuffix}{extension}";
 
                         var byteContent = new ByteArrayContent(imageBytes);
